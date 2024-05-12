@@ -1,18 +1,24 @@
 import Link from "next/link"
+import { GitHubLogoIcon } from "@radix-ui/react-icons"
+import { Separator } from "@/components/ui/separator"
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-      <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
-        Built by&nbsp;
-        <Link href="https://github.com/rizkyhaksono" target="_blank" rel="noreferrer" className="font-medium text-foreground underline underline-offset-4">
-          rizkyhaksono
-        </Link>
-        .&nbsp;The source code is available on&nbsp;
-        <Link href="https://github.com/rizkyhaksono/otakudesu-fe" target="_blank" rel="noreferrer" className="font-medium text-foreground underline underline-offset-4">
-          GitHub
-        </Link>
-      </p>
-    </footer>
+    <>
+      <Separator className="mt-5" />
+      <div className="flex w-full flex-col items-center justify-between gap-5 my-5 sm:flex-row">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
+          Copyright © {new Date().getFullYear()}{" "}
+          <Link href="https://github.com/rizkyhaksono" className="underline underline-offset-2" target="_blank">
+            Rizky Haksono
+          </Link>{" "}
+        </p>
+        <div className="flex gap-4">
+          <Link href="https://github.com/rizkyhaksono" target="_blank">
+            <GitHubLogoIcon />
+          </Link>
+        </div>
+      </div>
+    </>
   )
 }

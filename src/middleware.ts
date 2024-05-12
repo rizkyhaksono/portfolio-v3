@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 
-export function middleware(request: NextRequest, response: NextResponse) {
-  const cookieValue = request.cookies.get("SUPABASE_AUTH_COOKIE")
+export async function middleware(request: NextRequest, response: NextResponse) {
+  const userCookieValue = request.cookies.get("USER_SUPABASE_AUTH_COOKIE")
+  const adminCookieValue = request.cookies.get("ADMIN_SUPABASE_AUTH_COOKIE")
 
-  if (cookieValue) {
-    return NextResponse.next()
-  } else {
+  if (request.nextUrl.pathname.startsWith("/admin") && !adminCookieValue) {
+    return NextResponse.redirect(new URL("/admin/auth/login", request.url))
+  } else if (request.nextUrl.pathname.startsWith("/chat") && !userCookieValue) {
     return NextResponse.redirect(new URL("/auth/login", request.url))
   }
+
+  return NextResponse.next()
 }
 
 export const config = {

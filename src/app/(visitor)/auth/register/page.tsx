@@ -2,18 +2,26 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { supabaseServer } from "@/lib/supabase/server"
 import { useRouter } from "next/navigation"
+import { getCookieValue } from "@/lib/cookie-helper"
 
 export default function AuthRegister() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
   const router = useRouter()
+
+  const checkUser = useCallback(async () => {
+    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE")
+    if (cookie) {
+      router.push("/")
+    }
+  }, [router])
 
   const handleRegister = async () => {
     try {
@@ -31,6 +39,10 @@ export default function AuthRegister() {
       console.error("Registration error:", error.message)
     }
   }
+
+  useEffect(() => {
+    checkUser()
+  }, [checkUser])
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
