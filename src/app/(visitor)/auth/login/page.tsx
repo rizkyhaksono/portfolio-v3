@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { supabaseServer } from "@/lib/supabase/server"
+import { supabaseUser } from "@/lib/supabase/server"
 import { useRouter } from "next/navigation"
 import { setCookieValue, getCookieValue } from "@/lib/cookie-helper"
 
@@ -25,7 +25,7 @@ export default function AuthLogin() {
 
   const handleLogin = async () => {
     try {
-      const { data, error } = await supabaseServer.auth.signInWithPassword({
+      const { data, error } = await supabaseUser.auth.signInWithPassword({
         email: email,
         password: password,
       })
