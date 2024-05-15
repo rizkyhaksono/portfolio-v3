@@ -1,7 +1,9 @@
+import DashboardWidget from "./components/dashboard-widget"
+
 export default function AdminDashboardPage() {
   return (
     <div>
-      <h1>Admin Dashboard</h1>
+      <DashboardWidget />
     </div>
   )
 }

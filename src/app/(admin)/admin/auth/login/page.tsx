@@ -1,10 +1,54 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import Image from "next/image"
+import { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { getCookieValue, setCookieValue } from "@/lib/cookie-helper"
+import { supabaseServer } from "@/lib/supabase/server"
 
 export default function AdminAuthLogin() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<any>(null)
+  const router = useRouter()
+
+  const checkUser = useCallback(async () => {
+    const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE")
+    if (cookie) {
+      router.push("/admin/dashboard")
+    }
+  }, [router])
+
+  const handleAdminLogin = async () => {
+    try {
+      const { data, error } = await supabaseServer.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
+      if (error) {
+        throw error
+      }
+      console.log("Registration successful:", data)
+      if (data?.user?.role == "admin") {
+        setCookieValue("ADMIN_SUPABASE_AUTH_COOKIE", data?.session?.access_token)
+        router.push("/admin/dashboard")
+      } else {
+        setError("Invalid admin account")
+      }
+    } catch (error: any) {
+      setError(error.message)
+      console.error("Registration error:", error.message)
+    }
+  }
+
+  useEffect(() => {
+    checkUser()
+  }, [checkUser])
+
   return (
     <div className="container relative hidden h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
@@ -31,7 +75,7 @@ export default function AdminAuthLogin() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input id="email" type="email" placeholder="m@example.com" required onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -40,9 +84,10 @@ export default function AdminAuthLogin() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
             </div>
-            <Button type="submit" className="w-full">
+            {error && <p className="text-red-500">{error}</p>}
+            <Button type="submit" className="w-full" onClick={handleAdminLogin}>
               Login to admin account
             </Button>
           </div>
