@@ -4,9 +4,11 @@ export async function middleware(request: NextRequest, response: NextResponse) {
   const userCookieValue = request.cookies.get("USER_SUPABASE_AUTH_COOKIE")
   const adminCookieValue = request.cookies.get("ADMIN_SUPABASE_AUTH_COOKIE")
 
-  if (request.nextUrl.pathname.startsWith("/admin") && !adminCookieValue) {
+  if ((request.nextUrl.pathname.startsWith("/admin/dashboard") || request.nextUrl.pathname.startsWith("/admin/profile")) && !adminCookieValue) {
     return NextResponse.redirect(new URL("/admin/auth/login", request.url))
-  } else if (request.nextUrl.pathname.startsWith("/chat") && !userCookieValue) {
+  }
+
+  if (request.nextUrl.pathname.startsWith("/chat") && !userCookieValue) {
     return NextResponse.redirect(new URL("/auth/login", request.url))
   }
 
