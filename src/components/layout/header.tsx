@@ -1,22 +1,40 @@
 "use client"
 
 import Link from "next/link"
+import { useState, useEffect, useCallback } from "react"
 import { MoonIcon, SunIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { useState } from "react"
+import { getCookieValue } from "@/lib/cookie-helper"
 
 export default function Header() {
   const { setTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
+
+  const checkUser = useCallback(async () => {
+    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE")
+    if (cookie) {
+      console.log("User is logged in")
+      setLoggedIn(true)
+    } else {
+      console.log("User is not logged in")
+    }
+  }, [])
+
+  useEffect(() => {
+    checkUser()
+  }, [checkUser])
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-between h-14 items-center">
-        <div className="font-semibold">Rizky Haksono</div>
+        <Link href={"/"} className="font-semibold">
+          Rizky Haksono
+        </Link>
         <Sheet onOpenChange={() => setMenuOpen(!menuOpen)}>
           <SheetTrigger className="md:hidden">
             <HamburgerMenuIcon />
@@ -28,10 +46,9 @@ export default function Header() {
             </SheetHeader>
           </SheetContent>
         </Sheet>
-        <div className="md:flex gap-2 items-center hidden">
-          <Link href={"/project"}>Project</Link>
+        <div className="md:flex gap-5 items-center hidden">
           <Link href={"/blog"}>Blog</Link>
-          <Link href={"/about"}>About</Link>
+          {loggedIn ? <Link href={"/Chat"}>Chat</Link> : <></>}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
