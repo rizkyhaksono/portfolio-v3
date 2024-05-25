@@ -75,16 +75,13 @@ export default function AdminAuthLogin() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" placeholder="admin@example.com" required onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                  Forgot your password?
-                </Link>
               </div>
-              <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" placeholder="********" required onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="text-red-500">{error}</p>}
             <Button type="submit" className="w-full" onClick={handleAdminLogin}>
@@ -93,11 +90,11 @@ export default function AdminAuthLogin() {
           </div>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
-            <a className="underline underline-offset-4 hover:text-primary" href="/terms">
+            <a className="underline underline-offset-4 hover:text-primary" href="#">
               Terms of Service
             </a>{" "}
             and{" "}
-            <a className="underline underline-offset-4 hover:text-primary" href="/privacy">
+            <a className="underline underline-offset-4 hover:text-primary" href="#">
               Privacy Policy
             </a>
             .

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, useEffect, useCallback } from "react"
 import { MoonIcon, SunIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
 import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -14,6 +15,7 @@ export default function Header() {
   const { setTheme } = useTheme()
   const [menuOpen, setMenuOpen] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
+  const pathname = usePathname()
 
   const checkUser = useCallback(async () => {
     const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE")
@@ -41,14 +43,47 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side={"left"}>
             <SheetHeader>
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>This action cannot be undone. This will permanently delete your account and remove your data from our servers.</SheetDescription>
+              <SheetTitle>
+                <Link href={"/"}>Rizky Haksono</Link>
+              </SheetTitle>
+              <SheetDescription>
+                <div className="flex justify-center items-center gap-5">
+                  <Link href={"/blog"} className={pathname === "/blog" ? "underline underline-offset-8" : ""}>
+                    Blog
+                  </Link>
+                  {loggedIn ? (
+                    <Link href={"/Chat"}>Chat</Link>
+                  ) : (
+                    <div className="flex gap-1 items-center">
+                      <Button variant={"outline"}>
+                        <Link href={"/auth/register"}>Register</Link>
+                      </Button>
+                      <Button>
+                        <Link href={"/auth/login"}>Login</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </SheetDescription>
             </SheetHeader>
           </SheetContent>
         </Sheet>
         <div className="md:flex gap-5 items-center hidden">
-          <Link href={"/blog"}>Blog</Link>
-          {loggedIn ? <Link href={"/Chat"}>Chat</Link> : <></>}
+          <Link href={"/blog"} className={pathname === "/blog" ? "underline underline-offset-8" : ""}>
+            Blog
+          </Link>
+          {loggedIn ? (
+            <Link href={"/Chat"}>Chat</Link>
+          ) : (
+            <div className="flex gap-1 items-center">
+              <Button variant={"outline"}>
+                <Link href={"/auth/register"}>Register</Link>
+              </Button>
+              <Button>
+                <Link href={"/auth/login"}>Login</Link>
+              </Button>
+            </div>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">

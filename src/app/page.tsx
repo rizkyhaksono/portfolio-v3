@@ -2,7 +2,7 @@ import BaseLayout from "@/components/layout/base-layout"
 import GreetingSection from "@/components/layout/greeting-section"
 import AboutSection from "@/components/layout/about-section"
 import CareerSection from "@/components/layout/career-section"
-import PortfolioSection from "@/components/layout/portfolio-section"
+import ProjectSection from "@/components/layout/project-section"
 
 export default async function Home() {
   return (
@@ -10,7 +10,7 @@ export default async function Home() {
       <GreetingSection />
       <AboutSection />
       <CareerSection />
-      <PortfolioSection />
+      <ProjectSection />
     </BaseLayout>
   )
 }

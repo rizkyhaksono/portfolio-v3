@@ -56,7 +56,7 @@ export default function AuthLogin() {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" placeholder="user@example.com" required onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -65,14 +65,11 @@ export default function AuthLogin() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
+              <Input id="password" type="password" placeholder="********" required onChange={(e) => setPassword(e.target.value)} />
             </div>
             {error && <p className="text-red-500">{error}</p>}
             <Button type="submit" className="w-full" onClick={handleLogin}>
               Login
-            </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
