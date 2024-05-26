@@ -43,28 +43,29 @@ export default function Header() {
           </SheetTrigger>
           <SheetContent side={"left"}>
             <SheetHeader>
-              <SheetTitle>
+              <SheetTitle className="text-start">
                 <Link href={"/"}>Rizky Haksono</Link>
               </SheetTitle>
-              <SheetDescription>
-                <div className="flex justify-center items-center gap-5">
-                  <Link href={"/blog"} className={pathname === "/blog" ? "underline underline-offset-8" : ""}>
-                    Blog
-                  </Link>
-                  {loggedIn ? (
-                    <Link href={"/Chat"}>Chat</Link>
-                  ) : (
-                    <div className="flex gap-1 items-center">
-                      <Button variant={"outline"}>
-                        <Link href={"/auth/register"}>Register</Link>
-                      </Button>
-                      <Button>
-                        <Link href={"/auth/login"}>Login</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </SheetDescription>
+              <div className="flex flex-col items-start">
+                {loggedIn ? (
+                  <Link href={"/Chat"}>Chat</Link>
+                ) : (
+                  <div className="flex gap-2 items-center justify-center w-full">
+                    <Button variant={"outline"} className="w-full">
+                      <Link href={"/auth/register"}>Register</Link>
+                    </Button>
+                    <Button variant={"default"} className="w-full">
+                      <Link href={"/auth/login"}>Login</Link>
+                    </Button>
+                  </div>
+                )}
+                <Link href={"/"} className={pathname === "/" ? "underline underline-offset-8 mt-5" : "mt-5"}>
+                  Home
+                </Link>
+                <Link href={"/blog"} className={pathname === "/blog" ? "underline underline-offset-8 mt-2" : "mt-2"}>
+                  Blog
+                </Link>
+              </div>
             </SheetHeader>
           </SheetContent>
         </Sheet>
