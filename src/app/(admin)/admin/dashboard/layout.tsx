@@ -1,5 +1,5 @@
-import AdminSidebar from "./components/admin-sidebar"
-import AdminHeader from "./components/admin-header"
+import AdminSidebar from "@/components/layout/admin-sidebar";
+import AdminHeader from "@/components/layout/admin-header";
 
 export default function AdminDashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -8,5 +8,5 @@ export default function AdminDashboardLayout({ children }: Readonly<{ children: 
       <AdminHeader />
       {children}
     </div>
-  )
+  );
 }

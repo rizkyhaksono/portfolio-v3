@@ -1,9 +1,5 @@
-import DashboardWidget from "./components/dashboard-widget"
+import AdminDashboardWidget from "@/components/layout/admin-dashboard-widget";
 
 export default function AdminDashboardPage() {
-  return (
-    <div>
-      <DashboardWidget />
-    </div>
-  )
+  return <AdminDashboardWidget />;
 }
