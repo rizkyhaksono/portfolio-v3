@@ -1,39 +1,39 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { useState, useEffect, useCallback } from "react"
-import { MoonIcon, SunIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
-import { useTheme } from "next-themes"
-import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { getCookieValue } from "@/lib/cookie-helper"
+import Link from "next/link";
+import { useState, useEffect, useCallback } from "react";
+import { MoonIcon, SunIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { getCookieValue } from "@/lib/cookie-helper";
 
 export default function Header() {
-  const { setTheme } = useTheme()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [loggedIn, setLoggedIn] = useState(false)
-  const pathname = usePathname()
+  const { setTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const pathname = usePathname();
 
   const checkUser = useCallback(async () => {
-    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE")
+    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE");
     if (cookie) {
-      console.log("User is logged in")
-      setLoggedIn(true)
+      console.log("User is logged in");
+      setLoggedIn(true);
     } else {
-      console.log("User is not logged in")
+      console.log("User is not logged in");
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    checkUser()
-  }, [checkUser])
+    checkUser();
+  }, [checkUser]);
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-between h-14 items-center">
+      <header className="sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-muted/80 dark:supports-[backdrop-filter]:bg-muted/0 flex justify-between h-14 items-center">
         <Link href={"/"} className="font-semibold">
           Rizky Haksono
         </Link>
@@ -103,5 +103,5 @@ export default function Header() {
       </header>
       <Separator className="mb-5" />
     </>
-  )
+  );
 }

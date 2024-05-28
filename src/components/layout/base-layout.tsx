@@ -1,5 +1,5 @@
-import Header from "./header"
-import Footer from "./footer"
+import Header from "./header";
+import Footer from "./footer";
 
 export default function BaseLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -8,5 +8,5 @@ export default function BaseLayout({ children }: Readonly<{ children: React.Reac
       {children}
       <Footer />
     </main>
-  )
+  );
 }
