@@ -56,13 +56,16 @@ export default function AdminDashboardCareerPage() {
 
   if (isLoading) {
     return (
-      <div className="">
-        <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-          Admin Dashboard Career Page
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-4 w-1/4" />
-          <Skeleton className="h-4 w-3/4" />
+      <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
+        Admin Dashboard Career Page
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-1/12" />
+          <div className="flex justify-between items-center space-x-4">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-6 w-20" />
+          </div>
         </div>
+        <Skeleton className="h-72 w-full" />
       </div>
     );
   }

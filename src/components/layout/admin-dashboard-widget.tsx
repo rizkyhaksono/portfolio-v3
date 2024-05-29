@@ -1,6 +1,9 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Copy, CreditCard, File, ListFilter, MoreVertical, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, CreditCard, MoreVertical, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { supabaseUser } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +15,50 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AdminDashboardWidget() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [careerData, setCareerData] = useState<any>([]);
+  const [projectData, setProjectData] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchCareer = async () => {
+      const { data, error } = await supabaseUser.from("career").select("*");
+      if (error) {
+        console.log(error);
+      } else {
+        setCareerData(data);
+        setIsLoading(false);
+      }
+    };
+
+    const fetchProject = async () => {
+      const { data, error } = await supabaseUser.from("projects").select("*");
+      if (error) {
+        console.log(error);
+      } else {
+        setProjectData(data);
+        setIsLoading(false);
+      }
+    };
+
+    fetchCareer();
+    fetchProject();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
+        <div className="flex justify-between items-center">
+          <Skeleton className="h-8 w-1/12" />
+          <div className="flex justify-between items-center space-x-4">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-6 w-20" />
+          </div>
+        </div>
+        <Skeleton className="h-72 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
       <main className="grid flex-1 items-start md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -28,7 +75,7 @@ export default function AdminDashboardWidget() {
             </Card>
             <Card x-chunk="dashboard-05-chunk-1">
               <CardHeader className="pb-2">
-                <CardDescription>This Week</CardDescription>
+                <CardDescription>All Data Career</CardDescription>
                 <CardTitle className="text-4xl">$1,329</CardTitle>
               </CardHeader>
               <CardContent>
@@ -40,7 +87,7 @@ export default function AdminDashboardWidget() {
             </Card>
             <Card x-chunk="dashboard-05-chunk-2">
               <CardHeader className="pb-2">
-                <CardDescription>This Month</CardDescription>
+                <CardDescription>All Data Project</CardDescription>
                 <CardTitle className="text-4xl">$5,329</CardTitle>
               </CardHeader>
               <CardContent>
@@ -54,31 +101,9 @@ export default function AdminDashboardWidget() {
           <Tabs defaultValue="week">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="week">Week</TabsTrigger>
-                <TabsTrigger value="month">Month</TabsTrigger>
-                <TabsTrigger value="year">Year</TabsTrigger>
+                <TabsTrigger value="week">Career</TabsTrigger>
+                <TabsTrigger value="month">Project</TabsTrigger>
               </TabsList>
-              <div className="ml-auto flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-7 gap-1 text-sm">
-                      <ListFilter className="h-3.5 w-3.5" />
-                      <span className="sr-only sm:not-sr-only">Filter</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuCheckboxItem checked>Fulfilled</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Declined</DropdownMenuCheckboxItem>
-                    <DropdownMenuCheckboxItem>Refunded</DropdownMenuCheckboxItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Button size="sm" variant="outline" className="h-7 gap-1 text-sm">
-                  <File className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only">Export</span>
-                </Button>
-              </div>
             </div>
             <TabsContent value="week">
               <Card x-chunk="dashboard-05-chunk-3">
@@ -98,7 +123,7 @@ export default function AdminDashboardWidget() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow className="bg-accent">
+                      <TableRow>
                         <TableCell>
                           <div className="font-medium">Liam Johnson</div>
                           <div className="hidden text-sm text-muted-foreground md:inline">liam@example.com</div>
