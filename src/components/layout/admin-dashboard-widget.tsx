@@ -1,23 +1,56 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Copy, CreditCard, MoreVertical, Truck } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, CreditCard, MoreVertical, Truck, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { supabaseUser } from "@/lib/supabase/server";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
+import Image from "next/image";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
 
 export default function AdminDashboardWidget() {
   const [isLoading, setIsLoading] = useState(true);
   const [careerData, setCareerData] = useState<any>([]);
   const [projectData, setProjectData] = useState<any>([]);
+
+  const formSchema = z.object({
+    titleCareer: z.string().min(2).max(50),
+    description: z.string().min(2).max(50),
+    url: z.string().min(2).max(50),
+    titleProject: z.string().min(2).max(50),
+    subtitle: z.string().min(2).max(50),
+    duration: z.string().min(2).max(50),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      titleCareer: "",
+      description: "",
+      url: "",
+      titleProject: "",
+      subtitle: "",
+      duration: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+  }
 
   useEffect(() => {
     const fetchCareer = async () => {
@@ -66,46 +99,48 @@ export default function AdminDashboardWidget() {
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4">
             <Card className="sm:col-span-2" x-chunk="dashboard-05-chunk-0">
               <CardHeader className="pb-3">
-                <CardTitle>Your Orders</CardTitle>
-                <CardDescription className="max-w-lg text-balance leading-relaxed">Introducing Our Dynamic Orders Dashboard for Seamless Management and Insightful Analysis.</CardDescription>
+                <CardTitle>Rizky Haksono Admin Dashboard</CardTitle>
+                <CardDescription className="max-w-lg text-balance leading-relaxed">{"Welcome back, Rizky! Here's what's happening with your store today"}</CardDescription>
               </CardHeader>
               <CardFooter>
-                <Button>Create New Order</Button>
+                <Link href={"/admin/dashboard/project"}>
+                  <Button>Add new project</Button>
+                </Link>
               </CardFooter>
             </Card>
             <Card x-chunk="dashboard-05-chunk-1">
               <CardHeader className="pb-2">
                 <CardDescription>All Data Career</CardDescription>
-                <CardTitle className="text-4xl">$1,329</CardTitle>
+                <CardTitle className="text-4xl">{careerData.length} Records</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-xs text-muted-foreground">+25% from last week</div>
               </CardContent>
               <CardFooter>
-                <Progress value={25} aria-label="25% increase" />
+                <Progress value={careerData.length} aria-label="25% increase" />
               </CardFooter>
             </Card>
             <Card x-chunk="dashboard-05-chunk-2">
               <CardHeader className="pb-2">
                 <CardDescription>All Data Project</CardDescription>
-                <CardTitle className="text-4xl">$5,329</CardTitle>
+                <CardTitle className="text-4xl">{projectData.length} Records</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-xs text-muted-foreground">+10% from last month</div>
               </CardContent>
               <CardFooter>
-                <Progress value={12} aria-label="12% increase" />
+                <Progress value={projectData.length} aria-label="12% increase" />
               </CardFooter>
             </Card>
           </div>
-          <Tabs defaultValue="week">
+          <Tabs defaultValue="career">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="week">Career</TabsTrigger>
-                <TabsTrigger value="month">Project</TabsTrigger>
+                <TabsTrigger value="career">Career</TabsTrigger>
+                <TabsTrigger value="project">Project</TabsTrigger>
               </TabsList>
             </div>
-            <TabsContent value="week">
+            <TabsContent value="career">
               <Card x-chunk="dashboard-05-chunk-3">
                 <CardHeader className="px-7">
                   <CardTitle>Orders</CardTitle>
@@ -115,113 +150,236 @@ export default function AdminDashboardWidget() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Customer</TableHead>
-                        <TableHead className="hidden sm:table-cell">Type</TableHead>
-                        <TableHead className="hidden sm:table-cell">Status</TableHead>
-                        <TableHead className="hidden md:table-cell">Date</TableHead>
-                        <TableHead className="text-right">Amount</TableHead>
+                        <TableHead className="hidden lg:table-cell">ID</TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>URL</TableHead>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Action</TableHead>
                       </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    {projectData.map((project: any) => (
+                      <TableBody key={project.id}>
+                        <TableRow>
+                          <TableCell>{project.id}</TableCell>
+                          <TableCell>{project.title}</TableCell>
+                          <TableCell>{project.description}</TableCell>
+                          <TableCell>
+                            <Link href={project.url} target="_blank">
+                              {project.url}
+                            </Link>
+                          </TableCell>
+                          <TableCell>{project.image === null ? "-" : <Image src={project.image} width={500} height={500} alt="Project Image" />}</TableCell>
+                          <TableCell className="flex gap-2">
+                            <Dialog>
+                              <DialogTrigger
+                                asChild
+                                onClick={() => {
+                                  console.log(project.id);
+                                }}
+                              >
+                                <Button variant="outline" size="icon">
+                                  <Pencil className="h-5 w-5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit {project.title}</DialogTitle>
+                                  <DialogDescription>{project.description}</DialogDescription>
+                                </DialogHeader>
+                                <Form {...form}>
+                                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    <FormField
+                                      control={form.control}
+                                      name="titleCareer"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Title</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career title" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="description"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Description</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career description" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="url"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>URL</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career url" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <Button type="submit">Submit</Button>
+                                  </form>
+                                </Form>
+                              </DialogContent>
+                            </Dialog>
+                            <AlertDialog>
+                              <AlertDialogTrigger
+                                onClick={() => {
+                                  console.log(project.id);
+                                }}
+                              >
+                                <Button variant="outline" size="icon">
+                                  <Trash className="h-5 w-5" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>This action cannot be undone. This will permanently delete your account and remove your data from our servers.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    ))}
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="project">
+              <Card x-chunk="dashboard-05-chunk-3">
+                <CardHeader className="px-7">
+                  <CardTitle>Career</CardTitle>
+                  <CardDescription>Recent career from your experience.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Liam Johnson</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">liam@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Sale</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
-                            Fulfilled
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-23</TableCell>
-                        <TableCell className="text-right">$250.00</TableCell>
+                        <TableHead className="hidden lg:table-cell">ID</TableHead>
+                        <TableHead>Title</TableHead>
+                        <TableHead className="hidden sm:table-cell">Subtitle</TableHead>
+                        <TableHead className="">Duration</TableHead>
+                        <TableHead className="hidden md:table-cell">Created At</TableHead>
+                        <TableHead className="text-left hidden md:table-cell">Updated At</TableHead>
+                        <TableHead className="text-left">Action</TableHead>
                       </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Olivia Smith</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">olivia@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Refund</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="outline">
-                            Declined
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-24</TableCell>
-                        <TableCell className="text-right">$150.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Noah Williams</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">noah@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Subscription</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
-                            Fulfilled
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-25</TableCell>
-                        <TableCell className="text-right">$350.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Emma Brown</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">emma@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Sale</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
-                            Fulfilled
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-26</TableCell>
-                        <TableCell className="text-right">$450.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Liam Johnson</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">liam@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Sale</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
-                            Fulfilled
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-23</TableCell>
-                        <TableCell className="text-right">$250.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Olivia Smith</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">olivia@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Refund</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="outline">
-                            Declined
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-24</TableCell>
-                        <TableCell className="text-right">$150.00</TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <div className="font-medium">Emma Brown</div>
-                          <div className="hidden text-sm text-muted-foreground md:inline">emma@example.com</div>
-                        </TableCell>
-                        <TableCell className="hidden sm:table-cell">Sale</TableCell>
-                        <TableCell className="hidden sm:table-cell">
-                          <Badge className="text-xs" variant="secondary">
-                            Fulfilled
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">2023-06-26</TableCell>
-                        <TableCell className="text-right">$450.00</TableCell>
-                      </TableRow>
-                    </TableBody>
+                    </TableHeader>
+                    {careerData.map((career: any) => (
+                      <TableBody key={career.id}>
+                        <TableRow>
+                          <TableCell className="hidden lg:table-cell">{career.id}</TableCell>
+                          <TableCell>{career.title}</TableCell>
+                          <TableCell className="hidden sm:table-cell">{career.subtitle}</TableCell>
+                          <TableCell className="">{career.duration}</TableCell>
+                          <TableCell className="hidden md:table-cell">{career.created_at}</TableCell>
+                          <TableCell className="text-left hidden md:table-cell">{career.updated_at}</TableCell>
+                          <TableCell className="text-left space-x-2 flex">
+                            <Dialog>
+                              <DialogTrigger
+                                asChild
+                                onClick={() => {
+                                  console.log(career.id);
+                                }}
+                              >
+                                <Button variant="outline" size="icon">
+                                  <Pencil className="h-5 w-5" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                  <DialogTitle>Edit {career.title}</DialogTitle>
+                                  <DialogDescription>
+                                    {career.subtitle} | {career.duration}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <Form {...form}>
+                                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                    <FormField
+                                      control={form.control}
+                                      name="titleProject"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Title</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career title" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="subtitle"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Subtitle</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career subtitle" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="duration"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel>Duration</FormLabel>
+                                          <FormControl>
+                                            <Input placeholder="Your career duration" {...field} />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <Button type="submit">Submit</Button>
+                                  </form>
+                                </Form>
+                              </DialogContent>
+                            </Dialog>
+                            <AlertDialog>
+                              <AlertDialogTrigger
+                                onClick={() => {
+                                  console.log(career.id);
+                                }}
+                              >
+                                <Button variant="outline" size="icon">
+                                  <Trash className="h-5 w-5" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>This action cannot be undone. This will permanently delete your account and remove your data from our servers.</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction>Continue</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    ))}
                   </Table>
                 </CardContent>
               </Card>
