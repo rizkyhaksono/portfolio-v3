@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("min-h-screen bg-muted/80 dark:bg-muted/40 font-sans antialiased", fontSans.variable)}>
+      <body className={cn("min-h-screen bg-white dark:bg-muted/40 font-sans antialiased", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

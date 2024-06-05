@@ -33,7 +33,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-muted/80 dark:supports-[backdrop-filter]:bg-muted/0 flex justify-between h-14 items-center">
+      <header className="sticky top-0 z-50 w-full backdrop-blur supports-[backdrop-filter]:bg-white dark:supports-[backdrop-filter]:bg-muted/0 flex justify-between h-14 items-center">
         <Link href={"/"} className="font-semibold">
           Rizky Haksono
         </Link>

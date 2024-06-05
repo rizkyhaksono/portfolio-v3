@@ -1,56 +1,58 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { useCallback, useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { supabaseUser } from "@/lib/supabase/server"
-import { useRouter } from "next/navigation"
-import { setCookieValue, getCookieValue } from "@/lib/cookie-helper"
+import Image from "next/image";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { supabaseUser } from "@/lib/supabase/server";
+import { useRouter } from "next/navigation";
+import { setCookieValue, getCookieValue } from "@/lib/cookie-helper";
 
 export default function AuthLogin() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState(null)
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const router = useRouter();
 
   const checkUser = useCallback(async () => {
-    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE")
+    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE");
     if (cookie) {
-      router.push("/")
+      router.push("/");
     }
-  }, [router])
+  }, [router]);
 
   const handleLogin = async () => {
     try {
       const { data, error } = await supabaseUser.auth.signInWithPassword({
         email: email,
         password: password,
-      })
+      });
       if (error) {
-        throw error
+        throw error;
       }
-      console.log("Login successful:", data)
-      setCookieValue("USER_SUPABASE_AUTH_COOKIE", data?.session?.access_token)
-      router.push("/")
+      console.log("Login successful:", data);
+      setCookieValue("USER_SUPABASE_AUTH_COOKIE", data?.session?.access_token);
+      router.push("/");
     } catch (error: any) {
-      setError(error.message)
-      console.error("Registration error:", error.message)
+      setError(error.message);
+      console.error("Registration error:", error.message);
     }
-  }
+  };
 
   useEffect(() => {
-    checkUser()
-  }, [checkUser])
+    checkUser();
+  }, [checkUser]);
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2 xl:min-h-screen">
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
+            <Link href={"/"} className="hover:underline hover:underline-offset-8 transition duration-300">
+              <p className="text-3xl font-bold">Login</p>
+            </Link>
             <p className="text-balance text-muted-foreground">Enter your email below to login to your account</p>
           </div>
           <div className="grid gap-4">
@@ -90,5 +92,5 @@ export default function AuthLogin() {
         />
       </div>
     </div>
-  )
+  );
 }
