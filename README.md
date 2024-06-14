@@ -3,18 +3,15 @@
 This is my third portfolio. It is a work in progress and will be updated as I learn more about web development.
 
 ## Technologies Used
-- HTML
-- CSS
-- JavaScript
-- React
-- Node.js
+- Next.js
+- Tailwind
+- Supabase
+- Shadcn.ui
 
 ## Features
-- Home page
-- About page
-
-## Future Features
-- Projects page
+- Visitor
+- User
+- Admin
 
 ## Installation
 1. Clone the repository
