@@ -1,8 +1,23 @@
 "use client";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react";
+import { supabaseUser } from "@/lib/supabase/server";
 
 export default function ProjectSection() {
+  const [projects, setProjects] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      const { data, error } = await  supabaseUser.from("projects").select("*");
+      if (error) {
+        console.log(error);
+      };
+      setProjects(data);
+    };
+    fetchProject();
+  }, []);
+
   return (
     <div className="bg-muted/40 dark:bg-muted/20 px-10 py-6 rounded-md mt-10">
       <p className="text-center text-2xl font-semibold mb-5">Project</p>
@@ -15,10 +30,10 @@ export default function ProjectSection() {
 
         <ScrollArea className="w-full rounded-md border mt-5">
           <div className="flex space-x-4 p-4 overflow-x-auto">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
-              <div className="bg-muted/80 dark:bg-muted/40 p-5 rounded-md" key={item}>
-                <p className="text-center mb-3 text-lg font-medium">Project {item}</p>
-                <p className="w-60">{"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam et sapien nec ipsum tincidunt fermentum. Nullam et sapien nec ipsum tincidunt fermentum."}</p>
+            {projects.map((project: any) => (
+              <div key={project.id} className="flex flex-col w-60 h-40 bg-muted/80 rounded-md p-4">
+                <p className="text-lg font-semibold">{project.name}</p>
+                <p className="text-sm">{project.description}</p>
               </div>
             ))}
           </div>
