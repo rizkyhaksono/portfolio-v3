@@ -20,17 +20,6 @@ export default function AboutSection() {
           <br />I enjoy meeting new people and hearing new perspectives.
         </div>
       </div>
-      <div className="mt-10">
-        <p className="text-center text-2xl font-semibold mb-5">Skills</p>
-        <div className="grid md:grid-cols-3 gap-2 lg:gap-5 items-center">
-          <div className="bg-muted/80 p-2 rounded-md">React</div>
-          <div className="bg-muted/80 p-2 rounded-md">Node.js</div>
-          <div className="bg-muted/80 p-2 rounded-md">Flutter</div>
-          <div className="bg-muted/80 p-2 rounded-md">TypeScript</div>
-          <div className="bg-muted/80 p-2 rounded-md">JavaScript</div>
-          <div className="bg-muted/80 p-2 rounded-md">HTML/CSS</div>
-        </div>
-      </div>
     </div>
   );
 }

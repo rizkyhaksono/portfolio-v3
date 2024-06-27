@@ -1,44 +1,29 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { InstagramLogoIcon, GitHubLogoIcon, TwitterLogoIcon, ArrowDownIcon } from "@radix-ui/react-icons";
-import { Button } from "@/components/ui/button";
+import Particles from "@/components/magicui/particles";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function GreetingSection() {
+  const { theme } = useTheme();
+  const [color, setColor] = useState("#ffffff");
+ 
+  useEffect(() => {
+    setColor(theme === "dark" ? "#ffffff" : "#000000");
+  }, [theme]);
+ 
   return (
-    <div className="lg:h-screen">
-      <div className="flex flex-row xl:h-4/5 lg:h-3/4 md:h-screen sm:h-screen max-[644px]:h-screen">
-        <div className="hidden lg:flex lg:flex-col mr-3 justify-center items-center gap-2">
-          <Link href={"instagram.com/rizkyhaksonoo"} target="_blank">
-            <InstagramLogoIcon className="h-6 w-6" />
-          </Link>
-          <Link href={"https://github.com/rizkyhaksono"} target="_blank">
-            <GitHubLogoIcon className="h-6 w-6" />
-          </Link>
-          <Link href={"https://x.com/rizkyhaksono"} target="_blank">
-            <TwitterLogoIcon className="h-6 w-6" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-8 gap-2">
-          <div className="bg-muted/40 dark:bg-muted/20 lg:col-span-6 p-5 rounded-md lg:rounded-s-sm">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Atque sunt quis cumque esse. Impedit in et earum culpa, necessitatibus aliquam voluptatem, laboriosam possimus, magnam quis vel temporibus animi deserunt numquam.
-          </div>
-          <div className="grid-cols-1 lg:col-span-2 lg:mt-0 mt-5 flex justify-between">
-            <Image src={"/rizky.jpg"} alt="Profile" width={500} height={500} className="w-full h-40 lg:w-full rounded-md lg:rounded-e-sm object-cover lg:h-full" />
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col w-fit my-10 lg:mt-10 items-center">
-        <Button
-          variant={"default"}
-          onClick={() => {
-            document.getElementById("about-section")?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          Scroll Down <ArrowDownIcon className="w-4 h-4" />
-        </Button>
-      </div>
+    <div className="relative flex h-screen w-full items-center justify-center overflow-hidden rounded-lg">
+      <span className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-7xl font-semibold leading-none text-transparent dark:from-white dark:to-black md:text-9xl">
+        Rizky Haksono
+      </span>
+      <Particles
+        className="absolute inset-0"
+        quantity={100}
+        ease={80}
+        color={color}
+        refresh
+      />
     </div>
   );
 }
