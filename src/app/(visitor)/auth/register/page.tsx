@@ -80,10 +80,11 @@ export default function AuthRegister() {
       </div>
       <div className="hidden bg-muted lg:block">
         <Image
-          src="https://images.nightcafe.studio/jobs/tXRJUpC0o8IdNVebodDG/tXRJUpC0o8IdNVebodDG--2--mypkr.jpg?tr=w-1600,c-at_max"
-          alt="Image"
-          width="1920"
-          height="1080"
+          src={`https://picsum.photos/1000/700`}
+          priority
+          alt="Image Home"
+          width={1000}
+          height={1000}
           className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>

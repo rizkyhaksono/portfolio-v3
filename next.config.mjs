@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.nightcafe.studio",
       },
+      {
+        protocol: "https",
+        hostname: "picsum.photos",
+      },
     ],
   },
 }

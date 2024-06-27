@@ -80,7 +80,7 @@ export default function Header() {
               <Button variant={"outline"}>
                 <Link href={"/auth/register"}>Register</Link>
               </Button>
-              <Button>
+              <Button variant={"default"}>
                 <Link href={"/auth/login"}>Login</Link>
               </Button>
             </div>

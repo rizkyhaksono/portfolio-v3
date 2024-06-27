@@ -9,7 +9,7 @@ export default function GreetingSection() {
   const [color, setColor] = useState("#ffffff");
  
   useEffect(() => {
-    setColor(theme === "dark" ? "#ffffff" : "#000000");
+    setColor((theme === "dark" || theme === "system") ? "#ffffff" : "#000000");
   }, [theme]);
  
   return (
