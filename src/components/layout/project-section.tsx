@@ -24,16 +24,17 @@ export default function ProjectSection() {
       <div className="">
         <div>
           {
-            "This is my portfolio. I have worked on a variety of projects, ranging from small websites to large web applications. I have experience with a wide range of technologies, including HTML, CSS, JavaScript, React, and Node.js. I am always looking for new projects to work on, so if you have a project in mind, feel free to get in touch!"
+            "I have experience with a wide range of technologies, including Frontend, Backend, and Devops. I am always looking for new projects to work on, so if you have a project in mind, feel free to get in touch!"
           }
         </div>
 
         <ScrollArea className="w-full rounded-md border mt-5">
           <div className="flex space-x-4 p-4 overflow-x-auto">
             {projects.map((project: any) => (
-              <div key={project.id} className="flex flex-col w-60 h-40 bg-muted/80 rounded-md p-4">
-                <p className="text-lg font-semibold">{project.name}</p>
-                <p className="text-sm">{project.description}</p>
+              <div key={project.id} className="flex flex-col w-64 h-40 bg-muted/80 rounded-md p-4">
+                <p className="text-lg font-semibold underline underline-offset-8">{project.title}</p>
+                <p className="text-sm mt-2">{project.description}</p>
+                <p className="text-sm mt-2">{project.url}</p>
               </div>
             ))}
           </div>
