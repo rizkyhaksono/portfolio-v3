@@ -1,8 +1,3 @@
-import {
-  MagicCard,
-  MagicContainer,
-} from "@/components/magicui/magic-card";
-
 export default function CareerSection() {
   return (
     <div className="bg-muted/40 dark:bg-muted/20 px-10 py-6 rounded-md mt-10">
@@ -15,15 +10,15 @@ export default function CareerSection() {
             <ol className="relative border-s border-gray-200 dark:border-gray-700">
               <li className="mb-10 ms-4">
                 <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">February 2022</time>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Application UI code in Tailwind CSS</h3>
-                <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.</p>
+                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Sept 2021 - Now</time>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">University Of Muhammadiyah Malang</h3>
+                <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">{"Engineer's Degreee, Informatika"}</p>
               </li>
               <li className="mb-10 ms-4">
                 <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">March 2022</time>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Marketing UI design in Figma</h3>
-                <p className="text-base font-normal text-gray-500 dark:text-gray-400">All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.</p>
+                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Jul 2018 - Jul 2021</time>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">SMA Negeri 2 Denpasar</h3>
+                <p className="text-base font-normal text-gray-500 dark:text-gray-400">MIPA</p>
               </li>
             </ol>
           </div>
@@ -32,57 +27,26 @@ export default function CareerSection() {
             <ol className="relative border-s border-gray-200 dark:border-gray-700">
               <li className="mb-10 ms-4">
                 <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">February 2022</time>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Application UI code in Tailwind CSS</h3>
-                <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.</p>
+                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Aug 2023 - Dec 2023</time>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Infinite Learning Indonesia - Study Independent</h3>
+                <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Completed an intensive Full Stack Developer bootcamp encompassing frontend and backend development, along with UI/UX design principles. Acquired proficiency in frontend technologies such as HTML5, CSS3, JavaScript (ES6+), and React.js for building interactive user interfaces. </p>
               </li>
               <li className="mb-10 ms-4">
                 <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">March 2022</time>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Marketing UI design in Figma</h3>
-                <p className="text-base font-normal text-gray-500 dark:text-gray-400">All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.</p>
+                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Aug 2022 - Now</time>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Informatics Laboratory UMM</h3>
+                <p className="text-base font-normal text-gray-500 dark:text-gray-400">Work as Laboratory Assistant, and Software Engineer</p>
+              </li>
+              <li className="mb-10 ms-4">
+                <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
+                <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">Feb 2024 - Jul 2024</time>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">BIGIO.ID - Intern</h3>
+                <p className="text-base font-normal text-gray-500 dark:text-gray-400">Work as Full Stack Developer</p>
               </li>
             </ol>
           </div>
         </div>
       </div>
-
-      <MagicContainer
-        className={
-          "flex h-[500px] w-full flex-col gap-4 lg:h-[250px] lg:flex-row"
-        }
-      >
-        <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-        <p className="text-lg font-semibold mb-2">Work Experience</p>
-          <ol className="relative border-s border-gray-200 dark:border-gray-700">
-            <li className="mb-10 ms-4">
-              <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-              <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">February 2022</time>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Application UI code in Tailwind CSS</h3>
-              <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.</p>
-            </li>
-            <li className="mb-10 ms-4">
-              <div className="absolute w-3 h-3 bg-gray-200 rounded-full mt-1.5 -start-1.5 border border-white dark:border-gray-900 dark:bg-gray-700"></div>
-              <time className="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">March 2022</time>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Marketing UI design in Figma</h3>
-              <p className="text-base font-normal text-gray-500 dark:text-gray-400">All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.</p>
-            </li>
-          </ol>
-          <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-        </MagicCard>
-        <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-          <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
-            Card
-          </p>
-          <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-        </MagicCard>
-        <MagicCard className="flex w-full cursor-pointer flex-col items-center justify-center overflow-hidden p-20 shadow-2xl">
-          <p className="z-10 whitespace-nowrap text-4xl font-medium text-gray-800 dark:text-gray-200">
-            Demo
-          </p>
-          <div className="pointer-events-none absolute inset-0 h-full bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
-        </MagicCard>
-      </MagicContainer>
     </div>
   );
 }
