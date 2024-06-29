@@ -139,7 +139,7 @@ export default function SkillsSection() {
         <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-8xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
           Tech
         </span>
-  
+
         {/* Inner Circles */}
         <OrbitingCircles
           className="h-[30px] w-[30px] border-none bg-transparent"
@@ -157,7 +157,7 @@ export default function SkillsSection() {
         >
           <Icons.notion />
         </OrbitingCircles>
-  
+
         {/* Outer Circles (reverse) */}
         <OrbitingCircles
           className="h-[50px] w-[50px] border-none bg-transparent"
