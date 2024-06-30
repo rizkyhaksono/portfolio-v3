@@ -7,6 +7,7 @@ This is my third portfolio. It is a work in progress and will be updated as I le
 - Tailwind
 - Supabase
 - Shadcn.ui
+- Magic UI
 
 ## Features
 - Visitor
