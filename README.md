@@ -1,6 +1,6 @@
 ## Portfolio v3
 
-This is my third portfolio. It is a work in progress and will be updated as I learn more about web development.
+This is my third portfolio. It is a work in progress and will be updated as I learn more about web development and mobile development.
 
 ## Technologies Used
 - Next.js
