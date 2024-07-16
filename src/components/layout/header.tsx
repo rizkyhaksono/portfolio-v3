@@ -4,18 +4,20 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { MoonIcon, SunIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { getCookieValue } from "@/lib/cookie-helper";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getCookieValue, removeCookieValue } from "@/lib/cookie-helper";
 
 export default function Header() {
   const { setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const pathname = usePathname();
+  const router = useRouter()
 
   const checkUser = useCallback(async () => {
     const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE");
@@ -26,6 +28,18 @@ export default function Header() {
       console.log("User is not logged in");
     }
   }, []);
+
+  const signOut = async () => {
+    const cookie = await getCookieValue("USER_SUPABASE_AUTH_COOKIE");
+    if (cookie) {
+      console.log("User is logged in");
+      setLoggedIn(false);
+      await removeCookieValue("USER_SUPABASE_AUTH_COOKIE");
+      router.push("/")
+    } else {
+      console.log("User is not logged in");
+    }
+  }
 
   useEffect(() => {
     checkUser();
@@ -48,7 +62,29 @@ export default function Header() {
               </SheetTitle>
               <div className="flex flex-col items-start">
                 {loggedIn ? (
-                  <Link href={"/Chat"}>Chat</Link>
+                  <div className="flex justify-center items-center space-x-3">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Avatar>
+                          <AvatarImage src="https://github.com/shadcn.png" />
+                          <AvatarFallback>User</AvatarFallback>
+                        </Avatar>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>Profile</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={
+                            async () => {
+                              await signOut();
+                            }
+                          }
+                        >
+                          Sign Out
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Link href={"/chat"}>Chat</Link>
+                  </div>
                 ) : (
                   <div className="flex gap-2 items-center justify-center w-full">
                     <Button variant={"outline"} className="w-full">
@@ -74,7 +110,21 @@ export default function Header() {
             Blog
           </Link>
           {loggedIn ? (
-            <Link href={"/Chat"}>Chat</Link>
+            <>
+              <Link href={"/chat"}>Chat</Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>User</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Sign Out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <div className="flex gap-1 items-center">
               <Button variant={"outline"}>

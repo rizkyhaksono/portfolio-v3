@@ -9,8 +9,8 @@ export default async function ChatPage() {
   }
 
   return (
-    <div>
-      <h1>Chat</h1>
+    <div className="flex flex-col justify-center items-center h-screen">
+      <p>Working on</p>
       <p>{user}</p>
     </div>
   )
