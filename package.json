@@ -33,6 +33,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.12",
+    "html-react-parser": "^5.1.12",
     "html2pdf.js": "^0.10.1",
     "jspdf-autotable": "^3.8.2",
     "lucide-react": "^0.378.0",
