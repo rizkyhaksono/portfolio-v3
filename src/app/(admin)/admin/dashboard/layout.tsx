@@ -1,5 +1,5 @@
-import AdminSidebar from "@/components/layout/admin-sidebar";
-import AdminHeader from "@/components/layout/admin-header";
+import AdminSidebar from "@/components/layout/admin/admin-sidebar";
+import AdminHeader from "@/components/layout/admin/admin-header";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

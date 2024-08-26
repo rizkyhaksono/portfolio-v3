@@ -1,4 +1,4 @@
-import AdminDashboardWidget from "@/components/layout/admin-dashboard-widget";
+import AdminDashboardWidget from "@/components/layout/admin/admin-dashboard-widget";
 
 export default function AdminDashboardPage() {
   return <AdminDashboardWidget />;

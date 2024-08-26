@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Montserrat as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import Navbar from "@/components/layout/navbar";
+import Footer from "@/components/layout/footer";
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -21,11 +23,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("min-h-screen bg-white dark:bg-muted/40 font-sans antialiased", fontSans.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <body className={cn("container max-w-2xl min-h-screen bg-background font-sans antialiased mx-auto py-12 sm:py-24 px-6", fontSans.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <Navbar />
           {children}
+          <Footer />
         </ThemeProvider>
       </body>
-    </html>
+    </html >
   );
 }

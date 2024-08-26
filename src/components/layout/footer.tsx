@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { GitHubLogoIcon } from "@radix-ui/react-icons"
 import { Separator } from "@/components/ui/separator"
 
 export default function Footer() {
@@ -11,13 +10,8 @@ export default function Footer() {
           Copyright © {new Date().getFullYear()}{" "}
           <Link href="https://github.com/rizkyhaksono" className="underline underline-offset-2" target="_blank">
             Rizky Haksono
-          </Link>{" "}
-        </p>
-        <div className="flex gap-4">
-          <Link href="https://github.com/rizkyhaksono" target="_blank">
-            <GitHubLogoIcon />
           </Link>
-        </div>
+        </p>
       </div>
     </>
   )
