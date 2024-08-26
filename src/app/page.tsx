@@ -88,10 +88,20 @@ export default function Home() {
 
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Skill</p>
-        <div className="flex flex-row gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2">
           <Badge>Next.js</Badge>
           <Badge>Flutter</Badge>
           <Badge>Docker</Badge>
+          <Badge>Git</Badge>
+          <Badge>Portainer</Badge>
+          <Badge>Express.js</Badge>
+          <Badge>Nest.js</Badge>
+          <Badge>PostgreSQL</Badge>
+          <Badge>MySQL</Badge>
+          <Badge>Laravel</Badge>
+          <Badge>Java Spring</Badge>
+          <Badge>Go</Badge>
+          <Badge>ASP .NET</Badge>
         </div>
       </div>
 

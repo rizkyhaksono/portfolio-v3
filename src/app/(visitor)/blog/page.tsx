@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabaseUser } from "@/lib/supabase/server";
-import parse from 'html-react-parser';
 
 export default function BlogPage() {
   const [blogs, setBlogs] = useState<any>([]);
@@ -29,7 +28,10 @@ export default function BlogPage() {
             <p className="text-lg font-semibold underline underline-offset-8">
               {blog.title}
             </p>
-            <p className="text-sm mt-2">{parse(blog.subtitle)}</p>
+            <div
+              className="prose max-w-full text-pretty font-sans text-xs text-muted-foreground dark:prose-invert mt-2"
+              dangerouslySetInnerHTML={{ __html: blog.subtitle }}
+            />
           </div>
         ))}
       </div>
