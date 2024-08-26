@@ -69,22 +69,22 @@ const DATA = {
     social: {
       GitHub: {
         name: "GitHub",
-        url: "#",
+        url: "https://github.com/rizkyhaksono",
         icon: Icons.github,
       },
       LinkedIn: {
         name: "LinkedIn",
-        url: "#",
+        url: "https://www.linkedin.com/in/rizkyhaksono/",
         icon: Icons.linkedin,
       },
       X: {
         name: "X",
-        url: "#",
+        url: "https://x.com/rizkyhaksono",
         icon: Icons.x,
       },
       email: {
         name: "Send Email",
-        url: "#",
+        url: "mailto:mrizkyhaksono@gmail.com",
         icon: Icons.email,
       },
     },
