@@ -12,7 +12,7 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "Rizky Haksono",
+  title: "RH | Portfolio",
   description: "Built by @rizkyhaksono",
 };
 
