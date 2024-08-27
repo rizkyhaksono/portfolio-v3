@@ -13,7 +13,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const { data, error } = await supabaseUser.from("projects").select("*");
+      const { data, error } = await supabaseUser.from("projects").select("*").order("created_at", { ascending: false });
       if (error) {
         console.log(error);
       };
@@ -149,7 +149,7 @@ export default function Home() {
       <div className="mt-10">
         <div className="text-center">
           <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
-            Project
+            Projects
           </Button>
           <div className="mt-2 text-sm text-muted-foreground">
             {`I have experience working on a wide range of projects, from basic websites to advanced web applications. Here are a few that stand out.`}
@@ -162,6 +162,7 @@ export default function Home() {
               title={project.title}
               description={project.description}
               href={project.url}
+              source={project.source_code}
               image={project.image || "/no-image.jpg"}
             />
           ))}
