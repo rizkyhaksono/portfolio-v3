@@ -24,35 +24,29 @@ export default function Home() {
 
   const workExperiences = [
     {
-      company: "Company A",
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-      duration: "2021 Jan - 2021 Dec",
-      image: "/no-image.jpg",
+      company: "INFORMATICS LABORATORY UMM - PART TIME",
+      description: "Information Systems",
+      duration: "Aug 2022 - Present",
+      image: "https://infotech.umm.ac.id/infotech-assets/favicon/favico.png",
     },
     {
-      company: "Company B",
-      description: "Enim mollitia beatae aliquid! Porro iure soluta amet veniam.",
-      duration: "2020 Jan - 2020 Dec",
-      image: "/no-image.jpg",
-    },
-    {
-      company: "Company C",
-      description: "Molestiae dignissimos labore ut vel suscipit animi!",
-      duration: "2019 Jan - 2019 Dec",
-      image: "/no-image.jpg",
+      company: "PT. BEJANA INVESTIDATA GLOBALINDO - INTERNSHIP",
+      description: "Full Stack Developer",
+      duration: "Jan 2024 - Jun 2024",
+      image: "https://www.bigio.id/themes/big-theme/assets/img/Beranda/favicon-150x150.png",
     },
   ];
 
   const education = [
     {
-      image: "/no-image.jpg",
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit.",
-      school: "Infinite Learning Indonesia",
-      duration: "2018 Jan - 2021 Dec",
+      image: "https://media.licdn.com/dms/image/v2/C560BAQEX1pFURxwK_g/company-logo_200_200/company-logo_200_200/0/1640263809942?e=2147483647&v=beta&t=wblJ0auqtcPbhZfF7NbSFVOFmmxZ9F3BO8NUCLp39xE",
+      description: "Web Developer",
+      school: "Infinite Learning Indonesia - Independent Study",
+      duration: "Aug 2023 - Dec 2023",
     },
     {
-      image: "/no-image.jpg",
-      description: "Molestiae dignissimos labore ut vel suscipit animi!",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuIlbqOZjWEyUok7AT1rMa5-Wy9Mp6ahuxJQ&s",
+      description: "Bachelor of Computer Science (GPA 3.90/4.00)",
       school: "University of Muhammadiyah Malang",
       duration: "2015 Jan - 2018 Dec",
     },
@@ -60,34 +54,34 @@ export default function Home() {
 
   return (
     <>
-      <div className="grid grid-cols-10 gap-5 items-center">
-        <div className="col-span-6 md:col-span-7 text-left">
-          <div className="font-bold text-3xl">{`Hi, I'm Rizky Haksono`}</div><br />
-          <span>{`Full Stack Developer. I love building web and mobile applications. Very active on GitHub and always looking for new opportunities.`}</span>
+      <div className="flex flex-row items-center gap-5">
+        <div className="flex-1 text-left">
+          <div className="font-bold text-3xl mb-2">{`Hi, I'm Rizky Haksono`}</div>
+          <span className="text-base">{`Full Stack Developer. I love building web and mobile applications. Very active on GitHub and always looking for new opportunities.`}</span>
         </div>
         <Image
           src={"/rizky.jpg"}
           alt="Profile"
           width={1000}
           height={1000}
-          className="rounded-full object-cover size-28 col-span-4 md:col-span-3 justify-self-end"
+          className="rounded-full object-cover size-28 md:justify-self-end"
         />
       </div>
-
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">About</p>
-        <div className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert mt-2">
+        <div className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert">
           Experience in Software Development with skills in Web and Mobile Development. I am still an undergraduate and have experience related to web and mobile development as well as UI/UX design.
-          <a href="/cv-rizky-v3.pdf" download>
-            <Button className="flex gap-2 mt-4 rounded-sm" variant={"default"}>
-              CV <Download className="size-4" />
-            </Button>
-          </a>
+          <div className="w-fit">
+            <a href="/cv-rizky-v3.pdf" download>
+              <Button className="flex gap-2 mt-4 rounded-sm" variant={"default"} size={"sm"}>
+                CV <Download className="size-4" />
+              </Button>
+            </a>
+          </div>
         </div>
       </div>
-
       <div className="mt-10">
-        <p className="text-left text-xl font-semibold">Skill</p>
+        <p className="text-left text-xl font-semibold">Skills</p>
         <div className="flex flex-wrap gap-2 mt-2">
           <Badge>Next.js</Badge>
           <Badge>Flutter</Badge>
@@ -104,11 +98,13 @@ export default function Home() {
           <Badge>ASP .NET</Badge>
         </div>
       </div>
-
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Work Experience</p>
         {workExperiences.map((experience, index) => (
-          <div key={index} className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 grid grid-cols-8 gap-4">
+          <div
+            key={experience.company + index}
+            className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
+          >
             <Image
               src={experience.image}
               alt={`${experience.company} logo`}
@@ -116,48 +112,48 @@ export default function Home() {
               height={1000}
               className="rounded-full object-cover size-16 justify-self-start col-span-1"
             />
-            <div className="col-span-5">
+            <div className="flex-1">
               <p>{experience.company}</p>
-              <p className="text-muted-foreground">{experience.description}</p>
+              <p className="text-muted-foreground text-xs">{experience.description}</p>
             </div>
-            <div className="col-span-2 text-end">
+            <div className="text-end text-xs ml-auto self-start">
               {experience.duration}
             </div>
           </div>
         ))}
       </div>
-
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Education</p>
         {education.map((edu, index) => (
-          <div key={index} className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 grid grid-cols-8 gap-4">
+          <div
+            key={edu.school + index}
+            className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
+          >
             <Image
               src={edu.image}
               alt={`${edu.school} logo`}
               width={1000}
               height={1000}
-              className="rounded-full object-cover size-16 justify-self-start col-span-1"
+              className="rounded-full object-cover size-16 justify-self-start"
             />
-            <div className="col-span-5">
+            <div className="flex-1">
               <p>{edu.school}</p>
-              <p className="text-muted-foreground">{edu.description}</p>
+              <p className="text-muted-foreground text-xs">{edu.description}</p>
             </div>
-            <div className="col-span-2 text-end">
+            <div className="text-end text-xs ml-auto self-start">
               {edu.duration}
             </div>
           </div>
         ))}
       </div>
-
       <div className="mt-10">
         <div className="text-center">
-          <Button className="text-xl font-semibold" variant={"default"}>
+          <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
             Project
           </Button>
-          <div className="mt-2">
-            Explore some of my recent projects
+          <div className="mt-2 text-sm text-muted-foreground">
+            {`I have experience working on a wide range of projects, from basic websites to advanced web applications. Here are a few that stand out.`}
           </div>
-          <span>{`I have experience working on a wide range of projects, from basic websites to advanced web applications. Here are a few that stand out.`}</span>
         </div>
         <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
           {projects.map((project: any) => (
@@ -171,14 +167,25 @@ export default function Home() {
           ))}
         </div>
       </div>
-
       <div className="mt-10">
         <div className="text-center">
-          <Button className="text-xl font-semibold" variant={"default"}>
+          <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
+            Certificates
+          </Button>
+          <div className="mt-2 text-sm text-muted-foreground">
+            {`I have completed various online courses and have received certificates for them. Here are a few that I am particularly proud of.`}
+          </div>
+        </div>
+        <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
+        </div>
+      </div>
+      <div className="mt-10">
+        <div className="text-center">
+          <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
             Contact
           </Button>
-          <div className="mt-2">
-            Get in Touch
+          <div className="mt-2 text-sm text-muted-foreground">
+            {`I am always open to new opportunities and collaborations. If you have any questions or would like to work together, please feel free to contact me.`}
           </div>
         </div>
       </div>

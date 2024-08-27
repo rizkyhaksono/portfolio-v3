@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Globe, GitBranch } from "lucide-react";
 
 export default function CardProject({
   title,
@@ -43,7 +45,7 @@ export default function CardProject({
       </Link>
       <CardHeader className="px-2">
         <div className="space-y-1">
-          <CardTitle className="mt-1 text-base">{title}</CardTitle>
+          <CardTitle className="mt-1 text-base font-bold">{title}</CardTitle>
           {/* <time className="font-sans text-xs">{new Date(created_at).toLocaleDateString()}</time> */}
           <div
             className="prose max-w-full text-pretty font-sans text-xs text-muted-foreground dark:prose-invert"
@@ -62,7 +64,7 @@ export default function CardProject({
           </div>
         )} */}
       </CardContent>
-      <CardFooter className="px-2 pb-2">
+      <CardFooter className="px-2">
         {links && links.length > 0 && (
           <div className="flex flex-row flex-wrap items-start gap-1">
             {links.map((link, idx) => (
@@ -75,6 +77,14 @@ export default function CardProject({
             ))}
           </div>
         )}
+        <div className="flex flex-row gap-2">
+          <Button size={"sm"} className="gap-2">
+            <Globe className="text-muted size-4" /> Website
+          </Button>
+          <Button size={"sm"} className="gap-2">
+            <GitBranch className="text-muted size-4" /> Source
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   )

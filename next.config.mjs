@@ -10,6 +10,22 @@ const nextConfig = {
         protocol: "https",
         hostname: "picsum.photos",
       },
+      {
+        protocol: "https",
+        hostname: "infotech.umm.ac.id",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.bigio.id",
+      },
+      {
+        protocol: "https",
+        hostname: "media.licdn.com",
+      },
     ],
   },
 }
