@@ -11,7 +11,6 @@ This is my third portfolio. It is a work in progress and will be updated as I le
 
 ## Features
 - Visitor
-- User
 - Admin
 
 ## Installation
@@ -29,4 +28,4 @@ npm start
 ```
 
 ## License
-[MIT](./LICENSE)
+See the [MIT LICENSE](./LICENSE)
