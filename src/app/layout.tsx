@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/sonner"
+import { Analytics } from "@vercel/analytics/react"
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -29,6 +30,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <Toaster position="top-right" />
+          <Analytics />
           <Footer />
         </ThemeProvider>
       </body>
