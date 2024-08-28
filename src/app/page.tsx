@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"
 import { supabaseUser } from "@/lib/supabase/server";
 import CardProject from "@/components/layout/user/card-project";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea"
+import Link from "next/link";
 
 export default function Home() {
   const [projects, setProjects] = useState<any>([]);
@@ -173,11 +176,19 @@ export default function Home() {
           <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
             Certificates
           </Button>
-          <div className="mt-2 text-sm text-muted-foreground">
-            {`I have completed various online courses and have received certificates for them. Here are a few that I am particularly proud of.`}
-          </div>
-        </div>
-        <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
+          <Link
+            href={"https://www.linkedin.com/in/rizkyhaksono/details/certifications"}
+            target="_blank"
+          >
+            <div className="mt-2 text-sm text-muted-foreground">
+              <p>
+                {`I have completed various online courses and have received certificates for them.`}
+              </p>
+              <p className="underline underline-offset-4 flex justify-center">
+                {`Click here to view all certificates on LinkedIn.`}
+              </p>
+            </div>
+          </Link>
         </div>
       </div>
       <div className="mt-10">
@@ -187,6 +198,13 @@ export default function Home() {
           </Button>
           <div className="mt-2 text-sm text-muted-foreground">
             {`I am always open to new opportunities and collaborations. If you have any questions or would like to work together, please feel free to contact me.`}
+          </div>
+          <div className="flex flex-col gap-2 mt-5 items-center">
+            <Input placeholder="Email" type="email" className="w-80" />
+            <Textarea placeholder="Message" className="w-80" />
+            <Button className="text-sm font-semibold mt-2 w-80" variant={"default"} size={"sm"} type="button">
+              Send
+            </Button>
           </div>
         </div>
       </div>
