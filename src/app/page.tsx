@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  useReducer
+} from "react";
 import Image from "next/image";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,9 +14,30 @@ import CardProject from "@/components/layout/user/card-project";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link";
+import emailjs from "@emailjs/browser";
+import { toast } from "sonner"
+
+const initialState = {
+  email: "",
+  message: "",
+};
+
+function formReducer(state: any, action: any) {
+  switch (action.type) {
+    case "SET_EMAIL":
+      return { ...state, email: action.payload };
+    case "SET_MESSAGE":
+      return { ...state, message: action.payload };
+    case "RESET":
+      return initialState;
+    default:
+      return state;
+  }
+}
 
 export default function Home() {
   const [projects, setProjects] = useState<any>([]);
+  const [formState, dispatch] = useReducer(formReducer, initialState);
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -24,6 +49,33 @@ export default function Home() {
     };
     fetchProject();
   }, []);
+
+  const sendEmail = (e: any) => {
+    e.preventDefault();
+
+    const templateParams = {
+      email: formState.email,
+      message: formState.message,
+    };
+
+    emailjs
+      .send(
+        process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID ?? "",
+        process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID ?? "",
+        templateParams,
+        process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
+      )
+      .then(
+        (response) => {
+          toast.success("Email sent successfully");
+          dispatch({ type: "RESET" });
+        },
+        (error) => {
+          toast.error("Failed to send email");
+          console.log('FAILED...', error);
+        }
+      );
+  };
 
   const workExperiences = [
     {
@@ -197,15 +249,30 @@ export default function Home() {
             Contact
           </Button>
           <div className="mt-2 text-sm text-muted-foreground">
-            {`I am always open to new opportunities and collaborations. If you have any questions or would like to work together, please feel free to contact me.`}
+            If you have any questions or would like to work together, feel free to reach out.
           </div>
-          <div className="flex flex-col gap-2 mt-5 items-center">
-            <Input placeholder="Email" type="email" className="w-80" />
-            <Textarea placeholder="Message" className="w-80" />
-            <Button className="text-sm font-semibold mt-2 w-80" variant={"default"} size={"sm"} type="button">
-              Send
-            </Button>
-          </div>
+        </div>
+        <div className="flex justify-center mt-4">
+          <form className="w-full max-w-md" onSubmit={sendEmail}>
+            <div className="flex flex-col gap-4">
+              <Input
+                type="email"
+                placeholder="Your Email"
+                value={formState.email}
+                onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
+                required
+              />
+              <Textarea
+                placeholder="Your Message"
+                value={formState.message}
+                onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
+                required
+              />
+              <Button type="submit" variant={"default"} size={"sm"}>
+                Send
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </>

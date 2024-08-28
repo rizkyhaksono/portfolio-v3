@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
+import { Toaster } from "@/components/ui/sonner"
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -27,6 +28,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Navbar />
           {children}
+          <Toaster position="top-right" />
           <Footer />
         </ThemeProvider>
       </body>
