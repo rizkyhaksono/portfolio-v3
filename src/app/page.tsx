@@ -103,7 +103,7 @@ export default function Home() {
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuIlbqOZjWEyUok7AT1rMa5-Wy9Mp6ahuxJQ&s",
       description: "Bachelor of Computer Science (GPA 3.90/4.00)",
       school: "University of Muhammadiyah Malang",
-      duration: "2015 Jan - 2018 Dec",
+      duration: "September 2021 - Present",
     },
   ]
 
