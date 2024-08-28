@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn("container max-w-2xl min-h-screen bg-background font-sans antialiased mx-auto py-12 sm:py-24 px-6", fontSans.variable)}>
+      <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Navbar />
           {children}

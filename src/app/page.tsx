@@ -108,7 +108,7 @@ export default function Home() {
   ]
 
   return (
-    <>
+    <div className="container max-w-2xl min-h-screen py-12 sm:py-24 px-6">
       <div className="flex flex-row items-center gap-5">
         <div className="flex-1 text-left">
           <div className="font-bold text-3xl mb-2">{`Hi, I'm Rizky Haksono`}</div>
@@ -275,6 +275,6 @@ export default function Home() {
           </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
