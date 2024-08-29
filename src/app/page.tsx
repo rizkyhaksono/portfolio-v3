@@ -41,7 +41,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const { data, error } = await supabaseUser.from("projects").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabaseUser.from("projects").select("*").order("created_at", { ascending: true });
       if (error) {
         console.log(error);
       };
