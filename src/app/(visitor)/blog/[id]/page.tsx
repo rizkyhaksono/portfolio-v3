@@ -8,8 +8,6 @@ export default function BlogDetail() {
   const id = pathname.split("/").pop();
   const { data } = useGetBlogById(id ?? "");
 
-  console.log(data)
-
   return (
     <>
       <p className="text-center text-2xl font-semibold">{data?.title}</p>

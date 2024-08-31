@@ -8,7 +8,7 @@ export default function BlogPage() {
 
   return (
     <>
-      <p className="text-center text-2xl font-semibold mb-5">Blog</p>
+      <p className="text-center text-2xl font-semibold mb-5">Blogs</p>
       <div className="mt-5 flex flex-col gap-5">
         {blogs?.map((blog: any) => (
           <CardBlog
