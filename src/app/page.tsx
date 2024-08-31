@@ -97,6 +97,8 @@ export default function Home() {
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Skills</p>
         <div className="flex flex-wrap gap-2 mt-2">
+          <Badge>Typescript</Badge>
+          <Badge>Javascript</Badge>
           <Badge>Next.js</Badge>
           <Badge>Flutter</Badge>
           <Badge>Docker</Badge>
@@ -104,10 +106,11 @@ export default function Home() {
           <Badge>Portainer</Badge>
           <Badge>Express.js</Badge>
           <Badge>Nest.js</Badge>
+          <Badge>Astro.js</Badge>
           <Badge>PostgreSQL</Badge>
           <Badge>MySQL</Badge>
           <Badge>Laravel</Badge>
-          <Badge>Java Spring</Badge>
+          <Badge>Spring Boot</Badge>
           <Badge>Go</Badge>
           <Badge>ASP .NET</Badge>
         </div>
