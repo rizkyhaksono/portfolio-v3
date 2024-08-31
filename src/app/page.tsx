@@ -1,15 +1,13 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useReducer
-} from "react";
+import { useReducer } from "react";
 import Image from "next/image";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"
-import { supabaseUser } from "@/lib/supabase/server";
+import { useGetProject } from "@/lib/hooks/useProject";
+import { useGetCareer } from "@/lib/hooks/useCareer";
+import { useGetEducation } from "@/lib/hooks/useEducation";
 import CardProject from "@/components/layout/user/card-project";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
@@ -36,19 +34,10 @@ function formReducer(state: any, action: any) {
 }
 
 export default function Home() {
-  const [projects, setProjects] = useState<any>([]);
   const [formState, dispatch] = useReducer(formReducer, initialState);
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      const { data, error } = await supabaseUser.from("projects").select("*").order("created_at", { ascending: true });
-      if (error) {
-        console.log(error);
-      };
-      setProjects(data);
-    };
-    fetchProject();
-  }, []);
+  const { data: projects } = useGetProject();
+  const { data: careers } = useGetCareer();
+  const { data: educations } = useGetEducation();
 
   const sendEmail = (e: any) => {
     e.preventDefault();
@@ -66,7 +55,7 @@ export default function Home() {
         process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
       )
       .then(
-        (response) => {
+        () => {
           toast.success("Email sent successfully");
           dispatch({ type: "RESET" });
         },
@@ -76,36 +65,6 @@ export default function Home() {
         }
       );
   };
-
-  const workExperiences = [
-    {
-      company: "INFORMATICS LABORATORY UMM - PART TIME",
-      description: "Information Systems",
-      duration: "Aug 2022 - Present",
-      image: "https://infotech.umm.ac.id/infotech-assets/favicon/favico.png",
-    },
-    {
-      company: "PT. BEJANA INVESTIDATA GLOBALINDO - INTERNSHIP",
-      description: "Full Stack Developer",
-      duration: "Jan 2024 - Jun 2024",
-      image: "https://www.bigio.id/themes/big-theme/assets/img/Beranda/favicon-150x150.png",
-    },
-  ];
-
-  const education = [
-    {
-      image: "https://media.licdn.com/dms/image/v2/C560BAQEX1pFURxwK_g/company-logo_200_200/company-logo_200_200/0/1640263809942?e=2147483647&v=beta&t=wblJ0auqtcPbhZfF7NbSFVOFmmxZ9F3BO8NUCLp39xE",
-      description: "Web Developer",
-      school: "Infinite Learning Indonesia - Independent Study",
-      duration: "Aug 2023 - Dec 2023",
-    },
-    {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuIlbqOZjWEyUok7AT1rMa5-Wy9Mp6ahuxJQ&s",
-      description: "Bachelor of Computer Science (GPA 3.90/4.00)",
-      school: "University of Muhammadiyah Malang",
-      duration: "September 2021 - Present",
-    },
-  ]
 
   return (
     <div className="container max-w-2xl min-h-screen pt-12 sm:pt-24 px-6">
@@ -155,45 +114,45 @@ export default function Home() {
       </div>
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Work Experience</p>
-        {workExperiences.map((experience, index) => (
+        {careers?.map((career: any, index: number) => (
           <div
-            key={experience.company + index}
+            key={career.company + index}
             className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
           >
             <Image
-              src={experience.image}
-              alt={`${experience.company} logo`}
+              src={career.image}
+              alt={`${career.title} logo`}
               width={1000}
               height={1000}
-              className="rounded-full object-cover size-16 justify-self-start col-span-1"
+              className="rounded-full object-cover size-16 justify-self-start"
             />
             <div className="flex-1">
-              <p>{experience.company}</p>
-              <p className="text-muted-foreground text-xs">{experience.description}</p>
+              <p>{career.title}</p>
+              <p className="text-muted-foreground text-xs">{career.subtitle}</p>
             </div>
             <div className="text-end text-xs ml-auto self-start">
-              {experience.duration}
+              {career.duration}
             </div>
           </div>
         ))}
       </div>
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Education</p>
-        {education.map((edu, index) => (
+        {educations?.map((edu: any, index: number) => (
           <div
             key={edu.school + index}
             className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
           >
             <Image
               src={edu.image}
-              alt={`${edu.school} logo`}
+              alt={`${edu.title} logo`}
               width={1000}
               height={1000}
               className="rounded-full object-cover size-16 justify-self-start"
             />
             <div className="flex-1">
-              <p>{edu.school}</p>
-              <p className="text-muted-foreground text-xs">{edu.description}</p>
+              <p>{edu.title}</p>
+              <p className="text-muted-foreground text-xs">{edu.subtitle}</p>
             </div>
             <div className="text-end text-xs ml-auto self-start">
               {edu.duration}
@@ -211,7 +170,7 @@ export default function Home() {
           </div>
         </div>
         <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
-          {projects.map((project: any) => (
+          {projects?.map((project: any) => (
             <CardProject
               key={project.id}
               title={project.title}
