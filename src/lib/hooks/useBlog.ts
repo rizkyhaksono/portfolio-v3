@@ -28,3 +28,30 @@ export function useGetBlog() {
 
   return { data, loading, error };
 }
+
+export function useGetBlogById(slug: string) {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<any>(true);
+  const [error, setError] = useState<any>(null);
+
+  useEffect(() => {
+    async function fetchBlog() {
+      try {
+        setLoading(true);
+        const { data } = await supabaseUser
+          .from("blogs")
+          .select("*")
+          .eq("slug", slug)
+          .single();
+        setData(data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBlog();
+  }, [slug]);
+
+  return { data, loading, error };
+}
