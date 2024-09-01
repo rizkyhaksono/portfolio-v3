@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import BlurFade from "@/components/magicui/blur-fade";
 import CardBlog from "@/components/layout/user/card-blog";
 import { getAllBlog } from "@/lib/services/blog";
 
@@ -6,11 +6,9 @@ export default async function BlogPage() {
   const blogs = await getAllBlog();
 
   return (
-    <>
+    <BlurFade delay={0.25} inView>
       <div className="text-center">
-        <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
-          Blog
-        </Button>
+        <p className="text-center text-xl font-semibold">Blog</p>
         <div className="mt-2 text-sm text-muted-foreground">
           {`I write about my experiences, thoughts, and ideas on various topics.`}
         </div>
@@ -25,6 +23,6 @@ export default async function BlogPage() {
           />
         ))}
       </div>
-    </>
+    </BlurFade>
   );
 }

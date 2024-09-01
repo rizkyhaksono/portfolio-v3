@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const initialState = {
   email: "",
+  name: "",
   message: "",
 };
 
@@ -16,6 +17,8 @@ function formReducer(state: any, action: any) {
   switch (action.type) {
     case "SET_EMAIL":
       return { ...state, email: action.payload };
+    case "SET_NAME":
+      return { ...state, name: action.payload };
     case "SET_MESSAGE":
       return { ...state, message: action.payload };
     case "RESET":
@@ -33,6 +36,7 @@ export default function UserContact() {
 
     const templateParams = {
       email: formState.email,
+      name: formState.name,
       message: formState.message,
     };
 
@@ -56,18 +60,28 @@ export default function UserContact() {
   };
 
   return (
-    <div className="flex justify-center mt-4">
-      <form className="w-full max-w-md" onSubmit={sendEmail}>
+    <div className="flex justify-start mt-5">
+      <form className="w-full" onSubmit={sendEmail}>
         <div className="flex flex-col gap-4">
-          <Input
-            type="email"
-            placeholder="Your Email"
-            value={formState.email}
-            onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
-            required
-          />
+          <div className="flex flex-row gap-2">
+            <Input
+              type="email"
+              placeholder="Your Email"
+              value={formState.email}
+              onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
+              required
+            />
+            <Input
+              type="text"
+              placeholder="Your Name"
+              value={formState.name}
+              onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })}
+              required
+            />
+          </div>
           <Textarea
             placeholder="Your Message"
+            className="h-60"
             value={formState.message}
             onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
             required
