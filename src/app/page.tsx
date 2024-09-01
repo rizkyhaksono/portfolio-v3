@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import Marquee from "@/components/magicui/marquee";
-import { GITHUB_ACCOUNTS } from "@/lib/constant/github";
+import { GITHUB_ACCOUNTS } from "@/lib/commons/constants/github";
 import GithubCalendar from "@/components/layout/user/github-calender";
 import GithubOverview from "@/components/layout/user/github-overview";
 import { fetchGithubData } from "@/lib/services/github";
@@ -151,7 +151,7 @@ export default async function Home() {
         <div className="mt-10">
           <p className="text-left text-xl font-semibold">Contact</p>
           <p className="flex justify-start text-muted-foreground text-sm">
-            Feel free to get in touch and let's have a discussion about how we can work together.
+            {`Feel free to get in touch and let's have a discussion about how we can work together.`}
           </p>
           <Separator className="my-5" />
           <p className="flex justify-start text-base">

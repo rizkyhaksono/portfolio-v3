@@ -1,4 +1,4 @@
-import { GITHUB_ACCOUNTS } from "../constant/github";
+import { GITHUB_ACCOUNTS } from "../common/constants/github";
 import axios from "axios";
 
 const GITHUB_USER_ENDPOINT = "https://api.github.com/graphql";
