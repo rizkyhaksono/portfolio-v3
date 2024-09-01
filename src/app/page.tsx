@@ -3,19 +3,16 @@ import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"
 import Marquee from "@/components/magicui/marquee";
-import CardProject from "@/components/layout/user/card-project";
 import Link from "next/link";
 import { GITHUB_ACCOUNTS } from "@/lib/constant/github";
 import GithubCalendar from "@/components/layout/github-calender";
 import GithubOverview from "@/components/layout/user/github-overview";
 import { fetchGithubData } from "@/lib/services/github";
 import UserContact from "@/components/layout/user/contact";
-import { getAllProject } from "@/lib/services/project";
 import { getAllCarrer } from "@/lib/services/career";
 import { getAllEducation } from "@/lib/services/education";
 
 export default async function Home() {
-  const projects = await getAllProject();
   const careers = await getAllCarrer();
   const educations = await getAllEducation();
 
@@ -24,15 +21,13 @@ export default async function Home() {
     GITHUB_ACCOUNTS[0].token
   );
 
-  // console.log(github?.data?.contributionsCollection?.contributionCalendar);
-
   return (
     <div className="container max-w-2xl min-h-screen pt-12 sm:pt-24 px-6">
       <div className="flex flex-row items-center gap-5">
         <div className="flex-1 text-left">
           <div className="font-bold text-3xl mb-2">{`Hi, I'm Rizky Haksono`}</div>
           <span className="text-base">{`Full Stack Developer. I love building web and mobile applications. Very active on GitHub and always looking for new opportunities.`}</span>
-        </div>
+        </div> 
         <Image
           src={"/rizky.jpg"}
           alt="Profile"
@@ -137,28 +132,6 @@ export default async function Home() {
             </div>
           </div>
         ))}
-      </div>
-      <div className="mt-10">
-        <div className="text-center">
-          <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
-            Projects
-          </Button>
-          <div className="mt-2 text-sm text-muted-foreground">
-            {`I have experience working on a wide range of projects, from basic websites to advanced web applications. Here are a few that stand out.`}
-          </div>
-        </div>
-        <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
-          {projects?.map((project) => (
-            <CardProject
-              key={project.id}
-              title={project.title}
-              description={project.description}
-              href={project.url}
-              source={project.source_code ?? ""}
-              image={project.image || "/no-image.jpg"}
-            />
-          ))}
-        </div>
       </div>
       <div className="mt-10">
         <div className="text-center">

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import CardBlog from "@/components/layout/user/card-blog";
 import { getAllBlog } from "@/lib/services/blog";
 
@@ -6,8 +7,15 @@ export default async function BlogPage() {
 
   return (
     <>
-      <p className="text-center text-2xl font-semibold mb-5">Blogs</p>
-      <div className="mt-5 flex flex-col gap-5">
+      <div className="text-center">
+        <Button className="text-base font-semibold" variant={"default"} size={"sm"}>
+          Blog
+        </Button>
+        <div className="mt-2 text-sm text-muted-foreground">
+          {`I have experience working on a wide range of projects, from basic websites to advanced web applications.`}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-2 mt-4">
         {blogs?.map((blog: any) => (
           <CardBlog
             key={blog.id}
