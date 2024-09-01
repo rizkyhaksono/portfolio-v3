@@ -3,12 +3,12 @@ import { getBlogBySlug } from "@/lib/services/blog";
 import { headers } from 'next/headers';
 
 export default async function BlogDetail() {
-  const headersList = headers();
-  const referer = headersList.get('referer')
-  const seperateUrl = referer?.split('/');
-  const slug = seperateUrl?.[seperateUrl.length - 1];
+  const referer = headers().get('referer');
+  const slug = referer?.split('/').pop();
 
-  const data = await getBlogBySlug(slug as string);
+  if (!slug) return null;
+  const data = await getBlogBySlug(slug);
+  if (!data || data.length === 0) return <div>No blog found</div>;
 
   return (
     <BlurFade delay={0.25} inView>
