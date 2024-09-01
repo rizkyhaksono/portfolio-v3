@@ -12,7 +12,7 @@ export default async function BlogPage() {
           Blog
         </Button>
         <div className="mt-2 text-sm text-muted-foreground">
-          {`I have experience working on a wide range of projects, from basic websites to advanced web applications.`}
+          {`I write about my experiences, thoughts, and ideas on various topics.`}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-2 mt-4">

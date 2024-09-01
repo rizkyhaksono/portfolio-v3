@@ -12,7 +12,7 @@ export default async function ProjectPage() {
           Projects
         </Button>
         <div className="mt-2 text-sm text-muted-foreground">
-          {`I have experience working on a wide range of projects, from basic websites to advanced web applications. Here are a few that stand out.`}
+          {`I have experience working on a wide range of projects, from basic websites to advanced web applications.`}
         </div>
       </div>
       <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">

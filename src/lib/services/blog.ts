@@ -21,3 +21,12 @@ export const getAllBlog = async () => {
 
   return data as blogType[];
 }
+
+export const getBlogBySlug = async (slug: string) => {
+  const { data } = await supabaseUser
+    .from("blogs")
+    .select("*")
+    .eq("slug", slug);
+
+  return data as blogType[];
+}

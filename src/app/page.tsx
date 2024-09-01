@@ -27,7 +27,7 @@ export default async function Home() {
         <div className="flex-1 text-left">
           <div className="font-bold text-3xl mb-2">{`Hi, I'm Rizky Haksono`}</div>
           <span className="text-base">{`Full Stack Developer. I love building web and mobile applications. Very active on GitHub and always looking for new opportunities.`}</span>
-        </div> 
+        </div>
         <Image
           src={"/rizky.jpg"}
           alt="Profile"
