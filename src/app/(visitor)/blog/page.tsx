@@ -1,10 +1,8 @@
-"use client"
-
 import CardBlog from "@/components/layout/user/card-blog";
-import { useGetBlog } from "@/lib/hooks/useBlog";
+import { getAllBlog } from "@/lib/services/blog";
 
-export default function BlogPage() {
-  const { data: blogs } = useGetBlog();
+export default async function BlogPage() {
+  const blogs = await getAllBlog();
 
   return (
     <>

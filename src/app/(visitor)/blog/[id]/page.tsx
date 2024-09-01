@@ -1,16 +1,9 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import { useGetBlogById } from "@/lib/hooks/useBlog";
-
 export default function BlogDetail() {
-  const pathname = usePathname();
-  const id = pathname.split("/").pop();
-  const { data } = useGetBlogById(id ?? "");
+
 
   return (
     <>
-      <p className="text-center text-2xl font-semibold">{data?.title}</p>
+      {/* <p className="text-center text-2xl font-semibold">{data?.title}</p>
       <div className="mt-5 flex flex-col gap-5">
         <div className="p-5 rounded-xl">
           <div
@@ -18,7 +11,7 @@ export default function BlogDetail() {
             dangerouslySetInnerHTML={{ __html: data?.content }}
           />
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

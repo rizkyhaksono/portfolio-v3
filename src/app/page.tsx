@@ -1,70 +1,30 @@
-"use client";
-
-import { useReducer } from "react";
 import Image from "next/image";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge"
-import { useGetProject } from "@/lib/hooks/useProject";
-import { useGetCareer } from "@/lib/hooks/useCareer";
-import { useGetEducation } from "@/lib/hooks/useEducation";
+import Marquee from "@/components/magicui/marquee";
 import CardProject from "@/components/layout/user/card-project";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link";
-import emailjs from "@emailjs/browser";
-import { toast } from "sonner"
+import { GITHUB_ACCOUNTS } from "@/lib/constant/github";
+import GithubCalendar from "@/components/layout/github-calender";
+import GithubOverview from "@/components/layout/user/github-overview";
+import { fetchGithubData } from "@/lib/services/github";
+import UserContact from "@/components/layout/user/contact";
+import { getAllProject } from "@/lib/services/project";
+import { getAllCarrer } from "@/lib/services/career";
+import { getAllEducation } from "@/lib/services/education";
 
-const initialState = {
-  email: "",
-  message: "",
-};
+export default async function Home() {
+  const projects = await getAllProject();
+  const careers = await getAllCarrer();
+  const educations = await getAllEducation();
 
-function formReducer(state: any, action: any) {
-  switch (action.type) {
-    case "SET_EMAIL":
-      return { ...state, email: action.payload };
-    case "SET_MESSAGE":
-      return { ...state, message: action.payload };
-    case "RESET":
-      return initialState;
-    default:
-      return state;
-  }
-}
+  const github = await fetchGithubData(
+    GITHUB_ACCOUNTS[0].username,
+    GITHUB_ACCOUNTS[0].token
+  );
 
-export default function Home() {
-  const [formState, dispatch] = useReducer(formReducer, initialState);
-  const { data: projects } = useGetProject();
-  const { data: careers } = useGetCareer();
-  const { data: educations } = useGetEducation();
-
-  const sendEmail = (e: any) => {
-    e.preventDefault();
-
-    const templateParams = {
-      email: formState.email,
-      message: formState.message,
-    };
-
-    emailjs
-      .send(
-        process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID ?? "",
-        process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID ?? "",
-        templateParams,
-        process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
-      )
-      .then(
-        () => {
-          toast.success("Email sent successfully");
-          dispatch({ type: "RESET" });
-        },
-        (error) => {
-          toast.error("Failed to send email");
-          console.log('FAILED...', error);
-        }
-      );
-  };
+  // console.log(github?.data?.contributionsCollection?.contributionCalendar);
 
   return (
     <div className="container max-w-2xl min-h-screen pt-12 sm:pt-24 px-6">
@@ -95,31 +55,46 @@ export default function Home() {
         </div>
       </div>
       <div className="mt-10">
+        <p className="text-left text-xl font-semibold">GitHub Contributions</p>
+        <GithubOverview
+          data={github?.data?.contributionsCollection?.contributionCalendar}
+        />
+        <GithubCalendar
+          data={github?.data?.contributionsCollection?.contributionCalendar}
+        />
+      </div>
+      <div className="mt-10">
         <p className="text-left text-xl font-semibold">Skills</p>
-        <div className="flex flex-wrap gap-2 mt-2">
-          <Badge>Typescript</Badge>
-          <Badge>Javascript</Badge>
-          <Badge>Next.js</Badge>
-          <Badge>Flutter</Badge>
-          <Badge>Docker</Badge>
-          <Badge>Git</Badge>
-          <Badge>Portainer</Badge>
-          <Badge>Express.js</Badge>
-          <Badge>Nest.js</Badge>
-          <Badge>Astro.js</Badge>
-          <Badge>PostgreSQL</Badge>
-          <Badge>MySQL</Badge>
-          <Badge>Laravel</Badge>
-          <Badge>Spring Boot</Badge>
-          <Badge>Go</Badge>
-          <Badge>ASP .NET</Badge>
+        <div className="relative w-full flex-col">
+          <Marquee pauseOnHover className="[--duration:30s]">
+            <Badge>Typescript</Badge>
+            <Badge>Javascript</Badge>
+            <Badge>Next.js</Badge>
+            <Badge>Flutter</Badge>
+            <Badge>Docker</Badge>
+            <Badge>Git</Badge>
+            <Badge>Portainer</Badge>
+          </Marquee>
+          <Marquee reverse pauseOnHover className="[--duration:30s]">
+            <Badge>Express.js</Badge>
+            <Badge>Nest.js</Badge>
+            <Badge>Astro.js</Badge>
+            <Badge>PostgreSQL</Badge>
+            <Badge>MySQL</Badge>
+            <Badge>Laravel</Badge>
+            <Badge>Spring Boot</Badge>
+            <Badge>Go</Badge>
+            <Badge>ASP .NET</Badge>
+          </Marquee>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background"></div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background"></div>
         </div>
       </div>
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Work Experience</p>
-        {careers?.map((career: any, index: number) => (
+        {careers?.map((career: any) => (
           <div
-            key={career.company + index}
+            key={career.title}
             className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
           >
             <Image
@@ -141,9 +116,9 @@ export default function Home() {
       </div>
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Education</p>
-        {educations?.map((edu: any, index: number) => (
+        {educations?.map((edu: any) => (
           <div
-            key={edu.school + index}
+            key={edu.title}
             className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
           >
             <Image
@@ -173,13 +148,13 @@ export default function Home() {
           </div>
         </div>
         <div className="grid max-[760px]:grid-cols-1 grid-cols-2 gap-2 mt-4">
-          {projects?.map((project: any) => (
+          {projects?.map((project) => (
             <CardProject
               key={project.id}
               title={project.title}
               description={project.description}
               href={project.url}
-              source={project.source_code}
+              source={project.source_code ?? ""}
               image={project.image || "/no-image.jpg"}
             />
           ))}
@@ -214,28 +189,7 @@ export default function Home() {
             If you have any questions or would like to work together, feel free to reach out.
           </div>
         </div>
-        <div className="flex justify-center mt-4">
-          <form className="w-full max-w-md" onSubmit={sendEmail}>
-            <div className="flex flex-col gap-4">
-              <Input
-                type="email"
-                placeholder="Your Email"
-                value={formState.email}
-                onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
-                required
-              />
-              <Textarea
-                placeholder="Your Message"
-                value={formState.message}
-                onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
-                required
-              />
-              <Button type="submit" variant={"default"} size={"sm"}>
-                Send
-              </Button>
-            </div>
-          </form>
-        </div>
+        <UserContact />
       </div>
     </div>
   );

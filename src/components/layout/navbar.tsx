@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
   TooltipContent,
@@ -81,11 +80,6 @@ const DATA = {
         url: "https://www.linkedin.com/in/rizkyhaksono/",
         icon: Icons.linkedin,
       },
-      X: {
-        name: "X",
-        url: "https://x.com/rizkyhaksono",
-        icon: Icons.x,
-      },
     },
   },
 };
@@ -116,7 +110,6 @@ export default function Navbar() {
               </Tooltip>
             </DockIcon>
           ))}
-          <Separator orientation="vertical" className="h-full" />
           {Object.entries(DATA.contact.social).map(([name, social]) => (
             <DockIcon key={name}>
               <Tooltip>
@@ -138,7 +131,6 @@ export default function Navbar() {
               </Tooltip>
             </DockIcon>
           ))}
-          <Separator orientation="vertical" className="h-full py-2" />
           <DockIcon>
             <Tooltip>
               <TooltipTrigger asChild>
