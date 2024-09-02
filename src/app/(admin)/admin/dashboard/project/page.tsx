@@ -1,6 +1,6 @@
 "use client";
 
-import { supabaseUser } from "@/lib/supabase/server";
+import { supabaseUser } from "@/supabase/server";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
