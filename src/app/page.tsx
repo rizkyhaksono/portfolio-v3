@@ -3,9 +3,12 @@ import BlurFade from "@/components/magicui/blur-fade";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
+import { getReadStats, getALLTimeSinceToday } from "@/lib/services/wakatime";
 import { GITHUB_ACCOUNTS } from "@/lib/commons/constants/github";
 import GithubCalendar from "@/components/layout/user/github-calender";
 import GithubOverview from "@/components/layout/user/github-overview";
+import WakatimeActive from "@/components/layout/user/wakatime-active";
+import WakatimeOverview from "@/components/layout/user/wakatime-overview";
 import { fetchGithubData } from "@/lib/services/github";
 import SkillSection from "@/lib/modules/skills";
 import ContactSection from "@/lib/modules/contact";
@@ -13,6 +16,14 @@ import EducationSection from "@/lib/modules/education";
 import CarrerSection from "@/lib/modules/career";
 
 export default async function Home() {
+  const readStatsResponse = await getReadStats();
+  const allTimeSinceTodayResponse = await getALLTimeSinceToday();
+
+  const wakatime = {
+    ...readStatsResponse.data,
+    all_time_since_today: allTimeSinceTodayResponse.data,
+  };
+
   const github = await fetchGithubData(
     GITHUB_ACCOUNTS[0].username,
     GITHUB_ACCOUNTS[0].token
@@ -54,17 +65,6 @@ export default async function Home() {
       </BlurFade>
       <BlurFade delay={0.25} inView>
         <div className="mt-10">
-          <p className="text-left text-xl font-semibold">GitHub Contributions</p>
-          <GithubOverview
-            data={github?.data?.contributionsCollection?.contributionCalendar}
-          />
-          <GithubCalendar
-            data={github?.data?.contributionsCollection?.contributionCalendar}
-          />
-        </div>
-      </BlurFade>
-      <BlurFade delay={0.25} inView>
-        <div className="mt-10">
           <p className="text-left text-xl font-semibold">Skills</p>
           <SkillSection />
         </div>
@@ -79,6 +79,19 @@ export default async function Home() {
         <div className="mt-10">
           <p className="text-left text-xl font-semibold">Education</p>
           <EducationSection />
+        </div>
+      </BlurFade>
+      <BlurFade delay={0.25} inView>
+        <div className="mt-10">
+          <p className="text-left text-xl font-semibold">GitHub Contributions</p>
+          <WakatimeOverview data={wakatime} />
+          <WakatimeActive data={wakatime} />
+          <GithubOverview
+            data={github?.data?.contributionsCollection?.contributionCalendar}
+          />
+          <GithubCalendar
+            data={github?.data?.contributionsCollection?.contributionCalendar}
+          />
         </div>
       </BlurFade>
       <BlurFade delay={0.25} inView>
