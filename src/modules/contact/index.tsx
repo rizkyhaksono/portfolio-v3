@@ -6,6 +6,8 @@ import { toast } from "sonner"
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator"
+import BlurFade from "@/components/magicui/blur-fade";
 
 const initialState = {
   email: "",
@@ -60,37 +62,67 @@ export default function ContactSection() {
   };
 
   return (
-    <div className="flex justify-start mt-5">
-      <form className="w-full" onSubmit={sendEmail}>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-row gap-2">
-            <Input
-              type="email"
-              placeholder="Your Email"
-              value={formState.email}
-              onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
-              required
-            />
-            <Input
-              type="text"
-              placeholder="Your Name"
-              value={formState.name}
-              onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })}
-              required
-            />
-          </div>
-          <Textarea
-            placeholder="Your Message"
-            className="h-60"
-            value={formState.message}
-            onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
-            required
-          />
-          <Button type="submit" variant={"default"} size={"sm"}>
-            Send
+    <BlurFade delay={0.25} inView>
+      <div className="mt-10">
+        <p className="text-left text-xl font-semibold">Contact</p>
+        <p className="flex justify-start text-muted-foreground text-sm">
+          {`Feel free to get in touch and let's have a discussion about how we can work together.`}
+        </p>
+        <Separator className="my-5" />
+        <p className="text-left text-base font-semibold">
+          Find me on social media
+        </p>
+        <div className="mt-5 flex flex-row gap-2">
+          <Button className="w-full rounded-sm" variant={"outline"}>
+            Github
+          </Button>
+          <Button className="w-full rounded-sm" variant={"outline"}>
+            Instagram
+          </Button>
+          <Button className="w-full rounded-sm" variant={"outline"}>
+            LinkedIn
+          </Button>
+          <Button className="w-full rounded-sm" variant={"outline"}>
+            Email
           </Button>
         </div>
-      </form>
-    </div>
+        <Separator className="my-5" />
+        <p className="text-left text-base font-semibold">
+          Or send me a message
+        </p>
+        <div className="flex justify-start mt-5">
+          <form className="w-full" onSubmit={sendEmail}>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-row gap-2">
+                <Input
+                  type="email"
+                  placeholder="Your Email"
+                  value={formState.email}
+                  onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
+                  required
+                />
+                <Input
+                  type="text"
+                  placeholder="Your Name"
+                  value={formState.name}
+                  onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })}
+                  required
+                />
+              </div>
+              <Textarea
+                placeholder="Your Message"
+                className="h-60"
+                value={formState.message}
+                onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
+                required
+              />
+              <Button type="submit" variant={"default"} size={"sm"}>
+                Send
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </BlurFade>
   )
 }
