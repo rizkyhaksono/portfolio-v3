@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight, Copy, CreditCard, MoreVertical, Truck, Pencil, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Skeleton } from "../../ui/skeleton";
-import { supabaseUser } from "@/lib/supabase/server";
+import { supabaseUser } from "@/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

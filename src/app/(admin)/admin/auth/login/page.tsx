@@ -7,8 +7,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getCookieValue, setCookieValue } from "@/lib/cookie-helper"
-import { supabaseUser } from "@/lib/supabase/server"
+import { getCookieValue, setCookieValue } from "@/commons/helpers"
+import { supabaseUser } from "@/supabase/server"
 
 export default function AdminAuthLogin() {
   const [email, setEmail] = useState("")
