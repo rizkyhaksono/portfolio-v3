@@ -1,7 +1,7 @@
 import {
   ALL_TIME_SINCE_TODAY,
   STATS_ENDPOINT,
-} from "../commons/constants/watatime";
+} from "@/commons/constants/watatime";
 
 export const getReadStats = async (): Promise<{
   status: number;

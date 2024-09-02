@@ -1,9 +1,9 @@
-import { DEVTO_BLOG_API } from "../commons/constants/blog";
+import { DEVTO_BLOG_API } from "../../app/commons/constants/blog";
 import {
   BlogDetailProps,
   BlogItem,
   CommentItemProps,
-} from "../commons/types/blog";
+} from "../../app/commons/types/blog";
 
 type BlogParamsProps = {
   params: { content: string };

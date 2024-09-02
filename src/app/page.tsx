@@ -3,17 +3,17 @@ import BlurFade from "@/components/magicui/blur-fade";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
-import { getReadStats, getALLTimeSinceToday } from "@/lib/services/wakatime";
-import { GITHUB_ACCOUNTS } from "@/lib/commons/constants/github";
+import { getReadStats, getALLTimeSinceToday } from "@/services/wakatime";
+import { GITHUB_ACCOUNTS } from "@/commons/constants/github";
 import GithubCalendar from "@/components/layout/user/github-calender";
 import GithubOverview from "@/components/layout/user/github-overview";
 import WakatimeActive from "@/components/layout/user/wakatime-active";
 import WakatimeOverview from "@/components/layout/user/wakatime-overview";
-import { fetchGithubData } from "@/lib/services/github";
-import SkillSection from "@/lib/modules/skills";
-import ContactSection from "@/lib/modules/contact";
-import EducationSection from "@/lib/modules/education";
-import CarrerSection from "@/lib/modules/career";
+import { fetchGithubData } from "@/services/github";
+import SkillSection from "@/modules/skills";
+import ContactSection from "@/modules/contact";
+import EducationSection from "@/modules/education";
+import CarrerSection from "@/modules/career";
 
 export default async function Home() {
   const readStatsResponse = await getReadStats();

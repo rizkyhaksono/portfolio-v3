@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge"
 import Marquee from "@/components/magicui/marquee";
 import {
   skills_data_top,
-  skills_data_bottom
-} from "@/lib/commons/constants/skills";
+  skills_data_bottom,
+} from "@/commons/constants/skills";
 
 export default function SkillSection() {
   return (
