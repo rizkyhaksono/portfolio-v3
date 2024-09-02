@@ -12,7 +12,7 @@ interface GithubOverviewProps {
 }
 
 const GithubOverview = ({ data }: GithubOverviewProps) => {
-  const totalContributions = data?.totalContributions || 0;
+  const totalContributions = data?.totalContributions ?? 0;
   const weeks = data?.weeks || [];
 
   const totalThisWeekContribution =

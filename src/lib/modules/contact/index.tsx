@@ -28,7 +28,7 @@ function formReducer(state: any, action: any) {
   }
 }
 
-export default function UserContact() {
+export default function ContactSection() {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const sendEmail = (e: any) => {
