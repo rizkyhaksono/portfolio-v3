@@ -88,14 +88,25 @@ export default async function Home() {
             {`Feel free to get in touch and let's have a discussion about how we can work together.`}
           </p>
           <Separator className="my-5" />
-          <p className="flex justify-start text-base">
+          <p className="text-left text-base font-semibold">
             Find me on social media
           </p>
-          <div className="mt-5 flex flex-row gap-5">
-
+          <div className="mt-5 flex flex-row gap-2">
+            <Button className="w-full rounded-sm" variant={"outline"}>
+              Github
+            </Button>
+            <Button className="w-full rounded-sm" variant={"outline"}>
+              Instagram
+            </Button>
+            <Button className="w-full rounded-sm" variant={"outline"}>
+              LinkedIn
+            </Button>
+            <Button className="w-full rounded-sm" variant={"outline"}>
+              Email
+            </Button>
           </div>
           <Separator className="my-5" />
-          <p className="flex justify-start text-base">
+          <p className="text-left text-base font-semibold">
             Or send me a message
           </p>
           <ContactSection />
