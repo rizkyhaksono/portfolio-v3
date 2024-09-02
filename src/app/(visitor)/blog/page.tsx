@@ -1,5 +1,5 @@
 import BlurFade from "@/components/magicui/blur-fade";
-import { getBlogData } from "@/lib/services/blog";
+import { getBlogData } from "@/services/blog";
 
 export default async function BlogPage() {
   const blogs = await getBlogData();

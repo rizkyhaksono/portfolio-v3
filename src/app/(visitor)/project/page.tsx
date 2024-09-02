@@ -1,6 +1,6 @@
 import BlurFade from "@/components/magicui/blur-fade";
 import CardProject from "@/modules/project/card-project";
-import { getAllProject } from "@/lib/services/project";
+import { getAllProject } from "@/services/project";
 
 export default async function ProjectPage() {
   const projects = await getAllProject();
@@ -21,7 +21,7 @@ export default async function ProjectPage() {
             description={project.description}
             href={project.url}
             source={project.source_code ?? ""}
-            image={project.image || "/no-image.jpg"}
+            image={project.image ?? "/no-image.jpg"}
           />
         ))}
       </div>

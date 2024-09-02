@@ -1,3 +1,5 @@
+"use server"
+
 import { format, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { cookies } from "next/headers"
