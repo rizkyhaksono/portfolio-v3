@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator"
+import CardContact from "./card-contact";
 import BlurFade from "@/components/magicui/blur-fade";
 
 const initialState = {
@@ -36,7 +37,7 @@ export default function ContactSection() {
   const sendEmail = (e: any) => {
     e.preventDefault();
 
-    const templateParams = {
+    const params = {
       email: formState.email,
       name: formState.name,
       message: formState.message,
@@ -46,7 +47,7 @@ export default function ContactSection() {
       .send(
         process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID ?? "",
         process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID ?? "",
-        templateParams,
+        params,
         process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
       )
       .then(
@@ -54,9 +55,8 @@ export default function ContactSection() {
           toast.success("Email sent successfully");
           dispatch({ type: "RESET" });
         },
-        (error) => {
+        () => {
           toast.error("Failed to send email");
-          console.log('FAILED...', error);
         }
       );
   };
@@ -73,18 +73,10 @@ export default function ContactSection() {
           Find me on social media
         </p>
         <div className="mt-5 flex flex-row gap-2">
-          <Button className="w-full rounded-sm" variant={"outline"}>
-            Github
-          </Button>
-          <Button className="w-full rounded-sm" variant={"outline"}>
-            Instagram
-          </Button>
-          <Button className="w-full rounded-sm" variant={"outline"}>
-            LinkedIn
-          </Button>
-          <Button className="w-full rounded-sm" variant={"outline"}>
-            Email
-          </Button>
+          <CardContact title="LinkedIn" href="https://linkedin.com/in/rizkyhaksono" />
+          <CardContact title="GitHub" href="https://github.com/rizkyhaksono" />
+          <CardContact title="Instagram" href="https://instagram.com/rizkyhaksonoo" />
+          <CardContact title="Email" href="mailto:mrizkyhaksono@gmail.com" />
         </div>
         <Separator className="my-5" />
         <p className="text-left text-base font-semibold">
@@ -96,21 +88,21 @@ export default function ContactSection() {
               <div className="flex flex-row gap-2">
                 <Input
                   type="email"
-                  placeholder="Your Email"
+                  placeholder="example@gmail.com"
                   value={formState.email}
                   onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
                   required
                 />
                 <Input
                   type="text"
-                  placeholder="Your Name"
+                  placeholder="example name"
                   value={formState.name}
                   onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })}
                   required
                 />
               </div>
               <Textarea
-                placeholder="Your Message"
+                placeholder="i'd like to discuss..."
                 className="h-60"
                 value={formState.message}
                 onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}

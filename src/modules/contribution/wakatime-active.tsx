@@ -56,7 +56,7 @@ const WakatimeActive = ({ data }: WakatimeActiveProps) => {
       total: getLanguagesTotalTimeDisplay,
       data: data?.languages,
       styles: {
-        bg: "bg-gradient-to-r from-amber-400 to-rose-600",
+        bg: "bg-black/50 dark:bg-white/50",
       },
     },
     {
@@ -64,7 +64,7 @@ const WakatimeActive = ({ data }: WakatimeActiveProps) => {
       total: getEditorTotalTimeDisplay,
       data: data?.categories,
       styles: {
-        bg: "bg-gradient-to-r from-blue-400 to-purple-600",
+        bg: "bg-black/50 dark:bg-white/50",
       },
     },
   ];

@@ -1,9 +1,10 @@
 import BlurFade from "@/components/magicui/blur-fade";
+import CardBlog from "@/modules/blog/card-blog";
 import { getBlogData } from "@/services/blog";
 
 export default async function BlogPage() {
   const blogs = await getBlogData();
-  console.log(blogs);
+  // console.log(blogs);
 
   return (
     <BlurFade delay={0.25} inView>
@@ -14,7 +15,15 @@ export default async function BlogPage() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-2 mt-4">
-
+        {blogs.map((blog) => (
+          <CardBlog
+            key={blog.id}
+            title={blog.title}
+            description={blog.description}
+            image={blog.cover_image}
+            href={`/blog/${blog.slug}?id=${blog.id}`}
+          />
+        ))}
       </div>
     </BlurFade>
   );
