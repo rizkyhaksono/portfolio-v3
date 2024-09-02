@@ -7,7 +7,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getCookieValue, setCookieValue } from "@/commons/helpers"
+import { getCookieValue, setCookieValue } from "@/commons/helpers/cookies"
 import { supabaseUser } from "@/supabase/server"
 
 export default function AdminAuthLogin() {

@@ -5,7 +5,7 @@ import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { getCookieValue } from "@/commons/helpers";
+import { getCookieValue } from "@/commons/helpers/cookies";
 
 export default function AdminHeader() {
   const { setTheme } = useTheme();

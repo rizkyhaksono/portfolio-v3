@@ -1,27 +1,9 @@
-"use server"
-
 import { format, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { cookies } from "next/headers"
 
 interface ParsedUrlProps {
   parentSlug: string;
   contentSlug: string;
-}
-
-export async function getCookieValue(key: string) {
-  const cookiesStore = cookies()
-  return cookiesStore.get(key)
-}
-
-export async function setCookieValue(key: string, value: string) {
-  const cookiesStore = cookies()
-  cookiesStore.set(key, value)
-}
-
-export async function removeCookieValue(key: string) {
-  const cookiesStore = cookies()
-  cookiesStore.delete(key)
 }
 
 export const formatBlogSlug = (slug: string) => slug?.slice(0, -5);
