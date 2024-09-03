@@ -84,11 +84,11 @@ const WakatimeActive = ({ data }: WakatimeActiveProps) => {
           )}
         >
           <div className="h-full w-full rounded-lg bg-background p-2">
-            <div className="absolute -top-3 left-3 bg-background px-2 dark:bg-dark">
+            <div className="absolute -top-3 left-3 bg-background px-2 dark:bg-dark text-sm">
               {item?.title}
             </div>
 
-            <ul className="flex flex-col gap-1 px-4 py-3">
+            <ul className="flex flex-col gap-1 px-4 py-3 text-xs">
               {item?.data?.map((subItem) => (
                 <li key={subItem?.name}>
                   <WakatimeProgress

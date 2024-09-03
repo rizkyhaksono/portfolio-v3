@@ -16,7 +16,7 @@ const WakatimeOverviewItem = ({ label, value }: WakatimeOverviewItemProps) => (
       <CardTitle className="text-sm text-neutral-600 dark:text-neutral-400">
         {label}
       </CardTitle>
-      <CardDescription className="text-black dark:text-white text-lg">
+      <CardDescription className="text-black dark:text-white text-sm">
         {value || "-"}
       </CardDescription>
     </CardHeader>

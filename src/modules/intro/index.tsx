@@ -1,5 +1,5 @@
-import BlurFade from "@/components/magicui/blur-fade";
 import Image from "next/image";
+import BlurFade from "@/components/magicui/blur-fade";
 
 export default function IntroSection() {
   return (
@@ -20,5 +20,5 @@ export default function IntroSection() {
         />
       </div>
     </BlurFade>
-  )
+  );
 }

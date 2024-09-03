@@ -72,7 +72,7 @@ export default function ContactSection() {
         <p className="text-left text-base font-semibold">
           Find me on social media
         </p>
-        <div className="mt-5 flex flex-row gap-2">
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
           <CardContact title="LinkedIn" href="https://linkedin.com/in/rizkyhaksono" />
           <CardContact title="GitHub" href="https://github.com/rizkyhaksono" />
           <CardContact title="Instagram" href="https://instagram.com/rizkyhaksonoo" />
@@ -85,7 +85,7 @@ export default function ContactSection() {
         <div className="flex justify-start mt-5">
           <form className="w-full" onSubmit={sendEmail}>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-col md:flex-row gap-2">
                 <Input
                   type="email"
                   placeholder="example@gmail.com"

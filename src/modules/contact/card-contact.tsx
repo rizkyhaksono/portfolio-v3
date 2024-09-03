@@ -15,7 +15,7 @@ export default function CardContact({
 }: Readonly<CardContactProps>) {
   return (
     <Link href={href} target="_blank" className="w-full">
-      <Button className="w-full rounded-sm" variant={"outline"}>
+      <Button className="w-full rounded-sm text-xs" variant={"outline"}>
         {title}
       </Button>
     </Link>
