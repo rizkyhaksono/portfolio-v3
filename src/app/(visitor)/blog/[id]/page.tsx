@@ -15,15 +15,17 @@ export default async function BlogDetail({
   const blog = await getBlogDetail({ params, searchParams });
   // console.log(blog)
 
+  if (!blog) return null;
+
   return (
     <BlurFade delay={0.25} inView>
       <div
         className="text-start text-2xl font-semibold"
-        dangerouslySetInnerHTML={{ __html: blog.title }}
+        dangerouslySetInnerHTML={{ __html: blog?.title }}
       />
       <div
         className="mt-5 text-start text-base font-normal"
-        dangerouslySetInnerHTML={{ __html: blog.body_html }}
+        dangerouslySetInnerHTML={{ __html: blog?.body_html }}
       />
     </BlurFade>
   )
