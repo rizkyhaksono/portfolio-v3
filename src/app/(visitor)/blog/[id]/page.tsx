@@ -1,3 +1,5 @@
+"use strict";
+
 import BlurFade from "@/components/magicui/blur-fade"
 import { getBlogDetail } from "@/services/blog"
 
@@ -16,7 +18,7 @@ export default async function BlogDetail({
   return (
     <BlurFade delay={0.25} inView>
       <div
-        className="text-start text-xl font-semibold"
+        className="text-start text-2xl font-semibold"
         dangerouslySetInnerHTML={{ __html: blog.title }}
       />
       <div
