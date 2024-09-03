@@ -4,7 +4,6 @@ import { getBlogData } from "@/services/blog";
 
 export default async function BlogPage() {
   const blogs = await getBlogData();
-  // console.log(blogs);
 
   return (
     <BlurFade delay={0.25} inView>
@@ -14,7 +13,7 @@ export default async function BlogPage() {
           {`I write about my experiences, thoughts, and ideas on various topics.`}
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-2 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
         {blogs.map((blog) => (
           <CardBlog
             key={blog.id}

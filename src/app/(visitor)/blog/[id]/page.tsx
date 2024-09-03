@@ -1,4 +1,3 @@
-import { headers } from 'next/headers';
 import BlurFade from "@/components/magicui/blur-fade"
 import { getBlogDetail } from "@/services/blog"
 
