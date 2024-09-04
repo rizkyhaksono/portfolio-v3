@@ -42,7 +42,7 @@ export default function CardBlog({
       </CardHeader>
       <CardFooter className="px-2">
         <Link href={href}>
-          <Button size={"sm"} className="gap-1">
+          <Button size={"sm"} className="gap-2">
             Read more <ArrowBigRightDash className="text-muted size-4" />
           </Button>
         </Link>

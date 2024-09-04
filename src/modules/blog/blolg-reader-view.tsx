@@ -1,6 +1,5 @@
 import { BlogDetailProps, CommentItemProps } from "@/commons/types/blog";
 import BlogReaderHeader from "./blog-reader-header";
-// import Image from "@/components/ui/image";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -67,9 +66,9 @@ const BlogReaderView = ({
         <Typography.h3 className="text-lg font-medium">
           Comment on DEV Community:
         </Typography.h3>
-        <Link href={url} target="_blank" className="text-blue-600">
+        {/* <Link href={url} target="_blank" className="text-blue-600">
           {url}
-        </Link>
+        </Link> */}
       </div>
       <BlogCommentList
         id={id}
