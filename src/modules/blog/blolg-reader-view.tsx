@@ -1,8 +1,8 @@
+import Link from "next/link";
 import { BlogDetailProps, CommentItemProps } from "@/commons/types/blog";
 import BlogReaderHeader from "./blog-reader-header";
-import Image from "next/image";
+import ImageRender from "@/components/ui/image-render";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 import MDXComponent from "@/components/ui/mdx-components";
 import BlogCommentList from "./blog-comment-list";
 import Typography from "@/components/ui/typography";
@@ -32,6 +32,13 @@ const BlogReaderView = ({
   } = content;
   return (
     <>
+      <div className="mb-5 text-start text-sm font-normal underline underline-offset-4">
+        <Link
+          href={"/blog"}
+        >
+          Back
+        </Link>
+      </div>
       <BlogReaderHeader
         title={title}
         comments_count={comments_count}
@@ -41,7 +48,7 @@ const BlogReaderView = ({
       />
       <div className="space-y-6 leading-[1.8] dark:text-neutral-300 ">
         <div className="overflow-hidden rounded-xl">
-          <Image
+          <ImageRender
             src={cover_image}
             width={800}
             height={500}
@@ -66,9 +73,9 @@ const BlogReaderView = ({
         <Typography.h3 className="text-lg font-medium">
           Comment on DEV Community:
         </Typography.h3>
-        {/* <Link href={url} target="_blank" className="text-blue-600">
+        <Link href={url} target="_blank" className="text-blue-600">
           {url}
-        </Link> */}
+        </Link>
       </div>
       <BlogCommentList
         id={id}

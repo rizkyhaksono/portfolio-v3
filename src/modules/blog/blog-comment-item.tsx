@@ -2,8 +2,8 @@
 
 import { formatDate } from "@/commons/helpers";
 import { CommentItemProps } from "@/commons/types/blog";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import Image from "next/image";
+import { Card, CardHeader } from "@/components/ui/card";
+import ImageRender from "@/components/ui/image-render";
 import { useEffect, useRef } from "react";
 
 export default function BlogCommentItem({
@@ -30,12 +30,13 @@ export default function BlogCommentItem({
       className="flex gap-5 break-all dark:text-neutral-400"
     >
       <div className="flex-shrink-0">
-        <Image
+        <ImageRender
           data-testid="user-comment-image"
           src={user?.profile_image_90}
           alt={user?.name}
           width={40}
           height={40}
+          rounded="rounded-full"
           className="border border-neutral-200 dark:border-neutral-800"
         />
       </div>
