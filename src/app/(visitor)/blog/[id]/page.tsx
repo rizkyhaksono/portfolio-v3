@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade"
-import { getBlogDetail } from "@/services/blog"
+import { getBlogDetail, getBlogViews, getComments } from "@/services/blog"
+import BlogReaderView from "@/modules/blog/blolg-reader-view";
 
 type BlogsDetailPageProps = {
   params: { content: string };
@@ -12,11 +13,8 @@ export default async function BlogDetail({
   searchParams,
 }: Readonly<BlogsDetailPageProps>) {
   const blog = await getBlogDetail({ params, searchParams });
-
-  if (!blog) return null;
-
-  // const titleHTML = blog.title ? String(blog.title) : "";
-  // const bodyHTML = blog.body_html ? String(blog.body_html) : "";
+  const pageViewCount = await getBlogViews(searchParams.id as string);
+  const comments = await getComments(searchParams.id as string);
 
   return (
     <BlurFade delay={0.25} inView>
@@ -26,16 +24,11 @@ export default async function BlogDetail({
       >
         Back
       </Link>
-      <p className="text-start text-2xl mt-5 font-semibold">{blog.title}</p>
-      <p className="mt-5 text-start text-base font-normal">{blog.body_markdown}</p>
-      {/* <div
-        className="text-start text-2xl mt-5 font-semibold"
-        dangerouslySetInnerHTML={{ __html: titleHTML }}
+      <BlogReaderView
+        content={blog}
+        pageViewCount={pageViewCount}
+        comments={comments}
       />
-      <div
-        className="mt-5 text-start text-base font-normal"
-        dangerouslySetInnerHTML={{ __html: bodyHTML }}
-      /> */}
     </BlurFade>
   )
 }

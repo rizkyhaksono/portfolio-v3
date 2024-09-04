@@ -1,4 +1,3 @@
-import { DEVTO_BLOG_API } from "@/commons/constants/blog";
 import {
   BlogDetailProps,
   BlogItem,
@@ -7,8 +6,11 @@ import {
 } from "@/commons/types/blog";
 
 export async function getBlogData(): Promise<BlogItem[]> {
-  const response = await fetch(DEVTO_BLOG_API, {
+  const response = await fetch(`https://dev.to/api/articles/me`, {
     method: "GET",
+    headers: {
+      "api-key": process.env.DEVTO_KEY ?? "",
+    },
     next: {
       revalidate: 60,
     },
