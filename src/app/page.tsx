@@ -5,10 +5,11 @@ import CarrerSection from "@/modules/career";
 import EducationSection from "@/modules/education";
 import ContributionSection from "@/modules/contribution";
 import ContactSection from "@/modules/contact";
+import BaseLayout from "@/components/layout/base-layout";
 
 export default async function Home() {
   return (
-    <div className="container max-w-4xl min-h-screen pt-12 sm:pt-24 px-6">
+    <BaseLayout>
       <IntroSection />
       <AboutSection />
       <SkillSection />
@@ -16,6 +17,6 @@ export default async function Home() {
       <EducationSection />
       <ContributionSection />
       <ContactSection />
-    </div>
+    </BaseLayout>
   );
 }
