@@ -73,10 +73,7 @@ export default function ContactSection() {
           Find me on social media
         </p>
         <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <CardContact title="LinkedIn" href="https://linkedin.com/in/rizkyhaksono" />
-          <CardContact title="GitHub" href="https://github.com/rizkyhaksono" />
-          <CardContact title="Instagram" href="https://instagram.com/rizkyhaksonoo" />
-          <CardContact title="Email" href="mailto:mrizkyhaksono@gmail.com" />
+          <CardContact />
         </div>
         <Separator className="my-5" />
         <p className="text-left text-base font-semibold">

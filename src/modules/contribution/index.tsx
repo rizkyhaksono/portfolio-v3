@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
 import { getReadStats, getALLTimeSinceToday } from "@/services/wakatime";
 import { GITHUB_ACCOUNTS } from "@/commons/constants/github";
@@ -24,7 +25,13 @@ export default async function ContributionSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <p className="text-left text-xl font-semibold">GitHub Contributions</p>
+        <Link
+          className="text-lg font-semibold underline underline-offset-4"
+          href={"https://github.com/rizkyhaksono"}
+          target="_blank"
+        >
+          {`@rizkyhaksono's contributions`}
+        </Link>
         <WakatimeOverview data={wakatime} />
         <WakatimeActive data={wakatime} />
         <GithubOverview
