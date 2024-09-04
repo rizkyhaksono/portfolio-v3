@@ -15,8 +15,8 @@ export default async function BlogDetail({
 
   if (!blog) return null;
 
-  const titleHTML = blog.title ? String(blog.title) : "";
-  const bodyHTML = blog.body_html ? String(blog.body_html) : "";
+  // const titleHTML = blog.title ? String(blog.title) : "";
+  // const bodyHTML = blog.body_html ? String(blog.body_html) : "";
 
   return (
     <BlurFade delay={0.25} inView>
@@ -26,14 +26,16 @@ export default async function BlogDetail({
       >
         Back
       </Link>
-      <div
+      <p className="text-start text-2xl mt-5 font-semibold">{blog.title}</p>
+      <p className="mt-5 text-start text-base font-normal">{blog.body_markdown}</p>
+      {/* <div
         className="text-start text-2xl mt-5 font-semibold"
         dangerouslySetInnerHTML={{ __html: titleHTML }}
       />
       <div
         className="mt-5 text-start text-base font-normal"
         dangerouslySetInnerHTML={{ __html: bodyHTML }}
-      />
+      /> */}
     </BlurFade>
   )
 }
