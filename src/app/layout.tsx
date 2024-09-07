@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "@/components/ui/sonner"
 import { Analytics } from "@vercel/analytics/react"
+import { MetadataConstants } from "@/commons/constants/metadata";
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -12,8 +13,31 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "RH | Home",
-  description: "Built by @rizkyhaksono",
+  title: "Rizky Haksono | Software Engineer",
+  metadataBase: new URL(
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : process.env.DOMAIN || ""
+  ),
+  description: MetadataConstants.description,
+  keywords: MetadataConstants.keyword,
+  creator: MetadataConstants.creator,
+  authors: {
+    name: MetadataConstants.creator,
+    url: MetadataConstants.openGraph.url,
+  },
+  openGraph: {
+    title: "Jody Yuantoro - Software Engineer",
+    images: MetadataConstants.profile,
+    url: MetadataConstants.openGraph.url,
+    siteName: MetadataConstants.openGraph.siteName,
+    locale: MetadataConstants.openGraph.locale,
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
