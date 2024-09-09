@@ -12,12 +12,12 @@ export default function SkillSection() {
       <div className="mt-10">
         <p className="text-left text-xl font-semibold">Skills</p>
         <div className="relative w-full flex-col">
-          <Marquee pauseOnHover className="[--duration:30s]">
+          <Marquee className="[--duration:15s]">
             {skills_data_top.map((skill) => (
               <Badge key={skill}>{skill}</Badge>
             ))}
           </Marquee>
-          <Marquee reverse pauseOnHover className="[--duration:30s]">
+          <Marquee reverse className="[--duration:25s]">
             {skills_data_bottom.map((skill) => (
               <Badge key={skill}>{skill}</Badge>
             ))}

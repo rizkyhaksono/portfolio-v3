@@ -1,8 +1,8 @@
 import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
-import { getReadStats, getALLTimeSinceToday } from "@/services/wakatime";
+import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime";
 import { GITHUB_ACCOUNTS } from "@/commons/constants/github";
-import { fetchGithubData } from "@/services/github";
+import { fetchGithubData } from "@/services/visitor/github";
 import GithubCalendar from "@/modules/contribution/github-calender";
 import GithubOverview from "@/modules/contribution/github-overview";
 import WakatimeActive from "@/modules/contribution/wakatime-active";

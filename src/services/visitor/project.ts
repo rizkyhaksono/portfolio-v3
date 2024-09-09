@@ -1,4 +1,4 @@
-import { supabaseUser } from "../supabase/server";
+import { supabaseUser } from "../../supabase/server";
 
 type projectType = {
   id: string;

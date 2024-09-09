@@ -1,6 +1,6 @@
 import Image from "next/image"
 import BlurFade from "@/components/magicui/blur-fade";
-import { getAllCarrer } from "@/services/career";
+import { getAllCarrer } from "@/services/visitor/career";
 
 export default async function CarrerSection() {
   const careers = await getAllCarrer();

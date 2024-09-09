@@ -1,6 +1,6 @@
 import Image from "next/image"
 import BlurFade from "@/components/magicui/blur-fade";
-import { getAllEducation } from "@/services/education";
+import { getAllEducation } from "@/services/visitor/education";
 
 export default async function EducationSection() {
   const educations = await getAllEducation();

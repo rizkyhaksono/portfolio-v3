@@ -1,5 +1,5 @@
 import BlurFade from "@/components/magicui/blur-fade"
-import { getBlogDetail, getBlogViews, getComments } from "@/services/blog"
+import { getBlogDetail, getBlogViews, getComments } from "@/services/visitor/blog"
 import BlogReaderView from "@/modules/blog/blolg-reader-view";
 
 type BlogsDetailPageProps = {

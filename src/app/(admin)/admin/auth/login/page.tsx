@@ -1,53 +1,37 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import Link from "next/link"
-import Image from "next/image"
-import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { getCookieValue, setCookieValue } from "@/commons/helpers/cookies"
-import { supabaseUser } from "@/supabase/server"
+import { setCookieValue } from "@/commons/helpers/cookies"
+import { checkUser } from "@/commons/helpers"
+import { loginAdmin } from "@/services/admin/auth"
 
 export default function AdminAuthLogin() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<any>(null)
-  const router = useRouter()
 
-  const checkUser = useCallback(async () => {
-    const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE")
-    if (cookie) {
-      router.push("/admin/dashboard")
-    }
-  }, [router])
+  useEffect(() => {
+    checkUser(router);
+  }, [router]);
 
   const handleAdminLogin = async () => {
     try {
-      const { data, error } = await supabaseUser.auth.signInWithPassword({
-        email: email,
-        password: password,
-      })
-      if (error) {
-        throw error
-      }
-      console.log("Registration successful:", data)
-      if (data?.user?.role == "admin") {
-        setCookieValue("ADMIN_SUPABASE_AUTH_COOKIE", data?.session?.access_token)
-        router.push("/admin/dashboard")
-      } else {
-        setError("Invalid admin account")
+      const data = await loginAdmin({ email, password });
+      if (data?.session?.access_token) {
+        setCookieValue("ADMIN_SUPABASE_AUTH_COOKIE", data?.session?.access_token);
+        router.push("/admin/dashboard");
       }
     } catch (error: any) {
-      setError(error.message)
-      console.error("Registration error:", error.message)
+      setError(error.message || "Login failed");
+      console.error("Login error:", error);
     }
-  }
-
-  useEffect(() => {
-    checkUser()
-  }, [checkUser])
+  };
 
   return (
     <div className="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0 max-[766px]:mt-40">

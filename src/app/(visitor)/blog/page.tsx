@@ -1,6 +1,6 @@
 import BlurFade from "@/components/magicui/blur-fade";
 import CardBlog from "@/modules/blog/card-blog";
-import { getBlogData } from "@/services/blog";
+import { getBlogData } from "@/services/visitor/blog";
 
 export default async function BlogPage() {
   const blogs = await getBlogData();
