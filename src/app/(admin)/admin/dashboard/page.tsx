@@ -1,5 +1,7 @@
-import AdminDashboardWidget from "@/components/layout/admin/admin-dashboard-widget";
-
 export default function AdminDashboardPage() {
-  return <AdminDashboardWidget />;
+  return (
+    <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
+      Hai
+    </div>
+  )
 }

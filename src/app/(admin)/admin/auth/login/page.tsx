@@ -1,24 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useRouter } from "next/navigation"
 import { setCookieValue } from "@/commons/helpers/cookies"
-import { checkUser } from "@/commons/helpers"
+import { useCheckAdmin } from "@/commons/helpers/check"
 import { loginAdmin } from "@/services/admin/auth"
 
-export default function AdminAuthLogin() {
+export default function AdminLoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    checkUser(router);
-  }, [router]);
+  useCheckAdmin();
 
   const handleAdminLogin = async () => {
     try {

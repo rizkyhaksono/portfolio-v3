@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
-export default function AdminDashboardCareerPage() {
+export default function AdminCareerPage() {
   const [careerData, setCareerData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -57,7 +57,7 @@ export default function AdminDashboardCareerPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-        Admin Dashboard Career Page
+        Admin Career Page
         <div className="flex justify-between items-center">
           <Skeleton className="h-8 w-1/12" />
           <div className="flex justify-between items-center space-x-4">
@@ -72,7 +72,7 @@ export default function AdminDashboardCareerPage() {
 
   return (
     <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-      Admin Dashboard Career Page
+      Admin Career Page
       <Tabs defaultValue="allData" className="max-[644px]:mt-4">
         <div className="flex items-center">
           <TabsList>

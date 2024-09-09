@@ -1,29 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { getCookieValue } from "@/commons/helpers/cookies";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function AdminHeader() {
   const { setTheme } = useTheme();
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  const checkAdmin = useCallback(async () => {
-    const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE");
-    if (cookie) {
-      console.log("Admin is logged in", loggedIn);
-      setLoggedIn(true);
-    } else {
-      console.log("Admin is not logged in", loggedIn);
-    }
-  }, [loggedIn]);
-
-  useEffect(() => {
-    checkAdmin();
-  }, [checkAdmin]);
 
   return (
     <header className="px-4 sticky top-0 z-10 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-end sm:py-3 items-center">

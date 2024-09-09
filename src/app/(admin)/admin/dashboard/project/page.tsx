@@ -19,7 +19,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import Link from "next/link";
 import Image from "next/image";
 
-export default function AdminDashboardProjectPage() {
+export default function AdminProjectPage() {
   const [projectData, setProjectData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,7 +72,7 @@ export default function AdminDashboardProjectPage() {
 
   return (
     <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-      Admin Dashboard Project Page
+      Admin Project Page
       <Tabs defaultValue="allData" className="max-[644px]:mt-4">
         <div className="flex items-center">
           <TabsList>

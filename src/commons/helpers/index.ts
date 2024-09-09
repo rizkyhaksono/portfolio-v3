@@ -1,7 +1,5 @@
 import { format, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { useRouter } from "next/navigation";
-import { getCookieValue } from "@/commons/helpers/cookies";
 
 interface ParsedUrlProps {
   parentSlug: string;
@@ -57,11 +55,4 @@ export const calculateReadingTime = (content: string, wordsPerMinute = 5) => {
     cleanedContent.split(/\s+/).length / wordsPerMinute
   );
   return readingTimeMinutes;
-};
-
-export const checkUser = async (router: ReturnType<typeof useRouter>) => {
-  const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE");
-  if (cookie) {
-    router.push("/admin/dashboard");
-  }
 };
