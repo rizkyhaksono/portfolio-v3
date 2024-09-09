@@ -14,7 +14,7 @@ export default function AdminAuthLogin() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState<any>(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     checkUser(router);
@@ -29,7 +29,6 @@ export default function AdminAuthLogin() {
       }
     } catch (error: any) {
       setError(error.message || "Login failed");
-      console.error("Login error:", error);
     }
   };
 
@@ -45,7 +44,9 @@ export default function AdminAuthLogin() {
         </a>
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
-            <p className="text-lg">“This library has saved me countless hours of work and helped me deliver stunning designs to my clients faster than ever before.”</p>
+            <p className="text-lg">
+              “This library has saved me countless hours of work and helped me deliver stunning designs to my clients faster than ever before.”
+            </p>
             <footer className="text-sm">Sofia Davis</footer>
           </blockquote>
         </div>
@@ -53,36 +54,49 @@ export default function AdminAuthLogin() {
       <div className="lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">Login an admin account</h1>
-            <p className="text-sm text-muted-foreground">Enter your email below to login to admin account</p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Login an admin account
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Enter your email below to login to admin account
+            </p>
           </div>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="admin@example.com" required onChange={(e) => setEmail(e.target.value)} />
+              <Label htmlFor="email">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                required
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">
+                  Password
+                </Label>
               </div>
-              <Input id="password" type="password" placeholder="********" required onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="password"
+                type="password"
+                placeholder="********"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             {error && <p className="text-red-500">{error}</p>}
-            <Button type="submit" className="w-full" onClick={handleAdminLogin}>
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              onClick={handleAdminLogin}
+            >
               Login to admin account
             </Button>
           </div>
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to our{" "}
-            <a className="underline underline-offset-4 hover:text-primary" href="#">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a className="underline underline-offset-4 hover:text-primary" href="#">
-              Privacy Policy
-            </a>
-            .
-          </p>
         </div>
       </div>
     </div>
