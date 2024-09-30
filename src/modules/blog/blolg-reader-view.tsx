@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 import { BlogDetailProps, CommentItemProps } from "@/commons/types/blog";
 import BlogReaderHeader from "./blog-reader-header";
