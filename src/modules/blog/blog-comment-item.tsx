@@ -10,14 +10,15 @@ export default function BlogCommentItem({
   body_html,
   created_at,
   user,
-}: CommentItemProps) {
+}: Readonly<
+  CommentItemProps
+>) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (contentRef.current) {
       const codeElements = contentRef.current.getElementsByTagName("code");
-      for (let i = 0; i < codeElements.length; i++) {
-        const codeElement = codeElements[i];
+      for (const codeElement of Array.from(codeElements)) {
         codeElement.classList.add("break-words");
         codeElement.classList.add("text-xs");
         codeElement.classList.add("whitespace-pre-wrap");

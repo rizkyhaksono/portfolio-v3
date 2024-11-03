@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : process.env.DOMAIN || ""
+      : process.env.DOMAIN ?? ""
   ),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,

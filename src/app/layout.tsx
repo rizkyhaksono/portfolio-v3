@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : process.env.DOMAIN || ""
+      : process.env.DOMAIN ?? ""
   ),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
@@ -38,6 +38,7 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  abstract: MetadataConstants.description,
 };
 
 export default function RootLayout({
