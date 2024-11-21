@@ -61,7 +61,7 @@ const BlogReaderView = ({
       </div>
       {tags?.length >= 1 && (
         <div className="my-10 space-y-2">
-          <Typography.h3 className="text-lg font-medium">Tags:</Typography.h3>
+          <Typography.H3 className="text-lg font-medium">Tags:</Typography.H3>
           <div className="flex flex-wrap gap-2 pt-2">
             {tags?.map((stack: string, index: number) => (
               <Badge key={index}>{stack}</Badge>
@@ -71,9 +71,9 @@ const BlogReaderView = ({
       )}
       <Separator className="my-6" />
       <div className="mb-4 flex flex-col space-y-2">
-        <Typography.h3 className="text-lg font-medium">
+        <Typography.H3 className="text-lg font-medium">
           Comment on DEV Community:
-        </Typography.h3>
+        </Typography.H3>
         <Link href={url} target="_blank" className="text-blue-600">
           {url}
         </Link>

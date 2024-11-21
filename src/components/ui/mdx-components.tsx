@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeBlock from "./code-block";
 import Typography from "./typography";
+import NextImage from "next/image";
 
 interface MarkdownRendererProps {
   children: string;
@@ -30,10 +31,10 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
             {...props}
           />
         ),
-        p: (props) => <Typography.p {...props} />,
-        h1: (props) => <Typography.h1 {...props} />,
-        h2: (props) => <Typography.h2 {...props} />,
-        h3: (props) => <Typography.h3 {...props} />,
+        p: (props) => <Typography.P {...props} />,
+        h1: (props) => <Typography.H1 {...props} />,
+        h2: (props) => <Typography.H2 {...props} />,
+        h3: (props) => <Typography.H3 {...props} />,
         ul: (props) => (
           <ul className="list-disc space-y-3 pb-5 pl-10 font-sans" {...props} />
         ),
@@ -44,10 +45,14 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
           />
         ),
         img: (props) => (
-          <img
-            className="transition-all duration-700 ease-in-out hover:scale-105 rounded-xl my-8 align-middle"
-            {...props}
+          <NextImage
+            className="rounded-xl mx-auto my-3"
+            width={(props.width as number) || 1600}
+            height={(props.height as number) || 1600}
+            src={props.src as string}
+            alt={props.alt as string}
             loading="lazy"
+            quality={100}
           />
         ),
         code: (props) => <CodeBlock {...props} />,

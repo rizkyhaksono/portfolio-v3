@@ -18,7 +18,7 @@ const TypographyH1 = ({ children, className, ...props }: any) => {
     </h1>
   );
 };
-Typography.h1 = TypographyH1;
+Typography.H1 = TypographyH1;
 
 const TypographyH2 = ({ children, className, ...props }: any) => {
   return (
@@ -33,7 +33,7 @@ const TypographyH2 = ({ children, className, ...props }: any) => {
     </h2>
   );
 };
-Typography.h2 = TypographyH2;
+Typography.H2 = TypographyH2;
 
 const TypographyH3 = ({ children, className, ...props }: any) => {
   return (
@@ -48,7 +48,7 @@ const TypographyH3 = ({ children, className, ...props }: any) => {
     </h3>
   );
 };
-Typography.h3 = TypographyH3;
+Typography.H3 = TypographyH3;
 
 const TypographyH4 = ({ children, className, ...props }: any) => {
   return (
@@ -63,16 +63,16 @@ const TypographyH4 = ({ children, className, ...props }: any) => {
     </h4>
   );
 };
-Typography.h4 = TypographyH4;
+Typography.H4 = TypographyH4;
 
 const TypographyP = ({ children, className, ...props }: any) => {
   return (
-    <p className={cn("leading-7", className)} {...props}>
+    <div className={cn("leading-7", className)} {...props}>
       {children}
-    </p>
+    </div>
   );
 };
-Typography.p = TypographyP;
+Typography.P = TypographyP;
 
 const TypographyBlockquote = ({ children, className, ...props }: any) => {
   return (

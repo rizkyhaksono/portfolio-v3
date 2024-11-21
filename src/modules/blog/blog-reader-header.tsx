@@ -65,37 +65,37 @@ const BlogReaderHeader = ({
         {title}
       </motion.h1>
       <div className="mb-6 flex flex-col justify-between gap-2 pb-6 pt-5 text-[14px] text-neutral-600 dark:text-neutral-400 sm:flex-row">
-        <Typography.p>
+        <Typography.P>
           Published on
           <span className="px-1 font-medium">
             {published_at ? formatDate(published_at) : ""}
           </span>
-        </Typography.p>
+        </Typography.P>
 
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-1 font-medium">
             <ViewIcon size={18} />
-            <Typography.p className="ml-0.5 flex gap-1">
+            <Typography.P className="ml-0.5 flex gap-1">
               <span>{page_views_count || "-"}</span>
               <span>Views</span>
-            </Typography.p>
+            </Typography.P>
           </div>
           <div className="flex items-center gap-1 font-medium">
             <ClockIcon size={18} />
-            <Typography.p className="ml-0.5 flex gap-1">
+            <Typography.P className="ml-0.5 flex gap-1">
               <span>{reading_time_minutes}</span>
               <span>min read</span>
-            </Typography.p>
+            </Typography.P>
           </div>
           <div
             className="hidden cursor-pointer items-center gap-1 font-medium hover:dark:text-neutral-300 md:flex"
           // onClick={scrollToSection}
           >
             <CommentIcon size={20} />
-            <Typography.p className="ml-0.5 flex gap-1">
+            <Typography.P className="ml-0.5 flex gap-1">
               <span>{comments_count}</span>
               <span>Comment{comments_count > 1 && "s"}</span>
-            </Typography.p>
+            </Typography.P>
           </div>
         </div>
 

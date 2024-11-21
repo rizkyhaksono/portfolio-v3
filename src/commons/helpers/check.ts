@@ -1,12 +1,20 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { getCookieValue } from "@/commons/helpers/cookies";
 
-export const useCheckAdmin = async () => {
+export const useCheckAdmin = () => {
   const router = useRouter();
-  const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE");
-  if (cookie) {
-    router.push("/admin/dashboard");
-  }
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const cookie = await getCookieValue("ADMIN_SUPABASE_AUTH_COOKIE");
+      if (cookie) {
+        router.push("/admin/dashboard");
+      }
+    };
+
+    checkAdmin();
+  }, [router]);
 };
