@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Montserrat as FontSans } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/layout/theme-provider";
-import { Toaster } from "@/components/ui/sonner"
-import { Analytics } from "@vercel/analytics/react"
+import BaseLayout from "@/components/layout/base-layout";
 import { MetadataConstants } from "@/commons/constants/metadata";
-import "./globals.css";
-
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
 export const metadata: Metadata = {
   title: "Rizky Haksono | Software Engineer",
@@ -27,7 +17,7 @@ export const metadata: Metadata = {
     url: MetadataConstants.openGraph.url,
   },
   openGraph: {
-    title: "Rizky Haksono | Software Engineer",
+    title: "Rizky Haksono - Software Engineer",
     images: MetadataConstants.profile,
     url: MetadataConstants.openGraph.url,
     siteName: MetadataConstants.openGraph.siteName,
@@ -38,7 +28,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  abstract: MetadataConstants.description,
 };
 
 export default function RootLayout({
@@ -47,14 +36,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
-          <Toaster position="top-right" />
-          <Analytics />
-        </ThemeProvider>
-      </body>
-    </html >
+    <BaseLayout>
+      {children}
+    </BaseLayout>
   );
 }

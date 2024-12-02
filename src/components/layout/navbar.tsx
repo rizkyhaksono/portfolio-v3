@@ -4,6 +4,7 @@ import {
   HomeIcon,
   NotebookText,
   Code,
+  Sparkle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -23,6 +24,7 @@ const DATA = {
     { href: "/", icon: HomeIcon, label: "Home" },
     { href: "/project", icon: Code, label: "Project" },
     { href: "/blog", icon: NotebookText, label: "Blog" },
+    { href: "/ai", icon: Sparkle, label: "AI" },
   ],
 };
 
