@@ -11,7 +11,7 @@ export default async function AIPage(props: Readonly<{
   const searchParams = await props.searchParams;
   const query = Array.isArray(searchParams.query) ? searchParams.query[0] : searchParams.query ?? "Hello";
   const response = await getAIData(query);
-  const formattedResponses = response.response.candidates.map((candidate) => {
+  const formattedResponses = response?.response?.candidates.map((candidate) => {
     return candidate.content.parts
       .map((part) => part.text)
       .join(" ")
@@ -36,8 +36,8 @@ export default async function AIPage(props: Readonly<{
         </form>
 
         <div className="mt-4">
-          {response.response.candidates.map((candidate, index) => (
-            <div key={candidate.avgLogprobs} className="mb-4 p-4 border rounded shadow">
+          {response?.response?.candidates.map((candidate, index) => (
+            <div key={candidate?.avgLogprobs} className="mb-4 p-4 border rounded shadow">
               <p className="">
                 <span
                   dangerouslySetInnerHTML={{
