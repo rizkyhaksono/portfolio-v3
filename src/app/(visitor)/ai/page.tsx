@@ -20,6 +20,7 @@ export default async function AIPage(props: Readonly<{
   }
 
   const candidates = response?.response?.candidates ?? [];
+  console.log(candidates);
   const formattedResponses = candidates.map((candidate) =>
     candidate?.content?.parts
       ?.map((part) => part?.text ?? "")
@@ -27,6 +28,7 @@ export default async function AIPage(props: Readonly<{
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\n/g, "<br />")
   );
+  console.log(formattedResponses);
 
   return (
     <BlurFade delay={0.25} inView>

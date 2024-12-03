@@ -3,7 +3,7 @@ import BaseLayout from "@/components/layout/base-layout";
 import { MetadataConstants } from "@/commons/constants/metadata";
 
 export const metadata: Metadata = {
-  title: "Rizky Haksono | Blog",
+  title: "Blog | Rizky Haksono",
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
