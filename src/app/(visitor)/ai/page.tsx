@@ -6,18 +6,27 @@ import { Input } from "@/components/ui/input";
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function AIPage(props: Readonly<{
-  searchParams: SearchParams
+  searchParams: SearchParams;
 }>) {
   const searchParams = await props.searchParams;
   const query = Array.isArray(searchParams.query) ? searchParams.query[0] : searchParams.query ?? "Hello";
-  const response = await getAIData(query);
-  const formattedResponses = response?.response?.candidates.map((candidate) => {
-    return candidate.content.parts
-      .map((part) => part.text)
+
+  let response;
+  try {
+    response = await getAIData(query);
+  } catch (error) {
+    console.error("Error fetching AI data:", error);
+    response = null;
+  }
+
+  const candidates = response?.response?.candidates ?? [];
+  const formattedResponses = candidates.map((candidate) =>
+    candidate?.content?.parts
+      ?.map((part) => part?.text ?? "")
       .join(" ")
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\n/g, "<br />");
-  });
+      .replace(/\n/g, "<br />")
+  );
 
   return (
     <BlurFade delay={0.25} inView>
@@ -30,23 +39,25 @@ export default async function AIPage(props: Readonly<{
             defaultValue={query}
             placeholder="Ask something..."
           />
-          <Button type="submit">
-            Submit
-          </Button>
+          <Button type="submit">Submit</Button>
         </form>
 
         <div className="mt-4">
-          {response?.response?.candidates.map((candidate, index) => (
-            <div key={candidate?.avgLogprobs} className="mb-4 p-4 border rounded shadow">
-              <p className="">
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: formattedResponses[index],
-                  }}
-                />
-              </p>
-            </div>
-          ))}
+          {candidates.length > 0 ? (
+            candidates.map((candidate, index) => (
+              <div key={candidate?.avgLogprobs ?? index} className="mb-4 p-4 border rounded shadow">
+                <p>
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: formattedResponses[index],
+                    }}
+                  />
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No candidates found. Please try another query.</p>
+          )}
         </div>
       </>
     </BlurFade>
