@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/layout/theme-provider";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from 'sonner';
 import { Analytics } from "@vercel/analytics/react"
 import { MetadataConstants } from "@/commons/constants/metadata";
 import "./globals.css";

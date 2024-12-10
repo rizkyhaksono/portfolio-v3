@@ -1,7 +1,5 @@
-import { AIResponse } from "@/commons/types/ai.type";
-
-export async function getAIData(prompt: string): Promise<AIResponse> {
-  const response = await fetch(`${process.env.API_URL}/ai`, {
+export async function getAIData(prompt: string): Promise<string> {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -10,6 +8,5 @@ export async function getAIData(prompt: string): Promise<AIResponse> {
       text: prompt,
     }),
   });
-  if (response.status !== 200) return {} as AIResponse;
-  return await response.json();
+  return await response.text();
 };
