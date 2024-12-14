@@ -22,9 +22,9 @@ export default function AIPage() {
   useEffect(() => {
     if (query) {
       toast.promise(
-        getAIData(query).then((res) => setData(res)),
+        getAIData(query).then((res) => setData(res?.data)),
         {
-          loading: "Loading fetching...",
+          loading: "Loading ...",
           success: `Data fetched successfully: ${query}`,
           error: "Error fetching data",
         }
@@ -36,10 +36,10 @@ export default function AIPage() {
   return (
     <BlurFade delay={0.25} inView>
       <>
-        <Typography.H2 className="text-lg font-bold">Nateenese AI ⚡</Typography.H2>
+        <Typography.H3>Etan AI 😼</Typography.H3>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-1 items-center mt-2 gap-2"
+          className="flex flex-1 items-center mt-5 gap-2"
         >
           <Input
             type="text"
