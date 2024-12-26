@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import BlurFade from "@/components/magicui/blur-fade";
-import { getAIData } from "@/services/visitor/ai";
+import { requestAIChat } from "@/services/user/ai";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MDXComponent from "@/components/ui/mdx-components";
@@ -22,7 +22,7 @@ export default function AIPage() {
   useEffect(() => {
     if (query) {
       toast.promise(
-        getAIData(query).then((res) => setData(res?.data)),
+        requestAIChat(query).then((res) => setData(res?.data)),
         {
           loading: "Loading ...",
           success: `Data fetched successfully: ${query}`,
