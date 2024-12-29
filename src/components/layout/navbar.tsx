@@ -25,7 +25,7 @@ const DATA = {
     { href: "/", icon: HomeIcon, label: "Home" },
     { href: "/project", icon: Code, label: "Project" },
     { href: "/blog", icon: NotebookText, label: "Blog" },
-    // { href: "/ai", icon: Sparkle, label: "AI" },
+    { href: "/ai", icon: Sparkle, label: "AI" },
     // { href: "/login", icon: LogIn, label: "Login" },
   ],
 };
