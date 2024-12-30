@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -13,11 +16,35 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import Typography from "@/components/ui/typography"
+import { toast } from "sonner";
+
+import { authLogin } from "@/services/visitor/auth";
+import { storeCookie } from "@/app/actions";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const email = e.currentTarget.email.value;
+    const password = e.currentTarget.password.value;
+    const response = await authLogin(email, password);
+
+    if (response?.name === "BAD_REQUEST") {
+      toast.error(response.message);
+      return;
+    }
+
+    if (response?.status === "200") {
+      await storeCookie("auth_session", response?.token);
+      toast.success("Login success");
+      router.push("/");
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Tabs defaultValue="login" className="w-full">
@@ -28,13 +55,11 @@ export function LoginForm({
         <TabsContent value="login">
           <Card className="overflow-hidden">
             <CardContent className="grid p-0 md:grid-cols-2">
-              <form className="p-6 md:p-8">
+              <form className="p-6 md:p-8" onSubmit={handleLogin}>
                 <div className="flex flex-col gap-6">
                   <div className="flex flex-col items-center text-center">
                     <Typography.H4 className="text-2xl font-bold">Welcome back</Typography.H4>
-                    <p className="text-balance text-muted-foreground">
-                      Login to your account
-                    </p>
+                    <Typography.P className="text-balance text-muted-foreground">Login to your account</Typography.P>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
@@ -49,9 +74,7 @@ export function LoginForm({
                     <Label htmlFor="password">Password</Label>
                     <Input id="password" type="password" required placeholder="********" />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Login
-                  </Button>
+                  <Button type="submit" className="w-full">Login</Button>
                   <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                     <span className="relative z-10 bg-background px-2 text-muted-foreground">
                       Or continue with
@@ -149,7 +172,6 @@ export function LoginForm({
           </Card>
         </TabsContent>
       </Tabs>
-
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
         By clicking continue, you agree to our <Link href="#">Terms of Service</Link>{" "}
         and <Link href="#">Privacy Policy</Link>.

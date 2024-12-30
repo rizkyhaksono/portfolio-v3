@@ -39,3 +39,9 @@ const authLogout = async (accessToken: string) => {
   })
   return await response.json();
 }
+
+export {
+  authLogin,
+  authSignup,
+  authLogout,
+}
