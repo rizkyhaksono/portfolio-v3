@@ -5,7 +5,8 @@ import {
   NotebookText,
   Code,
   Sparkle,
-  LogIn
+  LogIn,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -17,20 +18,25 @@ import {
 } from "@/components/ui/tooltip";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { ModeToggle } from "./mode-toggle";
+import { isHaveValidToken } from "@/app/actions";
 
-export type IconProps = React.HTMLAttributes<SVGElement>;
+export default async function Navbar() {
+  const isHaveToken = await isHaveValidToken();
 
-const DATA = {
-  navbar: [
-    { href: "/", icon: HomeIcon, label: "Home" },
-    { href: "/project", icon: Code, label: "Project" },
-    { href: "/blog", icon: NotebookText, label: "Blog" },
-    { href: "/ai", icon: Sparkle, label: "AI" },
-    { href: "/login", icon: LogIn, label: "Login" },
-  ],
-};
+  const DATA = {
+    navbar: [
+      { href: "/", icon: HomeIcon, label: "Home" },
+      { href: "/project", icon: Code, label: "Project" },
+      { href: "/blog", icon: NotebookText, label: "Blog" },
+      { href: "/ai", icon: Sparkle, label: "AI" },
+      {
+        href: isHaveToken ? "/profile" : "/auth",
+        icon: isHaveToken ? User : LogIn,
+        label: isHaveToken ? "Profile" : "Login",
+      },
+    ],
+  };
 
-export default function Navbar() {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-8 z-30 mx-auto mb-4 flex origin-bottom h-full max-h-14">
       <div className="fixed bottom-0 inset-x-0 h-16 w-full bg-background to-transparent backdrop-blur-lg [-webkit-mask-image:linear-gradient(to_top,black,transparent)] dark:bg-background"></div>

@@ -18,19 +18,6 @@ export default function AIPage() {
   const [isTokenValid, setIsTokenValid] = useState(false);
 
   useEffect(() => {
-    isHaveValidToken().then((res) => {
-      const token = res;
-      if (!token) {
-        setIsTokenValid(false);
-        toast.error("You need to login first");
-      } else {
-        setIsTokenValid(true);
-        toast.success("You are logged in");
-      }
-    });
-  }, []);
-
-  useEffect(() => {
     if (query) {
       toast.promise(
         requestAIChat(query).then((res) => setData(res?.data)),
@@ -41,6 +28,14 @@ export default function AIPage() {
         }
       );
     }
+    toast.promise(isHaveValidToken(), {
+      loading: "Loading...",
+      success: async () => {
+        setIsTokenValid(true)
+        return "You are logged in"
+      },
+      error: (err) => err,
+    })
   }, [query]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -75,7 +70,7 @@ export default function AIPage() {
       ) : (
         <div className="flex flex-col w-full">
           <Typography.H3>Etan AI 😼</Typography.H3>
-          <Link href={"/login"}>
+          <Link href={"/auth"}>
             <Button variant="default" className="w-full mt-4" size={"sm"}>
               Please log in to access AI chat features.
             </Button>

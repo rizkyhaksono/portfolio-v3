@@ -29,13 +29,10 @@ const authSignup = async (email: string, password: string, name: string) => {
   return await response.json();
 };
 
-const authLogout = async (accessToken: string) => {
+const authLogout = async () => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${accessToken}`,
-    },
+    credentials: "include",
   })
   return await response.json();
 }

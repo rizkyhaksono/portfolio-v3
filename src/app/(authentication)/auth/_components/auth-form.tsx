@@ -21,7 +21,7 @@ import { toast } from "sonner";
 import { authLogin } from "@/services/visitor/auth";
 import { storeCookie } from "@/app/actions";
 
-export function LoginForm({
+export function AuthForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
