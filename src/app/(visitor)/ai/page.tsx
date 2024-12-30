@@ -19,6 +19,7 @@ export default function AIPage() {
 
   useEffect(() => {
     isHaveValidToken().then((res) => setIsTokenValid(res));
+    toast.info(`You are ${isTokenValid ? "logged in" : "not log in"}`);
     if (query) {
       toast.promise(requestAIChat(query).then((res) => setData(res?.data)), {
         loading: "Loading ...",
@@ -26,12 +27,7 @@ export default function AIPage() {
         error: (err) => err.message,
       });
     }
-    toast.promise(isHaveValidToken, {
-      loading: "Checking token ...",
-      success: () => "You are logged in",
-      error: () => "You are not logged in",
-    })
-  }, [query]);
+  }, [isTokenValid, query]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
