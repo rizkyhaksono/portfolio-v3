@@ -18,23 +18,18 @@ export default function AIPage() {
   const [isTokenValid, setIsTokenValid] = useState(false);
 
   useEffect(() => {
+    isHaveValidToken().then((res) => setIsTokenValid(res));
     if (query) {
-      toast.promise(
-        requestAIChat(query).then((res) => setData(res?.data)),
-        {
-          loading: "Loading ...",
-          success: `Data fetched successfully: ${query}`,
-          error: "Error fetching data",
-        }
-      );
+      toast.promise(requestAIChat(query).then((res) => setData(res?.data)), {
+        loading: "Loading ...",
+        success: () => `Data fetched successfully: ${query}`,
+        error: (err) => err.message,
+      });
     }
-    toast.promise(isHaveValidToken(), {
-      loading: "Loading...",
-      success: async () => {
-        setIsTokenValid(true)
-        return "You are logged in"
-      },
-      error: (err) => err,
+    toast.promise(isHaveValidToken, {
+      loading: "Checking token ...",
+      success: () => "You are logged in",
+      error: () => "You are not logged in",
     })
   }, [query]);
 
