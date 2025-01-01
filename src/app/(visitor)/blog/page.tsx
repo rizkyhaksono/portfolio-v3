@@ -1,5 +1,5 @@
 import BlurFade from "@/components/magicui/blur-fade";
-import CardBlog from "@/modules/blog/card-blog";
+import CardBlog from "@/app/_components/blog/card-blog";
 import { getBlogData } from "@/services/visitor/blog";
 
 export default async function BlogPage() {

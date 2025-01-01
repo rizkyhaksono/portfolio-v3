@@ -1,5 +1,5 @@
 import BlurFade from "@/components/magicui/blur-fade";
-import CardProject from "@/modules/project/card-project";
+import CardProject from "@/app/_components/project/card-project";
 import { getAllProject } from "@/services/visitor/project";
 
 export default async function ProjectPage() {

@@ -1,6 +1,6 @@
 import BlurFade from "@/components/magicui/blur-fade"
 import { getBlogDetail, getBlogViews, getComments } from "@/services/visitor/blog"
-import BlogReaderView from "@/modules/blog/blog-reader-view";
+import BlogReaderView from "@/app/_components/blog/blog-reader-view";
 
 type Params = Promise<{ content: string }>;
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;

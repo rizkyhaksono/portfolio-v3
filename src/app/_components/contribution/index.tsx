@@ -3,10 +3,10 @@ import BlurFade from "@/components/magicui/blur-fade";
 import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime";
 import { GITHUB_ACCOUNTS } from "@/commons/constants/github";
 import { fetchGithubData } from "@/services/visitor/github";
-import GithubCalendar from "@/modules/contribution/github-calender";
-import GithubOverview from "@/modules/contribution/github-overview";
-import WakatimeActive from "@/modules/contribution/wakatime-active";
-import WakatimeOverview from "@/modules/contribution/wakatime-overview";
+import GithubCalendar from "@/app/_components/contribution/github-calender";
+import GithubOverview from "@/app/_components/contribution/github-overview";
+import WakatimeActive from "@/app/_components/contribution/wakatime-active";
+import WakatimeOverview from "@/app/_components/contribution/wakatime-overview";
 
 export default async function ContributionSection() {
   const readStatsResponse = await getReadStats();
