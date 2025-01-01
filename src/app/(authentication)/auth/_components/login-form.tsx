@@ -41,10 +41,15 @@ export default function LoginForm() {
   const handleLogin = async (values: z.infer<typeof formSchema>) => {
     toast.promise(authLogin(values.email, values.password), {
       loading: "Logging in...",
-      success: (response) => {
-        storeCookie("auth_session", response?.token); 
-        router.push("/");
-        return "Login successfuly";
+      success: async (response) => {
+        if (response?.name === "BAD_REQUEST") {
+          return (`${response.message}, please try again`);
+        }
+        if (response?.status === "200") {
+          await storeCookie("auth_session", response?.token);
+          router.push("/");
+          return "Login successfuly";
+        }
       },
       error: (err) => err,
     });
