@@ -10,20 +10,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MDXComponent from "@/components/ui/mdx-components";
 import Typography from "@/components/ui/typography";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AIPage() {
   const [query, setQuery] = useState("");
   const [data, setData] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isTokenValid, setIsTokenValid] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     isHaveValidToken().then((res) => setIsTokenValid(res));
-    toast.info(`You are ${isTokenValid ? "logged in" : "not log in"}`);
+    isTokenValid ? toast.success("You are logged in.") : toast.error("Please log in to access AI chat features.");
     if (query) {
-      toast.promise(requestAIChat(query).then((res) => setData(res?.data)), {
+      setLoading(true);
+      toast.promise(requestAIChat(query).then((res) => {
+        setData(res?.data);
+        setLoading(false);
+      }), {
         loading: "Loading ...",
-        success: () => `Data fetched successfully: ${query}`,
+        success: () => `Successfully fetched: ${query}`,
         error: (err) => err.message,
       });
     }
@@ -54,7 +60,18 @@ export default function AIPage() {
             </form>
 
             <div className="mt-4">
-              <MDXComponent>{data}</MDXComponent>
+              {loading ? (
+                <div className="flex flex-col gap-2">
+                  <Skeleton className="w-full h-5" />
+                  <Skeleton className="w-96 h-5" />
+                  <Skeleton className="w-32 h-5" />
+                  <Skeleton className="w-80 h-5" />
+                  <Skeleton className="w-52 h-5" />
+                  <Skeleton className="w-72 h-5" />
+                </div>
+              ) : (
+                <MDXComponent>{data}</MDXComponent>
+              )}
             </div>
           </div>
         </BlurFade>

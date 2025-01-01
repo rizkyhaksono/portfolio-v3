@@ -10,7 +10,8 @@ const revalidateByTag = (path: string) => {
 const getAuthorizationHeader = async () => {
   const cookieStore = await cookies();
   return {
-    Authorization: `Bearer ${cookieStore.get("auth_session")?.value}`,
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${cookieStore.get("auth_session")?.value}`,
   };
 };
 

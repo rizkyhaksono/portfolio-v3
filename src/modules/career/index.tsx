@@ -1,6 +1,7 @@
 import Image from "next/image"
 import BlurFade from "@/components/magicui/blur-fade";
 import { getAllCarrer } from "@/services/visitor/career";
+import Typography from "@/components/ui/typography";
 
 export default async function CarrerSection() {
   const careers = await getAllCarrer();
@@ -8,7 +9,7 @@ export default async function CarrerSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <p className="text-left text-xl font-semibold">Work Experience</p>
+        <Typography.H4>Work Experience</Typography.H4>
         {careers?.map((career: any) => (
           <div
             key={career.title}
@@ -22,8 +23,8 @@ export default async function CarrerSection() {
               className="rounded-full object-cover size-16 justify-self-start"
             />
             <div className="flex-1">
-              <p>{career.title}</p>
-              <p className="text-muted-foreground text-xs">{career.subtitle}</p>
+              <Typography.P>{career.title}</Typography.P>
+              <Typography.P className="text-muted-foreground text-xs">{career.subtitle}</Typography.P>
             </div>
             <div className="text-end text-xs ml-auto self-start">
               {career.duration}

@@ -6,6 +6,13 @@ export const skills_data_top = [
   "Flutter",
   "Docker",
   "Git",
+  "Tailwind CSS",
+  "Chakra UI",
+  "Material UI",
+  "Ant Design",
+  "Kotlin",
+  "Java",
+  "React Native"
 ]
 
 export const skills_data_bottom = [
@@ -19,4 +26,6 @@ export const skills_data_bottom = [
   "Spring Boot",
   "Go",
   "ASP .NET",
+  "Python",
+  "Figma",
 ]

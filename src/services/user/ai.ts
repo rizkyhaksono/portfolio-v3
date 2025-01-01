@@ -19,9 +19,7 @@ const getAIChat = async (): Promise<any> => {
 const requestAIChat = async (prompt: string): Promise<AIResponse> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: await getAuthorizationHeader(),
     body: JSON.stringify({
       text: prompt,
     }),

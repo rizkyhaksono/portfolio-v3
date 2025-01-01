@@ -5,12 +5,13 @@ import {
   skills_data_top,
   skills_data_bottom,
 } from "@/commons/constants/skills";
+import Typography from "@/components/ui/typography";
 
 export default function SkillSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <p className="text-left text-xl font-semibold">Skills</p>
+        <Typography.H3 className="text-left text-xl font-semibold">Skills</Typography.H3>
         <div className="relative w-full flex-col">
           <Marquee className="[--duration:15s]">
             {skills_data_top.map((skill) => (
