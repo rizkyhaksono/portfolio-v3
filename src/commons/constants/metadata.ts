@@ -14,5 +14,5 @@ export const MetadataConstants = {
   },
   exTitle: "| natee",
   profile:
-    "https://res.cloudinary.com/drbpzysws/image/upload/v1725724223/portfolio/banner.png",
+    "https://res.cloudinary.com/drbpzysws/image/upload/v1735786873/portfolio/banner%20v2.png",
 };
