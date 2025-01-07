@@ -5,14 +5,14 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { isHaveValidToken } from "@/app/actions";
 import { requestAIChat } from "@/services/user/ai";
-import BlurFade from "@/components/magicui/blur-fade";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import MDXComponent from "@/components/ui/mdx-components";
 import Typography from "@/components/ui/typography";
 import { Skeleton } from "@/components/ui/skeleton";
+import AIChat from "./ai-chat";
 
-export default function AIPage() {
+export default function AIForm() {
   const [query, setQuery] = useState("");
   const [data, setData] = useState("");
   const [inputValue, setInputValue] = useState("");
@@ -43,12 +43,12 @@ export default function AIPage() {
   return (
     <>
       {isTokenValid ? (
-        <BlurFade delay={0.25} inView>
-          <div>
+        <>
+          <div className="sticky top-0 z-50 p-4">
             <Typography.H3>Etan AI 😼</Typography.H3>
             <form
               onSubmit={handleSubmit}
-              className="flex flex-1 items-center mt-5 gap-2"
+              className="flex flex-1 items-center mt-2 gap-2"
             >
               <Input
                 type="text"
@@ -58,23 +58,24 @@ export default function AIPage() {
               />
               <Button type="submit">Submit</Button>
             </form>
-
-            <div className="mt-4">
-              {loading ? (
-                <div className="flex flex-col gap-2">
-                  <Skeleton className="w-full h-5" />
-                  <Skeleton className="w-96 h-5" />
-                  <Skeleton className="w-32 h-5" />
-                  <Skeleton className="w-80 h-5" />
-                  <Skeleton className="w-52 h-5" />
-                  <Skeleton className="w-72 h-5" />
-                </div>
-              ) : (
-                <MDXComponent>{data}</MDXComponent>
-              )}
-            </div>
           </div>
-        </BlurFade>
+
+          <div className="mt-4">
+            <AIChat />
+            {loading ? (
+              <div className="flex flex-col gap-2">
+                <Skeleton className="w-full h-5" />
+                <Skeleton className="w-96 h-5" />
+                <Skeleton className="w-32 h-5" />
+                <Skeleton className="w-80 h-5" />
+                <Skeleton className="w-52 h-5" />
+                <Skeleton className="w-72 h-5" />
+              </div>
+            ) : (
+              <MDXComponent>{data}</MDXComponent>
+            )}
+          </div>
+        </>
       ) : (
         <div className="flex flex-col w-full">
           <Typography.H3>Etan AI 😼</Typography.H3>

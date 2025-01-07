@@ -13,6 +13,7 @@ const getAIChat = async (): Promise<any> => {
       revalidate: 0,
     }
   });
+  revalidateByTag("ai");
   return await response.json();
 }
 

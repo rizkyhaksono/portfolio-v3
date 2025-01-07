@@ -54,22 +54,22 @@ export default function ProfileHeader() {
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="h-16 w-16">
           <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-          <AvatarFallback>UN</AvatarFallback>
+          <AvatarFallback>Natee</AvatarFallback>
         </Avatar>
         <div>
-          <CardTitle>John Doe [work in progress...]</CardTitle>
-          <CardDescription>Software Developer [but the log out still works]</CardDescription>
+          <CardTitle>[work in progress...]</CardTitle>
+          <CardDescription>[but the log out still works]</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 opacity-70" /> <span>john.doe@example.com</span>
+          <Mail className="h-4 w-4 opacity-70" /> <span>lorem@example.com</span>
         </div>
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 opacity-70" /> <span>San Francisco, CA</span>
+          <MapPin className="h-4 w-4 opacity-70" /> <span>Malang, Indonesia</span>
         </div>
         <div className="flex items-center gap-2">
-          <LinkIcon className="h-4 w-4 opacity-70" /> <a href="https://johndoe.com" className="text-primary hover:underline">https://johndoe.com</a>
+          <LinkIcon className="h-4 w-4 opacity-70" /> <a href="https://natee.me" className="text-primary hover:underline">https://natee.me</a>
         </div>
         <div className="flex gap-2">
           <Button className="w-full" size={"sm"} variant={"secondary"} >Edit Profile</Button>
