@@ -1,4 +1,7 @@
-import { supabaseUser } from "../../supabase/server";
+"use server";
+
+import { supabaseUser } from "@/supabase/server";
+import { authHeaders } from "@/libs/header.config";
 
 type projectType = {
   id: string;
@@ -21,3 +24,29 @@ export const getAllProject = async () => {
 
   return data as projectType[];
 };
+
+export const getProjects = async () => {
+  const response = await fetch(`${process.env.API_URL}/project`,
+    {
+      method: "GET",
+      headers: await authHeaders(),
+      next: {
+        revalidate: 0,
+      }
+    }
+  ).then(async (res) => await res.json());
+  return response;
+}
+
+export const getProjectById = async (id: number) => {
+  const response = await fetch(`${process.env.API_URL}/project/${id}`,
+    {
+      method: "GET",
+      headers: await authHeaders(),
+      next: {
+        revalidate: 0,
+      }
+    }
+  ).then(async (res) => await res.json());
+  return response;
+}

@@ -1,9 +1,12 @@
 import BlurFade from "@/components/magicui/blur-fade";
 import CardProject from "@/app/_components/project/card-project";
-import { getAllProject } from "@/services/visitor/project";
+import { getAllProject, getProjects, getProjectById } from "@/services/visitor/project";
 
 export default async function ProjectPage() {
   const projects = await getAllProject();
+  // const data = await getProjects();
+  const data = await getProjectById(2);
+  // console.log(data);
 
   return (
     <BlurFade delay={0.25} inView>

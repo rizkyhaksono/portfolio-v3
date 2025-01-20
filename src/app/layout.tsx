@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat as FontSans } from "next/font/google";
-import { cn } from "@/lib/utils";
+import { cn } from "@/libs/utils";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from 'sonner';
 import { Analytics } from "@vercel/analytics/react"
