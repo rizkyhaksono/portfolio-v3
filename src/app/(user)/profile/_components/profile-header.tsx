@@ -27,14 +27,14 @@ import {
 import {
   Mail,
   MapPin,
-  LinkIcon
 } from 'lucide-react';
 import { authLogout } from "@/services/visitor/auth"
 import { removeCookie } from "@/app/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation";
+import { ProfileData } from "@/commons/types/profile";
 
-export default function ProfileHeader() {
+export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileData }>) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -53,26 +53,30 @@ export default function ProfileHeader() {
     <Card>
       <CardHeader className="flex flex-row items-center gap-4">
         <Avatar className="h-16 w-16">
-          <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-          <AvatarFallback>Natee</AvatarFallback>
+          <AvatarImage src={profile.bannerUrl ?? "https://xsgames.co/randomusers/avatar.php?g=pixel&key=1"} alt={profile.email} />
+          <AvatarFallback>{profile.name.split(" ").map((name) => name.charAt(0)).join("")}</AvatarFallback>
         </Avatar>
         <div>
-          <CardTitle>[work in progress...]</CardTitle>
-          <CardDescription>[but the log out still works]</CardDescription>
+          <CardTitle>{profile.name}</CardTitle>
+          <CardDescription>{profile.about ?? "-"}</CardDescription>
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="flex items-center gap-2">
-          <Mail className="h-4 w-4 opacity-70" /> <span>lorem@example.com</span>
+          <Mail className="h-4 w-4 opacity-70" /> <span>{profile.email}</span>
         </div>
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 opacity-70" /> <span>Malang, Indonesia</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <LinkIcon className="h-4 w-4 opacity-70" /> <a href="https://natee.me" className="text-primary hover:underline">https://natee.me</a>
+          <MapPin className="h-4 w-4 opacity-70" /> <span>{profile.location ?? "-"}</span>
         </div>
         <div className="flex gap-2">
-          <Button className="w-full" size={"sm"} variant={"secondary"} >Edit Profile</Button>
+          <Button
+            className="w-full"
+            size={"sm"}
+            variant={"secondary"}
+            onClick={() => router.push(`/profile/${profile.id}`)}
+          >
+            Edit Profile
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className="w-full" size={"sm"} variant={"outline"}>Log Out</Button>

@@ -1,9 +1,14 @@
+import { getProfile } from "@/services/user/profile"
 import ProfileHeader from "./_components/profile-header"
 
-export default function ProfilePage() {
+const ProfilePage = async () => {
+  const profile = await getProfile();
+
   return (
     <div className="flex flex-col gap-2">
-      <ProfileHeader />
+      <ProfileHeader profile={profile.data} />
     </div>
   )
 }
+
+export default ProfilePage;

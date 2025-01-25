@@ -8,6 +8,7 @@ export default async function ProjectPage() {
   const data = await getProjectById(2);
   // console.log(data);
 
+
   return (
     <BlurFade delay={0.25} inView>
       <div className="text-center">
