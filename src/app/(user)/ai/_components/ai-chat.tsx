@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { getAIChat } from "@/services/user/ai";
 import MDXComponent from "@/components/ui/mdx-components";
-import { MessageCircle, User, Bot } from "lucide-react"
+import { MessageCircle } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
 export default function AIChat() {
   const [data, setData] = useState<any>([]);
