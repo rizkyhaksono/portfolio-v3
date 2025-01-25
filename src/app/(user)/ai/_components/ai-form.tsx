@@ -44,7 +44,7 @@ export default function AIForm() {
     <>
       {isTokenValid ? (
         <>
-          <div className="sticky top-0 z-50 p-4">
+          <div className="sticky top-0 z-50 py-10 bg-background/10 backdrop-blur-sm">
             <Typography.H3>Etan AI 😼</Typography.H3>
             <form
               onSubmit={handleSubmit}
@@ -55,13 +55,13 @@ export default function AIForm() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Rawr..."
+                className="w-full h-12"
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" className="h-12">Submit</Button>
             </form>
           </div>
 
           <div className="mt-4">
-            <AIChat />
             {loading ? (
               <div className="flex flex-col gap-2">
                 <Skeleton className="w-full h-5" />
@@ -74,6 +74,7 @@ export default function AIForm() {
             ) : (
               <MDXComponent>{data}</MDXComponent>
             )}
+            <AIChat />
           </div>
         </>
       ) : (
