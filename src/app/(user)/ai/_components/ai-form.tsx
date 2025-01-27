@@ -61,7 +61,7 @@ export default function AIForm() {
             </form>
           </div>
 
-          <div className="mt-4">
+          <div className="my-4">
             {loading ? (
               <div className="flex flex-col gap-2">
                 <Skeleton className="w-full h-5" />

@@ -10,6 +10,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
 export default function AIChat() {
   const [data, setData] = useState<any>([]);
+  console.log(data?.data)
 
   const fetchAIChat = useCallback(async () => {
     const res = await getAIChat();
@@ -36,8 +37,8 @@ export default function AIChat() {
               </AccordionTrigger>
               <AccordionContent>
                 <CardContent className="p-0">
-                  {item.messages.map((message: any, msgIndex: number) => (
-                    <div key={msgIndex} className="px-10 pt-2">
+                  {item.messages.map((message: any) => (
+                    <div key={message.id} className="px-10 pt-2">
                       <div className="flex flex-col items-end mb-2">
                         <Avatar className="size-8" >
                           <AvatarImage src={"https://xsgames.co/randomusers/avatar.php?g=pixel&key=1"} alt="User" loading="lazy" />
