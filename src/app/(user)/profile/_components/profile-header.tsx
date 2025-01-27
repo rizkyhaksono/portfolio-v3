@@ -73,7 +73,7 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
             className="w-full"
             size={"sm"}
             variant={"secondary"}
-            onClick={() => router.push(`/profile/${profile.id}`)}
+            onClick={() => router.push(`/profile/edit`)}
           >
             Edit Profile
           </Button>

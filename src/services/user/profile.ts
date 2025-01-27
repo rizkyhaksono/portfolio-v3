@@ -4,7 +4,7 @@ import { getAuthorizationHeader, revalidateByTag } from "@/app/actions";
 import { ProfileResponse } from "@/commons/types/profile";
 
 const getProfile = async (): Promise<ProfileResponse> => {
-  const response = await fetch(`${process.env.API_URL}/user`, {
+  const response = await fetch(`${process.env.API_URL}/me`, {
     method: "GET",
     headers: await getAuthorizationHeader(),
     next: {
@@ -29,7 +29,7 @@ const putProfile = async (
     location: string,
     about: string,
   }): Promise<any> => {
-  const response = await fetch(`${process.env.API_URL}/user/${id}`, {
+  const response = await fetch(`${process.env.API_URL}/me/${id}`, {
     method: "PATCH",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
@@ -43,6 +43,7 @@ const putProfile = async (
       icon_url: ""
     })
   });
+  revalidateByTag("profile");
   return await response.json();
 }
 
