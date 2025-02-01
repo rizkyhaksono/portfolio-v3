@@ -1,6 +1,7 @@
 "use server";
 
 import { putProfile } from "@/services/user/profile";
+import { toast } from "sonner";
 
 export async function updateProfile(id: string, formData: FormData) {
   const profileData = {
@@ -11,5 +12,9 @@ export async function updateProfile(id: string, formData: FormData) {
     about: formData.get("about") as string,
     bannerUrl: formData.get("bannerUrl") as string,
   };
-  await putProfile(id, profileData);
+  toast.promise(await putProfile(id, profileData), {
+    loading: "Updating profile...",
+    success: "Profile updated!",
+    error: "Failed to update profile.",
+  });
 }

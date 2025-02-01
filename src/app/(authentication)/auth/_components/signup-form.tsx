@@ -40,11 +40,20 @@ export default function SignupForm() {
   });
 
   const handleRegister = async (values: z.infer<typeof formSchema>) => {
-    toast.promise(authSignup(values.email, values.password, values.name), {
+    const promise = authSignup(values.email, values.password, values.name);
+    toast.promise(promise, {
       loading: "Registering...",
-      success: () => "Register successfuly",
-      error: (err) => err,
-      finally: () => router.push("/auth"),
+      success: (res) => {
+        if (res?.name === "CONFLICT") {
+          toast.error("Email already exists!");
+          router.push("/auth");
+        } else {
+          toast.success("Registration successful!");
+          router.refresh();
+        }
+        return toast.dismiss();
+      },
+      error: (err) => `Error: ${err.message}`,
     });
   }
 
