@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { isHaveValidToken } from "./app/actions"
+import { isHaveValidToken } from "./app/actions/actions"
 
 export async function middleware(request: NextRequest, response: NextResponse) {
   const isHaveToken = await isHaveValidToken();

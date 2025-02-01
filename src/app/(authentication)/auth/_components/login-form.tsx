@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { authLogin } from "@/services/visitor/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { storeCookie } from "@/app/actions";
+import { storeCookie } from "@/app/actions/actions";
 import Image from "next/image";
 import Typography from "@/components/ui/typography";
 
