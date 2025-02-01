@@ -10,7 +10,6 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar"
 
 export default function AIChat() {
   const [data, setData] = useState<any>([]);
-  console.log(data?.data)
 
   const fetchAIChat = useCallback(async () => {
     const res = await getAIChat();

@@ -1,7 +1,7 @@
 "use server";
 
 import { AIResponse } from "@/commons/types/ai";
-import { getAuthorizationHeader, revalidateByTag } from "@/app/actions";
+import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 
 const getAIChat = async (): Promise<any> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {

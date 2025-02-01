@@ -1,6 +1,6 @@
 "use server";
 
-import { getAuthorizationHeader, revalidateByTag } from "@/app/actions";
+import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 import { ProfileResponse } from "@/commons/types/profile";
 
 const getProfile = async (): Promise<ProfileResponse> => {
@@ -21,26 +21,27 @@ const putProfile = async (
     name,
     headline,
     location,
-    about
+    about,
+    bannerUrl
   }: {
     email: string,
     name: string,
     headline: string,
     location: string,
     about: string,
+    bannerUrl: string
   }): Promise<any> => {
   const response = await fetch(`${process.env.API_URL}/me/${id}`, {
     method: "PATCH",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
       email,
-      email_verified: true,
+      emailVerified: true,
       name,
       headline,
       location,
       about,
-      bannerUrl: "",
-      icon_url: ""
+      bannerUrl,
     })
   });
   revalidateByTag("profile");

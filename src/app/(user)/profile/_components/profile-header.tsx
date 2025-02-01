@@ -29,7 +29,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import { authLogout } from "@/services/visitor/auth"
-import { removeCookie } from "@/app/actions"
+import { removeCookie } from "@/app/actions/actions"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation";
 import { ProfileData } from "@/commons/types/profile";

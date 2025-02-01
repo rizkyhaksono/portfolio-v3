@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { isHaveValidToken } from "@/app/actions";
+import { isHaveValidToken } from "@/app/actions/actions";
 import { requestAIChat } from "@/services/user/ai";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

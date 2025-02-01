@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { ModeToggle } from "./mode-toggle";
-import { isHaveValidToken } from "@/app/actions";
+import { isHaveValidToken } from "@/app/actions/actions";
 
 export default async function Navbar() {
   const isHaveToken = await isHaveValidToken();
