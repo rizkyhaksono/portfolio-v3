@@ -18,8 +18,12 @@ import {
 import { Input } from "@/components/ui/input"
 import { ProfileResponse } from "@/commons/types/profile"
 import { updateProfile } from "@/app/actions/profile"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse }>) {
+  const router = useRouter()
+
   const formSchema = z.object({
     name: z.string().min(2, {
       message: "Name must be at least 2 characters.",
@@ -67,7 +71,14 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse
     formData.append("location", values.location ?? "");
     formData.append("bannerUrl", values.bannerUrl ?? "");
 
-    await updateProfile(profile.data.id, formData);
+    toast.promise(updateProfile(profile.data.id, formData), {
+      loading: "Updating profile...",
+      success: (res) => {
+        router.push("/profile")
+        return "Profile updated successfully."
+      },
+      error: "Failed to update profile.",
+    })
     reset();
   }
 
