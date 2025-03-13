@@ -1,10 +1,10 @@
 export const MetadataConstants = {
-  creator: "Rizky Haksono",
+  creator: "Muhammad Rizky Haksono",
   description:
-    "Rizky Haksono is a software engineer who loves to build things.",
-  keyword: "Rizky Haksono, developer, frontend, backend, software developer",
+    "Muhammad Rizky Haksono is a software engineer who loves to build things.",
+  keyword: "Muhammad Rizky Haksono, developer, frontend, backend, software developer, UI/UX",
   authors: {
-    name: "Rizky Haksono",
+    name: "Muhammad Rizky Haksono",
     url: process.env.DOMAIN,
   },
   openGraph: {

@@ -2,9 +2,9 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Rizky Haksono - Software Engineer",
-    short_name: "natee",
-    description: "Rizky Haksono is a software engineer who loves to build things.",
+    name: "Muhammad Rizky Haksono - Software Engineer",
+    short_name: "natee | Rizky Haksono",
+    description: "Muhammad Rizky Haksono is a software engineer who loves to build things.",
     start_url: "/",
     display: "standalone",
     background_color: "#fff",
