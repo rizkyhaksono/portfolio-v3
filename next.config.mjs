@@ -16,6 +16,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "venturo.id",
+      },
+      {
+        protocol: "https",
         hostname: "encrypted-tbn0.gstatic.com",
       },
       {
