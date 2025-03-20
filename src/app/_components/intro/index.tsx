@@ -1,4 +1,3 @@
-import Image from "next/image";
 import BlurFade from "@/components/magicui/blur-fade";
 
 export default function IntroSection() {
@@ -11,13 +10,6 @@ export default function IntroSection() {
             {`Full Stack Developer. I love building web and mobile applications. Very active on GitHub and always looking for new opportunities.`}
           </span>
         </div>
-        <Image
-          src={"/rizky.jpg"}
-          alt="Profile"
-          width={1000}
-          height={1000}
-          className="rounded-full object-cover size-28 md:justify-self-end"
-        />
       </div>
     </BlurFade>
   );

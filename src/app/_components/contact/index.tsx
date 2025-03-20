@@ -72,7 +72,7 @@ export default function ContactSection() {
         <p className="text-left text-base font-semibold">
           Find me on social media
         </p>
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 items-start justify-start">
           <CardContact />
         </div>
         <Separator className="my-5" />

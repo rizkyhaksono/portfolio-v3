@@ -173,7 +173,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="bannerUrl"
             render={({ field }) => (
@@ -188,7 +188,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <Button type="submit">Submit</Button>
         </form>
       </Form>

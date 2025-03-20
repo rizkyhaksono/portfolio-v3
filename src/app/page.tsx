@@ -6,10 +6,11 @@ import EducationSection from "@/app/_components/education";
 import ContributionSection from "@/app/_components/contribution";
 import ContactSection from "@/app/_components/contact";
 import BaseLayout from "@/components/layout/base-layout";
+import SidebarMain from "@/components/layout/sidebar-main";
 
 export default async function Home() {
   return (
-    <BaseLayout>
+    <BaseLayout sidebar={<SidebarMain />}>
       <IntroSection />
       <AboutSection />
       <SkillSection />

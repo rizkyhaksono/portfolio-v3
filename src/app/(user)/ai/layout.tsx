@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BaseLayout from "@/components/layout/base-layout";
 import { MetadataConstants } from "@/commons/constants/metadata";
+import SidebarMain from "@/components/layout/sidebar-main";
 
 export const metadata: Metadata = {
   title: "AI | Rizky Haksono",
@@ -36,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <BaseLayout>
+    <BaseLayout sidebar={<SidebarMain />}>
       {children}
     </BaseLayout>
   );

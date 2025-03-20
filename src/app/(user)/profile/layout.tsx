@@ -1,6 +1,7 @@
 import { type Metadata } from "next"
 import { MetadataConstants } from "@/commons/constants/metadata";
 import BaseLayout from "@/components/layout/base-layout";
+import SidebarMain from "@/components/layout/sidebar-main";
 
 export const metadata: Metadata = {
   title: "Profile | Rizky Haksono",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 
 export default function ProfileLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <BaseLayout>
+    <BaseLayout sidebar={<SidebarMain />}>
       {children}
     </BaseLayout>
   )

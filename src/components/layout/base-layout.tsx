@@ -2,17 +2,19 @@ import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import DotPattern from "@/components/magicui/dot-pattern";
 import { cn } from "@/libs/utils";
-import ScrollProgress from "../ui/scroll-progress";
+import ScrollProgress from "@/components/ui/scroll-progress";
 
 export default function BaseLayout({
   children,
+  sidebar
 }: Readonly<{
   children: React.ReactNode;
+  sidebar?: React.ReactNode;
 }>) {
   return (
     <>
       <ScrollProgress />
-      <div className="container max-w-4xl min-h-screen pt-12 sm:pt-24 px-6">
+      <div className="container min-h-screen pt-12 sm:pt-24 px-6">
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden h-40 pointer-events-none z-[-1]">
           <DotPattern
             width={20}
@@ -25,8 +27,15 @@ export default function BaseLayout({
             )}
           />
         </div>
-        <Navbar />
-        {children}
+        <div className="block md:hidden">
+          <Navbar />
+        </div>
+        <div className="flex md:gap-6 max-w-7xl">
+          {sidebar && <aside>{sidebar}</aside>}
+          <main className="mb-16 mt-0 w-screen md:max-w-lg xl:max-w-4xl">
+            {children}
+          </main>
+        </div>
         <Footer />
       </div>
     </>
