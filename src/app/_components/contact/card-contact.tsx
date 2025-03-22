@@ -7,7 +7,7 @@ export default function CardContact() {
     <>
       {media_socials.map((item) => (
         <Link key={item.title} href={item.href} className="w-full">
-          <Button className="w-full rounded-sm text-xs" variant={"outline"}>
+          <Button className="w-full rounded-sm text-xs justify-start" variant={"outline"}>
             <item.icon className="size-4 mr-2" /> {item.title}
           </Button>
         </Link>

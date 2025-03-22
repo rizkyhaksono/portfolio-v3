@@ -43,22 +43,19 @@ export default function ContactSection() {
       message: formState.message,
     };
 
-    emailjs
-      .send(
-        process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID ?? "",
-        process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID ?? "",
-        params,
-        process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
-      )
-      .then(
-        () => {
-          toast.success("Email sent successfully");
-          dispatch({ type: "RESET" });
-        },
-        () => {
-          toast.error("Failed to send email");
-        }
-      );
+    toast.promise(emailjs.send(
+      process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID ?? "",
+      process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID ?? "",
+      params,
+      process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY ?? ""
+    ), {
+      loading: "Sending email...",
+      success: () => {
+        dispatch({ type: "RESET" });
+        return "Email sent successfully"
+      },
+      error: "Failed to send email"
+    })
   };
 
   return (

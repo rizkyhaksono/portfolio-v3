@@ -32,7 +32,7 @@ export default function BaseLayout({
         </div>
         <div className="flex md:gap-6 max-w-7xl">
           {sidebar && <aside>{sidebar}</aside>}
-          <main className="mb-16 mt-0 w-screen md:max-w-lg xl:max-w-4xl">
+          <main className="mb-16 mt-0 w-full overflow-hidden xl:max-w-4xl">
             {children}
           </main>
         </div>
