@@ -41,7 +41,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
     })
   }
 
-  if (!profile || profile?.name === "UNAUTHORIZED" || profile?.name === undefined) return <AuthCard className="border rounded-xl" />;
+  if (!profile || profile?.name === "UNAUTHORIZED") return <AuthCard className="border rounded-xl" />;
 
   return (
     <DropdownMenu>
