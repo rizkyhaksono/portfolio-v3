@@ -1,15 +1,14 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { cn } from "@/libs/utils";
 import Typography from "@/components/ui/typography";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-// import { authSignOut } from "@/services/auth";
+import { authLogout } from "@/services/visitor/auth";
+import { removeCookie } from "@/app/actions/actions";
 import { toast } from "sonner";
 import { getProfile } from "@/services/user/profile";
 import { useRouter } from "next/navigation";
-import { Skeleton } from "@/components/ui/skeleton";
 import AuthCard from "./auth-card";
 import {
   DropdownMenu,
@@ -20,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Home, LogOutIcon, User } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
@@ -31,30 +29,19 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
     getProfile().then(setProfile);
   }, []);
 
-  // const handleLogout = () => {
-  //   toast.promise(authSignOut(), {
-  //     loading: "Turning back to home from Eden...",
-  //     success: () => {
-  //       setProfile(null);
-  //       return "Successfull logged out";
-  //     },
-  //     error: (err) => err,
-  //     finally: () => router.refresh(),
-  //   });
-  // };
+  const handleLogout = async () => {
+    toast.promise(authLogout(), {
+      loading: "Back to home...",
+      success: async () => {
+        await removeCookie("auth_session");
+        return "Logged out successfully";
+      },
+      error: (err) => err,
+      finally: () => router.refresh()
+    })
+  }
 
-  // if (loading)
-  //   return (
-  //     <div className="flex p-3 w-full gap-3 items-center cursor-pointer border rounded-xl transition-all">
-  //       <Skeleton className="h-10 w-10 rounded-full" />
-  //       <div className="flex flex-col gap-1">
-  //         <Skeleton className="h-4 w-28" />
-  //         <Skeleton className="h-4 w-2/5" />
-  //       </div>
-  //     </div>
-  //   );
-
-  if (!profile || profile.name === "UNAUTHORIZED") return <AuthCard className="border rounded-xl" />;
+  if (!profile || profile?.name === "UNAUTHORIZED" || profile?.name === undefined) return <AuthCard className="border rounded-xl" />;
 
   return (
     <DropdownMenu>
@@ -67,25 +54,14 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
           )}
         >
           <Avatar className="h-10 w-10">
-            <AvatarFallback>{profile?.data.name.slice(0, 1)}</AvatarFallback>
-            {/* {profile?.data.iconUrl !== null ? (
-              <Image
-                fill={true}
-                sizes="(max-width: 68px) 100vw, (max-width: 68px) 50vw, 33vw"
-                className="h-full w-full transform object-cover"
-                alt={profile?.name}
-                src={profile?.iconUrl}
-              />
-            ) : (
-              <AvatarFallback>{profile?.data.name.slice(0, 1)}</AvatarFallback>
-            )} */}
+            {profile?.data?.name && <AvatarFallback>{profile?.data?.name?.slice(0, 1)}</AvatarFallback>}
           </Avatar>
           <div className="flex flex-col gap-1">
             <Typography.P className="text-sm text-start font-medium text-ellipsis">
-              {profile?.data.name}
+              {profile?.data?.name}
             </Typography.P>
             <Typography.P className="text-xs text-start opacity-75 text-ellipsis">
-              {profile?.data.email}
+              {profile?.data?.email}
             </Typography.P>
           </div>
         </div>
@@ -112,10 +88,10 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
           </Link>
         )}
         <DropdownMenuSeparator />
-        {/* <DropdownMenuItem data-cy="sign-out" onClick={() => handleLogout()}>
+        <DropdownMenuItem data-cy="sign-out" onClick={() => handleLogout()}>
           <LogOutIcon size={16} className="mr-3" />
           <span>Sign Out</span>
-        </DropdownMenuItem> */}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
