@@ -30,7 +30,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   useEffect(() => {
     getProfile().then(setProfile);
   }, []);
-  
+
   // const handleLogout = () => {
   //   toast.promise(authSignOut(), {
   //     loading: "Turning back to home from Eden...",
@@ -67,7 +67,8 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
           )}
         >
           <Avatar className="h-10 w-10">
-            {profile?.data.iconUrl !== null ? (
+            <AvatarFallback>{profile?.data.name.slice(0, 1)}</AvatarFallback>
+            {/* {profile?.data.iconUrl !== null ? (
               <Image
                 fill={true}
                 sizes="(max-width: 68px) 100vw, (max-width: 68px) 50vw, 33vw"
@@ -77,7 +78,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
               />
             ) : (
               <AvatarFallback>{profile?.data.name.slice(0, 1)}</AvatarFallback>
-            )}
+            )} */}
           </Avatar>
           <div className="flex flex-col gap-1">
             <Typography.P className="text-sm text-start font-medium text-ellipsis">
