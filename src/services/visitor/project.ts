@@ -19,7 +19,7 @@ export const getAllProject = async () => {
     .from("projects")
     .select("*")
     .order("created_at", {
-      ascending: true
+      ascending: false,
     });
 
   return data as projectType[];
