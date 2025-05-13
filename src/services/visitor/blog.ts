@@ -64,3 +64,10 @@ export async function getBlogViews(searchParams: string) {
   const page_views_count: number = findArticle?.page_views_count;
   return page_views_count;
 }
+
+export async function getBlogMedium() {
+  const URL = "https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@rizkyhaksono";
+  const response = await fetch(URL)
+  if (response.status !== 200) return 0;
+  return await response.json();
+}
