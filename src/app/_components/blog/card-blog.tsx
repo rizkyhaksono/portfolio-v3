@@ -1,13 +1,13 @@
-import Image from "next/image";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ArrowBigRightDash } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function CardBlog({
   title,
@@ -29,6 +29,8 @@ export default function CardBlog({
           width={500}
           height={300}
           className="h-40 w-full overflow-hidden object-cover object-top"
+          draggable={false}
+          loading="lazy"
         />
       )}
       <CardHeader className="px-2">

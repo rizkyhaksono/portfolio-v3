@@ -1,8 +1,8 @@
-import BlurFade from "@/components/magicui/blur-fade";
-import CardBlog from "@/app/_components/blog/card-blog";
 import CardBlogMedium from "@/app/_components/blog/blog-medium";
+import CardBlog from "@/app/_components/blog/card-blog";
+import BlurFade from "@/components/magicui/blur-fade";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default async function BlogPage() {
   const blogs = await getBlogData();
@@ -41,7 +41,6 @@ export default async function BlogPage() {
                 key={blog.guid}
                 title={blog.title}
                 description={blog.description}
-                image={blog.thumbnail ?? ''}
                 href={blog.link}
               />
             ))}

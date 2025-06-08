@@ -53,7 +53,27 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "i.pinimg.com",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "dicoding-assets.sgp1.cdn.digitaloceanspaces.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.icon-icons.com",
+      },
+      {
+        protocol: "https",
+        hostname: "icons.veryicon.com",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn-images-1.medium.com",
+      },
     ],
   },
 }

@@ -1,7 +1,7 @@
-import Image from "next/image"
 import BlurFade from "@/components/magicui/blur-fade";
-import { getAllCarrer } from "@/services/visitor/career";
 import Typography from "@/components/ui/typography";
+import { getAllCarrer } from "@/services/visitor/career";
+import Image from "next/image";
 
 export default async function CarrerSection() {
   const careers = await getAllCarrer();
@@ -12,7 +12,7 @@ export default async function CarrerSection() {
         <Typography.H4>Work Experience</Typography.H4>
         {careers?.map((career: any) => (
           <div
-            key={career.title}
+            key={career.id}
             className="prose max-w-full text-pretty font-sans text-sm dark:prose-invert mt-2 flex flex-row gap-4"
           >
             <Image
