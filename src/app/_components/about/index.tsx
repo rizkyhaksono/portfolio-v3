@@ -26,7 +26,7 @@ export default function AboutSection() {
                 </AnimatedShinyText>
               </div>
             </Link>
-            <Link href="https://drive.google.com/file/d/1xb9nKFHr05NksJC5AAB0gl1fNco2apyP/view?usp=sharing" target="_blank">
+            <Link href="https://drive.google.com/file/d/1f-x1PWRBmoYzzPi8t8thA0s6RTymuTdx/view?usp=sharing" target="_blank">
               <AnimatedGradientText className="h-8 rounded-md px-3 text-xs">
                 <span
                   className={cn(
