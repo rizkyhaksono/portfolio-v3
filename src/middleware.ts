@@ -10,9 +10,9 @@ export async function middleware(request: NextRequest, response: NextResponse) {
     return NextResponse.redirect(new URL("/admin/auth/login", request.url))
   }
 
-  if (request.nextUrl.pathname.startsWith("/chat") && !userCookieValue) {
-    return NextResponse.redirect(new URL("/auth", request.url))
-  }
+  // if (request.nextUrl.pathname.startsWith("/ai") && !userCookieValue) {
+  //   return NextResponse.redirect(new URL("/auth", request.url))
+  // }
 
   if (request.nextUrl.pathname.startsWith("/profile") && !isHaveToken) {
     return NextResponse.redirect(new URL("/auth", request.url))

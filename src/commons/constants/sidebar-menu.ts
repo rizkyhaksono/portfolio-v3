@@ -3,12 +3,14 @@ import {
   CatIcon,
   Coffee,
   Home,
-  Lock,
+  MessageSquare,
   LucideIcon,
-  MessageCircle,
-  RocketIcon,
+  BookOpen,
+  Code,
   Rss,
   User,
+  FolderOpen,
+  SquareDashedBottomCode,
 } from "lucide-react";
 
 type Menu = {
@@ -50,6 +52,41 @@ export const publicDashboardMenu = [
         href: "/ai",
         label: "Etan AI",
         icon: CatIcon,
+      },
+      {
+        href: "/snippets",
+        label: "Snippets",
+        icon: SquareDashedBottomCode,
+      },
+      {
+        href: "/notes",
+        label: "Notes",
+        icon: BookText,
+      },
+      {
+        href: "/files",
+        label: "Files",
+        icon: FolderOpen,
+      },
+    ],
+  },
+  {
+    groupLabel: "Playground",
+    menus: [
+      {
+        href: "/compiler",
+        label: "Compiler",
+        icon: Code,
+      },
+      {
+        href: "/chat",
+        label: "Chat",
+        icon: MessageSquare,
+      },
+      {
+        href: "/roadmap",
+        label: "Roadmap",
+        icon: BookOpen,
       },
     ],
   },
