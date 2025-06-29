@@ -10,13 +10,13 @@ export default async function BlogPage() {
 
   return (
     <BlurFade delay={0.25} inView>
-      <div className="text-center">
+      <div className="text-center mb-6">
         <p className="text-center text-xl font-semibold">Blog</p>
         <div className="mt-2 text-sm text-muted-foreground">
           {`I write about my experiences, thoughts, and ideas on various topics.`}
         </div>
       </div>
-      <Tabs defaultValue="devto" className="w-full flex flex-col items-center mt-5">
+      <Tabs defaultValue="devto" className="w-full flex flex-col items-center">
         <TabsList>
           <TabsTrigger value="devto">Dev To</TabsTrigger>
           <TabsTrigger value="medium">Medium</TabsTrigger>

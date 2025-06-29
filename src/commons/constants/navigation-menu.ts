@@ -1,5 +1,5 @@
 import {
-  BookText,
+  Wrench,
   CatIcon,
   Coffee,
   Home,
@@ -61,9 +61,9 @@ export const publicDashboardMenu = [
         icon: SquareDashedBottomCode,
       },
       {
-        href: "/notes",
-        label: "Notes",
-        icon: BookText,
+        href: "/tools",
+        label: "Tools",
+        icon: Wrench,
       },
       {
         href: "/files",
@@ -121,7 +121,7 @@ export const mainNavData = (isHaveToken: boolean) => [
 
 export const expandedNavData = [
   { href: "/snippets", icon: SquareDashedBottomCode, label: "Snippets" },
-  { href: "/notes", icon: BookText, label: "Notes" },
+  { href: "/tools", icon: Wrench, label: "Notes" },
   { href: "/files", icon: FolderOpen, label: "Files" },
   { href: "/compiler", icon: Code, label: "Compiler" },
   { href: "/chat", icon: MessageSquare, label: "Chat" },

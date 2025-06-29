@@ -9,7 +9,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Download, FileText, Search, Code, Image, FileSpreadsheet } from "lucide-react";
 import { useState } from "react";
 
-// Sample files data - you would likely fetch this from your backend or CMS
 const FILES_DATA = {
   documents: [
     {
@@ -102,10 +101,8 @@ export default function FilesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Get all file categories
   const categories = Object.keys(FILES_DATA);
 
-  // Filter files based on search query and active category
   const filteredFiles = Object.entries(FILES_DATA).flatMap(([category, files]) => {
     return files.filter(file => {
       const matchesSearch =
@@ -119,105 +116,111 @@ export default function FilesPage() {
     });
   });
 
-  // Function to handle file download
   const handleDownload = (file: typeof FILES_DATA[keyof typeof FILES_DATA][number]) => {
-    // You might want to track downloads or perform other actions
     console.log(`Downloading file: ${file.title}`);
-    // The actual download will happen through the href attribute
   };
 
   return (
     <BlurFade delay={0.25} inView>
-      <div className="container max-w-4xl py-10">
-        <h1 className="text-3xl font-bold mb-2">Files</h1>
-        <p className="text-muted-foreground mb-8">
+      <div className="text-center mb-6">
+        <p className="text-center text-xl font-semibold">Files</p>
+        <div className="mt-2 text-sm text-muted-foreground">
           {`Downloadable resources, templates, and assets I've created that you might find useful.`}
-        </p>
+        </div>
+      </div>
 
-        {/* Search area */}
-        <div className="mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search files..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+      {/* Disclaimer */}
+      <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-800 mb-4">
+        <CardContent className="p-4">
+          <p className="text-sm text-yellow-800 dark:text-yellow-200">
+            <strong>Disclaimer:</strong> {`Under development....`}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Search area */}
+      <div className="mb-8">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search files..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Category tabs */}
+      <Tabs
+        defaultValue="all"
+        className="mb-8 text-center"
+        onValueChange={(value) => setActiveCategory(value)}
+      >
+        <TabsList>
+          <TabsTrigger value="all">All Files</TabsTrigger>
+          {categories.map(category => (
+            <TabsTrigger key={category} value={category} className="capitalize">
+              {category}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
+
+      {/* Files display */}
+      <div className="grid gap-4 md:grid-cols-2">
+        {filteredFiles.length > 0 ? (
+          filteredFiles.map(file => {
+            const Icon = file.icon;
+
+            return (
+              <Card key={file.id} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-md bg-secondary p-2">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{file.title}</CardTitle>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <span>{file.fileType}</span>
+                        <span>•</span>
+                        <span>{file.fileSize}</span>
+                        <span>•</span>
+                        <span>{file.date}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{file.description}</CardDescription>
+                  <div className="flex gap-2 flex-wrap mt-3">
+                    {file.tags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter className="mt-auto pt-4">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    asChild
+                    onClick={(e) => handleDownload(file)}
+                  >
+                    <a href={file.downloadUrl} download>
+                      <Download className="mr-2 h-4 w-4" />
+                      Download
+                    </a>
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })
+        ) : (
+          <div className="text-center py-10 col-span-2">
+            <p className="text-muted-foreground">No files match your search criteria.</p>
           </div>
-        </div>
-
-        {/* Category tabs */}
-        <Tabs
-          defaultValue="all"
-          className="mb-8"
-          onValueChange={(value) => setActiveCategory(value)}
-        >
-          <TabsList>
-            <TabsTrigger value="all">All Files</TabsTrigger>
-            {categories.map(category => (
-              <TabsTrigger key={category} value={category} className="capitalize">
-                {category}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-
-        {/* Files display */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {filteredFiles.length > 0 ? (
-            filteredFiles.map(file => {
-              const Icon = file.icon;
-
-              return (
-                <Card key={file.id} className="flex flex-col">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-md bg-secondary p-2">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{file.title}</CardTitle>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          <span>{file.fileType}</span>
-                          <span>•</span>
-                          <span>{file.fileSize}</span>
-                          <span>•</span>
-                          <span>{file.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>{file.description}</CardDescription>
-                    <div className="flex gap-2 flex-wrap mt-3">
-                      {file.tags.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-xs">{tag}</Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="mt-auto pt-4">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      asChild
-                      onClick={(e) => handleDownload(file)}
-                    >
-                      <a href={file.downloadUrl} download>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </a>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })
-          ) : (
-            <div className="text-center py-10 col-span-2">
-              <p className="text-muted-foreground">No files match your search criteria.</p>
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </BlurFade>
   );
