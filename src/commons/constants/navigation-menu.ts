@@ -6,11 +6,13 @@ import {
   MessageSquare,
   LucideIcon,
   BookOpen,
-  Code,
   Rss,
-  User,
-  FolderOpen,
   SquareDashedBottomCode,
+  FolderOpen,
+  HomeIcon,
+  Code,
+  LogIn,
+  User,
 } from "lucide-react";
 
 type Menu = {
@@ -103,4 +105,25 @@ export const userProfileMenu = [
       },
     ],
   },
+];
+
+export const mainNavData = (isHaveToken: boolean) => [
+  { href: "/", icon: HomeIcon, label: "Home" },
+  { href: "/project", icon: Coffee, label: "Project" },
+  { href: "/blog", icon: Rss, label: "Blog" },
+  { href: "/ai", icon: CatIcon, label: "Etan AI" },
+  {
+    href: isHaveToken ? "/profile" : "/auth",
+    icon: isHaveToken ? User : LogIn,
+    label: isHaveToken ? "Profile" : "Login",
+  },
+];
+
+export const expandedNavData = [
+  { href: "/snippets", icon: SquareDashedBottomCode, label: "Snippets" },
+  { href: "/notes", icon: BookText, label: "Notes" },
+  { href: "/files", icon: FolderOpen, label: "Files" },
+  { href: "/compiler", icon: Code, label: "Compiler" },
+  { href: "/chat", icon: MessageSquare, label: "Chat" },
+  { href: "/roadmap", icon: BookOpen, label: "Roadmap" },
 ];

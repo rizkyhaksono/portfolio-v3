@@ -2,7 +2,7 @@
 
 import { motion, type AnimationProps } from "framer-motion";
 
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 
 const animationProps = {
   initial: { "--x": "100%", scale: 0.8 },

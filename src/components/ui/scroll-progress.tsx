@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import { motion, useScroll, useSpring } from "motion/react";
 
 interface ScrollProgressProps {

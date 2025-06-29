@@ -1,7 +1,7 @@
 "use server";
 
 import { supabaseUser } from "@/supabase/server";
-import { authHeaders } from "@/libs/header.config";
+import { authHeaders } from "@/lib/header.config";
 
 type projectType = {
   id: string;

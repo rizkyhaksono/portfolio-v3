@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import Typography from "@/components/ui/typography";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { authLogout } from "@/services/visitor/auth";

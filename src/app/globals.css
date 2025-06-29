@@ -47,6 +47,9 @@
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
   }
+  .theme {
+    --animate-meteor: meteor 5s linear infinite;
+  }
 }
 
 @layer base {
@@ -55,5 +58,21 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@theme inline {
+  @keyframes meteor {
+  0% {
+    transform: rotate(var(--angle)) translateX(0);
+    opacity: 1;
+    }
+  70% {
+    opacity: 1;
+    }
+  100% {
+    transform: rotate(var(--angle)) translateX(-500px);
+    opacity: 0;
+    }
   }
 }

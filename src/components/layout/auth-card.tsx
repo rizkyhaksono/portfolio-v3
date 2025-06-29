@@ -1,7 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import Typography from "@/components/ui/typography";
 import { useRouter } from "next/navigation";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 
 const AuthCard = ({ className }: any) => {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import * as LucideIcons from "lucide-react";
 

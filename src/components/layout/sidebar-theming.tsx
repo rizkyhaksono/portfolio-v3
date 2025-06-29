@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import Typography from "@/components/ui/typography";
 import { MoonIcon, SunIcon } from "lucide-react";

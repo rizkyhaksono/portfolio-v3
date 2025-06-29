@@ -4,7 +4,7 @@ import Link from "next/link";
 import Typography from "@/components/ui/typography";
 import AnimatedGradientText from "@/components/ui/animated-gradient-text";
 import AnimatedShinyText from "@/components/ui/animated-shiny-text";
-import { cn } from "@/libs/utils";
+import { cn } from "@/lib/utils";
 
 export default function AboutSection() {
   return (

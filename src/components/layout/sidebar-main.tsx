@@ -1,6 +1,6 @@
 "use client";
 
-import { publicDashboardMenu } from "@/commons/constants/sidebar-menu";
+import { publicDashboardMenu } from "@/commons/constants/navigation-menu";
 import { MdVerified as VerifiedIcon } from "react-icons/md";
 import Typography from "@/components/ui/typography";
 import { Avatar } from "@/components/ui/avatar";

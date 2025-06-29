@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import ProfileSideCard from "./profile-side-card";
-import { SidebarMenu } from "@/commons/constants/sidebar-menu";
-import { cn } from "@/libs/utils";
+import { SidebarMenu } from "@/commons/constants/navigation-menu";
+import { cn } from "@/lib/utils";
 import Typography from "@/components/ui/typography";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
