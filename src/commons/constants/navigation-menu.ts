@@ -13,6 +13,7 @@ import {
   Code,
   LogIn,
   User,
+  WholeWord,
 } from "lucide-react";
 
 type Menu = {
@@ -90,6 +91,11 @@ export const publicDashboardMenu = [
         label: "Roadmap",
         icon: BookOpen,
       },
+      {
+        href: "/wpm",
+        label: "WPM",
+        icon: WholeWord,
+      },
     ],
   },
 ];
@@ -126,4 +132,5 @@ export const expandedNavData = [
   { href: "/compiler", icon: Code, label: "Compiler" },
   { href: "/chat", icon: MessageSquare, label: "Chat" },
   { href: "/roadmap", icon: BookOpen, label: "Roadmap" },
+  { href: "/wpm", icon: WholeWord, label: "WPM" },
 ];
