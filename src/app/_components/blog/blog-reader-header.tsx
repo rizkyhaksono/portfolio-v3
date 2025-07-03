@@ -47,7 +47,7 @@ const BlogReaderHeader = ({
     };
   }, []);
 
-  const transition = { duration: 0.3, ease: "easeInOut" };
+  const transition = { duration: 0.3, ease: [0.4, 0, 0.2, 1] };
   const titleVariants = {
     initial: { opacity: 0, y: -20 },
     animate: { opacity: 1, y: 0 },
