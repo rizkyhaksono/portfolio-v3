@@ -53,7 +53,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Toaster position="top-right" />
-          {/* <SmoothCursor /> */}
+          <SmoothCursor />
           <Analytics />
         </ThemeProvider>
       </body>
