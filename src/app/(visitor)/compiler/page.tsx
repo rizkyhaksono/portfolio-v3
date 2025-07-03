@@ -8,9 +8,7 @@ import { CompilerCodeEditor } from "./_components/compiler-code-editor";
 import { CompilerToolbar } from "./_components/compiler-toolbar";
 import { CompilerState } from "@/commons/types/compiler";
 import { postExecuteCode } from "@/services/visitor/compiler";
-import { LANGUAGES } from "@/commons/constants/compiler";
-
-type Theme = 'dark' | 'light' | 'dracula' | 'monokai' | 'github' | 'solarized';
+import { LANGUAGES, Theme } from "@/commons/constants/compiler"; // Import Theme from constants
 
 export default function CompilerPage() {
   const [theme, setTheme] = useState<Theme>('dark');
@@ -126,6 +124,11 @@ export default function CompilerPage() {
     setState(prev => ({ ...prev, code }));
   };
 
+  // Theme change handler that matches the expected signature
+  const handleThemeChange = (newTheme: Theme) => {
+    setTheme(newTheme);
+  };
+
   return (
     <BlurFade delay={0.25} inView>
       <div className="text-center mb-6">
@@ -157,7 +160,7 @@ export default function CompilerPage() {
           onChange={handleCodeChange}
           language={state.language}
           theme={theme}
-          onThemeChange={setTheme}
+          onThemeChange={handleThemeChange}
         />
         <CompilerOutputPanel
           output={state.output}
