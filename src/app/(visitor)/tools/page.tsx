@@ -1,13 +1,14 @@
 "use client";
 
 import BlurFade from "@/components/magicui/blur-fade";
-import { useState } from "react";
-import { Download, Play, Image, Video } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Download, ImageIcon, Play, Video } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
 
 interface DownloadResult {
   title: string;
@@ -42,7 +43,7 @@ const TOOLS = [
     id: "instagram",
     name: "Instagram Downloader",
     description: "Download Instagram posts, stories, and reels",
-    icon: Image,
+    icon: ImageIcon,
     color: "bg-gradient-to-r from-purple-500 to-pink-500",
     supportedFormats: ["MP4", "JPG"],
   },
@@ -217,8 +218,10 @@ export default function ToolsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 mb-4">
-              <img
-                src={result.thumbnail}
+              <Image
+                src={"/no-image.jpg"}
+                width={300}
+                height={300}
                 alt="Thumbnail"
                 className="w-32 h-20 object-cover rounded-lg"
               />

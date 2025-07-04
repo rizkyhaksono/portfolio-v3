@@ -113,9 +113,7 @@ export default function ChatPage() {
               {/* Message Bubble */}
               <div
                 className={`max-w-[70%] rounded-lg px-4 py-2 ${message.sender === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-                  }`}
+                  ? "bg-primary text-primary-foreground" : "bg-muted"}`}
               >
                 <p className="text-sm">{message.text}</p>
                 <p

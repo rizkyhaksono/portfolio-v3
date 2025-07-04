@@ -8,7 +8,7 @@ import { CompilerCodeEditor } from "./_components/compiler-code-editor";
 import { CompilerToolbar } from "./_components/compiler-toolbar";
 import { CompilerState } from "@/commons/types/compiler";
 import { postExecuteCode } from "@/services/visitor/compiler";
-import { LANGUAGES, Theme } from "@/commons/constants/compiler"; // Import Theme from constants
+import { LANGUAGES, Theme } from "@/commons/constants/compiler";
 
 export default function CompilerPage() {
   const [theme, setTheme] = useState<Theme>('dark');

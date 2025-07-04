@@ -7,10 +7,15 @@ import ContributionSection from "@/app/_components/contribution";
 import ContactSection from "@/app/_components/contact";
 import BaseLayout from "@/components/layout/base-layout";
 import SidebarMain from "@/components/layout/sidebar-main";
+import { getVisitorInfo } from "@/services/visitor/visitor";
+import VisitorInfo from "@/app/_components/visitor";
 
 export default async function Home() {
+  const res = await getVisitorInfo();
+
   return (
     <BaseLayout sidebar={<SidebarMain />}>
+      <VisitorInfo initialData={res} />
       <IntroSection />
       <AboutSection />
       <SkillSection />
