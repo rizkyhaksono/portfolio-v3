@@ -1,7 +1,7 @@
 "use client";
 
 import { formatDate } from "@/commons/helpers";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { FaRegEye as ViewIcon } from "react-icons/fa";
 import { scroller } from "react-scroll";
