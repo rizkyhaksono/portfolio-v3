@@ -8,10 +8,12 @@ import { cn } from "@/lib/utils";
 
 export default async function BaseLayout({
   children,
-  sidebar
+  sidebar,
+  rightSidebar,
 }: Readonly<{
   children: React.ReactNode;
   sidebar?: React.ReactNode;
+  rightSidebar?: React.ReactNode;
 }>) {
   const isHaveToken = await isHaveValidToken();
 
@@ -47,6 +49,7 @@ export default async function BaseLayout({
           <main className="mb-16 pt-4 w-full overflow-hidden">
             {children}
           </main>
+          {rightSidebar && <aside className="hidden md:block w-64">{rightSidebar}</aside>}
         </div>
         <Footer />
       </div>

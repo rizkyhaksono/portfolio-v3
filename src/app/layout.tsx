@@ -53,7 +53,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Toaster position="top-right" />
-          <SmoothCursor />
+          <div className="hidden sm:block">
+            <SmoothCursor />
+          </div>
           <Analytics />
         </ThemeProvider>
       </body>

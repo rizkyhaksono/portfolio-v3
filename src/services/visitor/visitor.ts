@@ -1,9 +1,10 @@
-export const getVisitorInfo = async () => {
-  const response = await fetch("http://localhost:3000/api/visitor", {
+export async function getVisitor() {
+  const response = await fetch("https://api.ipify.org?format=json", {
     method: "GET",
     next: {
       revalidate: 0,
-    }
-  })
-  return await response.json();
+    },
+  });
+  if (response.status !== 200) return {};
+  return response.json();
 }
