@@ -47,11 +47,6 @@ const BlogReaderHeader = ({
     };
   }, []);
 
-  const transition = {
-    duration: 0.3,
-    delay: 0,
-    ease: [0, 0.71, 0.2, 1.01],
-  };
   const titleVariants = {
     initial: { opacity: 0, y: -20 },
     animate: { opacity: 1, y: 0 },
@@ -64,7 +59,11 @@ const BlogReaderHeader = ({
         initial="initial"
         animate="animate"
         variants={titleVariants}
-        transition={transition}
+        transition={{
+          duration: 0.3,
+          delay: 0,
+          ease: "easeInOut"
+        }}
       >
         {title}
       </motion.h1>
