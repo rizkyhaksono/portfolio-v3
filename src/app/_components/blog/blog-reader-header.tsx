@@ -47,7 +47,11 @@ const BlogReaderHeader = ({
     };
   }, []);
 
-  const transition = { duration: 0.3, ease: [0.4, 0, 0.2, 1] };
+  /**
+   * This trasition ease usually error when build the project
+   * It might change to numbers or back to string again
+   */
+  const transition = { duration: 0.3, ease: "easeInOut" };
   const titleVariants = {
     initial: { opacity: 0, y: -20 },
     animate: { opacity: 1, y: 0 },
