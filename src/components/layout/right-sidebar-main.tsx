@@ -64,7 +64,7 @@ const RightSidebarMain = async () => {
   return (
     <div className="hidden lg:flex lg:w-64 xl:w-72 flex-col p-4 space-y-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
       {/* Visitor Info */}
-      <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
+      {/* <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
         <div className="flex items-center gap-2 mb-3">
           <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
           <Typography.P className="text-sm font-semibold text-primary/80">
@@ -92,10 +92,9 @@ const RightSidebarMain = async () => {
             </Typography.P>
           </div>
 
-          {/* Right Sidebar Client Component */}
           <RightSidebarClient />
         </div>
-      </div>
+      </div> */}
 
       {/* Status */}
       <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
