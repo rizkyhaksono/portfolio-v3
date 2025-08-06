@@ -28,6 +28,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "www.bejana.id",
+      },
+      {
+        protocol: "https",
         hostname: "media.licdn.com",
       },
       {
