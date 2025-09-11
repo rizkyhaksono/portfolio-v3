@@ -14,7 +14,7 @@ export default function AboutSection() {
         <div className="font-sans text-sm text-muted-foreground dark:prose-invert">
           Experience in Software Development with skills in Web and Mobile Development. I am still an undergraduate and have experience related to web and mobile development as well as UI/UX design.
           <div className="flex gap-4 w-full mt-4">
-            <Link href="https://drive.google.com/file/d/1q4ZZtQ4Cd26-G4wygwVXod3Qx3AOY3P1/view?usp=sharing" target="_blank">
+            <Link href="https://s.id/cv-rizky" target="_blank">
               <div
                 className={cn(
                   "group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
@@ -26,7 +26,7 @@ export default function AboutSection() {
                 </AnimatedShinyText>
               </div>
             </Link>
-            <Link href="https://drive.google.com/file/d/1f-x1PWRBmoYzzPi8t8thA0s6RTymuTdx/view?usp=sharing" target="_blank">
+            <Link href="https://s.id/portfolio-rizky-pdf" target="_blank">
               <AnimatedGradientText className="h-8 rounded-md px-3 text-xs">
                 <span
                   className={cn(
