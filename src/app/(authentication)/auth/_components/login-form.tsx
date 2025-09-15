@@ -46,7 +46,7 @@ export default function LoginForm() {
           return (`${response.message}, please try again`);
         }
         if (response?.status === "200") {
-          await storeCookie("auth_session", response?.token);
+          await storeCookie("NATEE_V3_TOKEN", response?.token);
           router.push("/");
           return "Login successfuly";
         }

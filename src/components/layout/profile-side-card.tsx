@@ -33,7 +33,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
     toast.promise(authLogout(), {
       loading: "Back to home...",
       success: async () => {
-        await removeCookie("auth_session");
+        await removeCookie("NATEE_V3_TOKEN");
         return "Logged out successfully";
       },
       error: (err) => err,

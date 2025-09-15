@@ -11,7 +11,7 @@ const getAuthorizationHeader = async () => {
   const cookieStore = await cookies();
   return {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${cookieStore.get("auth_session")?.value}`,
+    "Authorization": `Bearer ${cookieStore.get("NATEE_V3_TOKEN")?.value}`,
   };
 };
 
@@ -32,7 +32,7 @@ const removeCookie = async (key: string) => {
 
 const isHaveValidToken = async () => {
   const cookieStore = await cookies();
-  return !!cookieStore.get("auth_session");
+  return !!cookieStore.get("NATEE_V3_TOKEN");
 };
 
 export {

@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 
 const authHeaders = async (form = false) => {
+  const token = (await cookies()).get("NATEE_V3_TOKEN")?.value;
   return {
     "Content-Type": form ? "multipart/form-data" : "application/json",
-    "Authorization": `Bearer ${(await cookies()).get("auth_session")}`,
+    ...(token ? { "Authorization": `Bearer ${token}` } : {}),
   }
 };
 
