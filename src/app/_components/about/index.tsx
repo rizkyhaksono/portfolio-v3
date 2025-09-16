@@ -14,7 +14,7 @@ export default function AboutSection() {
         <div className="font-sans text-sm text-muted-foreground dark:prose-invert">
           Experience in Software Development with skills in Web and Mobile Development. I am still an undergraduate and have experience related to web and mobile development as well as UI/UX design.
           <div className="flex gap-4 w-full mt-4">
-            <Link href="https://drive.google.com/file/d/1euQtLWAq5g4JmKSiXp3rCFpaGRxJHKIc/view?usp=sharing" target="_blank">
+            <Link href="https://drive.google.com/file/d/1cZnjFsdn5vduIwuaRxtYLVigoqeA0YiN/view?usp=sharing" target="_blank">
               <div
                 className={cn(
                   "group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
