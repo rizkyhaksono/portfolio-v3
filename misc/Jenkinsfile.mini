@@ -29,7 +29,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'docker exec portfolio-v3 npm run build'
+                    sh 'docker exec portfolio-v3 bun install'
+                    sh 'docker exec portfolio-v3 bun run build'
                 }
             }
         }
