@@ -14,10 +14,12 @@ const SidebarSecondary = ({
   menu,
   disableProfileCard,
   disableThemeSetting,
+  onItemClick,
 }: {
   menu: SidebarMenu[];
   disableProfileCard?: boolean;
   disableThemeSetting?: boolean;
+  onItemClick?: () => void;
 }) => {
   const pathname = usePathname();
 
@@ -35,16 +37,18 @@ const SidebarSecondary = ({
                 <Button
                   key={href + index}
                   variant={pathname.endsWith(href) ? "secondary" : "ghost"}
-                  className="w-full justify-start h-10 mb-1"
+                  className="w-full justify-between h-10 mb-1"
                   asChild
                 >
-                  <Link href={href}>
-                    <span className="mr-4">
-                      <Icon size={18} />
-                    </span>
-                    <Typography.P className="flex flex-grow max-w-[200px] truncate">
-                      {label}
-                    </Typography.P>
+                  <Link href={href} onClick={onItemClick}>
+                    <div className="flex items-center">
+                      <span className="mr-4">
+                        <Icon size={18} />
+                      </span>
+                      <Typography.P className="flex flex-grow max-w-[200px] truncate">
+                        {label}
+                      </Typography.P>
+                    </div>
                     <ArrowRightIcon
                       className={
                         pathname.endsWith(href) ? "block opacity-60" : "hidden"
