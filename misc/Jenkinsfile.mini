@@ -1,0 +1,48 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Check Portfolio Container') {
+            steps {
+                script {
+                    sh 'docker inspect --format="{{.State.Status}}" portfolio-v3'
+                    sh 'docker logs --tail 20 portfolio-v3'
+                }
+            }
+        }
+
+        stage('Git Pull') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'github-first-account', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh """
+                            docker exec portfolio-v3 git config --global credential.helper store
+                            docker exec portfolio-v3 sh -c 'echo "https://$GIT_USER:$GIT_PASS@github.com" > ~/.git-credentials'
+                            docker exec portfolio-v3 git pull origin main
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    sh 'docker exec portfolio-v3 npm run build'
+                }
+            }
+        }
+
+        stage('Restart Container') {
+            steps {
+                script {
+                    sh 'docker restart portfolio-v3'
+                    sh 'sleep 5'
+                    sh 'docker inspect --format="{{.State.Status}}" portfolio-v3'
+                    sh 'docker logs --tail 20 portfolio-v3'
+                }
+            }
+        }
+    }
+}
