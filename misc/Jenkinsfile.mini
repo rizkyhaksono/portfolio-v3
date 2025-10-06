@@ -29,7 +29,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'docker exec portfolio-v3 bun install'
+                    sh 'docker exec portfolio-v3 bun i'
                     sh 'docker exec portfolio-v3 bun run build'
                 }
             }
