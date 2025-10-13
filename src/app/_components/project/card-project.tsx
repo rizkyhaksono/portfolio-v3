@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Globe, GitBranch } from "lucide-react";
 
 export default function CardProject({
+  id,
   title,
   description,
   source,
   image,
   href,
 }: Readonly<{
+  id: string
   title: string
   description: string
   source?: string,
@@ -24,25 +26,27 @@ export default function CardProject({
 }>) {
   return (
     <Card className="flex flex-col overflow-hidden border hover:shadow-lg transition-all duration-300 ease-out h-full">
-      {image && (
-        <Image
-          src={image}
-          alt={title}
-          width={500}
-          height={300}
-          className="h-40 w-full overflow-hidden object-cover object-top"
-        />
-      )}
-      <CardHeader className="px-2">
-        <div className="space-y-1">
-          <CardTitle className="mt-1 text-base font-bold">{title}</CardTitle>
-          <div
-            className="prose max-w-full text-pretty font-sans text-xs text-muted-foreground dark:prose-invert pt-2"
-            dangerouslySetInnerHTML={{ __html: description }}
+      <Link href={`/project/${id}`} className="block">
+        {image && (
+          <Image
+            src={image}
+            alt={title}
+            width={500}
+            height={300}
+            className="h-40 w-full overflow-hidden object-cover object-top"
           />
-        </div>
-      </CardHeader>
-      <CardFooter className="px-2">
+        )}
+        <CardHeader className="px-2">
+          <div className="space-y-1">
+            <CardTitle className="mt-1 text-base font-bold hover:underline">{title}</CardTitle>
+            <div
+              className="prose max-w-full text-pretty font-sans text-xs text-muted-foreground dark:prose-invert pt-2 line-clamp-3"
+              dangerouslySetInnerHTML={{ __html: description }}
+            />
+          </div>
+        </CardHeader>
+      </Link>
+      <CardFooter className="px-2 mt-auto">
         <div className="flex flex-row flex-wrap items-start gap-2">
           {href && href.length > 0 && (
             <Link href={href} target="_blank">
