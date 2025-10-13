@@ -124,13 +124,3 @@ export const mainNavData = (isHaveToken: boolean) => [
     label: isHaveToken ? "Profile" : "Login",
   },
 ];
-
-export const expandedNavData = [
-  { href: "/snippets", icon: SquareDashedBottomCode, label: "Snippets" },
-  { href: "/tools", icon: Wrench, label: "Notes" },
-  { href: "/files", icon: FolderOpen, label: "Files" },
-  { href: "/compiler", icon: Code, label: "Compiler" },
-  { href: "/chat", icon: MessageSquare, label: "Chat" },
-  { href: "/roadmap", icon: BookOpen, label: "Roadmap" },
-  { href: "/wpm", icon: WholeWord, label: "WPM" },
-];
