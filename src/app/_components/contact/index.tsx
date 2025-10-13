@@ -1,8 +1,9 @@
 "use client"
 
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { toast } from "sonner"
+import { Turnstile } from "@marsidev/react-turnstile";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button";
@@ -33,9 +34,18 @@ function formReducer(state: any, action: any) {
 
 export default function ContactSection() {
   const [formState, dispatch] = useReducer(formReducer, initialState);
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sendEmail = (e: any) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      toast.error("Please complete the CAPTCHA verification");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     const params = {
       email: formState.email,
@@ -52,9 +62,14 @@ export default function ContactSection() {
       loading: "Sending email...",
       success: () => {
         dispatch({ type: "RESET" });
+        setTurnstileToken("");
+        setIsSubmitting(false);
         return "Email sent successfully"
       },
-      error: "Failed to send email"
+      error: () => {
+        setIsSubmitting(false);
+        return "Failed to send email"
+      }
     })
   };
 
@@ -102,8 +117,28 @@ export default function ContactSection() {
                 onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
                 required
               />
-              <Button type="submit" variant={"default"} size={"sm"}>
-                Send
+
+              {/* Cloudflare Turnstile */}
+              <div className="flex justify-start">
+                <Turnstile
+                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
+                  onSuccess={(token) => setTurnstileToken(token)}
+                  onError={() => setTurnstileToken("")}
+                  onExpire={() => setTurnstileToken("")}
+                  options={{
+                    theme: "auto",
+                    size: "normal",
+                  }}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                variant={"default"}
+                size={"sm"}
+                disabled={!turnstileToken || isSubmitting}
+              >
+                {isSubmitting ? "Sending..." : "Send"}
               </Button>
             </div>
           </form>
