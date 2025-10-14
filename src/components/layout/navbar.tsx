@@ -19,7 +19,7 @@ import { ModeToggle } from "./mode-toggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
 import { mainNavData } from "@/commons/constants/navigation-menu";
-import NavbarExpand from "./navbar-expand";
+import MobileNavbarExpand from "./mobile-navbar-expand";
 
 interface NavbarProps {
   isHaveToken: boolean;
@@ -63,7 +63,7 @@ export default function Navbar({ isHaveToken }: Readonly<NavbarProps>) {
                   <div className="bg-background rounded-t-3xl shadow-2xl border-t border-border max-h-[80vh] overflow-y-auto pb-20">
                     <div className="p-4">
                       <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-4" />
-                      <NavbarExpand onItemClick={() => setIsExpanded(false)} />
+                      <MobileNavbarExpand onItemClick={() => setIsExpanded(false)} />
                     </div>
                   </div>
                 </motion.div>
@@ -77,7 +77,7 @@ export default function Navbar({ isHaveToken }: Readonly<NavbarProps>) {
                   className="hidden md:block absolute bottom-20 right-0 pointer-events-auto"
                 >
                   <div className="bg-background rounded-2xl shadow-xl border border-border my-20">
-                    <NavbarExpand onItemClick={() => setIsExpanded(false)} />
+                    <MobileNavbarExpand onItemClick={() => setIsExpanded(false)} />
                   </div>
                 </motion.div>
               </>
