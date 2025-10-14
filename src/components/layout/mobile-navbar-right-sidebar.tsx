@@ -1,42 +1,73 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Typography from "@/components/ui/typography";
-import { getPing } from "@/services/visitor/ping";
-import { getWeather } from "@/services/visitor/weather";
-import { getNowPlaying } from "@/services/visitor/spotify";
 import { MdWifi as IpIcon, MdLocationOn, MdDevices, MdTrendingUp } from "react-icons/md";
-import { BiCalendar, BiGlobe } from "react-icons/bi";
+import { BiCalendar } from "react-icons/bi";
 import { SiSpotify } from "react-icons/si";
-import CurrentTimeCard from "@/components/layout/current-time-card";
 import Image from "next/image";
 import Link from "next/link";
-import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar";
+import { getBrowserInfo, quickStats } from "@/commons/constants/sidebar";
+import CurrentTimeCard from "@/components/layout/current-time-card";
+import type { PingResponse } from "@/services/visitor/ping";
+import type { SpotifyNowPlaying } from "@/services/visitor/spotify";
 
-const RightSidebarMain = async () => {
-  const ping = await getPing();
-  const weather = await getWeather();
-  const spotify = await getNowPlaying();
+interface WeatherResponse {
+  name?: string;
+  main?: {
+    temp: number;
+    feels_like: number;
+  };
+  weather?: Array<{
+    main: string;
+    icon: string;
+  }>;
+}
 
-  const temperature = weather?.main?.temp
-    ? Math.round(weather.main.temp - 273.15)
-    : null;
+const MobileNavbarRightSidebar = () => {
+  const [ping, setPing] = useState<PingResponse | null>(null);
+  const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [spotify, setSpotify] = useState<SpotifyNowPlaying | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const feelsLike = weather?.main?.feels_like
-    ? Math.round(weather.main.feels_like - 273.15)
-    : null;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [pingRes, weatherRes, spotifyRes] = await Promise.all([
+          fetch('/api/ping').then(res => res.ok ? res.json() : null),
+          fetch('/api/weather').then(res => res.ok ? res.json() : null),
+          fetch('/api/spotify').then(res => res.ok ? res.json() : null),
+        ]);
 
-  const weatherCondition = weather?.weather?.[0];
-  const weatherEmoji = weatherCondition
-    ? getWeatherEmoji(weatherCondition.main, weatherCondition.icon)
-    : '🌤️';
+        setPing(pingRes);
+        setWeather(weatherRes);
+        setSpotify(spotifyRes);
+      } catch (error) {
+        console.error('Error fetching sidebar data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const quickStats = [
-    { label: "Projects", value: "15+" },
-    { label: "Experience", value: "2+ Years" },
-    { label: "Technologies", value: "20+" },
-    { label: "Coffee Cups", value: "∞" }
-  ];
+    fetchData();
+  }, []); // Empty dependency array - only fetch once on mount
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col space-y-4 mt-4 pt-4 border-t border-border">
+        <div className="bg-secondary/20 rounded-lg p-4 border border-border/30 animate-pulse">
+          <div className="h-4 bg-secondary/30 rounded w-1/3 mb-3" />
+          <div className="space-y-2">
+            <div className="h-3 bg-secondary/30 rounded w-full" />
+            <div className="h-3 bg-secondary/30 rounded w-2/3" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="hidden lg:flex lg:w-64 xl:w-72 flex-col p-4 space-y-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+    <div className="flex flex-col space-y-4 mt-4 pt-4 border-t border-border">
       {/* Visitor Info */}
       {ping?.user_info && (
         <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
@@ -94,6 +125,7 @@ const RightSidebarMain = async () => {
           </div>
         </div>
       )}
+
       {/* Status */}
       <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
         <div className="flex items-center gap-2 mb-3">
@@ -135,8 +167,8 @@ const RightSidebarMain = async () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          {quickStats.map((stat, index) => (
-            <div key={index} className="bg-secondary/30 rounded-lg p-2 text-center">
+          {quickStats.map((stat) => (
+            <div key={stat.label} className="bg-secondary/30 rounded-lg p-2 text-center">
               <Typography.P className="text-sm font-bold text-primary">
                 {stat.value}
               </Typography.P>
@@ -153,11 +185,11 @@ const RightSidebarMain = async () => {
         <div className="flex items-center gap-2 mb-3">
           <SiSpotify size={16} className="text-green-500" />
           <Typography.P className="text-sm font-semibold text-primary/80">
-            {spotify.isPlaying ? "Now Playing" : "Spotify"}
+            {spotify?.isPlaying ? "Now Playing" : "Spotify"}
           </Typography.P>
         </div>
 
-        {spotify.isPlaying && spotify.songUrl ? (
+        {spotify?.isPlaying && spotify.songUrl ? (
           <Link href={spotify.songUrl} target="_blank" rel="noopener noreferrer">
             <div className="flex items-center gap-3 hover:bg-secondary/30 rounded-lg p-2 -m-2 transition-colors">
               {spotify.albumImageUrl ? (
@@ -198,53 +230,8 @@ const RightSidebarMain = async () => {
           </div>
         )}
       </div>
-
-      {/* Weather */}
-      <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
-        <div className="flex items-center gap-2 mb-3">
-          <BiGlobe size={16} className="text-orange-500" />
-          <Typography.P className="text-sm font-semibold text-primary/80">
-            Weather
-          </Typography.P>
-        </div>
-
-        {weather ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="text-2xl">{weatherEmoji}</div>
-              <div>
-                <Typography.P className="text-lg font-bold text-primary">
-                  {temperature !== null ? `${temperature}°C` : "N/A"}
-                </Typography.P>
-                <Typography.P className="text-xs text-primary/60">
-                  {weather.name ?? "Malang"}, ID
-                </Typography.P>
-              </div>
-            </div>
-            <div className="text-right">
-              <Typography.P className="text-xs text-primary/70 capitalize">
-                {weatherCondition?.description ?? "Unknown"}
-              </Typography.P>
-              <Typography.P className="text-xs text-primary/60">
-                {feelsLike !== null ? `Feels like ${feelsLike}°` : ""}
-              </Typography.P>
-              {weather.main?.humidity && (
-                <Typography.P className="text-xs text-primary/60">
-                  Humidity {weather.main.humidity}%
-                </Typography.P>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-4">
-            <Typography.P className="text-xs text-primary/60">
-              Weather data unavailable
-            </Typography.P>
-          </div>
-        )}
-      </div>
     </div>
   );
 };
 
-export default RightSidebarMain;
+export default MobileNavbarRightSidebar;

@@ -1,18 +1,16 @@
-"use client"
-
 import { publicDashboardMenu } from "@/commons/constants/navigation-menu";
 import { MdVerified as VerifiedIcon } from "react-icons/md";
 import Typography from "@/components/ui/typography";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 import SidebarSecondary from "./sidebar-secondary";
-import NavbarRightSidebar from "./navbar-right-sidebar";
+import MobileNavbarRightSidebar from "./mobile-navbar-right-sidebar";
 
 interface NavbarExpandProps {
   onItemClick?: () => void;
 }
 
-const NavbarExpand = ({ onItemClick }: NavbarExpandProps) => {
+const MobileNavbarExpand = ({ onItemClick }: NavbarExpandProps) => {
   return (
     <div className="flex flex-col overflow-y-auto w-full md:w-52 lg:w-64">
       <div className="mb-4 px-1">
@@ -43,9 +41,9 @@ const NavbarExpand = ({ onItemClick }: NavbarExpandProps) => {
         </div>
       </div>
       <SidebarSecondary menu={publicDashboardMenu} onItemClick={onItemClick} />
-      <NavbarRightSidebar />
+      <MobileNavbarRightSidebar />
     </div>
   );
 };
 
-export default NavbarExpand;
+export default MobileNavbarExpand;
