@@ -92,7 +92,7 @@ export default function ContactSection() {
           Or send me a message
         </p>
         <div className="flex justify-start mt-5">
-          <form className="w-full" onSubmit={sendEmail}>
+          <form className="w-full mx-1" onSubmit={sendEmail}>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col md:flex-row gap-2">
                 <Input
