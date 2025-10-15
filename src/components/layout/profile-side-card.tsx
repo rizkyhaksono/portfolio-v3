@@ -26,7 +26,9 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    getProfile().then(setProfile);
+    (async () => {
+      await getProfile().then(setProfile);
+    })();
   }, []);
 
   const handleLogout = async () => {
@@ -41,17 +43,14 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
     })
   }
 
-  if (!profile || profile?.name === "UNAUTHORIZED") return <AuthCard className="border rounded-xl" />;
+  if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
         <div
           data-cy="auth-card-side"
-          className={cn(
-            `flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]"
-            }`
-          )}
+          className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}
         >
           <Avatar className="h-10 w-10">
             {profile?.data?.name && <AvatarFallback>{profile?.data?.name?.slice(0, 1)}</AvatarFallback>}

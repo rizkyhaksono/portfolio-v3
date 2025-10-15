@@ -21,8 +21,8 @@ export default function IntroSection() {
           </span>
         </div>
 
-        {/* 3D Anime Art for Desktop */}
-        <div className="hidden md:block flex-shrink-0 w-72 h-96">
+        {/* 3D Art for Desktop */}
+        <div className="hidden md:block flex-shrink-0 w-72">
           <CodingScene />
         </div>
 
