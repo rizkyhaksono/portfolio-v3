@@ -113,6 +113,11 @@ const config = {
 					'30%, 60%': {
 						'background-position': 'calc(100% + var(--shiny-width)) 0'
 					}
+				},
+				scroll: {
+					to: {
+						transform: 'translate(calc(-50% - 0.5rem))'
+					}
 				}
 			},
 			animation: {
@@ -122,7 +127,8 @@ const config = {
 				marquee: 'marquee var(--duration) linear infinite',
 				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
 				gradient: 'gradient 8s linear infinite',
-				'shiny-text': 'shiny-text 8s infinite'
+				'shiny-text': 'shiny-text 8s infinite',
+				scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite'
 			}
 		}
 	},

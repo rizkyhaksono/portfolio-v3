@@ -50,6 +50,7 @@
 
   .theme {
     --animate-meteor: meteor 5s linear infinite;
+    --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
   }
 }
 
@@ -76,6 +77,19 @@
 
     100% {
       transform: rotate(var(--angle)) translateX(-500px);
+      opacity: 0;
+    }
+  }
+
+  @keyframes blink-cursor {
+
+    0%,
+    49% {
+      opacity: 1;
+    }
+
+    50%,
+    100% {
       opacity: 0;
     }
   }
@@ -138,4 +152,20 @@ html:hover ::-webkit-scrollbar-thumb {
 
 .dark * {
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@theme inline {
+  --animate-scroll: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 0.5rem));
+    }
+  }
 }
