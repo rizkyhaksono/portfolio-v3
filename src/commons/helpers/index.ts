@@ -8,13 +8,14 @@ interface ParsedUrlProps {
 
 export const formatBlogSlug = (slug: string) => slug?.slice(0, -5);
 
-export const formatDate = (date: string, type = "MMMM dd, yyyy") => {
+export const formatDate = (date: string | Date, type = "MMMM dd, yyyy") => {
   if (!date) {
     return "";
   }
 
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
   const formattedDate = format(
-    toZonedTime(parseISO(date), "Asia/Jakarta"),
+    toZonedTime(dateObj, "Asia/Jakarta"),
     type
   );
   return formattedDate;
@@ -56,3 +57,11 @@ export const calculateReadingTime = (content: string, wordsPerMinute = 5) => {
   );
   return readingTimeMinutes;
 };
+
+// Re-export rate limiting utilities
+export {
+  checkContactRateLimit,
+  recordContactSubmission,
+  formatRemainingTime,
+  type RateLimitResult,
+} from "./rate-limit";
