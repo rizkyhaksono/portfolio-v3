@@ -25,6 +25,16 @@ export const getAllProject = async () => {
   return data as projectType[];
 };
 
+export const getSupabaseProjectById = async (id: string) => {
+  const { data } = await supabaseUser
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  return data as projectType;
+}
+
 export const getProjects = async () => {
   const response = await fetch(`${process.env.API_URL}/project`,
     {
