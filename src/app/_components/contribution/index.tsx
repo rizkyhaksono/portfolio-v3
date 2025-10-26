@@ -1,16 +1,21 @@
 import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
 import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime";
+import { getDuolingoProfile } from "@/services/visitor/duolingo";
 import { GITHUB_ACCOUNTS } from "@/commons/constants/github";
 import { fetchGithubData } from "@/services/visitor/github";
 import GithubCalendar from "@/app/_components/contribution/github-calender";
 import GithubOverview from "@/app/_components/contribution/github-overview";
 import WakatimeActive from "@/app/_components/contribution/wakatime-active";
 import WakatimeOverview from "@/app/_components/contribution/wakatime-overview";
+import DuolingoStats from "./duolingo-stats";
+import { Highlighter } from "@/components/ui/highlighter";
+import { TypingAnimation } from "@/components/ui/typing-animation";
 
 export default async function ContributionSection() {
   const readStatsResponse = await getReadStats();
   const allTimeSinceTodayResponse = await getALLTimeSinceToday();
+  const duolingoProfile = await getDuolingoProfile();
 
   const wakatime = {
     ...readStatsResponse.data,
@@ -25,13 +30,20 @@ export default async function ContributionSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <Link
-          className="text-lg font-semibold underline underline-offset-4"
-          href={"https://github.com/rizkyhaksono"}
-          target="_blank"
-        >
-          {`@rizkyhaksono's contributions`}
-        </Link>
+        <Highlighter action="underline" color="#4ade80">
+          <TypingAnimation
+            words={[
+              "@rizkyhaksono's contributions",
+              "@rizkyhaksono's stats",
+              "My journey so far i guess...",
+            ]}
+            typeSpeed={50}
+            deleteSpeed={150}
+            pauseDelay={2000}
+            loop
+          />
+        </Highlighter>
+        <DuolingoStats duolingo={duolingoProfile} />
         <WakatimeOverview data={wakatime} />
         <WakatimeActive data={wakatime} />
         <GithubOverview
@@ -42,5 +54,5 @@ export default async function ContributionSection() {
         />
       </div>
     </BlurFade>
-  )
+  );
 }

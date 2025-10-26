@@ -1,5 +1,6 @@
 import { formatDate } from "@/commons/helpers";
 import WakatimeOverviewItem from "./wakatime-overview-item";
+import { Highlighter } from "@/components/ui/highlighter";
 
 interface WakatimeOverviewProps {
   data: {
@@ -30,17 +31,26 @@ const WakatimeOverview = ({ data }: WakatimeOverviewProps) => {
     : "N/A";
 
   return (
-    <div className="mb-1 grid gap-3 py-2 md:grid-cols-2">
-      <WakatimeOverviewItem label="Start Date" value={startDate} />
-      <WakatimeOverviewItem label="End Date" value={endDate} />
-      <WakatimeOverviewItem label="Daily Coding Average" value={dailyAverage} />
-      <WakatimeOverviewItem label="This Week Coding Time" value={dailyTotal} />
-      <WakatimeOverviewItem label="Best Day Coding Time" value={bestDay} />
-      <WakatimeOverviewItem
-        label="All Time Since Today"
-        value={allTimeSinceToday}
-      />
-    </div>
+    <>
+      <div className="mt-5 flex items-center gap-2">
+        <h3 className="text-base font-semibold text-black">
+          <Highlighter action="highlight" color="#87CEFA">
+            Coding Progress
+          </Highlighter>
+        </h3>
+      </div>
+      <div className="mb-1 grid gap-3 py-2 md:grid-cols-2">
+        <WakatimeOverviewItem label="Start Date" value={startDate} />
+        <WakatimeOverviewItem label="End Date" value={endDate} />
+        <WakatimeOverviewItem label="Daily Coding Average" value={dailyAverage} />
+        <WakatimeOverviewItem label="This Week Coding Time" value={dailyTotal} />
+        <WakatimeOverviewItem label="Best Day Coding Time" value={bestDay} />
+        <WakatimeOverviewItem
+          label="All Time Since Today"
+          value={allTimeSinceToday}
+        />
+      </div>
+    </>
   );
 };
 
