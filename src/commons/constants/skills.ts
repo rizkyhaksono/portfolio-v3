@@ -165,8 +165,8 @@ export const skills_data: SkillCategory[] = [
   {
     name: "Blockchain & Web3",
     skills: [
-      "Solidity",
-      "Web3.js",
+      "Solidity (Learning)",
+      "Web3.js (Learning)",
     ]
   }
 ];

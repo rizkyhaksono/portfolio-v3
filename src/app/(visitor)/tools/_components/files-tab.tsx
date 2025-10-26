@@ -97,7 +97,7 @@ const FILES_DATA = {
   ]
 };
 
-export default function FilesPage() {
+export function FilesTab() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 

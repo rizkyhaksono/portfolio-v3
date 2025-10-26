@@ -278,7 +278,7 @@ export default function WPMTest() {
       <div className="space-y-6">
         {/* Words Display */}
         <div className="bg-card rounded-lg p-6 min-h-[200px] flex items-center">
-          <div className="text-2xl leading-relaxed font-mono w-full">
+          <div className="text-base leading-relaxed font-mono w-full">
             {words.slice(0, 50).map((word, wordIndex) => (
               <span key={wordIndex} className="inline-block mr-3 mb-2">
                 {word.split("").map((char, charIndex) => (

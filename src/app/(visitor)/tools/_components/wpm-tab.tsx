@@ -1,7 +1,7 @@
 import BlurFade from "@/components/magicui/blur-fade";
-import WPMTest from "./_components/wpm-test";
+import WPMTest from "./wpm/wpm-test";
 
-export default function WPMPage() {
+export function WpmTab() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="text-center mb-6">
@@ -13,5 +13,5 @@ export default function WPMPage() {
       </div>
       <WPMTest />
     </BlurFade>
-  )
+  );
 }

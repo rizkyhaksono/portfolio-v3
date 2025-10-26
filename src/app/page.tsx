@@ -5,11 +5,16 @@ import CarrerSection from "@/app/_components/career";
 import EducationSection from "@/app/_components/education";
 import ContributionSection from "@/app/_components/contribution";
 import ContactSection from "@/app/_components/contact";
+import LinkedinRecommendations from "@/app/_components/contact/linkedin-recommendations";
 import BaseLayout from "@/components/layout/base-layout";
 import SidebarMain from "@/components/layout/sidebar-main";
 import RightSidebarMain from "@/components/layout/right-sidebar-main";
+import { getLinkedinRecommendations } from "@/services/visitor/linkedin";
 
 export default async function Home() {
+  const linkedinRecommendationsResponse = await getLinkedinRecommendations();
+  const recommendations = linkedinRecommendationsResponse?.data || [];
+
   return (
     <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
       <IntroSection />
@@ -18,6 +23,7 @@ export default async function Home() {
       <CarrerSection />
       <EducationSection />
       <ContributionSection />
+      <LinkedinRecommendations recommendations={recommendations} />
       <ContactSection />
     </BaseLayout>
   );

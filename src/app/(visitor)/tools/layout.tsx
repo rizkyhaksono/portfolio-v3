@@ -2,26 +2,39 @@ import type { Metadata } from "next";
 import BaseLayout from "@/components/layout/base-layout";
 import { MetadataConstants } from "@/commons/constants/metadata";
 import SidebarMain from "@/components/layout/sidebar-main";
-import RightSidebarMain from "@/components/layout/right-sidebar-main";
 
 export const metadata: Metadata = {
-  title: "Tools | Rizky Haksono",
+  title: "Tools - Japanese Quiz, Anime Generator & More | Rizky Haksono",
   metadataBase: new URL(
     process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : process.env.DOMAIN ?? ""
   ),
-  description: MetadataConstants.description,
-  keywords: MetadataConstants.keyword,
+  description: "Collection of useful tools including Japanese JLPT Quiz, Anime Image Generator, Social Media Downloader, WPM Test, File Manager, and Online Compiler. Free and easy to use!",
+  keywords: [
+    ...MetadataConstants.keyword,
+    "Japanese quiz",
+    "JLPT practice",
+    "anime generator",
+    "video downloader",
+    "tiktok downloader",
+    "instagram downloader",
+    "youtube downloader",
+    "wpm test",
+    "typing speed test",
+    "online compiler",
+    "file manager",
+  ],
   creator: MetadataConstants.creator,
   authors: {
     name: MetadataConstants.creator,
     url: MetadataConstants.openGraph.url,
   },
   openGraph: {
-    title: "Muhammad Rizky Haksono - Software Engineer",
+    title: "Tools - Japanese Quiz, Anime Generator & More",
+    description: "Collection of useful tools for learning Japanese, generating anime images, downloading videos, and more!",
     images: MetadataConstants.profile,
-    url: MetadataConstants.openGraph.url,
+    url: `${MetadataConstants.openGraph.url}/tools`,
     siteName: MetadataConstants.openGraph.siteName,
     locale: MetadataConstants.openGraph.locale,
     type: "website",
@@ -38,7 +51,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />}>
       {children}
     </BaseLayout>
   )

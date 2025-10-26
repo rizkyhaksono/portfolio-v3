@@ -3,14 +3,14 @@
 import BlurFade from "@/components/magicui/blur-fade";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { CompilerOutputPanel } from "../tools/_components/compiler/compiler-output-panel";
-import { CompilerCodeEditor } from "../tools/_components/compiler/compiler-code-editor";
-import { CompilerToolbar } from "../tools/_components/compiler/compiler-toolbar";
+import { CompilerOutputPanel } from "./compiler/compiler-output-panel";
+import { CompilerCodeEditor } from "./compiler/compiler-code-editor";
+import { CompilerToolbar } from "./compiler/compiler-toolbar";
 import { CompilerState } from "@/commons/types/compiler";
 import { postExecuteCode } from "@/services/visitor/compiler";
 import { LANGUAGES, Theme } from "@/commons/constants/compiler";
 
-export default function CompilerPage() {
+export function CompilerTab() {
   const [theme, setTheme] = useState<Theme>('dark');
 
   const [state, setState] = useState<CompilerState>({

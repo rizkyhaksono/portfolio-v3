@@ -22,7 +22,7 @@ const TypingArea = forwardRef<HTMLInputElement, TypingAreaProps>(
           disabled={disabled}
           onFocus={onFocus}
           className={cn(
-            "text-center text-lg font-mono max-w-md",
+            "text-center text-sm font-mono max-w-md",
             "focus:ring-2 focus:ring-primary focus:border-primary",
             "transition-all duration-200"
           )}
