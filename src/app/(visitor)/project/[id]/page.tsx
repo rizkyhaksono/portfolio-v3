@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { getAllProject } from "@/services/visitor/project";
+import { getSupabaseProjectById } from "@/services/visitor/project";
 import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,22 +13,11 @@ type Props = {
   params: Promise<{ id: string }>
 }
 
-export async function generateStaticParams() {
-  const projects = await getAllProject();
-
-  return projects?.map((project) => ({
-    id: project.id.toString(),
-  })) || [];
-}
-
 export default async function ProjectDetailPage({ params }: Readonly<Props>) {
   const { id } = await params;
-  const projects = await getAllProject();
-  const project = projects?.find((p) => p.id === id);
+  const project = await getSupabaseProjectById(id);
 
-  if (!project) {
-    notFound();
-  }
+  if (!project) return notFound();
 
   return (
     <BlurFade delay={0.25} inView>
@@ -95,7 +84,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
             </Card>
 
             {/* Technologies Section */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Technologies Used</CardTitle>
                 <CardDescription>Tech stack and tools for this project</CardDescription>
@@ -111,7 +100,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
                   Note: Technology tags will be available once the database schema is updated.
                 </p>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Project Timeline */}
             <Card>
@@ -191,12 +180,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
               <CardHeader>
                 <CardTitle>Project Info</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-1">Project ID</p>
-                  <p className="text-sm text-muted-foreground">{project.id}</p>
-                </div>
-                <Separator />
+              <CardContent>
                 <div>
                   <p className="text-sm font-medium mb-1">Status</p>
                   <Badge variant="default">Active</Badge>
