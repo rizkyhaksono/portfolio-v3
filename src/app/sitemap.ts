@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const domain = process.env.DOMAIN ?? "https://www.natee.me/";
+  const domain = process.env.DOMAIN ?? "https://www.natee.my.id/";
   return [
     {
       url: domain,
