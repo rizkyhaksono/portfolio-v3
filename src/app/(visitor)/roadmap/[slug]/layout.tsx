@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RoadmapLayout({
+export default function RoadmapSlugLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
