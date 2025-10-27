@@ -1,0 +1,210 @@
+---
+title: "Setting Up Your Environment"
+description: "Installing Node.js, npm, and creating your first React app"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "beginner"
+duration: "15 min"
+order: 2
+video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+illustration: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2944&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal, Download, CheckCircle2, AlertCircle } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
+## Setting Up Your Development Environment
+
+Before you can start building with React, you need to set up your development environment. This lesson will guide you through installing the necessary tools.
+
+<Alert className="my-6">
+  <Download className="h-4 w-4" />
+  <AlertTitle>Prerequisites</AlertTitle>
+  <AlertDescription>
+    You'll need a code editor (we recommend VS Code) and a modern web browser (Chrome, Firefox, or Edge).
+  </AlertDescription>
+</Alert>
+
+## Installing Node.js and npm
+
+Node.js is a JavaScript runtime that allows you to run JavaScript outside the browser. npm (Node Package Manager) comes bundled with Node.js and is used to install and manage packages.
+
+### Step 1: Download Node.js
+
+Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) version for your operating system.
+
+<Tabs defaultValue="windows" className="my-6">
+  <TabsList>
+    <TabsTrigger value="windows">Windows</TabsTrigger>
+    <TabsTrigger value="macos">macOS</TabsTrigger>
+    <TabsTrigger value="linux">Linux</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="windows">
+    <Card>
+      <CardContent className="pt-6">
+        <ol className="list-decimal list-inside space-y-2">
+          <li>Download the Windows Installer (.msi) from nodejs.org</li>
+          <li>Run the installer and follow the installation wizard</li>
+          <li>Verify installation by opening Command Prompt and running:</li>
+        </ol>
+        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="macos">
+    <Card>
+      <CardContent className="pt-6">
+        <ol className="list-decimal list-inside space-y-2">
+          <li>Download the macOS Installer (.pkg) from nodejs.org</li>
+          <li>Run the installer and follow the installation steps</li>
+          <li>Verify installation by opening Terminal and running:</li>
+        </ol>
+        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+        <Alert className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Alternatively, you can use Homebrew: <code className="text-sm">brew install node</code>
+          </AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="linux">
+    <Card>
+      <CardContent className="pt-6">
+        <p className="mb-4">For Ubuntu/Debian:</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br/>
+          sudo apt-get install -y nodejs
+        </div>
+        <p className="mb-2">Verify installation:</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+## Creating Your First React App
+
+Now that you have Node.js and npm installed, you can create your first React application using Create React App or Vite.
+
+### Using Vite (Recommended)
+
+Vite is the modern, faster alternative to Create React App:
+
+```bash
+npm create vite@latest my-react-app -- --template react
+cd my-react-app
+npm install
+npm run dev
+```
+
+<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+      <CheckCircle2 className="h-5 w-5" />
+      Success!
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="text-green-800 dark:text-green-200">
+    <p>
+      Your React app should now be running at <code className="font-mono">http://localhost:5173</code>. 
+      Open it in your browser to see your first React application!
+    </p>
+  </CardContent>
+</Card>
+
+### Using Create React App (Alternative)
+
+```bash
+npx create-react-app my-react-app
+cd my-react-app
+npm start
+```
+
+## Understanding the Project Structure
+
+After creating your app, you'll see this folder structure:
+
+```
+my-react-app/
+├── node_modules/
+├── public/
+│   └── index.html
+├── src/
+│   ├── App.jsx
+│   ├── App.css
+│   ├── main.jsx
+│   └── index.css
+├── package.json
+└── vite.config.js
+```
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Terminal className="h-5 w-5" />
+      Key Files Explained
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <dl className="space-y-3">
+      <div>
+        <dt className="font-semibold">src/main.jsx</dt>
+        <dd className="text-muted-foreground text-sm">Entry point of your application</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">src/App.jsx</dt>
+        <dd className="text-muted-foreground text-sm">Main React component</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">package.json</dt>
+        <dd className="text-muted-foreground text-sm">Project dependencies and scripts</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">vite.config.js</dt>
+        <dd className="text-muted-foreground text-sm">Vite configuration file</dd>
+      </div>
+    </dl>
+  </CardContent>
+</Card>
+
+## Video Tutorial
+
+<div className="relative aspect-video my-8 rounded-lg overflow-hidden">
+  <iframe
+    className="w-full h-full"
+    src={frontmatter.videoUrl}
+    title="Setting Up Your Environment"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  />
+</div>
+
+## Next Steps
+
+With your development environment set up, you're ready to learn about JSX syntax and start writing React components!
+
+<Card className="my-6">
+  <CardContent className="pt-6">
+    <div className="flex justify-between items-center">
+      <span className="text-muted-foreground">Next Lesson:</span>
+      <span className="font-semibold">JSX Syntax</span>
+    </div>
+  </CardContent>
+</Card>

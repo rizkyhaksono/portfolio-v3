@@ -1,0 +1,313 @@
+---
+title: "JSX and Components in React"
+description: "Learn how to write JSX and create reusable components in React"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "beginner"
+duration: "25 min"
+order: 3
+video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+illustration: "/images/react-jsx-illustration.png"
+---
+
+<Author id="rizky" />
+
+## Introduction to JSX
+
+JSX (JavaScript XML) is a syntax extension for JavaScript that looks similar to HTML but comes with the full power of JavaScript.
+
+<Alert>
+  <AlertTitle>💡 Key Concept</AlertTitle>
+  <AlertDescription>
+    JSX is not a string or HTML—it's a syntax that gets compiled to regular JavaScript function calls.
+  </AlertDescription>
+</Alert>
+
+### Why Use JSX?
+
+<Card>
+  <CardHeader>
+    <CardTitle>Benefits of JSX</CardTitle>
+  </CardHeader>
+  <CardContent>
+    - **Familiar Syntax**: Looks like HTML, easy to read and write
+    - **Type Safety**: Can be statically analyzed with TypeScript
+    - **Prevents Injection Attacks**: Escapes values by default
+    - **JavaScript Power**: Use variables, expressions, and functions
+  </CardContent>
+</Card>
+
+## JSX Basics
+
+### Embedding Expressions
+
+<VideoViewer 
+  src="/videos/jsx-expressions-demo.mp4"
+  alt="JSX Expressions Demo"
+/>
+
+You can embed any JavaScript expression in JSX by wrapping it in curly braces:
+
+```jsx
+const name = "React Developer";
+const greeting = <h1>Hello, {name}!</h1>;
+
+// You can use any expression
+const element = (
+  <div>
+    <h1>2 + 2 = {2 + 2}</h1>
+    <p>Current time: {new Date().toLocaleTimeString()}</p>
+  </div>
+);
+```
+
+### JSX Attributes
+
+<Tabs defaultValue="html-vs-jsx">
+  <TabsList>
+    <TabsTrigger value="html-vs-jsx">HTML vs JSX</TabsTrigger>
+    <TabsTrigger value="common-attrs">Common Attributes</TabsTrigger>
+    <TabsTrigger value="style-object">Style Object</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="html-vs-jsx">
+    JSX uses camelCase for attribute names:
+    
+    ```jsx
+    // HTML
+    <div class="container" tabindex="0"></div>
+    
+    // JSX
+    <div className="container" tabIndex="0"></div>
+    ```
+  </TabsContent>
+  
+  <TabsContent value="common-attrs">
+    Common JSX attributes:
+    
+    ```jsx
+    <input
+      type="text"
+      placeholder="Enter name"
+      onChange={handleChange}
+      value={inputValue}
+      disabled={isDisabled}
+    />
+    ```
+  </TabsContent>
+  
+  <TabsContent value="style-object">
+    Inline styles use JavaScript objects:
+    
+    ```jsx
+    const styles = {
+      color: 'blue',
+      fontSize: '16px',
+      backgroundColor: '#f0f0f0'
+    };
+    
+    <div style={styles}>Styled content</div>
+    ```
+  </TabsContent>
+</Tabs>
+
+## Creating Components
+
+### Function Components
+
+The modern way to create React components:
+
+```tsx
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+
+// Arrow function syntax
+const Welcome = ({ name }) => {
+  return <h1>Hello, {name}</h1>;
+};
+
+// With TypeScript
+interface WelcomeProps {
+  name: string;
+}
+
+const Welcome: React.FC<WelcomeProps> = ({ name }) => {
+  return <h1>Hello, {name}</h1>;
+};
+```
+
+### Component Composition
+
+<ImageViewer 
+  src="/images/component-composition.png"
+  alt="Component Composition Diagram"
+/>
+
+Build complex UIs by composing smaller components:
+
+```tsx
+function Avatar({ user }) {
+  return (
+    <img
+      src={user.avatarUrl}
+      alt={user.name}
+      className="rounded-full"
+    />
+  );
+}
+
+function UserInfo({ user }) {
+  return (
+    <div className="user-info">
+      <Avatar user={user} />
+      <div className="user-details">
+        <h3>{user.name}</h3>
+        <p>{user.email}</p>
+      </div>
+    </div>
+  );
+}
+
+function UserCard({ user }) {
+  return (
+    <div className="card">
+      <UserInfo user={user} />
+      <button>Follow</button>
+    </div>
+  );
+}
+```
+
+## Props and Children
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="props">
+    <AccordionTrigger>What are Props?</AccordionTrigger>
+    <AccordionContent>
+      Props (properties) are arguments passed to React components. They are read-only and help make components reusable.
+      
+      ```tsx
+      function Button({ text, onClick, variant = 'primary' }) {
+        return (
+          <button 
+            className={`btn btn-${variant}`}
+            onClick={onClick}
+          >
+            {text}
+          </button>
+        );
+      }
+      
+      // Usage
+      <Button text="Click me" onClick={handleClick} variant="secondary" />
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="children">
+    <AccordionTrigger>Using Children Prop</AccordionTrigger>
+    <AccordionContent>
+      The special `children` prop contains the content between component tags:
+      
+      ```tsx
+      function Card({ children, title }) {
+        return (
+          <div className="card">
+            <h2>{title}</h2>
+            <div className="card-body">
+              {children}
+            </div>
+          </div>
+        );
+      }
+      
+      // Usage
+      <Card title="My Card">
+        <p>This is the card content</p>
+        <button>Action</button>
+      </Card>
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="destructuring">
+    <AccordionTrigger>Props Destructuring</AccordionTrigger>
+    <AccordionContent>
+      Destructure props for cleaner code:
+      
+      ```tsx
+      // Instead of this
+      function User(props) {
+        return <div>{props.name} - {props.email}</div>;
+      }
+      
+      // Do this
+      function User({ name, email }) {
+        return <div>{name} - {email}</div>;
+      }
+      
+      // With default values
+      function User({ name, email, role = 'user' }) {
+        return <div>{name} ({role}) - {email}</div>;
+      }
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+<Card className="mt-6">
+  <CardHeader>
+    <CardTitle>✅ Component Best Practices</CardTitle>
+  </CardHeader>
+  <CardContent>
+    1. **Keep components small and focused** - One component, one responsibility
+    2. **Use meaningful names** - Component names should be descriptive
+    3. **Validate props** - Use TypeScript or PropTypes
+    4. **Avoid deep nesting** - Extract nested components
+    5. **Use composition over inheritance** - Compose smaller components
+  </CardContent>
+</Card>
+
+## Practice Exercise
+
+Try creating a `ProfileCard` component that displays:
+- User avatar (use ImageViewer)
+- User name and bio
+- Social media links
+- Follow button
+
+```tsx
+interface User {
+  name: string;
+  bio: string;
+  avatar: string;
+  social: {
+    twitter?: string;
+    github?: string;
+  };
+}
+
+function ProfileCard({ user }: { user: User }) {
+  // Your implementation here
+}
+```
+
+## Next Steps
+
+In the next lesson, we'll explore **State and Hooks** to make our components interactive!
+
+<Alert>
+  <AlertTitle>📚 Additional Resources</AlertTitle>
+  <AlertDescription>
+    - [React JSX Documentation](https://react.dev/learn/writing-markup-with-jsx)
+    - [Component Props Guide](https://react.dev/learn/passing-props-to-a-component)
+    - [Thinking in React](https://react.dev/learn/thinking-in-react)
+  </AlertDescription>
+</Alert>
+
+---
+
+<Author id="natee" />
