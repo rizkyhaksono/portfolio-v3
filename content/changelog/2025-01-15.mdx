@@ -1,0 +1,138 @@
+---
+title: "Version 2.0 - Major Update with Enhanced UI"
+description: "Introducing new features, improved performance, and better user experience"
+date: "2025-01-15"
+version: "2.0"
+author: "Rizky Haksono"
+---
+
+<Author id="rizky" />
+
+## What's New
+
+We're excited to announce **Version 2.0** with significant improvements across the platform!
+
+### Enhanced Media Support
+
+<ImageViewer 
+  src="/images/new-dashboard.png" 
+  alt="New Dashboard Design"
+/>
+
+The new dashboard provides a cleaner, more intuitive interface with better organization of your content.
+
+### Key Features
+
+<Card>
+  <CardHeader>
+    <CardTitle>🎨 Modern UI Components</CardTitle>
+    <CardDescription>Complete redesign with accessibility in mind</CardDescription>
+  </CardHeader>
+  <CardContent>
+    - New component library with Tailwind CSS
+    - Dark mode support across all pages
+    - Responsive design for all screen sizes
+    - Improved loading states and animations
+  </CardContent>
+</Card>
+
+<Card className="mt-4">
+  <CardHeader>
+    <CardTitle>⚡ Performance Improvements</CardTitle>
+    <CardDescription>Faster load times and better optimization</CardDescription>
+  </CardHeader>
+  <CardContent>
+    - 40% faster page load times
+    - Optimized image delivery with Next.js Image
+    - Code splitting for better bundle sizes
+    - Server-side rendering improvements
+  </CardContent>
+</Card>
+
+### Breaking Changes
+
+<Alert>
+  <AlertTitle>⚠️ Important Notice</AlertTitle>
+  <AlertDescription>
+    This version includes breaking changes. Please review the migration guide before upgrading.
+  </AlertDescription>
+</Alert>
+
+<Accordion type="single" collapsible={true}>
+  <AccordionItem value="api-changes">
+    <AccordionTrigger>API Changes</AccordionTrigger>
+    <AccordionContent>
+      - `getUserData()` now returns a Promise
+      - Authentication endpoint moved to `/api/v2/auth`
+      - Legacy endpoints will be deprecated in v2.5
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="component-updates">
+    <AccordionTrigger>Component Updates</AccordionTrigger>
+    <AccordionContent>
+      - Button component now uses `variant` instead of `type`
+      - Card component requires explicit `CardContent` wrapper
+      - Modal component replaced with Dialog
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Technical Details
+
+### Architecture Improvements
+
+We've completely refactored the core architecture:
+
+```typescript
+// Before
+export function fetchData(id: string) {
+  return fetch(`/api/data/${id}`).then(res => res.json())
+}
+
+// After
+export async function fetchData(id: string): Promise<Data> {
+  const response = await fetch(`/api/v2/data/${id}`)
+  if (!response.ok) throw new Error('Failed to fetch')
+  return response.json()
+}
+```
+
+### Migration Steps
+
+<Tabs defaultValue="automatic">
+  <TabsList>
+    <TabsTrigger value="automatic">Automatic</TabsTrigger>
+    <TabsTrigger value="manual">Manual</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="automatic">
+    Run our migration script:
+    
+    ```bash
+    npm run migrate:v2
+    ```
+    
+    The script will automatically update your code and configuration files.
+  </TabsContent>
+  
+  <TabsContent value="manual">
+    Follow these steps manually:
+    
+    1. Update dependencies in `package.json`
+    2. Run `npm install` to install new versions
+    3. Update import statements in your code
+    4. Test thoroughly before deploying
+  </TabsContent>
+</Tabs>
+
+## What's Next
+
+Stay tuned for Version 2.1 coming next month with:
+- AI-powered content suggestions
+- Advanced analytics dashboard
+- Real-time collaboration features
+
+---
+
+<Author id="natee" />
