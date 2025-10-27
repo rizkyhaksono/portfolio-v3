@@ -2,6 +2,7 @@ import { isHaveValidToken } from "@/app/actions/actions";
 import Footer from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import DotPattern from "@/components/magicui/dot-pattern";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern";
 import ScrollProgress from "@/components/ui/scroll-progress";
 import { cn } from "@/lib/utils";
@@ -22,15 +23,15 @@ export default async function BaseLayout({
       <ScrollProgress />
       <div className="container min-h-screen pt-12 sm:pt-24 px-6">
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden h-40 pointer-events-none z-[-1]">
-          <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:hidden">
+          {/* <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:hidden">
             <InteractiveGridPattern
               className={cn(
                 "[mask-image:radial-gradient(400px_circle_at_center,white,transparent)]",
                 "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12",
               )}
             />
-          </div>
-          <DotPattern
+          </div> */}
+          {/* <DotPattern
             width={20}
             height={20}
             cx={1}
@@ -39,7 +40,19 @@ export default async function BaseLayout({
             className={cn(
               "[-webkit-mask-image:linear-gradient(to_bottom,black,transparent)] hidden md:block",
             )}
-          />
+          /> */}
+          <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-background [-webkit-mask-image:linear-gradient(to_bottom,black,transparent)]">
+            <FlickeringGrid
+              className="absolute inset-0 z-0 size-full w-full"
+              squareSize={4}
+              gridGap={6}
+              color="#6B7280"
+              maxOpacity={0.5}
+              flickerChance={0.1}
+              height={800}
+              width={2000}
+            />
+          </div>
         </div>
         <div className="block md:hidden">
           <Navbar isHaveToken={isHaveToken} />

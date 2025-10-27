@@ -133,7 +133,7 @@ export default function Navbar({ isHaveToken }: Readonly<NavbarProps>) {
               </Tooltip>
             </DockIcon>
 
-            <DockIcon>
+            {/* <DockIcon>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <ModeToggle />
@@ -142,7 +142,7 @@ export default function Navbar({ isHaveToken }: Readonly<NavbarProps>) {
                   <p>Theme</p>
                 </TooltipContent>
               </Tooltip>
-            </DockIcon>
+            </DockIcon> */}
           </Dock>
         </div>
       </TooltipProvider>

@@ -1,24 +1,9 @@
-"use client";
-
 import { cn } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
 import Typography from "@/components/ui/typography";
 import { MoonIcon, SunIcon } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { useTheme } from "next-themes";
+import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 
 const SidebarTheming = () => {
-  const { theme, setTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <>
       <Typography.P className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate pt-5">
@@ -38,12 +23,7 @@ const SidebarTheming = () => {
             Dark Mode
           </Typography.P>
         </div>
-
-        <Switch
-          checked={theme === "dark"}
-          accessKey="theme-mode"
-          onCheckedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
-        />
+        <AnimatedThemeToggler />
       </div>
     </>
   );

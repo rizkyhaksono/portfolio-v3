@@ -10,7 +10,7 @@ const AuthCard = ({ className }: any) => {
     <button
       onClick={() => router.push("/auth")}
       className={cn(
-        "flex p-3 gap-3 items-center cursor-pointer transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955] w-full text-left",
+        "flex p-3 gap-3 items-center cursor-pointer transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955] w-full text-left justify-between",
         className
       )}
     >

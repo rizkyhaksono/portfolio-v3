@@ -24,7 +24,7 @@ export default function CurrentTimeCard() {
           </Typography.P>
         </div>
         <div className="text-center">
-          <Typography.P className="text-2xl font-bold text-primary">
+          <Typography.P className="text-xs font-bold text-primary">
             --:--:--
           </Typography.P>
           <Typography.P className="text-xs text-primary/60 mt-1">
@@ -39,13 +39,13 @@ export default function CurrentTimeCard() {
     <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
       <div className="flex items-center gap-2 mb-3">
         <BiGlobe size={16} className="text-orange-500" />
-        <Typography.P className="text-sm font-semibold text-primary/80">
+        <Typography.P className="text-xs font-semibold text-primary/80">
           Local Time
         </Typography.P>
       </div>
 
       <div className="text-center">
-        <Typography.P className="text-2xl font-bold text-primary">
+        <Typography.P className="text-xs font-bold text-primary">
           {currentTime.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
