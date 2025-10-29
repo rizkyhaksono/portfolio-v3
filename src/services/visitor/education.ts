@@ -1,4 +1,4 @@
-import { supabaseUser } from "../../supabase/server";
+import { getAllFromTable } from "@/lib/supabase-utils";
 
 type educationType = {
   id: string;
@@ -11,12 +11,5 @@ type educationType = {
 }
 
 export const getAllEducation = async () => {
-  const { data } = await supabaseUser
-    .from("education")
-    .select("*")
-    .order("created_at", {
-      ascending: true
-    });
-
-  return data as educationType[];
+  return getAllFromTable<educationType>("education", "created_at", true);
 }

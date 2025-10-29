@@ -2,9 +2,10 @@
 
 import { AIResponse } from "@/commons/types/ai";
 import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
+import { fetchFromAPIAsJSON } from "@/lib/fetch-utils";
 
 const getAIChat = async (): Promise<any> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
+  const response = await fetchFromAPIAsJSON("/ai", {
     method: "GET",
     credentials: "include",
     headers: await getAuthorizationHeader(),
@@ -14,11 +15,11 @@ const getAIChat = async (): Promise<any> => {
     }
   });
   revalidateByTag("ai");
-  return await response.json();
+  return response;
 }
 
 const requestAIChat = async (prompt: string): Promise<AIResponse> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
+  const response = await fetchFromAPIAsJSON<AIResponse>("/ai", {
     method: "POST",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
@@ -29,7 +30,7 @@ const requestAIChat = async (prompt: string): Promise<AIResponse> => {
     },
   });
   revalidateByTag("ai");
-  return await response.json();
+  return response;
 };
 
 export {

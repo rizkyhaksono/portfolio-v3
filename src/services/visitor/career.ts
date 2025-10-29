@@ -1,4 +1,4 @@
-import { supabaseUser } from "../../supabase/server";
+import { getAllFromTable } from "@/lib/supabase-utils";
 
 type careerType = {
   id: string;
@@ -11,12 +11,5 @@ type careerType = {
 }
 
 export const getAllCarrer = async () => {
-  const { data } = await supabaseUser
-    .from("career")
-    .select("*")
-    .order("created_at", {
-      ascending: true
-    });
-
-  return data as careerType[];
+  return getAllFromTable<careerType>("career", "created_at", true);
 }
