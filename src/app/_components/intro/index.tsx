@@ -1,7 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
 import { HyperText } from "@/components/magicui/hyper-text";
 import CodingScene from "@/components/ui/3d-art";
+import { Button } from "@/components/ui/button";
 
 export default function IntroSection() {
   return (
@@ -19,6 +21,13 @@ export default function IntroSection() {
           <span>
             {`, and love to create new things. Currently, I specialize in building high-performance web applications using modern technologies like React, Next.js, and TypeScript. I'm also experienced in cloud infrastructure and learning CI/CD pipelines.`}
           </span>
+          <div className="mt-6">
+            <Link href="/changelog">
+              <Button variant="outline" size="sm">
+                View Changelog
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* 3D Art for Desktop */}

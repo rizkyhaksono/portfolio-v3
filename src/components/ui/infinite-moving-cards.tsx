@@ -28,13 +28,19 @@ export const InfiniteMovingCards = ({
   useEffect(() => {
     addAnimation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [direction, speed]);
 
   const [start, setStart] = useState(false);
 
   function addAnimation() {
     if (containerRef.current && scrollerRef.current) {
       const scrollerContent = Array.from(scrollerRef.current.children);
+
+      // Clear duplicates first to avoid adding duplicates on re-render
+      const itemCount = items.length;
+      while (scrollerRef.current.children.length > itemCount) {
+        scrollerRef.current.removeChild(scrollerRef.current.lastChild!);
+      }
 
       scrollerContent.forEach((item) => {
         const duplicatedItem = item.cloneNode(true);
@@ -43,39 +49,9 @@ export const InfiniteMovingCards = ({
         }
       });
 
-      getDirection();
-      getSpeed();
       setStart(true);
     }
   }
-
-  const getDirection = () => {
-    if (containerRef.current) {
-      if (direction === "left") {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "forwards"
-        );
-      } else {
-        containerRef.current.style.setProperty(
-          "--animation-direction",
-          "reverse"
-        );
-      }
-    }
-  };
-
-  const getSpeed = () => {
-    if (containerRef.current) {
-      if (speed === "fast") {
-        containerRef.current.style.setProperty("--animation-duration", "20s");
-      } else if (speed === "normal") {
-        containerRef.current.style.setProperty("--animation-duration", "40s");
-      } else {
-        containerRef.current.style.setProperty("--animation-duration", "80s");
-      }
-    }
-  };
 
   return (
     <div
@@ -84,6 +60,10 @@ export const InfiniteMovingCards = ({
         "scroller relative z-20 max-w-7xl overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]",
         className
       )}
+      style={{
+        "--animation-duration": speed === "fast" ? "20s" : speed === "normal" ? "40s" : "80s",
+        "--animation-direction": direction === "left" ? "forwards" : "reverse",
+      } as React.CSSProperties}
     >
       <ul
         ref={scrollerRef}

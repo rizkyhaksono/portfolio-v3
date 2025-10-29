@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeftIcon } from "lucide-react";
 import { getAllChangelogs } from "@/lib/mdx";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { formatDate } from "@/commons/helpers";
@@ -13,7 +15,12 @@ export default function ChangelogPage() {
       <div className="border-b border-border/50">
         <div className="max-w-5xl mx-auto relative">
           <div className="p-3 flex items-center justify-between">
-            <h1 className="text-3xl font-semibold tracking-tight">Changelog</h1>
+            <div className="flex items-center gap-2">
+              <Link href="/" aria-label="Go back to homepage">
+                <ArrowLeftIcon className="w-5 h-5 text-foreground/70 hover:text-foreground transition-colors" />
+              </Link>
+              <h1 className="text-lg font-semibold tracking-tight">Changelog</h1>
+            </div>
             <AnimatedThemeToggler />
           </div>
         </div>

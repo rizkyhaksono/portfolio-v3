@@ -1,4 +1,3 @@
-import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
 import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime";
 import { getDuolingoProfile } from "@/services/visitor/duolingo";
