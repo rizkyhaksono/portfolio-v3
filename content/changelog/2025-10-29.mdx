@@ -1,0 +1,47 @@
+---
+title: "Changelog Button & Navigation"
+description: "Added changelog button to homepage for easy access to all changes"
+date: "2025-10-29"
+version: "1.0"
+author: "Rizky Haksono"
+---
+
+![Changelog Button](https://images.unsplash.com/photo-1680016661694-1cd3faf31c3a?q=80&w=2874&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+
+- **Added Changelog Button** to the homepage intro section for easy navigation
+- **Improved UX** with direct access to view all project changes
+- **Better navigation** for visitors to track project updates
+- **Consistent styling** with outline button variant matching portfolio design
+
+<Accordion type="multiple" className="w-full not-prose">
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Features</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>
+          <strong>Changelog Button</strong> on the homepage intro section for quick access to all changes
+        </li>
+        <li>
+          Link to `/changelog` route with proper navigation
+        </li>
+        <li>Button styled with outline variant and small size</li>
+        <li>Proper spacing and positioning within the intro text</li>
+        <li>Mobile and desktop responsive design</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Technical Changes</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>
+          Updated `/src/app/_components/intro/index.tsx` with Link and Button components
+        </li>
+        <li>Added Next.js Link import for optimized navigation</li>
+        <li>Integrated Button component from UI library</li>
+        <li>Added changelog route link with proper styling</li>
+        <li>Maintained component consistency and accessibility standards</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
