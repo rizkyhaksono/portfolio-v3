@@ -13,12 +13,13 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   experimental: {
-    turbo: {
-      rules: {
-        '*.mdx': {
-          loaders: ['@mdx-js/loader'],
-          as: '*.js',
-        },
+    mdxRs: true,
+  },
+  turbopack: {
+    rules: {
+      '*.mdx': {
+        loaders: ['@mdx-js/loader'],
+        as: '*.js',
       },
     },
   },
