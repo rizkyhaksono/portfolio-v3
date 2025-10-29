@@ -42,9 +42,10 @@ export async function fetchFromAPI<T>(
 }
 
 /**
- * Fetch from API with JSON response (no error thrown on non-ok status)
+ * Fetch from API with JSON response
+ * Note: May throw if response body is not valid JSON
  */
-export async function fetchFromAPIWithoutThrow<T>(
+export async function fetchFromAPIAsJSON<T>(
   path: string,
   options?: RequestInit
 ): Promise<T> {

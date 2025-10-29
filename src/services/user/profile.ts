@@ -2,10 +2,10 @@
 
 import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 import { ProfileResponse } from "@/commons/types/profile";
-import { fetchFromAPIWithoutThrow } from "@/lib/fetch-utils";
+import { fetchFromAPIAsJSON } from "@/lib/fetch-utils";
 
 const getProfile = async (): Promise<ProfileResponse> => {
-  return fetchFromAPIWithoutThrow<ProfileResponse>("/me", {
+  return fetchFromAPIAsJSON<ProfileResponse>("/me", {
     method: "GET",
     headers: await getAuthorizationHeader(),
     next: {
@@ -31,7 +31,7 @@ const putProfile = async (
     about: string,
     bannerUrl: string
   }): Promise<any> => {
-  const response = await fetchFromAPIWithoutThrow(`/me/${id}`, {
+  const response = await fetchFromAPIAsJSON(`/me/${id}`, {
     method: "PATCH",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
