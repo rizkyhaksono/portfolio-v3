@@ -32,6 +32,7 @@ export async function fetchBlob(
 
 /**
  * Fetch from API with specific path and base URL from environment
+ * Throws an error if the response is not ok
  */
 export async function fetchFromAPI<T>(
   path: string,
@@ -42,7 +43,8 @@ export async function fetchFromAPI<T>(
 }
 
 /**
- * Fetch from API with JSON response
+ * Fetch from API with JSON response without checking response status
+ * Use this when you need to handle error responses yourself
  * Note: May throw if response body is not valid JSON
  */
 export async function fetchFromAPIAsJSON<T>(
@@ -53,4 +55,5 @@ export async function fetchFromAPIAsJSON<T>(
   const response = await fetch(`${baseUrl}${path}`, options);
   return await response.json();
 }
+
 
