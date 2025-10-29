@@ -1,7 +1,8 @@
 "use server";
 
-import { supabaseUser } from "@/supabase/server";
+import { getAllFromTable, getByIdFromTable } from "@/lib/supabase-utils";
 import { authHeaders } from "@/lib/header.config";
+import { fetchAPI } from "@/lib/fetch-utils";
 
 type projectType = {
   id: string;
@@ -15,48 +16,29 @@ type projectType = {
 };
 
 export const getAllProject = async () => {
-  const { data } = await supabaseUser
-    .from("projects")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
-
-  return data as projectType[];
+  return getAllFromTable<projectType>("projects", "created_at", false);
 };
 
 export const getSupabaseProjectById = async (id: string) => {
-  const { data } = await supabaseUser
-    .from("projects")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  return data as projectType;
+  return getByIdFromTable<projectType>("projects", id);
 }
 
 export const getProjects = async () => {
-  const response = await fetch(`${process.env.API_URL}/project`,
-    {
-      method: "GET",
-      headers: await authHeaders(),
-      next: {
-        revalidate: 0,
-      }
+  return fetchAPI(`${process.env.API_URL}/project`, {
+    method: "GET",
+    headers: await authHeaders(),
+    next: {
+      revalidate: 0,
     }
-  ).then(async (res) => await res.json());
-  return response;
+  });
 }
 
 export const getProjectById = async (id: number) => {
-  const response = await fetch(`${process.env.API_URL}/project/${id}`,
-    {
-      method: "GET",
-      headers: await authHeaders(),
-      next: {
-        revalidate: 0,
-      }
+  return fetchAPI(`${process.env.API_URL}/project/${id}`, {
+    method: "GET",
+    headers: await authHeaders(),
+    next: {
+      revalidate: 0,
     }
-  ).then(async (res) => await res.json());
-  return response;
+  });
 }

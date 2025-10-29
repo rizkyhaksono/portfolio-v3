@@ -1,44 +1,33 @@
-export async function getAnimeWaifu(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/waifu`, {
+import { fetchBlob } from "@/lib/fetch-utils";
+
+type AnimeType = "waifu" | "neko" | "cringe" | "blush" | "dance";
+
+/**
+ * Generic function to fetch anime images by type
+ */
+async function fetchAnimeImage(type: AnimeType): Promise<Blob> {
+  return fetchBlob(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/${type}`, {
     method: "GET",
     cache: "no-store",
   });
-  if (!response.ok) throw new Error("Failed to fetch anime waifu");
-  return response.blob();
+}
+
+export async function getAnimeWaifu(): Promise<Blob> {
+  return fetchAnimeImage("waifu");
 }
 
 export async function getAnimeNeko(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/neko`, {
-    method: "GET",
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Failed to fetch anime neko");
-  return response.blob();
+  return fetchAnimeImage("neko");
 }
 
 export async function getAnimeCringe(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/cringe`, {
-    method: "GET",
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Failed to fetch anime cringe");
-  return response.blob();
+  return fetchAnimeImage("cringe");
 }
 
 export async function getAnimeBlush(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/blush`, {
-    method: "GET",
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Failed to fetch anime blush");
-  return response.blob();
+  return fetchAnimeImage("blush");
 }
 
 export async function getAnimeDance(): Promise<Blob> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/tools/anime/dance`, {
-    method: "GET",
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error("Failed to fetch anime dance");
-  return response.blob();
+  return fetchAnimeImage("dance");
 }
