@@ -40,3 +40,16 @@ export async function fetchFromAPI<T>(
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
   return fetchAPI<T>(`${baseUrl}${path}`, options);
 }
+
+/**
+ * Fetch from API with JSON response (no error thrown on non-ok status)
+ */
+export async function fetchFromAPIWithoutThrow<T>(
+  path: string,
+  options?: RequestInit
+): Promise<T> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
+  const response = await fetch(`${baseUrl}${path}`, options);
+  return await response.json();
+}
+

@@ -2,9 +2,10 @@
 
 import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 import { ProfileResponse } from "@/commons/types/profile";
+import { fetchFromAPIWithoutThrow } from "@/lib/fetch-utils";
 
 const getProfile = async (): Promise<ProfileResponse> => {
-  const response = await fetch(`${process.env.API_URL}/me`, {
+  return fetchFromAPIWithoutThrow<ProfileResponse>("/me", {
     method: "GET",
     headers: await getAuthorizationHeader(),
     next: {
@@ -12,7 +13,6 @@ const getProfile = async (): Promise<ProfileResponse> => {
       revalidate: 0,
     }
   });
-  return await response.json();
 }
 
 const putProfile = async (
@@ -31,7 +31,7 @@ const putProfile = async (
     about: string,
     bannerUrl: string
   }): Promise<any> => {
-  const response = await fetch(`${process.env.API_URL}/me/${id}`, {
+  const response = await fetchFromAPIWithoutThrow(`/me/${id}`, {
     method: "PATCH",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
@@ -45,7 +45,7 @@ const putProfile = async (
     })
   });
   revalidateByTag("profile");
-  return await response.json();
+  return response;
 }
 
 export {

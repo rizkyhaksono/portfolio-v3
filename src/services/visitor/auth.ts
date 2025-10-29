@@ -1,7 +1,9 @@
 "use server";
 
+import { fetchFromAPI } from "@/lib/fetch-utils";
+
 const authLogin = async (email: string, password: string) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+  return fetchFromAPI("/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -10,12 +12,11 @@ const authLogin = async (email: string, password: string) => {
       email,
       password,
     }),
-  })
-  return await response.json();
+  });
 };
 
 const authSignup = async (email: string, password: string, name: string) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
+  return fetchFromAPI("/auth/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,16 +26,14 @@ const authSignup = async (email: string, password: string, name: string) => {
       password,
       name,
     }),
-  })
-  return await response.json();
+  });
 };
 
 const authLogout = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+  return fetchFromAPI("/auth/logout", {
     method: "POST",
     credentials: "include",
-  })
-  return await response.json();
+  });
 }
 
 export {
