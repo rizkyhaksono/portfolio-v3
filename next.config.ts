@@ -1,4 +1,3 @@
-import createMDX from '@next/mdx'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -11,22 +10,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  reactStrictMode: true,
   experimental: {
     mdxRs: true,
   },
-  turbopack: {
-    rules: {
-      '*.mdx': {
-        loaders: ['@mdx-js/loader'],
-        as: '*.js',
-      },
-    },
-  },
 }
 
-const withMDX = createMDX({
-  // Add markdown plugins here if needed
-})
-
-export default withMDX(nextConfig)
+export default nextConfig
