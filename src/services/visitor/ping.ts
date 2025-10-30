@@ -14,24 +14,10 @@ export interface PingResponse {
 }
 
 export async function getPing() {
-  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
-    console.error('API_URL is not defined in environment variables');
-    return null;
-  }
-
-  try {
-    const response = await fetch(`${apiUrl}/ping`, {
-      method: "GET",
-      next: {
-        revalidate: 0,
-      },
-    });
-    if (response.status !== 200) return null;
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching ping:', error);
-    return null;
-  }
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ping`, {
+    method: "GET",
+    next: { revalidate: 0 },
+  });
+  if (response.status !== 200) return null;
+  return response.json();
 }
