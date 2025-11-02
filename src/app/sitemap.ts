@@ -22,7 +22,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${domain}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.7,
+    },
+    {
       url: `${domain}/ai`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.5,
+    },
+    {
+      url: `${domain}/changelog`,
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.5,

@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from 'sonner';
 import { Analytics } from "@vercel/analytics/react"
 import { MetadataConstants } from "@/commons/constants/metadata";
-import { SmoothCursor } from "@/components/ui/smooth-cursor";
+// import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css";
 
 const fontSans = FontSans({
@@ -53,9 +53,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <Toaster position="top-right" />
-          <div className="hidden sm:block">
+          {/* <div className="hidden sm:block">
             <SmoothCursor />
-          </div>
+          </div> */}
           <Analytics />
         </ThemeProvider>
       </body>
