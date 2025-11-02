@@ -33,8 +33,8 @@ const WakatimeOverview = ({ data }: WakatimeOverviewProps) => {
   return (
     <>
       <div className="mt-5 flex items-center gap-2">
-        <h3 className="text-base font-semibold text-black">
-          <Highlighter action="highlight" color="#87CEFA">
+        <h3 className="text-base font-semibold text-foreground">
+          <Highlighter action="underline" color="#4ade80">
             Coding Progress
           </Highlighter>
         </h3>

@@ -8,7 +8,6 @@ import GithubOverview from "@/app/_components/contribution/github-overview";
 import WakatimeActive from "@/app/_components/contribution/wakatime-active";
 import WakatimeOverview from "@/app/_components/contribution/wakatime-overview";
 import DuolingoStats from "./duolingo-stats";
-import { Highlighter } from "@/components/ui/highlighter";
 import { TypingAnimation } from "@/components/ui/typing-animation";
 
 export default async function ContributionSection() {
@@ -29,19 +28,17 @@ export default async function ContributionSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <Highlighter action="underline" color="#4ade80">
-          <TypingAnimation
-            words={[
-              "@rizkyhaksono's contributions",
-              "@rizkyhaksono's stats",
-              "My journey so far i guess...",
-            ]}
-            typeSpeed={50}
-            deleteSpeed={150}
-            pauseDelay={2000}
-            loop
-          />
-        </Highlighter>
+        <TypingAnimation
+          words={[
+            "@rizkyhaksono's contributions",
+            "@rizkyhaksono's stats",
+            "My journey so far i guess...",
+          ]}
+          typeSpeed={50}
+          deleteSpeed={150}
+          pauseDelay={2000}
+          loop
+        />
         <DuolingoStats duolingo={duolingoProfile} />
         <WakatimeOverview data={wakatime} />
         <WakatimeActive data={wakatime} />

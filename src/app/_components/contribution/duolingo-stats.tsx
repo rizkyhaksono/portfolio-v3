@@ -59,8 +59,8 @@ export default function DuolingoStats({ duolingo }: DuolingoStatsProps) {
   return (
     <div className="mt-5">
       <div className="flex items-center gap-2">
-        <h3 className="text-base font-semibold text-black">
-          <Highlighter action="highlight" color="#87CEFA">
+        <h3 className="text-base font-semibold text-foreground">
+          <Highlighter action="underline" color="#4ade80">
             Duolingo Progress
           </Highlighter>
         </h3>
