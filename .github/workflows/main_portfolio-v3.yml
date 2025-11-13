@@ -24,6 +24,23 @@ jobs:
           node-version: '24.x'
 
       - name: npm install, build, and test
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          DOMAIN: ${{ secrets.DOMAIN }}
+          API_URL: ${{ secrets.API_URL }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_EMAIL_JS_PUBLIC_KEY }}
+          NEXT_PUBLIC_EMAIL_JS_SERVICE_ID: ${{ secrets.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID }}
+          NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID }}
+          GH_READ_USER_TOKEN_PERSONAL: ${{ secrets.GH_READ_USER_TOKEN_PERSONAL }}
+          DEVTO_KEY: ${{ secrets.DEVTO_KEY }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
           npm install
           npm run build --if-present
@@ -62,4 +79,5 @@ jobs:
           app-name: 'portfolio-v3'
           slot-name: 'Production'
           package: .
+
           
