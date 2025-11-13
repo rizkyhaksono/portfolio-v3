@@ -42,21 +42,18 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
-          # FIX 1: Use --legacy-peer-deps to solve dependency conflicts
           npm install --legacy-peer-deps
           npm run build --if-present
           npm run test --if-present
+
+      - name: Remove node_modules for artifact
+        run: rm -rf node_modules
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
           path: .
-          # FIX 2: This is the most important fix.
-          # Exclude node_modules to force Azure to install them correctly.
-          ignore-path: |
-            node_modules
-            .git
 
   deploy:
     runs-on: ubuntu-latest
@@ -87,4 +84,5 @@ jobs:
           package: .
 
           
+
 
