@@ -1,0 +1,44 @@
+---
+alwaysApply: true
+description: Project Rules
+---
+
+# Rules File: Progress Tracking System
+
+## Core Rules
+
+1. **Always read feature.md first**
+   - Read and understand the complete feature requirements
+   - Identify all tasks and deliverables outlined in feature.md
+   - Use this as the source of truth for what needs to be accomplished
+
+2. **Always read progress.md before starting work**
+   - Check current status of all tasks
+   - Identify what has been completed
+   - Identify what remains to be done
+   - Avoid duplicating completed work
+
+3. **Update progress.md after completing any task**
+   - Mark completed tasks with status and timestamp
+   - Add detailed notes about what was accomplished
+   - Update percentage completion if applicable
+   - Note any blockers or issues encountered
+
+4. **Progress.md Structure Requirements**
+   - Maintain clear task breakdown from feature.md
+   - Use consistent status indicators (TODO, IN_PROGRESS, COMPLETED)
+   - Include timestamps for all status changes
+   - Provide brief descriptions of work completed
+   - Track overall feature completion percentage
+
+5. **Task Completion Workflow**
+   - Read feature.md → Read progress.md → Complete task → Update progress.md
+   - Never skip the progress update step
+   - Be specific about what was accomplished in each update
+   - Reference specific files, functions, or components modified
+
+6. **Quality Standards**
+   - Ensure progress updates are accurate and detailed
+   - Maintain chronological order of updates
+   - Keep progress.md synchronized with actual work completed
+   - Use clear, professional language in all updates

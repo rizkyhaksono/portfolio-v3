@@ -1,0 +1,116 @@
+---
+globs: "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "tests/unit/**/*"
+alwaysApply: false
+---
+# Unit Testing Rules
+
+## Core Principles
+
+- **Scope**: Test one unit in isolation (pure functions, small utilities, or a single module's public API). Avoid integration concerns.
+- **Location & naming**: Place files under `/tests/unit` mirroring the `src` path; name them `*.test.ts` or `*.test.tsx`.
+- **Dependencies**: Never mock internal code; only mock external dependencies (APIs, DB, file system). Use MSW for HTTP.
+- **Determinism**: Eliminate flakiness. Control time, randomness, and async with fake timers (`vi.useFakeTimers`, `vi.setSystemTime`) and stubs for `Math.random`.
+- **Structure**: Use Arrange–Act–Assert; name tests by behavior ("should … when …").
+- **Assertions**: Prefer explicit assertions over snapshots; only use small, stable snapshots when necessary.
+- **Coverage**: Cover happy path, key error states, and edge cases; don't chase line coverage for its own sake.
+- **Isolation**: Reset state and mocks between tests (`vi.restoreAllMocks`, `vi.resetModules`). No cross-test data coupling.
+- **Quality gates**: Tests must pass TypeScript strict checks and ESLint; no `any` or untyped helpers.
+
+## Test Structure
+
+```typescript
+describe("Feature", () => {
+  describe("when condition", () => {
+    it("should expected behavior", async () => {
+      // Arrange
+      const input = { /* test data */ };
+
+      // Act
+      const result = await functionUnderTest(input);
+
+      // Assert
+      expect(result).toEqual(expectedOutput);
+    });
+  });
+});
+```
+
+## Mocking Guidelines
+
+- **External APIs**: Mock with MSW or `vi.mock()` for HTTP clients
+- **Database**: Mock repository functions, not the ORM itself
+- **Time**: Use `vi.useFakeTimers()` and `vi.setSystemTime()`
+- **Randomness**: Stub `Math.random()` with `vi.spyOn(Math, 'random').mockReturnValue(0.5)`
+- **Environment**: Mock `process.env` values as needed
+
+## Common Patterns
+
+### Testing Pure Functions
+```typescript
+describe("formatUserData", () => {
+  it("should format user name correctly", () => {
+    const user = { firstName: "John", lastName: "Doe" };
+    const result = formatUserData(user);
+    expect(result.name).toBe("John Doe");
+  });
+});
+```
+
+### Testing Async Functions
+```typescript
+describe("fetchUserData", () => {
+  it("should return user data when API call succeeds", async () => {
+    const mockUser = { id: "1", name: "John" };
+    vi.mocked(apiClient.get).mockResolvedValue(mockUser);
+
+    const result = await fetchUserData("1");
+
+    expect(result).toEqual(mockUser);
+    expect(apiClient.get).toHaveBeenCalledWith("/users/1");
+  });
+});
+```
+
+### Testing Error Cases
+```typescript
+describe("validateEmail", () => {
+  it("should throw error for invalid email", () => {
+    expect(() => validateEmail("invalid-email")).toThrow("Invalid email format");
+  });
+});
+```
+
+## File Organization
+
+```
+tests/
+└── unit/
+    ├── lib/
+    │   ├── utils.test.ts
+    │   └── schemas.test.ts
+    ├── server/
+    │   ├── services/
+    │   │   └── user.test.ts
+    │   └── clients/
+    │       └── api.test.ts
+    └── components/
+        └── ui/
+            └── button.test.tsx
+```
+
+## Quality Checklist
+
+- [ ] Test covers happy path
+- [ ] Test covers error cases
+- [ ] Test covers edge cases
+- [ ] No internal code mocked
+- [ ] External dependencies properly mocked
+- [ ] Tests are deterministic (no flakiness)
+- [ ] Proper cleanup in `afterEach`/`afterAll`
+- [ ] TypeScript strict mode passes
+- [ ] ESLint passes
+- [ ] Test names describe behavior, not implementation
+description:
+globs:
+alwaysApply: false
+---

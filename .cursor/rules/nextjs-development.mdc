@@ -1,0 +1,805 @@
+---
+alwaysApply: true
+description: NextJs development rules
+---
+
+# Next.js Development Rules
+
+You are an expert full-stack TypeScript engineer working with Next.js. Produce production-ready code that follows modern Next.js App Router patterns and best practices.
+
+## Tech Stack Guidelines
+
+- **Next.js 15+** (App Router) + React 19
+- **TypeScript** (strict mode)
+- **Testing**: Vitest + React Testing Library + MSW
+- **Styling**: Tailwind CSS + shadcn/ui (when applicable)
+- **Package Manager**: pnpm
+
+Focus on: separation of concerns, strict typing, accessibility, performance, and comprehensive testing.
+
+## Project Structure
+
+```
+src/
+├─ app/                       # App Router (RSC by default)
+│  ├─ _components/            # App-level (RSC-ok) components
+│  ├─ api/                    # API routes for external webhooks only
+│  ├─ (routes)/               # Route groups and pages
+│  └─ layout.tsx
+├─ components/                # Reusable client/RSC components
+│  ├─ ui/                     # Base UI components
+│  └─ [feature]/              # Feature-specific components
+├─ lib/                       # Utilities and shared helpers
+├─ server/                    # Server-side code
+│  ├─ api/                    # tRPC API layer
+│  │  ├─ routers/             # tRPC router composition
+│  │  ├─ procedures/          # Individual tRPC procedures
+│  │  ├─ root.ts              # Root router
+│  │  └─ trpc.ts              # tRPC setup
+│  ├─ services/               # Business logic services
+│  └─ clients/                # External service clients
+├─ db/                        # Database schema & migrations
+├─ tools/                     # AI tool definitions
+├─ prompts/                   # AI prompt templates
+└─ trpc/                      # tRPC client setup
+
+test/
+├─ unit/                      # Unit tests
+├─ integ/                     # Integration tests
+└─ e2e/                       # End-to-end tests
+```
+
+### Directory Conventions
+
+- Use **kebab-case** for folders and files
+- Co-locate tests next to source: `*.test.ts(x)`
+- Export from `index.ts` barrels only when it helps DX without circular deps
+
+## Next.js App Router Rules
+
+### Server vs Client Components
+
+- **Default to RSC** (no "use client"). Use client components only for:
+  - Interactivity (event handlers)
+  - Browser APIs (localStorage, window, etc.)
+  - Third-party libraries requiring client-side initialization
+
+### Server Boundaries
+
+- Keep data access in server context (RSC, server actions, API routes)
+- API routes in `app/api` are for external webhooks only
+- Use internal APIs (tRPC, server actions) for app-to-app communication
+
+### Performance & UX
+
+- Use `<Suspense>` for async UI; provide skeletons
+- Implement proper loading and error boundaries
+- Use Next.js caching (`revalidateTag`, `revalidatePath`) appropriately
+- Prefer Edge runtime for simple operations, Node for complex ones
+
+### Accessibility
+
+- All interactive elements must have proper roles and labels
+- Ensure keyboard navigation support
+- Provide ARIA attributes where needed
+- Test with screen readers
+
+## API Architecture
+
+### Internal APIs (tRPC Recommended)
+
+- Organize by feature domains
+- Use Zod for input validation
+- Implement proper error handling with custom error classes
+- Keep business logic server-side (no JSX in API layer)
+- Write integration tests with mocked external services
+- **Router logic should be application code only** - delegate to business logic services
+- **Use only protected procedures** for all endpoints
+- **Split procedures and routers** into separate files for better organization
+
+### Application Logic vs Business Logic
+
+**Application Logic** (in tRPC procedures):
+- Input validation and sanitization
+- Authentication and authorization checks
+- Request/response formatting
+- Error handling and mapping
+- Delegation to business logic services
+- Logging and observability
+
+**Business Logic** (in service layer):
+- Core business rules and validations
+- Domain-specific operations
+- Data transformations and calculations
+- Business workflow orchestration
+- Domain knowledge and expertise
+
+**Example:**
+
+```typescript
+// Application Logic (tRPC Procedure)
+export const createUserProcedure = protectedProcedure
+  .input(createUserSchema)
+  .mutation(async ({ ctx, input }) => {
+    try {
+      // Application logic: validation, auth, delegation
+      const result = await createUser({
+        userId: ctx.auth.userId,
+        ...input
+      });
+      
+      return { success: true, data: result };
+    } catch (error) {
+      // Application logic: error handling
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("INTERNAL_ERROR", "An unexpected error occurred");
+    }
+  });
+
+// Business Logic (Service Layer)
+export const createUser = async (params: CreateUserParams): Promise<User> => {
+  const { userId, email, name, role } = params;
+  
+  // Business logic: domain rules
+  if (role === 'admin' && !await hasAdminPrivileges(userId)) {
+    throw new CustomError("UNAUTHORIZED", "Insufficient privileges for admin role", 403);
+  }
+  
+  // Business logic: business validations
+  if (await isEmailAlreadyTaken(email)) {
+    throw new CustomError("CONFLICT", "Email already registered", 409);
+  }
+  
+  // Business logic: domain operations
+  const user = await userRepo.create({
+    email: email.toLowerCase(),
+    name: name.trim(),
+    role,
+    status: 'pending_verification'
+  });
+  
+  // Business logic: business workflow
+  await sendWelcomeEmail(user);
+  await createDefaultPreferences(user.id);
+  
+  return user;
+};
+```
+
+### External API Integration
+
+- Isolate external service calls in dedicated modules
+- Implement retry logic with exponential backoff
+- Map provider errors to internal error types
+- Store sensitive data (tokens, keys) securely
+
+## Database & Data Layer
+
+### ORM Best Practices
+
+- Use type-safe ORMs (Drizzle, Prisma, etc.)
+- Define schemas with proper relationships and constraints
+- Infer types from schema definitions
+- Write repository-style helpers to isolate queries
+- Implement proper migrations
+
+### Data Access Patterns
+
+- Keep database queries in dedicated modules
+- Avoid N+1 queries; use joins and CTEs
+- Implement pagination for list endpoints
+- Use select projections to limit payload size
+
+## Authentication & Authorization
+
+- Implement server-side auth checks
+- Never trust client-side auth flags
+- Use middleware for route protection
+- Store user data securely with proper encryption
+
+## Testing Strategy
+
+### Unit Testing (Vitest)
+
+- **Never mock internal code** - only mock external dependencies
+- Use MSW for API mocking when needed
+- Test utilities, repositories, and business logic
+- Mock external services (APIs, databases, file systems)
+
+### Component Testing (React Testing Library)
+
+- Test interactive components with proper accessibility
+- Ensure loading and error states are covered
+- Test user interactions and state changes
+- Use data-testid sparingly; prefer semantic queries
+
+### Integration Testing
+
+- Test API endpoints with real database connections
+- Use test databases with proper cleanup
+- Test authentication flows end-to-end
+- Mock external services consistently
+
+### Test Structure
+
+```typescript
+// Example test structure
+describe("Feature", () => {
+  describe("when condition", () => {
+    it("should expected behavior", async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+  });
+});
+```
+
+## Error Handling & Observability
+
+- Implement early returns on invalid input (fail fast)
+- Use typed error codes and messages
+- Log server-side with contextual metadata
+- Never expose stack traces to clients
+- Provide user-friendly error messages
+
+## Security Best Practices
+
+- Validate all inputs at boundaries
+- Use environment variables for sensitive data (server-only)
+- Implement proper CORS policies
+- Sanitize user inputs
+- Use HTTPS in production
+- Implement rate limiting where appropriate
+
+## Performance Optimization
+
+- Favor RSC to keep bundles slim
+- Use dynamic imports for client-only heavy components
+- Implement proper caching strategies
+- Optimize images and assets
+- Use React.memo and useMemo appropriately
+- Monitor Core Web Vitals
+
+## Code Style & Quality
+
+### Whitespace & Readability
+
+- Insert a single blank line to separate logical blocks for scannability:
+  - between import groups (external → internal → styles/assets)
+  - between top-level declarations (types, constants, functions/components)
+  - between distinct steps inside functions (guards/early returns, setup, side effects, return)
+  - between hook groups and render return in React components
+- Avoid multiple consecutive blank lines.
+- Use spaces around binary operators and after commas; do not add spaces just inside parentheses/brackets.
+- Prefer a blank line before a terminal `return` when it improves readability; skip for trivial cases.
+
+### TypeScript
+
+- Use strict mode
+- Avoid `any` type
+- Prefer interfaces over types for object shapes
+- Use proper generic constraints
+- Prefer the nullish coalescing operator (`??`) over logical OR (`||`) when providing default values
+
+### Code Organization
+
+- **Prefer functions over classes** - use functional programming patterns
+- Keep functions small and focused
+- Use descriptive, stateful names
+- **Always write docstrings** for functions, classes, and complex logic
+- **Never write superfluous comments** - code should be self-documenting
+- Follow single responsibility principle
+- **Favor composability over inheritance** - use composition and higher-order functions
+- Use pure functions when possible
+- Minimize side effects and mutable state
+
+### Naming Conventions
+
+- Use descriptive names: `isLoading`, `hasVerified`, `canSendSms`
+- Use PascalCase for components and types
+- Use camelCase for variables and functions
+- Use UPPER_SNAKE_CASE for constants
+
+### Constants and Values
+
+- **Always define constants** instead of hardcoding strings, numbers, or values
+- **Use descriptive constant names** that explain the purpose
+- **Group related constants** in dedicated files or objects
+- **Export constants** from centralized locations
+- **Use TypeScript enums** for related constant groups
+- **Define magic numbers** as named constants
+- **Use configuration objects** for complex values
+
+### Functional Programming Patterns
+
+- **Prefer pure functions** - same input always produces same output
+- **Use composition over inheritance** - combine small functions into larger ones
+- **Minimize side effects** - isolate side effects to specific functions
+- **Use higher-order functions** - functions that take or return functions
+- **Favor immutable data** - avoid mutating objects and arrays
+- **Use functional utilities** - map, filter, reduce, pipe, compose
+- **Avoid classes unless necessary** - prefer object literals and functions
+
+## Development Workflow
+
+1. **Analyze requirements** → identify affected layers
+2. **Schema first** (if needed) → update database schema
+3. **Business logic** → implement in server layer
+4. **UI layer** → RSC/client split with proper boundaries
+5. **Testing** → unit, integration, and component tests
+6. **Quality checks** → typecheck, lint, test
+
+## File Generation Patterns
+
+When implementing new features, create:
+
+```
+src/
+├─ server/
+│  ├─ api/routers/[feature].ts     # tRPC router composition
+│  ├─ api/procedures/[feature].ts  # Individual tRPC procedures
+│  ├─ services/[feature].ts        # Business logic services
+│  ├─ clients/[service].ts         # External service clients
+│  └─ __tests__/[feature].test.ts
+├─ lib/
+│  ├─ constants.ts                 # Constants and configuration
+│  ├─ schemas.ts                   # Zod schemas
+│  ├─ utils.ts                     # Utility functions
+│  └─ __tests__/[feature].test.ts
+├─ components/[feature]/
+│  ├─ [component].tsx
+│  └─ __tests__/[component].test.tsx
+├─ tools/[feature]-tools.ts        # AI tool definitions
+├─ prompts/[feature].ts            # AI prompts
+└─ app/[route]/page.tsx
+
+test/
+├─ unit/[feature].test.ts          # Unit tests
+├─ integ/[feature].test.ts         # Integration tests
+└─ e2e/[feature].test.ts           # End-to-end tests
+```
+
+## Acceptance Checklist
+
+Before completing any feature:
+
+- [ ] RSC by default; client components only where required
+- [ ] All inputs validated and errors properly handled
+- [ ] No internal fetch/route handlers used for app-to-app communication
+- [ ] Database queries isolated in dedicated modules
+- [ ] Business logic separated into service layer
+- [ ] Custom error classes used for error handling
+- [ ] tRPC routers contain application code only
+- [ ] Only protected procedures used
+- [ ] Procedures and routers split into separate files
+- [ ] Functional programming patterns used (functions over classes)
+- [ ] Composition over inheritance preferred
+- [ ] Constants defined instead of hardcoded values
+- [ ] Docstrings written for functions and complex logic
+- [ ] No superfluous comments - code is self-documenting
+- [ ] Tests added and passing (unit, integration, component)
+- [ ] TypeScript strict mode compliance
+- [ ] Linting passes without errors
+- [ ] Accessible UI (labels, roles, keyboard navigation)
+- [ ] No secrets in client bundles
+- [ ] Performance considerations addressed
+- [ ] Error boundaries implemented where needed
+
+## Common Patterns
+
+### tRPC Procedure Template
+
+```typescript
+// src/server/api/procedures/[feature].ts
+import { z } from "zod";
+import { protectedProcedure } from "../trpc";
+import { CustomError } from "@/lib/errors";
+import { performFeatureAction } from "@/server/services/feature";
+
+const inputSchema = z.object({
+  // validation schema
+});
+
+/**
+ * Creates a new feature item for the authenticated user
+ * Validates input, delegates to business logic, and handles errors
+ */
+export const actionProcedure = protectedProcedure
+  .input(inputSchema)
+  .mutation(async ({ ctx, input }) => {
+    try {
+      const result = await performFeatureAction({
+        userId: ctx.auth.userId,
+        ...input
+      });
+      
+      return { success: true, data: result };
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("INTERNAL_ERROR", "An unexpected error occurred");
+    }
+  });
+```
+
+### tRPC Router Template
+
+```typescript
+// src/server/api/routers/[feature].ts
+import { createTRPCRouter } from "../trpc";
+import { actionProcedure } from "../procedures/[feature]";
+
+export const featureRouter = createTRPCRouter({
+  action: actionProcedure,
+});
+```
+
+### Custom Error Template
+
+```typescript
+// src/lib/errors.ts
+export class CustomError extends Error {
+  constructor(
+    public code: string,
+    message: string,
+    public statusCode: number = 500
+  ) {
+    super(message);
+    this.name = "CustomError";
+  }
+}
+
+export const createCustomError = (code: string, message: string, statusCode?: number) => {
+  return new CustomError(code, message, statusCode);
+};
+```
+
+### External Service Client Template
+
+```typescript
+// src/server/clients/[service].ts
+export class ServiceClient {
+  constructor(private config: ServiceConfig) {}
+
+  async method(): Promise<Result> {
+    // implementation
+  }
+}
+```
+
+### Constants Template
+
+```typescript
+// src/lib/constants.ts
+// API endpoints
+export const API_ENDPOINTS = {
+  USERS: '/api/users',
+  AUTH: '/api/auth',
+  CHAT: '/api/chat',
+} as const;
+
+// Status codes
+export const STATUS_CODES = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  NOT_FOUND: 404,
+  INTERNAL_ERROR: 500,
+} as const;
+
+// User roles
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
+}
+
+// Configuration
+export const CONFIG = {
+  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+  SESSION_TIMEOUT: 30 * 60 * 1000, // 30 minutes
+  RETRY_ATTEMPTS: 3,
+  DEFAULT_PAGE_SIZE: 20,
+} as const;
+
+// Error messages
+export const ERROR_MESSAGES = {
+  VALIDATION_FAILED: 'Validation failed',
+  UNAUTHORIZED_ACCESS: 'Unauthorized access',
+  RESOURCE_NOT_FOUND: 'Resource not found',
+  INTERNAL_SERVER_ERROR: 'Internal server error',
+} as const;
+```
+
+### Business Logic Service Template
+
+```typescript
+// src/server/services/[feature].ts
+import { CustomError } from "@/lib/errors";
+import { db } from "@/db";
+import { featureTable } from "@/db/schema";
+
+/**
+ * Validates business rules for feature creation
+ * @param input - The input data to validate
+ * @returns True if validation passes, false otherwise
+ */
+const validateBusinessRules = (input: any): boolean => {
+  return true;
+};
+
+/**
+ * Performs the main business logic for feature creation
+ * Validates business rules, creates the feature, and triggers workflows
+ * @param params - Parameters containing userId and feature data
+ * @returns The created feature result
+ */
+export const performFeatureAction = async (params: ActionParams): Promise<ActionResult> => {
+  const { userId, ...input } = params;
+  
+  if (!validateBusinessRules(input)) {
+    throw new CustomError("VALIDATION_ERROR", "Invalid business rules", 400);
+  }
+  
+  const result = await db.insert(featureTable).values(input).returning();
+  
+  await performPostActionWorkflow(result[0]);
+  
+  return result[0];
+};
+
+// Service object for backward compatibility (if needed)
+export const featureService = {
+  performAction: performFeatureAction,
+};
+```
+
+### Functional Programming Example
+
+```typescript
+// src/lib/utils/functional.ts
+/**
+ * Formats user data for display by combining first and last name
+ * and normalizing email to lowercase
+ */
+export const formatUserData = (user: User): FormattedUser => ({
+  id: user.id,
+  name: `${user.firstName} ${user.lastName}`,
+  email: user.email.toLowerCase(),
+  isActive: user.status === 'active'
+});
+
+/**
+ * Higher-order function that wraps async functions with error handling
+ * @param fn - The async function to wrap
+ * @returns A new function with error handling
+ */
+export const withErrorHandling = <T extends any[], R>(
+  fn: (...args: T) => Promise<R>
+) => async (...args: T): Promise<R> => {
+  try {
+    return await fn(...args);
+  } catch (error) {
+    console.error('Function error:', error);
+    throw error;
+  }
+};
+
+/**
+ * Composes multiple functions to process user data
+ * Applies formatting, error handling, and validation in sequence
+ */
+export const processUserData = pipe(
+  formatUserData,
+  withErrorHandling,
+  validateUserData
+);
+
+/**
+ * Updates a user in an array without mutating the original array
+ * @param users - Array of users to search
+ * @param userId - ID of the user to update
+ * @param updates - Partial user data to apply
+ * @returns New array with updated user
+ */
+export const updateUser = (users: User[], userId: string, updates: Partial<User>): User[] =>
+  users.map(user => 
+    user.id === userId 
+      ? { ...user, ...updates }
+      : user
+  );
+```
+
+### API Route Template
+
+```typescript
+// app/api/example/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { CustomError } from '@/lib/errors';
+
+const schema = z.object({
+  // validation schema
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const validated = schema.parse(body);
+    
+    // business logic
+    
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    if (error instanceof CustomError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+    return NextResponse.json(
+      { error: 'Invalid request' },
+      { status: 400 }
+    );
+  }
+}
+```
+
+### Component Template
+
+```typescript
+// components/Example.tsx
+import { Suspense } from 'react';
+
+interface ExampleProps {
+  // props interface
+}
+
+export function Example({ ...props }: ExampleProps) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      {/* component content */}
+    </Suspense>
+  );
+}
+```
+
+### UI Component Guidelines
+
+- **Always use shadcn/ui** for base UI components
+- **Add new shadcn components** using: `pnpm dlx shadcn@latest add <component>`
+- **Extend shadcn components** rather than creating from scratch
+- **Use Tailwind CSS** for custom styling and layout
+- **Follow shadcn patterns** for component composition
+- **Prefer controlled components** with proper state management
+
+### Test Template
+
+```typescript
+// __tests__/example.test.ts
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+
+// Mock external dependencies only
+vi.mock('external-library');
+
+describe('Example', () => {
+  it('should render correctly', () => {
+    // test implementation
+  });
+});
+```
+
+## Commands
+
+```bash
+# Development
+pnpm dev          # Start development server
+pnpm build        # Build for production
+pnpm start        # Start production server
+
+# Quality
+pnpm typecheck    # TypeScript check
+pnpm lint         # ESLint
+pnpm test         # Run tests
+pnpm test:watch   # Watch mode tests
+
+# Database
+pnpm db:generate  # Generate migrations
+pnpm db:migrate   # Run migrations
+pnpm db:seed      # Seed database
+
+# UI Components
+pnpm dlx shadcn@latest add <component>  # Add shadcn/ui component
+```
+vi.mock('external-library');
+
+describe('Example', () => {
+  it('should render correctly', () => {
+    // test implementation
+  });
+});
+```
+
+## Commands
+
+```bash
+# Development
+pnpm dev          # Start development server
+pnpm build        # Build for production
+pnpm start        # Start production server
+
+# Quality
+pnpm typecheck    # TypeScript check
+pnpm lint         # ESLint
+pnpm test         # Run tests
+pnpm test:watch   # Watch mode tests
+
+# Database
+pnpm db:generate  # Generate migrations
+pnpm db:migrate   # Run migrations
+pnpm db:seed      # Seed database
+
+
+- Use type-safe ORMs (Drizzle, Prisma, etc.)
+- Define schemas with proper relationships and constraints
+- Infer types from schema definitions
+- Write repository-style helpers to isolate queries
+- Implement proper migrations
+
+### Data Access Patterns
+
+- Keep database queries in dedicated modules
+- Avoid N+1 queries; use joins and CTEs
+- Implement pagination for list endpoints
+- Use select projections to limit payload size
+
+## Authentication & Authorization
+
+- Implement server-side auth checks
+- Never trust client-side auth flags
+- Use middleware for route protection
+- Store user data securely with proper encryption
+
+## Testing Strategy
+
+### Unit Testing (Vitest)
+
+- **Never mock internal code** - only mock external dependencies
+- Use MSW for API mocking when needed
+- Test utilities, repositories, and business logic
+- Mock external services (APIs, databases, file systems)
+
+### Component Testing (React Testing Library)
+
+- Test interactive components with proper accessibility
+- Ensure loading and error states are covered
+- Test user interactions and state changes
+- Use data-testid sparingly; prefer semantic queries
+
+### Integration Testing
+
+- Test API endpoints with real database connections
+- Use test databases with proper cleanup
+- Test authentication flows end-to-end
+- Mock external services consistently
+
+### Test Structure
+
+```typescript
+// Example test structure
+describe("Feature", () => {
+  describe("when condition", () => {
+    it("should expected behavior", async () => {
+      // Arrange
+      // Act
+      // Assert
+    });
+  });
+});
+```
