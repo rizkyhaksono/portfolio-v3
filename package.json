@@ -7,8 +7,9 @@
     "github": "https://github.com/rizkyhaksono/portfolio-v3",
     "linkedin": "https://www.linkedin.com/in/rizkyhaksono"
   },
-  "version": "1.1.0",
-  "description": "My personal portfolio website v3, built with Next.js, and Shadcn.",
+  "license": "MIT",
+  "version": "1.2.0",
+  "description": "My personal portfolio website v3, built with Next.js 16, and Shadcn.",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
