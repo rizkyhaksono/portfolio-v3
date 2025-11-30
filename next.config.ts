@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
         hostname: "*",
       }
     ],
+    // Note: LinkedIn images may still fail with 403 if they require authentication headers
+    // Consider proxying these images through your backend API for production
+    unoptimized: false,
   },
   experimental: {
     mdxRs: true,
