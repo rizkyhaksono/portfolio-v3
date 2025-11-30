@@ -3,6 +3,7 @@ import AboutSection from "@/app/_components/about";
 import SkillSection from "@/app/_components/skills";
 import CarrerSection from "@/app/_components/career";
 import EducationSection from "@/app/_components/education";
+import CertificationSection from "@/app/_components/certification";
 import ContributionSection from "@/app/_components/contribution";
 import ContactSection from "@/app/_components/contact";
 import LinkedinRecommendations from "@/app/_components/contact/linkedin-recommendations";
@@ -22,6 +23,7 @@ export default async function Home() {
       <SkillSection />
       <CarrerSection />
       <EducationSection />
+      <CertificationSection />
       <ContributionSection />
       <LinkedinRecommendations recommendations={recommendations} />
       <ContactSection />
