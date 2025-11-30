@@ -25,6 +25,7 @@ export function CertificationCard({ certification, compact = false }: Certificat
                   width={40}
                   height={40}
                   className="rounded object-contain"
+                  unoptimized // LinkedIn images require unoptimized to avoid 403
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
                   }}
@@ -74,6 +75,7 @@ export function CertificationCard({ certification, compact = false }: Certificat
                 width={64}
                 height={64}
                 className="rounded-lg object-contain"
+                unoptimized // LinkedIn images require unoptimized to avoid 403
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                 }}

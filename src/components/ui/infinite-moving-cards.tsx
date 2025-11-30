@@ -94,6 +94,10 @@ export const InfiniteMovingCards = ({
                     width={40}
                     height={40}
                     className="rounded-full"
+                    unoptimized // LinkedIn images require unoptimized to avoid 403
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
                   />
                 )}
                 <span className="flex flex-col gap-1">

@@ -2,6 +2,23 @@ import { LinkedinRecommendationsApiResponse, LinkedinCertificationsResponse } fr
 
 const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
+const EMPTY_RECOMMENDATIONS: LinkedinRecommendationsApiResponse = {
+  success: false,
+  data: [],
+  total: 0,
+};
+
+const EMPTY_CERTIFICATIONS: LinkedinCertificationsResponse = {
+  success: false,
+  data: [],
+  page: 1,
+  limit: 10,
+  total: 0,
+  totalPages: 0,
+  prev: null,
+  next: null,
+};
+
 export async function getLinkedinRecommendations(): Promise<LinkedinRecommendationsApiResponse> {
   try {
     const url = `${API_URL}/v3/linkedin/recommendations`;
@@ -9,15 +26,25 @@ export async function getLinkedinRecommendations(): Promise<LinkedinRecommendati
     const response = await fetch(url, {
       method: "GET",
       cache: "no-store",
+      next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch LinkedIn recommendations: ${response.status}`);
+      console.error(`LinkedIn recommendations API returned ${response.status}`);
+      return EMPTY_RECOMMENDATIONS;
     }
 
-    return await response.json();
+    const text = await response.text();
+    // Check if response is HTML (error page) instead of JSON
+    if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+      console.error('LinkedIn recommendations API returned HTML instead of JSON');
+      return EMPTY_RECOMMENDATIONS;
+    }
+
+    return JSON.parse(text);
   } catch (error) {
-    throw error;
+    console.error('Failed to fetch LinkedIn recommendations:', error);
+    return EMPTY_RECOMMENDATIONS;
   }
 }
 
@@ -28,14 +55,24 @@ export async function getLinkedinCertifications(page: number = 1, limit: number 
     const response = await fetch(url, {
       method: "GET",
       cache: "no-store",
+      next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch LinkedIn certifications: ${response.status}`);
+      console.error(`LinkedIn certifications API returned ${response.status}`);
+      return { ...EMPTY_CERTIFICATIONS, page, limit };
     }
 
-    return await response.json();
+    const text = await response.text();
+    // Check if response is HTML (error page) instead of JSON
+    if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
+      console.error('LinkedIn certifications API returned HTML instead of JSON');
+      return { ...EMPTY_CERTIFICATIONS, page, limit };
+    }
+
+    return JSON.parse(text);
   } catch (error) {
-    throw error;
+    console.error('Failed to fetch LinkedIn certifications:', error);
+    return { ...EMPTY_CERTIFICATIONS, page, limit };
   }
 }
