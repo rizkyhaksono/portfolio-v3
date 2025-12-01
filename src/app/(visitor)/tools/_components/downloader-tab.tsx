@@ -4,11 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Download, Video, ImageIcon, Play } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Download, Video, ImageIcon, Play, ExternalLink, Info, Copy, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import type { DownloadResult } from "@/commons/types/tools";
+import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools";
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter";
 
@@ -56,7 +56,7 @@ const PLATFORMS: PlatformConfig[] = [
   },
   {
     id: "twitter",
-    name: "Twitter",
+    name: "X (Twitter)",
     description: "Download Twitter videos and GIFs",
     icon: Video,
     color: "bg-blue-400",
@@ -64,11 +64,32 @@ const PLATFORMS: PlatformConfig[] = [
   },
 ];
 
+// Instagram specific result type
+interface InstagramResult {
+  type: "instagram";
+  data: InstagramDownloadData;
+}
+
+// Standard download result type
+interface StandardResult {
+  type: "standard";
+  data: DownloadResult;
+}
+
+type ResultType = InstagramResult | StandardResult | null;
+
 export function DownloaderTab() {
   const [activePlatform, setActivePlatform] = useState<Platform>("tiktok");
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<DownloadResult | null>(null);
+  const [result, setResult] = useState<ResultType>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleDownload = async () => {
     if (!url.trim()) return;
@@ -76,23 +97,86 @@ export function DownloaderTab() {
     setIsLoading(true);
     setResult(null);
 
-    // Mock download for demo - replace with actual API call
-    setTimeout(() => {
-      const mockResult: DownloadResult = {
-        title: "Sample Video Title - This is a demo result",
-        thumbnail: "https://via.placeholder.com/320x180?text=Video+Thumbnail",
-        author: "@username",
-        duration: "00:45",
-        downloadLinks: [
-          { quality: "HD (1080p)", url: "#", size: "25.6 MB" },
-          { quality: "SD (720p)", url: "#", size: "15.2 MB" },
-          { quality: "Audio Only (MP3)", url: "#", size: "3.8 MB" },
-        ],
-      };
-
-      setResult(mockResult);
+    try {
+      await processDownload();
+    } catch (error) {
+      console.error("Download error:", error);
+      setResult({
+        type: "standard",
+        data: {
+          title: "Error",
+          thumbnail: "/no-image.jpg",
+          downloadLinks: [],
+          author: error instanceof Error ? error.message : "Failed to download. Please check the URL and try again.",
+        }
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
+  };
+
+  const processDownload = async () => {
+    switch (activePlatform) {
+      case "facebook": {
+        const { downloadFromFacebook } = await import("@/services/visitor/downloader");
+        const downloadResult = await downloadFromFacebook(url);
+        if (downloadResult?.data) {
+          setResult({ type: "standard", data: downloadResult.data });
+        }
+        break;
+      }
+      case "instagram": {
+        const { downloadFromInstagram } = await import("@/services/visitor/downloader");
+        const igResult = await downloadFromInstagram(url);
+        handleInstagramResult(igResult);
+        break;
+      }
+      case "tiktok": {
+        const { downloadFromTikTok } = await import("@/services/visitor/downloader");
+        const downloadResult = await downloadFromTikTok(url);
+        if (downloadResult?.data) {
+          setResult({ type: "standard", data: downloadResult.data });
+        }
+        break;
+      }
+      case "twitter": {
+        const { downloadFromX } = await import("@/services/visitor/downloader");
+        const downloadResult = await downloadFromX(url);
+        if (downloadResult?.data) {
+          setResult({ type: "standard", data: downloadResult.data });
+        }
+        break;
+      }
+      case "youtube": {
+        const { downloadFromYouTube } = await import("@/services/visitor/downloader");
+        const downloadResult = await downloadFromYouTube(url);
+        if (downloadResult?.data) {
+          setResult({ type: "standard", data: downloadResult.data });
+        }
+        break;
+      }
+      default:
+        throw new Error("Unsupported platform");
+    }
+  };
+
+  const handleInstagramResult = (igResult: unknown) => {
+    if (!igResult || typeof igResult !== "object") return;
+
+    // Check if it's the new Instagram response format (with success and embedUrl)
+    if ("success" in igResult && "data" in igResult) {
+      const response = igResult as { success: boolean; data: InstagramDownloadData };
+      if (response.success && response.data && "embedUrl" in response.data) {
+        setResult({ type: "instagram", data: response.data });
+        return;
+      }
+    }
+
+    // Fall back to standard format
+    if ("data" in igResult) {
+      const response = igResult as { data: DownloadResult };
+      setResult({ type: "standard", data: response.data });
+    }
   };
 
   const currentPlatform = PLATFORMS.find((p) => p.id === activePlatform)!;
@@ -186,53 +270,124 @@ export function DownloaderTab() {
         </CardContent>
       </Card>
 
-      {/* Download Result */}
-      {result && (
+      {/* Instagram Result (New Format) */}
+      {result?.type === "instagram" && (
         <Card>
           <CardHeader>
-            <CardTitle>Download Ready</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-blue-500" />
+              Instagram Content Found
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {result.data.note && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Service Notice</AlertTitle>
+                <AlertDescription>
+                  {result.data.note}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium">Shortcode</p>
+                  <p className="text-xs text-muted-foreground truncate">{result.data.shortcode}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(result.data.shortcode)}
+                >
+                  {copied ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start gap-2"
+                  asChild
+                >
+                  <a href={result.data.embedUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4" />
+                    View Embed
+                  </a>
+                </Button>
+
+                <Button
+                  variant="default"
+                  className="w-full justify-start gap-2"
+                  asChild
+                >
+                  <a href={result.data.directUrl} target="_blank" rel="noopener noreferrer">
+                    <Download className="w-4 h-4" />
+                    Open Direct URL
+                  </a>
+                </Button>
+              </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                Open the direct URL in your browser, then right-click on the video/image to save it.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Standard Download Result */}
+      {result?.type === "standard" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {result.data.downloadLinks && result.data.downloadLinks.length > 0 ? "Download Ready" : "Download Failed"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4">
               <Image
-                src={"/no-image.jpg"}
+                src={result.data.thumbnail || "/no-image.jpg"}
                 width={160}
                 height={90}
                 alt="Thumbnail"
                 className="w-40 h-24 object-cover rounded-lg flex-shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold mb-1 line-clamp-2">{result.title}</h3>
-                {result.author && (
+                <h3 className="font-semibold mb-1 line-clamp-2">{result.data.title}</h3>
+                {result.data.author && (
                   <p className="text-sm text-muted-foreground mb-1">
-                    By {result.author}
+                    {result.data.downloadLinks && result.data.downloadLinks.length > 0 ? `By ${result.data.author}` : result.data.author}
                   </p>
                 )}
-                {result.duration && (
+                {result.data.duration && (
                   <Badge variant="secondary" className="text-xs">
-                    {result.duration}
+                    {result.data.duration}
                   </Badge>
                 )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              {result.downloadLinks.map((link, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className="w-full justify-between"
-                  asChild
-                >
-                  <a href={link.url} download>
-                    <span>{link.quality}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {link.size || "Unknown size"}
-                    </span>
-                  </a>
-                </Button>
-              ))}
-            </div>
+            {result.data.downloadLinks && result.data.downloadLinks.length > 0 && (
+              <div className="space-y-2">
+                {result.data.downloadLinks.map((link) => (
+                  <Button
+                    key={link.url}
+                    variant="outline"
+                    className="w-full justify-between"
+                    asChild
+                  >
+                    <a href={link.url} download target="_blank" rel="noopener noreferrer">
+                      <span>{link.quality}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {link.size || "Unknown size"}
+                      </span>
+                    </a>
+                  </Button>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
