@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { isHaveValidToken } from "./app/actions/actions"
 
-export async function middleware(request: NextRequest, response: NextResponse) {
+export async function proxy(request: NextRequest, response: NextResponse) {
   const isHaveToken = await isHaveValidToken();
   const userCookieValue = request.cookies.get("USER_SUPABASE_AUTH_COOKIE")
   const adminCookieValue = request.cookies.get("ADMIN_SUPABASE_AUTH_COOKIE")

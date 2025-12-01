@@ -42,11 +42,6 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 - **[next-mdx-remote](https://github.com/hashicorp/next-mdx-remote)** - Load MDX content
 - **[highlight.js](https://highlightjs.org/)** - Syntax highlighting
 
-### 3D Graphics
-- **[Three.js](https://threejs.org/)** - 3D graphics library
-- **[@react-three/fiber](https://docs.pmnd.rs/react-three-fiber)** - React renderer for Three.js
-- **[@react-three/drei](https://github.com/pmndrs/drei)** - Useful helpers for R3F
-
 ### Testing
 - **[Jest](https://jestjs.io/)** - JavaScript testing framework
 - **[React Testing Library](https://testing-library.com/)** - Component testing
