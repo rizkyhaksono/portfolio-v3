@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import BlurFade from "@/components/magicui/blur-fade";
 import { HyperText } from "@/components/magicui/hyper-text";
-import CodingScene from "@/components/ui/3d-art";
 import { Button } from "@/components/ui/button";
 
 export default function IntroSection() {
@@ -28,11 +27,6 @@ export default function IntroSection() {
               </Button>
             </Link>
           </div>
-        </div>
-
-        {/* 3D Art for Desktop */}
-        <div className="hidden md:block flex-shrink-0 w-72">
-          <CodingScene />
         </div>
 
         {/* Original Profile Image for Mobile */}
