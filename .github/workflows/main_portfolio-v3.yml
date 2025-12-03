@@ -42,9 +42,8 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
-          npm install --legacy-peer-deps
-          npm run build --if-present
-          npm run test --if-present
+          npm install
+          npm run build
 
       - name: Remove node_modules for artifact
         run: rm -rf node_modules
@@ -84,5 +83,6 @@ jobs:
           package: .
 
           
+
 
 
