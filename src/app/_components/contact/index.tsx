@@ -202,8 +202,8 @@ export default function ContactSection() {
                       <p className="font-medium text-sm">Prefer email?</p>
                       <p className="text-muted-foreground text-xs mt-1">
                         Use the form or reach out at{" "}
-                        <a href="mailto:rizkyhaksono@gmail.com" className="text-primary hover:underline">
-                          rizkyhaksono@gmail.com
+                        <a href="mailto:mrizkyhaksono@gmail.com" className="text-primary hover:underline">
+                          mrizkyhaksono@gmail.com
                         </a>
                       </p>
                     </div>
