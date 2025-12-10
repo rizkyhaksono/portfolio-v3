@@ -1,6 +1,8 @@
 export interface SkillCategory {
   name: string;
   skills: string[];
+  icon: string;
+  color: string;
 }
 
 export const skills_data: SkillCategory[] = [
@@ -17,7 +19,9 @@ export const skills_data: SkillCategory[] = [
       "CSS3",
       "React Native",
       "Flutter",
-    ]
+    ],
+    icon: "Monitor",
+    color: "from-blue-500 to-cyan-400"
   },
   {
     name: "UI/UX & Libraries",
@@ -32,7 +36,9 @@ export const skills_data: SkillCategory[] = [
       "Figma",
       "Framer Motion",
       "Responsive Design",
-    ]
+    ],
+    icon: "Palette",
+    color: "from-pink-500 to-rose-400"
   },
   {
     name: "Backend Development",
@@ -52,7 +58,9 @@ export const skills_data: SkillCategory[] = [
       "REST API",
       "tRPC",
       "Socket.io",
-    ]
+    ],
+    icon: "Server",
+    color: "from-green-500 to-emerald-400"
   },
   {
     name: "Programming Languages",
@@ -69,7 +77,9 @@ export const skills_data: SkillCategory[] = [
       "Rust",
       "Dart",
       "PHP",
-    ]
+    ],
+    icon: "Code2",
+    color: "from-violet-500 to-purple-400"
   },
   {
     name: "Databases",
@@ -83,7 +93,9 @@ export const skills_data: SkillCategory[] = [
       "Firebase",
       "Supabase",
       "Prisma",
-    ]
+    ],
+    icon: "Database",
+    color: "from-orange-500 to-amber-400"
   },
   {
     name: "DevOps & Tools",
@@ -104,7 +116,9 @@ export const skills_data: SkillCategory[] = [
       "DigitalOcean",
       "Nginx",
       "Apache",
-    ]
+    ],
+    icon: "Cloud",
+    color: "from-sky-500 to-blue-400"
   },
   {
     name: "Testing & Quality",
@@ -115,7 +129,9 @@ export const skills_data: SkillCategory[] = [
       "Vitest",
       "Postman",
       "SonarQube",
-    ]
+    ],
+    icon: "TestTube2",
+    color: "from-teal-500 to-cyan-400"
   },
   {
     name: "State Management",
@@ -125,7 +141,9 @@ export const skills_data: SkillCategory[] = [
       "Recoil",
       "Jotai",
       "React Query",
-    ]
+    ],
+    icon: "Layers",
+    color: "from-indigo-500 to-violet-400"
   },
   {
     name: "Build Tools & Bundlers",
@@ -137,7 +155,9 @@ export const skills_data: SkillCategory[] = [
       "SWC",
       "Babel",
       "Nx",
-    ]
+    ],
+    icon: "Hammer",
+    color: "from-yellow-500 to-orange-400"
   },
   {
     name: "Mobile Development",
@@ -147,7 +167,9 @@ export const skills_data: SkillCategory[] = [
       "Expo",
       "Kotlin (Android)",
       "Java (Android)",
-    ]
+    ],
+    icon: "Smartphone",
+    color: "from-lime-500 to-green-400"
   },
   {
     name: "Data Science & AI",
@@ -160,16 +182,21 @@ export const skills_data: SkillCategory[] = [
       "Keras",
       "OpenCV",
       "Matplotlib",
-    ]
+    ],
+    icon: "Brain",
+    color: "from-fuchsia-500 to-pink-400"
   },
   {
     name: "Blockchain & Web3",
     skills: [
       "Solidity (Learning)",
       "Web3.js (Learning)",
-    ]
+    ],
+    icon: "Blocks",
+    color: "from-slate-500 to-zinc-400"
   }
 ];
+
 
 export const skills_data_top = [
   "React",
