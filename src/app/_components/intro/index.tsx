@@ -97,8 +97,8 @@ export default function IntroSection() {
       </div>
 
       {/* Profile Image - Only visible on mobile, hidden on md and above since sidebar shows it */}
-      <BlurFade delay={0.3} inView className="md:hidden">
-        <div className="relative">
+      <BlurFade delay={0.3} inView className="md:hidden flex justify-center">
+        <div className="relative w-fit">
           {/* Glow Effect */}
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-purple-500/20 to-pink-500/30 blur-2xl opacity-60 dark:opacity-40" />
 
