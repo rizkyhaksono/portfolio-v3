@@ -21,11 +21,15 @@ import { useRouter } from "next/navigation";
 import { storeCookie } from "@/app/actions/actions";
 import Image from "next/image";
 import Typography from "@/components/ui/typography";
+import { FcGoogle } from "react-icons/fc";
+import { FaGithub, FaDiscord, FaFacebook } from "react-icons/fa";
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function LoginForm() {
   const router = useRouter();
@@ -54,6 +58,34 @@ export default function LoginForm() {
       error: (err) => err,
     });
   };
+
+  const handleOAuthLogin = (provider: string) => {
+    // Redirect to OAuth endpoint
+    window.location.href = `${API_URL}/v3/auth/${provider}`;
+  };
+
+  const oauthProviders = [
+    {
+      name: "Google",
+      icon: FcGoogle,
+      provider: "google",
+    },
+    {
+      name: "GitHub",
+      icon: FaGithub,
+      provider: "github",
+    },
+    {
+      name: "Discord",
+      icon: FaDiscord,
+      provider: "discord",
+    },
+    {
+      name: "Facebook",
+      icon: FaFacebook,
+      provider: "facebook",
+    },
+  ];
 
   return (
     <Card className="overflow-hidden">
@@ -95,6 +127,34 @@ export default function LoginForm() {
               />
             </div>
             <Button type="submit" className="mt-4 w-full">Login</Button>
+
+            {/* Divider */}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* OAuth Providers */}
+            <div className="grid grid-cols-2 gap-2">
+              {oauthProviders.map((provider) => (
+                <Button
+                  key={provider.provider}
+                  variant="outline"
+                  type="button"
+                  onClick={() => handleOAuthLogin(provider.provider)}
+                  className="w-full"
+                >
+                  <provider.icon className="mr-2 h-4 w-4" />
+                  {provider.name}
+                </Button>
+              ))}
+            </div>
           </form>
         </Form>
         <div className="relative hidden bg-muted md:block">
