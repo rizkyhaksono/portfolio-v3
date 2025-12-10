@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import { LinkedinCertification } from "@/commons/types/linkedin";
-import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink, Award } from "lucide-react";
-import Image from "next/image";
+import { LinkedinCertification } from "@/commons/types/linkedin"
+import { Card, CardContent } from "@/components/ui/card"
+import { ExternalLink, Award } from "lucide-react"
+import Image from "next/image"
 
 interface CertificationCardProps {
-  certification: LinkedinCertification;
-  compact?: boolean;
+  certification: LinkedinCertification
+  compact?: boolean
 }
 
-export function CertificationCard({ certification, compact = false }: CertificationCardProps) {
+export function CertificationCard({ certification, compact = false }: Readonly<CertificationCardProps>) {
   if (compact) {
     return (
       <Card className="hover:shadow-md transition-all">
@@ -27,7 +27,7 @@ export function CertificationCard({ certification, compact = false }: Certificat
                   className="rounded object-contain"
                   unoptimized // LinkedIn images require unoptimized to avoid 403
                   onError={(e) => {
-                    e.currentTarget.style.display = "none";
+                    e.currentTarget.style.display = "none"
                   }}
                 />
               </div>
@@ -46,20 +46,14 @@ export function CertificationCard({ certification, compact = false }: Certificat
 
             {/* Link Icon */}
             {certification.link && (
-              <a
-                href={certification.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                aria-label="View credential"
-              >
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300" aria-label="View credential">
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   // Full version for dedicated page
@@ -77,7 +71,7 @@ export function CertificationCard({ certification, compact = false }: Certificat
                 className="rounded-lg object-contain"
                 unoptimized // LinkedIn images require unoptimized to avoid 403
                 onError={(e) => {
-                  e.currentTarget.style.display = "none";
+                  e.currentTarget.style.display = "none"
                 }}
               />
             </div>
@@ -93,12 +87,7 @@ export function CertificationCard({ certification, compact = false }: Certificat
             <p className="text-xs text-muted-foreground">Issued {certification.issuedDisplay}</p>
 
             {certification.link && (
-              <a
-                href={certification.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2"
-              >
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2">
                 <span>View Credential</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
@@ -107,5 +96,5 @@ export function CertificationCard({ certification, compact = false }: Certificat
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
