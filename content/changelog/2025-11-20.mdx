@@ -1,0 +1,155 @@
+---
+title: "Performance & Accessibility Improvements"
+description: "Major performance optimizations and accessibility enhancements across the platform"
+date: "2025-11-20"
+version: "1.2.1"
+author: "Rizky Haksono"
+---
+
+![Performance Update](https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop&ixlib=rb-4.0.3)
+
+## ⚡ Performance & Accessibility Update
+
+This release focuses on improving the overall performance and accessibility of the platform, ensuring a better experience for all users.
+
+---
+
+### 🚀 Performance Improvements
+
+<Accordion type="multiple" className="w-full not-prose">
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Core Web Vitals Optimization</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+          <span className="font-medium">Largest Contentful Paint (LCP)</span>
+          <span className="text-green-600 font-semibold">1.2s → 0.8s</span>
+        </div>
+        <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+          <span className="font-medium">First Input Delay (FID)</span>
+          <span className="text-green-600 font-semibold">100ms → 45ms</span>
+        </div>
+        <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+          <span className="font-medium">Cumulative Layout Shift (CLS)</span>
+          <span className="text-green-600 font-semibold">0.15 → 0.05</span>
+        </div>
+        <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-950/30 rounded-lg">
+          <span className="font-medium">Time to Interactive (TTI)</span>
+          <span className="text-green-600 font-semibold">2.5s → 1.8s</span>
+        </div>
+      </div>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Image Optimization</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>
+          <strong>WebP/AVIF Support</strong> — Automatic image format conversion for smaller file sizes
+        </li>
+        <li>
+          <strong>Lazy Loading</strong> — Images load only when entering viewport
+        </li>
+        <li>
+          <strong>Blur Placeholders</strong> — Beautiful loading states with blur-up effect
+        </li>
+        <li>
+          <strong>Responsive Images</strong> — Serve appropriately sized images for each device
+        </li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-3">
+    <AccordionTrigger>Bundle Size Reduction</AccordionTrigger>
+    <AccordionContent className="flex flex-col gap-4 text-balance">
+      <ul className="list-disc space-y-2 pl-4">
+        <li>
+          <strong>Tree Shaking</strong> — Removed unused code from production bundles
+        </li>
+        <li>
+          <strong>Code Splitting</strong> — Dynamic imports for route-based splitting
+        </li>
+        <li>
+          <strong>Dependency Optimization</strong> — Replaced heavy libraries with lighter alternatives
+        </li>
+        <li>
+          <strong>Bundle Size</strong> — Reduced from 450KB to 280KB (38% reduction)
+        </li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+---
+
+### ♿ Accessibility Enhancements
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>WCAG 2.1 AA Compliance</CardTitle>
+    <CardDescription>
+      Improvements to meet Web Content Accessibility Guidelines
+    </CardDescription>
+  </CardHeader>
+  <CardContent>
+    <ul className="space-y-3">
+      <li className="flex items-start gap-3">
+        <span className="text-green-500 mt-0.5">✓</span>
+        <div>
+          <p className="font-medium">Keyboard Navigation</p>
+          <p className="text-sm text-muted-foreground">Full keyboard support for all interactive elements</p>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <span className="text-green-500 mt-0.5">✓</span>
+        <div>
+          <p className="font-medium">Screen Reader Support</p>
+          <p className="text-sm text-muted-foreground">Proper ARIA labels and semantic HTML structure</p>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <span className="text-green-500 mt-0.5">✓</span>
+        <div>
+          <p className="font-medium">Color Contrast</p>
+          <p className="text-sm text-muted-foreground">Minimum 4.5:1 contrast ratio for all text</p>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <span className="text-green-500 mt-0.5">✓</span>
+        <div>
+          <p className="font-medium">Focus Indicators</p>
+          <p className="text-sm text-muted-foreground">Clear visible focus states for all interactive elements</p>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <span className="text-green-500 mt-0.5">✓</span>
+        <div>
+          <p className="font-medium">Reduced Motion</p>
+          <p className="text-sm text-muted-foreground">Respects user's reduced motion preferences</p>
+        </div>
+      </li>
+    </ul>
+  </CardContent>
+</Card>
+
+---
+
+### 🔧 Technical Changes
+
+- Upgraded to Next.js 15.1 with improved caching
+- Implemented React Server Components for better performance
+- Added Incremental Static Regeneration (ISR) for dynamic content
+- Optimized database queries with proper indexing
+- Implemented edge caching for static assets
+
+<Alert className="my-6">
+  <AlertTitle>📊 Lighthouse Score</AlertTitle>
+  <AlertDescription>
+    <div className="flex gap-4 mt-2">
+      <span className="font-mono bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-green-700 dark:text-green-300">Performance: 98</span>
+      <span className="font-mono bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-green-700 dark:text-green-300">Accessibility: 100</span>
+      <span className="font-mono bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-green-700 dark:text-green-300">Best Practices: 100</span>
+      <span className="font-mono bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-green-700 dark:text-green-300">SEO: 100</span>
+    </div>
+  </AlertDescription>
+</Alert>
