@@ -1,0 +1,496 @@
+---
+title: "Setting Up Express Development Environment"
+description: "Installing Node.js, npm, and creating your first Express.js project with proper structure"
+course: "express-fundamentals"
+category: "backend"
+difficulty: "beginner"
+duration: "15 min"
+order: 2
+video: "https://www.youtube.com/embed/L72fhGm1tfE"
+illustration: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2938&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Terminal, Download, CheckCircle2, AlertCircle, FolderTree, Package } from "lucide-react"
+
+## Setting Up Your Development Environment
+
+Before you can start building with Express.js, you need to set up your development environment properly. This lesson will guide you through installing the necessary tools and creating a well-structured project.
+
+<Alert className="my-6">
+  <Download className="h-4 w-4" />
+  <AlertTitle>Prerequisites</AlertTitle>
+  <AlertDescription>
+    You'll need a code editor (VS Code recommended), a terminal, and basic knowledge of JavaScript and npm.
+  </AlertDescription>
+</Alert>
+
+---
+
+## Installing Node.js and npm
+
+Node.js is the runtime that allows Express to run. npm (Node Package Manager) comes bundled with it.
+
+### Step 1: Download Node.js
+
+Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) version.
+
+<Tabs defaultValue="windows" className="my-6">
+  <TabsList>
+    <TabsTrigger value="windows">Windows</TabsTrigger>
+    <TabsTrigger value="macos">macOS</TabsTrigger>
+    <TabsTrigger value="linux">Linux</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="windows">
+    <Card>
+      <CardContent className="pt-6">
+        <ol className="list-decimal list-inside space-y-2">
+          <li>Download the Windows Installer (.msi) from nodejs.org</li>
+          <li>Run the installer and follow the installation wizard</li>
+          <li>Verify installation by opening PowerShell and running:</li>
+        </ol>
+        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="macos">
+    <Card>
+      <CardContent className="pt-6">
+        <p className="mb-4">Using Homebrew (recommended):</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
+          brew install node
+        </div>
+        <p className="mb-2">Or download the macOS Installer from nodejs.org</p>
+        <p className="mb-2">Verify installation:</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="linux">
+    <Card>
+      <CardContent className="pt-6">
+        <p className="mb-4">For Ubuntu/Debian:</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br/>
+          sudo apt-get install -y nodejs
+        </div>
+        <p className="mb-2">Verify installation:</p>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+          node --version<br/>
+          npm --version
+        </div>
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Creating Your First Express Project
+
+### Step 1: Initialize the Project
+
+```bash
+# Create project directory
+mkdir my-express-api
+cd my-express-api
+
+# Initialize npm project
+npm init -y
+```
+
+### Step 2: Install Express and Dependencies
+
+```bash
+# Core dependencies
+npm install express cors helmet morgan dotenv
+
+# Development dependencies
+npm install -D nodemon
+```
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Package className="h-5 w-5" />
+      Package Breakdown
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <dl className="space-y-3">
+      <div>
+        <dt className="font-semibold">express</dt>
+        <dd className="text-muted-foreground text-sm">The web framework itself</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">cors</dt>
+        <dd className="text-muted-foreground text-sm">Enable Cross-Origin Resource Sharing</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">helmet</dt>
+        <dd className="text-muted-foreground text-sm">Security middleware for HTTP headers</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">morgan</dt>
+        <dd className="text-muted-foreground text-sm">HTTP request logger</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">dotenv</dt>
+        <dd className="text-muted-foreground text-sm">Load environment variables from .env file</dd>
+      </div>
+      <div>
+        <dt className="font-semibold">nodemon</dt>
+        <dd className="text-muted-foreground text-sm">Auto-restart server on file changes (dev only)</dd>
+      </div>
+    </dl>
+  </CardContent>
+</Card>
+
+### Step 3: Update package.json Scripts
+
+```json
+{
+  "name": "my-express-api",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
+```
+
+---
+
+## Project Structure
+
+A well-organized project structure is crucial for maintainability:
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <FolderTree className="h-5 w-5" />
+      Recommended Folder Structure
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
+{`my-express-api/
+├── src/
+│   ├── index.js          # Entry point
+│   ├── app.js            # Express app configuration
+│   ├── config/
+│   │   └── index.js      # Configuration settings
+│   ├── routes/
+│   │   ├── index.js      # Route aggregator
+│   │   └── users.js      # User routes
+│   ├── controllers/
+│   │   └── users.js      # User controller logic
+│   ├── middleware/
+│   │   ├── auth.js       # Authentication middleware
+│   │   └── error.js      # Error handling middleware
+│   ├── models/
+│   │   └── User.js       # User model (for database)
+│   ├── services/
+│   │   └── users.js      # Business logic
+│   └── utils/
+│       └── helpers.js    # Utility functions
+├── .env                  # Environment variables
+├── .env.example          # Environment template
+├── .gitignore
+├── package.json
+└── README.md`}
+    </pre>
+  </CardContent>
+</Card>
+
+---
+
+## Setting Up the Files
+
+### 1. Environment Variables (.env)
+
+```bash
+PORT=3000
+NODE_ENV=development
+```
+
+### 2. Configuration (src/config/index.js)
+
+```javascript
+require('dotenv').config();
+
+module.exports = {
+  port: process.env.PORT || 3000,
+  nodeEnv: process.env.NODE_ENV || 'development',
+  isProduction: process.env.NODE_ENV === 'production',
+};
+```
+
+### 3. Express App (src/app.js)
+
+```javascript
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+
+const routes = require('./routes');
+const errorHandler = require('./middleware/error');
+const config = require('./config');
+
+const app = express();
+
+// Security middleware
+app.use(helmet());
+
+// CORS
+app.use(cors());
+
+// Request logging
+if (!config.isProduction) {
+  app.use(morgan('dev'));
+}
+
+// Body parsers
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API routes
+app.use('/api', routes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Error handling
+app.use(errorHandler);
+
+module.exports = app;
+```
+
+### 4. Entry Point (src/index.js)
+
+```javascript
+const app = require('./app');
+const config = require('./config');
+
+const server = app.listen(config.port, () => {
+  console.log(`🚀 Server running on http://localhost:${config.port}`);
+  console.log(`📝 Environment: ${config.nodeEnv}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+```
+
+### 5. Routes (src/routes/index.js)
+
+```javascript
+const express = require('express');
+const usersRoutes = require('./users');
+
+const router = express.Router();
+
+router.use('/users', usersRoutes);
+
+module.exports = router;
+```
+
+### 6. User Routes (src/routes/users.js)
+
+```javascript
+const express = require('express');
+const usersController = require('../controllers/users');
+
+const router = express.Router();
+
+router.get('/', usersController.getAll);
+router.get('/:id', usersController.getById);
+router.post('/', usersController.create);
+router.patch('/:id', usersController.update);
+router.delete('/:id', usersController.remove);
+
+module.exports = router;
+```
+
+### 7. User Controller (src/controllers/users.js)
+
+```javascript
+const usersService = require('../services/users');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const users = await usersService.findAll();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const user = await usersService.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const user = await usersService.create(req.body);
+    res.status(201).json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const user = await usersService.update(req.params.id, req.body);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const success = await usersService.remove(req.params.id);
+    if (!success) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+```
+
+### 8. Error Middleware (src/middleware/error.js)
+
+```javascript
+module.exports = (err, req, res, next) => {
+  console.error(err.stack);
+
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Internal Server Error';
+
+  res.status(statusCode).json({
+    error: message,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+  });
+};
+```
+
+---
+
+## Running the Server
+
+<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+      <CheckCircle2 className="h-5 w-5" />
+      Start Development Server
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="text-green-800 dark:text-green-200">
+    <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
+      npm run dev
+    </div>
+    <p>
+      Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. 
+      Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
+    </p>
+  </CardContent>
+</Card>
+
+---
+
+## VS Code Extensions for Express
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Recommended Extensions</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="space-y-3">
+      <li className="flex items-center gap-2">
+        <span className="font-semibold">REST Client</span>
+        <span className="text-muted-foreground text-sm">— Test APIs directly in VS Code</span>
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="font-semibold">Thunder Client</span>
+        <span className="text-muted-foreground text-sm">— Lightweight REST API client</span>
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="font-semibold">ESLint</span>
+        <span className="text-muted-foreground text-sm">— JavaScript linting</span>
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="font-semibold">Prettier</span>
+        <span className="text-muted-foreground text-sm">— Code formatting</span>
+      </li>
+      <li className="flex items-center gap-2">
+        <span className="font-semibold">DotENV</span>
+        <span className="text-muted-foreground text-sm">— .env file syntax highlighting</span>
+      </li>
+    </ul>
+  </CardContent>
+</Card>
+
+---
+
+## Next Steps
+
+With your development environment set up, you're ready to learn about advanced routing and middleware patterns!
+
+<Card className="my-6">
+  <CardContent className="pt-6">
+    <div className="flex justify-between items-center">
+      <span className="text-muted-foreground">Next Lesson:</span>
+      <span className="font-semibold">Routing and Middleware in Depth</span>
+    </div>
+  </CardContent>
+</Card>

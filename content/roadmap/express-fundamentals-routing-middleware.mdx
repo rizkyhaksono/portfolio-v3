@@ -1,0 +1,595 @@
+---
+title: "Routing and Middleware"
+description: "Master Express.js routing patterns and middleware architecture for building modular APIs"
+course: "express-fundamentals"
+category: "backend"
+difficulty: "beginner"
+duration: "20 min"
+order: 3
+video: "https://www.youtube.com/embed/L72fhGm1tfE"
+illustration: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { BookOpen, Lightbulb, Target, Route, Layers, Shield } from "lucide-react"
+
+## Advanced Routing in Express
+
+Routing is the core of any web application. Express provides a powerful and flexible routing system that allows you to create clean, maintainable API endpoints.
+
+<Card className="my-6 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+      <Target className="h-5 w-5" />
+      Learning Objectives
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2 text-blue-800 dark:text-blue-200">
+      <li>Understand Express Router and modular routing</li>
+      <li>Learn route parameters and query strings</li>
+      <li>Master middleware types and patterns</li>
+      <li>Build reusable middleware functions</li>
+    </ul>
+  </CardContent>
+</Card>
+
+---
+
+## Express Router
+
+The Express Router is a mini Express application capable of handling routes and middleware. It helps organize your routes into separate modules.
+
+### Creating a Router
+
+```javascript
+// routes/products.js
+const express = require('express');
+const router = express.Router();
+
+// All routes here are relative to /api/products
+router.get('/', (req, res) => {
+  res.json({ message: 'Get all products' });
+});
+
+router.get('/:id', (req, res) => {
+  res.json({ message: `Get product ${req.params.id}` });
+});
+
+router.post('/', (req, res) => {
+  res.status(201).json({ message: 'Create product' });
+});
+
+module.exports = router;
+```
+
+### Mounting Routers
+
+```javascript
+// app.js
+const express = require('express');
+const productsRouter = require('./routes/products');
+const usersRouter = require('./routes/users');
+const ordersRouter = require('./routes/orders');
+
+const app = express();
+
+// Mount routers with prefixes
+app.use('/api/products', productsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/orders', ordersRouter);
+
+module.exports = app;
+```
+
+---
+
+## Route Parameters
+
+<Tabs defaultValue="basic" className="my-6">
+  <TabsList className="grid w-full grid-cols-3">
+    <TabsTrigger value="basic">Basic Params</TabsTrigger>
+    <TabsTrigger value="multiple">Multiple Params</TabsTrigger>
+    <TabsTrigger value="optional">Optional & Regex</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="basic">
+    <Card>
+      <CardHeader>
+        <CardTitle>Basic Route Parameters</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```javascript
+        // Single parameter
+        app.get('/users/:id', (req, res) => {
+          const userId = req.params.id;
+          res.json({ userId });
+        });
+
+        // Example: GET /users/123
+        // req.params = { id: '123' }
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="multiple">
+    <Card>
+      <CardHeader>
+        <CardTitle>Multiple Parameters</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```javascript
+        // Multiple parameters
+        app.get('/users/:userId/posts/:postId', (req, res) => {
+          const { userId, postId } = req.params;
+          res.json({ userId, postId });
+        });
+
+        // Example: GET /users/123/posts/456
+        // req.params = { userId: '123', postId: '456' }
+
+        // Nested resources
+        app.get('/categories/:category/products/:productId', (req, res) => {
+          const { category, productId } = req.params;
+          res.json({ category, productId });
+        });
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="optional">
+    <Card>
+      <CardHeader>
+        <CardTitle>Optional Parameters & Regex</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```javascript
+        // Optional parameter with ?
+        app.get('/posts/:year/:month?', (req, res) => {
+          const { year, month } = req.params;
+          res.json({ year, month: month || 'all' });
+        });
+
+        // Regex constraints
+        app.get('/users/:id(\\d+)', (req, res) => {
+          // Only matches if id is numeric
+          res.json({ id: req.params.id });
+        });
+
+        // Named regex groups
+        app.get('/files/:filename.:ext', (req, res) => {
+          res.json({
+            filename: req.params.filename,
+            extension: req.params.ext
+          });
+        });
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Query Strings
+
+Query strings are used for filtering, pagination, and search:
+
+```javascript
+// GET /api/products?category=electronics&sort=price&order=desc&page=1&limit=10
+
+app.get('/api/products', (req, res) => {
+  const {
+    category,
+    sort = 'createdAt',
+    order = 'asc',
+    page = 1,
+    limit = 10
+  } = req.query;
+
+  console.log({
+    category,     // 'electronics'
+    sort,         // 'price'
+    order,        // 'desc'
+    page,         // '1' (string!)
+    limit         // '10' (string!)
+  });
+
+  // Convert to numbers
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+
+  // Build query...
+  res.json({
+    data: [],
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total: 100
+    }
+  });
+});
+```
+
+<Alert className="my-6">
+  <Lightbulb className="h-4 w-4" />
+  <AlertTitle>Important</AlertTitle>
+  <AlertDescription>
+    Query string values are always strings! Remember to parse numbers with parseInt() or parseFloat().
+  </AlertDescription>
+</Alert>
+
+---
+
+## Middleware Deep Dive
+
+Middleware functions are the heart of Express. They execute in the order they're defined and can:
+- Execute code
+- Modify request and response objects
+- End the request-response cycle
+- Call the next middleware
+
+### Types of Middleware
+
+<Accordion type="multiple" className="w-full not-prose my-6">
+  <AccordionItem value="application">
+    <AccordionTrigger>Application-Level Middleware</AccordionTrigger>
+    <AccordionContent>
+      <p className="mb-4">Bound to the app instance using app.use() or app.METHOD():</p>
+      ```javascript
+      const app = express();
+
+      // Runs for ALL requests
+      app.use((req, res, next) => {
+        console.log('Time:', Date.now());
+        next();
+      });
+
+      // Runs for specific path
+      app.use('/api', (req, res, next) => {
+        console.log('API request');
+        next();
+      });
+
+      // Runs for specific method + path
+      app.get('/users', (req, res, next) => {
+        console.log('GET users');
+        next();
+      });
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="router">
+    <AccordionTrigger>Router-Level Middleware</AccordionTrigger>
+    <AccordionContent>
+      <p className="mb-4">Works like application-level but bound to a router instance:</p>
+      ```javascript
+      const router = express.Router();
+
+      // Middleware for this router only
+      router.use((req, res, next) => {
+        console.log('Router middleware');
+        next();
+      });
+
+      // Specific to a route
+      router.get('/profile', 
+        authenticateUser, // middleware
+        authorizeUser,    // middleware
+        (req, res) => {   // handler
+          res.json(req.user);
+        }
+      );
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="error">
+    <AccordionTrigger>Error-Handling Middleware</AccordionTrigger>
+    <AccordionContent>
+      <p className="mb-4">Takes 4 arguments (err, req, res, next):</p>
+      ```javascript
+      // Custom error class
+      class AppError extends Error {
+        constructor(message, statusCode) {
+          super(message);
+          this.statusCode = statusCode;
+          this.isOperational = true;
+        }
+      }
+
+      // Error handling middleware (must be last!)
+      app.use((err, req, res, next) => {
+        const statusCode = err.statusCode || 500;
+        const status = err.status || 'error';
+
+        res.status(statusCode).json({
+          status,
+          message: err.message,
+          ...(process.env.NODE_ENV === 'development' && {
+            stack: err.stack
+          })
+        });
+      });
+
+      // Using in routes
+      app.get('/users/:id', async (req, res, next) => {
+        try {
+          const user = await User.findById(req.params.id);
+          if (!user) {
+            throw new AppError('User not found', 404);
+          }
+          res.json(user);
+        } catch (error) {
+          next(error); // Pass to error handler
+        }
+      });
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="builtin">
+    <AccordionTrigger>Built-in Middleware</AccordionTrigger>
+    <AccordionContent>
+      <p className="mb-4">Express includes several built-in middleware:</p>
+      ```javascript
+      // Parse JSON request body
+      app.use(express.json());
+
+      // Parse URL-encoded request body
+      app.use(express.urlencoded({ extended: true }));
+
+      // Serve static files
+      app.use(express.static('public'));
+
+      // Serve static files with prefix
+      app.use('/assets', express.static('public'));
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+---
+
+## Creating Custom Middleware
+
+### Authentication Middleware
+
+```javascript
+// middleware/auth.js
+const jwt = require('jsonwebtoken');
+
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+// Role-based authorization
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ 
+        error: 'Not authorized to access this resource' 
+      });
+    }
+    next();
+  };
+};
+
+module.exports = { authenticate, authorize };
+```
+
+### Request Validation Middleware
+
+```javascript
+// middleware/validate.js
+const validateBody = (schema) => {
+  return (req, res, next) => {
+    const { error, value } = schema.validate(req.body);
+    
+    if (error) {
+      return res.status(400).json({
+        error: 'Validation error',
+        details: error.details.map(d => d.message)
+      });
+    }
+    
+    req.body = value; // Use validated/sanitized data
+    next();
+  };
+};
+
+// Usage with Joi
+const Joi = require('joi');
+
+const createUserSchema = Joi.object({
+  name: Joi.string().min(2).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required()
+});
+
+router.post('/users', 
+  validateBody(createUserSchema),
+  usersController.create
+);
+```
+
+### Rate Limiting Middleware
+
+```javascript
+// middleware/rateLimit.js
+const rateLimit = (options = {}) => {
+  const { 
+    windowMs = 60000, // 1 minute
+    max = 100,        // requests per window
+    message = 'Too many requests'
+  } = options;
+
+  const requests = new Map();
+
+  return (req, res, next) => {
+    const key = req.ip;
+    const now = Date.now();
+    
+    // Clean old entries
+    const windowStart = now - windowMs;
+    
+    if (!requests.has(key)) {
+      requests.set(key, []);
+    }
+    
+    const userRequests = requests.get(key)
+      .filter(time => time > windowStart);
+    
+    if (userRequests.length >= max) {
+      return res.status(429).json({ error: message });
+    }
+    
+    userRequests.push(now);
+    requests.set(key, userRequests);
+    
+    next();
+  };
+};
+
+// Usage
+app.use('/api', rateLimit({ max: 100, windowMs: 60000 }));
+```
+
+---
+
+## Middleware Execution Order
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Layers className="h-5 w-5" />
+      Middleware Chain
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    ```javascript
+    app.use(helmet());              // 1. Security headers
+    app.use(cors());                // 2. CORS
+    app.use(morgan('dev'));         // 3. Logging
+    app.use(express.json());        // 4. Parse body
+    app.use(rateLimit());           // 5. Rate limiting
+
+    // 6. Routes (with their own middleware)
+    app.use('/api', authenticate, apiRoutes);
+    app.use('/public', publicRoutes);
+
+    // 7. 404 Handler
+    app.use((req, res) => {
+      res.status(404).json({ error: 'Not found' });
+    });
+
+    // 8. Error Handler (always last!)
+    app.use((err, req, res, next) => {
+      res.status(500).json({ error: err.message });
+    });
+    ```
+  </CardContent>
+</Card>
+
+---
+
+## Route Chaining
+
+Express allows you to chain route handlers:
+
+```javascript
+// Method 1: Multiple callbacks
+app.get('/users/:id',
+  validateParams,
+  authenticate,
+  authorize('admin'),
+  async (req, res) => {
+    // All middleware passed!
+    res.json(user);
+  }
+);
+
+// Method 2: router.route() for same path, different methods
+router.route('/users')
+  .get(getUsers)
+  .post(validateBody(userSchema), createUser);
+
+router.route('/users/:id')
+  .get(getUser)
+  .patch(validateBody(updateSchema), updateUser)
+  .delete(authorize('admin'), deleteUser);
+```
+
+---
+
+## Best Practices
+
+<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
+  <CardHeader>
+    <CardTitle className="text-green-700 dark:text-green-300">✅ Routing & Middleware Best Practices</CardTitle>
+  </CardHeader>
+  <CardContent className="text-green-800 dark:text-green-200">
+    <ol className="list-decimal list-inside space-y-2">
+      <li><strong>Keep routes organized</strong> — Group related routes in separate files</li>
+      <li><strong>Use async/await with try-catch</strong> — Or use an async handler wrapper</li>
+      <li><strong>Validate input early</strong> — Use validation middleware before handlers</li>
+      <li><strong>Keep middleware focused</strong> — One middleware, one responsibility</li>
+      <li><strong>Order matters</strong> — Error handlers must be last</li>
+      <li><strong>Use meaningful HTTP status codes</strong> — 200, 201, 400, 401, 403, 404, 500</li>
+    </ol>
+  </CardContent>
+</Card>
+
+---
+
+## Next Steps
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <BookOpen className="h-5 w-5" />
+      Continue Learning
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p className="text-muted-foreground mb-4">
+      Now that you understand routing and middleware, let's connect to a database and build real CRUD operations!
+    </p>
+    <div className="flex justify-between items-center pt-4 border-t">
+      <span className="text-muted-foreground">Next Lesson:</span>
+      <span className="font-semibold">Database Integration with MongoDB/PostgreSQL</span>
+    </div>
+  </CardContent>
+</Card>
+
+<Alert>
+  <AlertTitle>📚 Additional Resources</AlertTitle>
+  <AlertDescription>
+    <ul className="mt-2 space-y-1">
+      <li>• <a href="https://expressjs.com/en/guide/routing.html" className="underline">Express Routing Guide</a></li>
+      <li>• <a href="https://expressjs.com/en/guide/using-middleware.html" className="underline">Using Middleware</a></li>
+      <li>• <a href="https://expressjs.com/en/guide/error-handling.html" className="underline">Error Handling</a></li>
+    </ul>
+  </AlertDescription>
+</Alert>
