@@ -9,6 +9,8 @@ import {
   Keyboard,
   FolderOpen,
   Code,
+  MapPin,
+  TrendingUp,
 } from "lucide-react";
 import { getJLPTLevels } from "@/services/visitor/japanese";
 import type { ToolTab, JLPTLevel } from "@/commons/types/tools";
@@ -18,6 +20,8 @@ import { DownloaderTab } from "./_components/downloader-tab";
 import { WpmTab } from "./_components/wpm-tab";
 import { FilesTab } from "./_components/files-tab";
 import { CompilerTab } from "./_components/compiler-tab";
+import { PostalCodeTab } from "./_components/postal-code-tab";
+import { Web3CryptoTab } from "./_components/web3-crypto-tab";
 import Link from "next/link";
 
 interface ToolsPageProps {
@@ -68,6 +72,20 @@ const TOOL_CATEGORIES = [
     description: "Online code compiler",
     icon: Code,
     color: "bg-red-500",
+  },
+  {
+    id: "postal-code" as ToolTab,
+    name: "Postal Code",
+    description: "Indonesian postal code lookup",
+    icon: MapPin,
+    color: "bg-emerald-500",
+  },
+  {
+    id: "web3-crypto" as ToolTab,
+    name: "Web3 Crypto",
+    description: "Cryptocurrency prices & charts",
+    icon: TrendingUp,
+    color: "bg-blue-500",
   },
 ];
 
@@ -168,6 +186,14 @@ export default async function ToolsPage({ searchParams }: ToolsPageProps) {
 
           <TabsContent value="compiler" className="mt-6">
             <CompilerTab />
+          </TabsContent>
+
+          <TabsContent value="postal-code" className="mt-6">
+            <PostalCodeTab />
+          </TabsContent>
+
+          <TabsContent value="web3-crypto" className="mt-6">
+            <Web3CryptoTab />
           </TabsContent>
         </Tabs>
       </div>
