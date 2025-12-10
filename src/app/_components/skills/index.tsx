@@ -1,41 +1,31 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
-import Marquee from "@/components/magicui/marquee";
-import BlurFade from "@/components/magicui/blur-fade";
-import {
-  skills_data,
-  skills_data_top,
-  skills_data_bottom,
-  getRandomSkills,
-  skillsStats
-} from "@/commons/constants/skills";
-import Typography from "@/components/ui/typography";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import Marquee from "@/components/magicui/marquee"
+import BlurFade from "@/components/magicui/blur-fade"
+import { skills_data, skills_data_top, skills_data_bottom, skillsStats } from "@/commons/constants/skills"
+import Typography from "@/components/ui/typography"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 export default function SkillSection() {
-  const [showDetailed, setShowDetailed] = useState(false);
+  const [showDetailed, setShowDetailed] = useState(false)
 
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
         <div className="flex items-center self-center justify-between mb-6">
           <Typography.P className="text-left text-xl font-semibold">
-            Skills<span className="text-sm font-normal text-muted-foreground ml-2">
+            Skills{""}
+            <span className="text-sm font-normal text-muted-foreground ml-2">
               ({skillsStats.totalSkills} skills across {skillsStats.totalCategories} categories)
             </span>
           </Typography.P>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowDetailed(!showDetailed)}
-            className="flex items-center gap-2"
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowDetailed(!showDetailed)} className="flex items-center gap-2">
             {showDetailed ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {showDetailed ? 'Show Less' : 'Show All'}
+            {showDetailed ? "Show Less" : "Show All"}
           </Button>
         </div>
 
@@ -77,11 +67,7 @@ export default function SkillSection() {
                     <CardContent>
                       <div className="flex flex-wrap gap-2">
                         {category.skills.map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="outline"
-                            className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200"
-                          >
+                          <Badge key={skill} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200">
                             {skill}
                           </Badge>
                         ))}
@@ -91,41 +77,6 @@ export default function SkillSection() {
                 </BlurFade>
               ))}
             </div>
-
-            {/* Skills Statistics */}
-            <BlurFade delay={0.4} inView>
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle className="text-lg">Skills Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{skillsStats.totalSkills}</div>
-                      <div className="text-sm text-muted-foreground">Total Skills</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{skillsStats.totalCategories}</div>
-                      <div className="text-sm text-muted-foreground">Categories</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{skillsStats.averageSkillsPerCategory}</div>
-                      <div className="text-sm text-muted-foreground">Avg per Category</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">
-                        {skills_data.find(cat => cat.name === skillsStats.categoryWithMostSkills)?.skills.length}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Most Skills
-                        <br />
-                        <span className="text-xs">({skillsStats.categoryWithMostSkills})</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </BlurFade>
           </BlurFade>
         )}
       </div>
