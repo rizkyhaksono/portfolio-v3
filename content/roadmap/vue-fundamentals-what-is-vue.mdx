@@ -1,0 +1,401 @@
+---
+title: "What is Vue.js?"
+description: "Understanding Vue.js philosophy, reactivity system, and why it's loved by developers"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "beginner"
+duration: "12 min"
+order: 1
+video: "https://www.youtube.com/embed/nhBVL41-_Cw"
+illustration: "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?q=80&w=2787&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { BookOpen, Lightbulb, Target, Zap, Heart, Code2 } from "lucide-react"
+
+## Introduction to Vue.js
+
+Vue.js is a progressive JavaScript framework for building user interfaces. Unlike monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable.
+
+<Card className="my-6 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+      <Target className="h-5 w-5" />
+      Learning Objectives
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2 text-green-800 dark:text-green-200">
+      <li>Understand Vue.js core philosophy and design principles</li>
+      <li>Learn about Vue's reactivity system</li>
+      <li>Compare Vue with other frameworks</li>
+      <li>Recognize when Vue is the right choice</li>
+    </ul>
+  </CardContent>
+</Card>
+
+---
+
+## Why Vue.js?
+
+<div className="grid md:grid-cols-3 gap-4 my-6">
+  <Card className="text-center">
+    <CardHeader>
+      <Zap className="h-8 w-8 mx-auto text-yellow-500" />
+      <CardTitle className="text-lg">Approachable</CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Builds on standard HTML, CSS, and JavaScript with intuitive API
+    </CardContent>
+  </Card>
+  
+  <Card className="text-center">
+    <CardHeader>
+      <Code2 className="h-8 w-8 mx-auto text-blue-500" />
+      <CardTitle className="text-lg">Versatile</CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Incrementally adoptable ecosystem scales between a library and full framework
+    </CardContent>
+  </Card>
+  
+  <Card className="text-center">
+    <CardHeader>
+      <Heart className="h-8 w-8 mx-auto text-red-500" />
+      <CardTitle className="text-lg">Performant</CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Truly reactive, compiler-optimized rendering with minimal manual optimization
+    </CardContent>
+  </Card>
+</div>
+
+---
+
+## Vue.js Core Concepts
+
+### The Vue Instance
+
+Every Vue application starts by creating a new Vue instance:
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const message = ref('Hello Vue!')
+</script>
+
+<template>
+  <div>
+    <h1>{{ message }}</h1>
+  </div>
+</template>
+
+<style scoped>
+h1 {
+  color: #42b883;
+}
+</style>
+```
+
+<Alert className="my-6">
+  <Lightbulb className="h-4 w-4" />
+  <AlertTitle>Single-File Components (SFC)</AlertTitle>
+  <AlertDescription>
+    Vue uses `.vue` files that encapsulate template, logic, and styles in a single file. This is one of Vue's most beloved features!
+  </AlertDescription>
+</Alert>
+
+### Reactivity System
+
+Vue's reactivity system is at the heart of the framework. It automatically tracks JavaScript state changes and efficiently updates the DOM.
+
+<Tabs defaultValue="ref" className="my-6">
+  <TabsList className="grid w-full grid-cols-3">
+    <TabsTrigger value="ref">ref()</TabsTrigger>
+    <TabsTrigger value="reactive">reactive()</TabsTrigger>
+    <TabsTrigger value="computed">computed()</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="ref">
+    <Card>
+      <CardHeader>
+        <CardTitle>ref() for Primitives</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const count = ref(0)
+        const name = ref('Vue Developer')
+        
+        function increment() {
+          count.value++
+        }
+        </script>
+        
+        <template>
+          <button @click="increment">
+            Count: {{ count }}
+          </button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="reactive">
+    <Card>
+      <CardHeader>
+        <CardTitle>reactive() for Objects</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```vue
+        <script setup>
+        import { reactive } from 'vue'
+        
+        const state = reactive({
+          user: {
+            name: 'John',
+            age: 25
+          },
+          items: []
+        })
+        
+        function addItem(item) {
+          state.items.push(item)
+        }
+        </script>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="computed">
+    <Card>
+      <CardHeader>
+        <CardTitle>computed() for Derived State</CardTitle>
+      </CardHeader>
+      <CardContent>
+        ```vue
+        <script setup>
+        import { ref, computed } from 'vue'
+        
+        const firstName = ref('John')
+        const lastName = ref('Doe')
+        
+        const fullName = computed(() => {
+          return `${firstName.value} ${lastName.value}`
+        })
+        </script>
+        
+        <template>
+          <p>Full name: {{ fullName }}</p>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Vue vs Other Frameworks
+
+<Card className="my-6">
+  <CardContent className="pt-6">
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left py-2 px-3">Feature</th>
+            <th className="text-left py-2 px-3">Vue</th>
+            <th className="text-left py-2 px-3">React</th>
+            <th className="text-left py-2 px-3">Angular</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr className="border-b">
+            <td className="py-2 px-3 font-medium">Learning Curve</td>
+            <td className="py-2 px-3 text-green-600">Gentle</td>
+            <td className="py-2 px-3 text-yellow-600">Moderate</td>
+            <td className="py-2 px-3 text-red-600">Steep</td>
+          </tr>
+          <tr className="border-b">
+            <td className="py-2 px-3 font-medium">Template Syntax</td>
+            <td className="py-2 px-3">HTML-based</td>
+            <td className="py-2 px-3">JSX</td>
+            <td className="py-2 px-3">HTML-based</td>
+          </tr>
+          <tr className="border-b">
+            <td className="py-2 px-3 font-medium">State Management</td>
+            <td className="py-2 px-3">Pinia/Vuex</td>
+            <td className="py-2 px-3">Redux/Zustand</td>
+            <td className="py-2 px-3">NgRx/Services</td>
+          </tr>
+          <tr className="border-b">
+            <td className="py-2 px-3 font-medium">Bundle Size</td>
+            <td className="py-2 px-3 text-green-600">~33KB</td>
+            <td className="py-2 px-3 text-green-600">~42KB</td>
+            <td className="py-2 px-3 text-yellow-600">~130KB</td>
+          </tr>
+          <tr>
+            <td className="py-2 px-3 font-medium">TypeScript</td>
+            <td className="py-2 px-3">First-class</td>
+            <td className="py-2 px-3">Good support</td>
+            <td className="py-2 px-3">Built-in</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </CardContent>
+</Card>
+
+---
+
+## When to Use Vue
+
+<Accordion type="multiple" className="w-full not-prose">
+  <AccordionItem value="ideal">
+    <AccordionTrigger>✅ Vue is Great For</AccordionTrigger>
+    <AccordionContent className="space-y-2">
+      <ul className="list-disc pl-4 space-y-2">
+        <li><strong>Progressive Enhancement</strong> — Adding interactivity to existing pages</li>
+        <li><strong>Single Page Applications</strong> — Full-featured SPAs with Vue Router</li>
+        <li><strong>Server-Side Rendering</strong> — Using Nuxt.js for SSR/SSG</li>
+        <li><strong>Mobile Apps</strong> — Cross-platform with Vue Native or Capacitor</li>
+        <li><strong>Desktop Apps</strong> — Using Electron with Vue</li>
+        <li><strong>Rapid Prototyping</strong> — Quick to set up and iterate</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="ecosystem">
+    <AccordionTrigger>🔧 Vue Ecosystem</AccordionTrigger>
+    <AccordionContent className="space-y-2">
+      <ul className="list-disc pl-4 space-y-2">
+        <li><strong>Vue Router</strong> — Official routing library</li>
+        <li><strong>Pinia</strong> — Modern state management (official recommendation)</li>
+        <li><strong>Nuxt.js</strong> — Full-stack framework with SSR, SSG, and more</li>
+        <li><strong>Vite</strong> — Lightning-fast build tool (created by Vue author)</li>
+        <li><strong>VueUse</strong> — Collection of essential composition utilities</li>
+        <li><strong>Vuetify/PrimeVue</strong> — UI component libraries</li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+---
+
+## Quick Start Example
+
+Here's a complete Vue 3 component showcasing the basics:
+
+```vue
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+
+interface Todo {
+  id: number
+  text: string
+  completed: boolean
+}
+
+const todos = ref<Todo[]>([])
+const newTodo = ref('')
+
+const completedCount = computed(() => 
+  todos.value.filter(t => t.completed).length
+)
+
+function addTodo() {
+  if (newTodo.value.trim()) {
+    todos.value.push({
+      id: Date.now(),
+      text: newTodo.value,
+      completed: false
+    })
+    newTodo.value = ''
+  }
+}
+
+function toggleTodo(id: number) {
+  const todo = todos.value.find(t => t.id === id)
+  if (todo) todo.completed = !todo.completed
+}
+
+onMounted(() => {
+  console.log('Component mounted!')
+})
+</script>
+
+<template>
+  <div class="todo-app">
+    <h1>Vue Todo App</h1>
+    
+    <form @submit.prevent="addTodo">
+      <input 
+        v-model="newTodo" 
+        placeholder="Add a todo..."
+      />
+      <button type="submit">Add</button>
+    </form>
+    
+    <ul>
+      <li 
+        v-for="todo in todos" 
+        :key="todo.id"
+        :class="{ completed: todo.completed }"
+        @click="toggleTodo(todo.id)"
+      >
+        {{ todo.text }}
+      </li>
+    </ul>
+    
+    <p>Completed: {{ completedCount }} / {{ todos.length }}</p>
+  </div>
+</template>
+
+<style scoped>
+.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+</style>
+```
+
+---
+
+## Next Steps
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <BookOpen className="h-5 w-5" />
+      Continue Learning
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p className="text-muted-foreground mb-4">
+      Now that you understand what Vue.js is, let's set up your development environment and create your first Vue application!
+    </p>
+    <div className="flex justify-between items-center pt-4 border-t">
+      <span className="text-muted-foreground">Next Lesson:</span>
+      <span className="font-semibold">Setting Up Vue Development Environment</span>
+    </div>
+  </CardContent>
+</Card>
+
+<Alert>
+  <AlertTitle>📚 Additional Resources</AlertTitle>
+  <AlertDescription>
+    <ul className="mt-2 space-y-1">
+      <li>• <a href="https://vuejs.org/guide/introduction.html" className="underline">Official Vue.js Guide</a></li>
+      <li>• <a href="https://vuejs.org/tutorial/" className="underline">Interactive Vue Tutorial</a></li>
+      <li>• <a href="https://vuejs.org/examples/" className="underline">Vue.js Examples</a></li>
+    </ul>
+  </AlertDescription>
+</Alert>

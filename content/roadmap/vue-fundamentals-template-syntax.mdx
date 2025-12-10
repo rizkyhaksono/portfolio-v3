@@ -1,0 +1,705 @@
+---
+title: "Vue Template Syntax & Reactivity"
+description: "Master Vue's template syntax, directives, and deep dive into the reactivity system"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "beginner"
+duration: "25 min"
+order: 3
+video: "https://www.youtube.com/embed/Yx8sG-H1j9s"
+illustration: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Code2, Zap, Eye, MousePointer, List, Lightbulb } from "lucide-react"
+
+## Vue Template Syntax
+
+Vue uses an HTML-based template syntax that allows you to declaratively bind the rendered DOM to the underlying component instance's data.
+
+<Card className="my-6 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+      <Lightbulb className="h-5 w-5" />
+      What You'll Learn
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="text-green-800 dark:text-green-200">
+    <ul className="list-disc list-inside space-y-2">
+      <li>Text interpolation and expressions</li>
+      <li>Attribute bindings with v-bind</li>
+      <li>Event handling with v-on</li>
+      <li>Conditional and list rendering</li>
+      <li>Two-way binding with v-model</li>
+    </ul>
+  </CardContent>
+</Card>
+
+---
+
+## Text Interpolation
+
+The most basic form of data binding is text interpolation using the "Mustache" syntax:
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const message = ref('Hello, Vue!')
+const rawHtml = ref('<span style="color: red">This is red</span>')
+</script>
+
+<template>
+  <!-- Text interpolation -->
+  <p>Message: {{ message }}</p>
+  
+  <!-- Expressions in templates -->
+  <p>Reversed: {{ message.split('').reverse().join('') }}</p>
+  <p>{{ 1 + 1 }}</p>
+  <p>{{ ok ? 'YES' : 'NO' }}</p>
+  
+  <!-- Raw HTML (use with caution!) -->
+  <p v-html="rawHtml"></p>
+</template>
+```
+
+<Alert className="my-6">
+  <AlertCircle className="h-4 w-4" />
+  <AlertTitle>Security Warning</AlertTitle>
+  <AlertDescription>
+    Only use <code className="font-mono bg-muted px-1 rounded">v-html</code> on trusted content. Never use it on user-provided content as it can lead to XSS attacks.
+  </AlertDescription>
+</Alert>
+
+---
+
+## Directives
+
+Directives are special attributes with the `v-` prefix. Vue provides many built-in directives:
+
+<div className="grid md:grid-cols-2 gap-4 my-6">
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-base flex items-center gap-2">
+        <Code2 className="h-4 w-4" />
+        v-bind
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Dynamically bind attributes
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-base flex items-center gap-2">
+        <MousePointer className="h-4 w-4" />
+        v-on
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Listen to DOM events
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-base flex items-center gap-2">
+        <Eye className="h-4 w-4" />
+        v-if / v-show
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      Conditional rendering
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader className="pb-2">
+      <CardTitle className="text-base flex items-center gap-2">
+        <List className="h-4 w-4" />
+        v-for
+      </CardTitle>
+    </CardHeader>
+    <CardContent className="text-sm text-muted-foreground">
+      List rendering
+    </CardContent>
+  </Card>
+</div>
+
+### Attribute Bindings (v-bind)
+
+<Tabs defaultValue="basic" className="my-6">
+  <TabsList className="grid w-full grid-cols-4">
+    <TabsTrigger value="basic">Basic</TabsTrigger>
+    <TabsTrigger value="shorthand">Shorthand</TabsTrigger>
+    <TabsTrigger value="class">Class</TabsTrigger>
+    <TabsTrigger value="style">Style</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="basic">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const imageUrl = ref('/images/logo.png')
+        const altText = ref('Company Logo')
+        const isDisabled = ref(true)
+        </script>
+        
+        <template>
+          <img v-bind:src="imageUrl" v-bind:alt="altText" />
+          <button v-bind:disabled="isDisabled">Submit</button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="shorthand">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <template>
+          <!-- Shorthand syntax with : -->
+          <img :src="imageUrl" :alt="altText" />
+          <button :disabled="isDisabled">Submit</button>
+          
+          <!-- Same-name shorthand (Vue 3.4+) -->
+          <img :src :alt="altText" />
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="class">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const isActive = ref(true)
+        const hasError = ref(false)
+        const classObject = ref({
+          active: true,
+          'text-danger': false
+        })
+        </script>
+        
+        <template>
+          <!-- Object syntax -->
+          <div :class="{ active: isActive, error: hasError }"></div>
+          
+          <!-- Array syntax -->
+          <div :class="[isActive ? 'active' : '', 'base-class']"></div>
+          
+          <!-- Binding an object -->
+          <div :class="classObject"></div>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="style">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref, computed } from 'vue'
+        
+        const activeColor = ref('red')
+        const fontSize = ref(16)
+        
+        const styleObject = computed(() => ({
+          color: activeColor.value,
+          fontSize: `${fontSize.value}px`
+        }))
+        </script>
+        
+        <template>
+          <!-- Object syntax (camelCase) -->
+          <div :style="{ color: activeColor, fontSize: fontSize + 'px' }">
+            Styled text
+          </div>
+          
+          <!-- Binding to computed -->
+          <div :style="styleObject">Also styled</div>
+          
+          <!-- Array syntax (multiple objects) -->
+          <div :style="[baseStyles, overrideStyles]"></div>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Event Handling (v-on)
+
+<Tabs defaultValue="inline" className="my-6">
+  <TabsList className="grid w-full grid-cols-4">
+    <TabsTrigger value="inline">Inline</TabsTrigger>
+    <TabsTrigger value="method">Method</TabsTrigger>
+    <TabsTrigger value="modifiers">Modifiers</TabsTrigger>
+    <TabsTrigger value="key">Key Events</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="inline">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const count = ref(0)
+        const name = ref('')
+        </script>
+        
+        <template>
+          <!-- Inline handler -->
+          <button @click="count++">Add 1</button>
+          <p>Count: {{ count }}</p>
+          
+          <!-- Accessing event object -->
+          <button @click="(e) => console.log(e.target)">
+            Log Target
+          </button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="method">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const count = ref(0)
+        
+        function increment() {
+          count.value++
+        }
+        
+        function greet(name: string, event: Event) {
+          console.log(`Hello, ${name}!`)
+          console.log(event.target)
+        }
+        </script>
+        
+        <template>
+          <!-- Method handler -->
+          <button @click="increment">Add 1</button>
+          
+          <!-- Passing arguments -->
+          <button @click="greet('Vue', $event)">Greet</button>
+          
+          <!-- Alternative with arrow function -->
+          <button @click="(e) => greet('Vue', e)">Greet</button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="modifiers">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <template>
+          <!-- Stop propagation -->
+          <button @click.stop="handleClick">Click</button>
+          
+          <!-- Prevent default -->
+          <form @submit.prevent="onSubmit">...</form>
+          
+          <!-- Chain modifiers -->
+          <a @click.stop.prevent="doThis">Link</a>
+          
+          <!-- Only trigger once -->
+          <button @click.once="doOnce">Once</button>
+          
+          <!-- Use capture mode -->
+          <div @click.capture="doThis">...</div>
+          
+          <!-- Only if target is the element itself -->
+          <div @click.self="doThat">...</div>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="key">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <template>
+          <!-- Only call when Enter is pressed -->
+          <input @keyup.enter="submit" />
+          
+          <!-- Other key modifiers -->
+          <input @keyup.tab="onTab" />
+          <input @keyup.delete="onDelete" />
+          <input @keyup.esc="onEscape" />
+          <input @keyup.space="onSpace" />
+          
+          <!-- System modifier keys -->
+          <input @keyup.alt.enter="clear" />
+          <div @click.ctrl="doSomething">Ctrl+Click</div>
+          
+          <!-- Exact modifier -->
+          <button @click.ctrl.exact="onCtrlClick">
+            Only Ctrl+Click
+          </button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Conditional Rendering
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>v-if vs v-show</CardTitle>
+    <CardDescription>Choose based on your use case</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-3">
+        <h4 className="font-semibold text-green-600">v-if</h4>
+        <ul className="list-disc list-inside text-sm space-y-1">
+          <li>True conditional rendering</li>
+          <li>Element is destroyed/recreated</li>
+          <li>Higher toggle cost</li>
+          <li>Lazy: initial render skipped if false</li>
+          <li>Best for rare toggle scenarios</li>
+        </ul>
+      </div>
+      <div className="space-y-3">
+        <h4 className="font-semibold text-blue-600">v-show</h4>
+        <ul className="list-disc list-inside text-sm space-y-1">
+          <li>CSS-based toggling (display: none)</li>
+          <li>Element always in DOM</li>
+          <li>Higher initial render cost</li>
+          <li>No lazy rendering</li>
+          <li>Best for frequent toggles</li>
+        </ul>
+      </div>
+    </div>
+  </CardContent>
+</Card>
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+const isLoggedIn = ref(false)
+const userRole = ref('admin')
+const isVisible = ref(true)
+</script>
+
+<template>
+  <!-- v-if / v-else-if / v-else -->
+  <div v-if="isLoggedIn">Welcome back!</div>
+  <div v-else>Please log in</div>
+  
+  <!-- Multiple conditions -->
+  <div v-if="userRole === 'admin'">Admin Panel</div>
+  <div v-else-if="userRole === 'editor'">Editor Panel</div>
+  <div v-else>User Panel</div>
+  
+  <!-- v-if on template (for multiple elements) -->
+  <template v-if="isLoggedIn">
+    <h1>Title</h1>
+    <p>Content</p>
+    <button>Action</button>
+  </template>
+  
+  <!-- v-show -->
+  <div v-show="isVisible">
+    I toggle with CSS display property
+  </div>
+</template>
+```
+
+---
+
+## List Rendering (v-for)
+
+```vue
+<script setup>
+import { ref } from 'vue'
+
+interface User {
+  id: number
+  name: string
+  email: string
+}
+
+const users = ref<User[]>([
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@example.com' },
+  { id: 3, name: 'Charlie', email: 'charlie@example.com' }
+])
+
+const object = ref({
+  title: 'Vue Guide',
+  author: 'Evan You',
+  year: 2024
+})
+</script>
+
+<template>
+  <!-- Array with index -->
+  <ul>
+    <li v-for="(user, index) in users" :key="user.id">
+      {{ index + 1 }}. {{ user.name }} ({{ user.email }})
+    </li>
+  </ul>
+  
+  <!-- Object iteration -->
+  <ul>
+    <li v-for="(value, key, index) in object" :key="key">
+      {{ index }}. {{ key }}: {{ value }}
+    </li>
+  </ul>
+  
+  <!-- Range -->
+  <span v-for="n in 10" :key="n">{{ n }}</span>
+  
+  <!-- With v-if (use template wrapper) -->
+  <template v-for="user in users" :key="user.id">
+    <li v-if="user.isActive">
+      {{ user.name }}
+    </li>
+  </template>
+</template>
+```
+
+<Alert className="my-6">
+  <AlertTitle>⚠️ Key Rule</AlertTitle>
+  <AlertDescription>
+    Always use a unique <code className="font-mono bg-muted px-1 rounded">:key</code> attribute when using <code className="font-mono bg-muted px-1 rounded">v-for</code>. This helps Vue track items and optimize updates.
+  </AlertDescription>
+</Alert>
+
+---
+
+## Two-Way Binding (v-model)
+
+<Tabs defaultValue="basic" className="my-6">
+  <TabsList className="grid w-full grid-cols-4">
+    <TabsTrigger value="basic">Basic</TabsTrigger>
+    <TabsTrigger value="inputs">Inputs</TabsTrigger>
+    <TabsTrigger value="modifiers">Modifiers</TabsTrigger>
+    <TabsTrigger value="custom">Custom</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="basic">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const message = ref('')
+        </script>
+        
+        <template>
+          <input v-model="message" placeholder="Type here" />
+          <p>Message: {{ message }}</p>
+          
+          <!-- v-model is syntactic sugar for: -->
+          <input 
+            :value="message" 
+            @input="message = $event.target.value"
+          />
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="inputs">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup>
+        import { ref } from 'vue'
+        
+        const text = ref('')
+        const multiline = ref('')
+        const checked = ref(false)
+        const picked = ref('A')
+        const selected = ref('')
+        const multiSelected = ref([])
+        </script>
+        
+        <template>
+          <!-- Textarea -->
+          <textarea v-model="multiline"></textarea>
+          
+          <!-- Checkbox -->
+          <input type="checkbox" v-model="checked" />
+          
+          <!-- Radio -->
+          <input type="radio" v-model="picked" value="A" />
+          <input type="radio" v-model="picked" value="B" />
+          
+          <!-- Select -->
+          <select v-model="selected">
+            <option value="">Choose</option>
+            <option value="a">A</option>
+            <option value="b">B</option>
+          </select>
+          
+          <!-- Multiple select -->
+          <select v-model="multiSelected" multiple>
+            <option value="a">A</option>
+            <option value="b">B</option>
+          </select>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="modifiers">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <template>
+          <!-- Sync on change instead of input -->
+          <input v-model.lazy="message" />
+          
+          <!-- Cast to number -->
+          <input v-model.number="age" type="number" />
+          
+          <!-- Trim whitespace -->
+          <input v-model.trim="name" />
+          
+          <!-- Chain modifiers -->
+          <input v-model.trim.lazy="query" />
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  
+  <TabsContent value="custom">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <!-- CustomInput.vue -->
+        <script setup>
+        const model = defineModel<string>()
+        </script>
+        
+        <template>
+          <input 
+            :value="model" 
+            @input="model = $event.target.value"
+          />
+        </template>
+        
+        <!-- Parent usage -->
+        <script setup>
+        import { ref } from 'vue'
+        import CustomInput from './CustomInput.vue'
+        
+        const text = ref('')
+        </script>
+        
+        <template>
+          <CustomInput v-model="text" />
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+---
+
+## Practice Exercise
+
+Create a Todo List component using what you've learned:
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+interface Todo {
+  id: number
+  text: string
+  completed: boolean
+}
+
+// TODO: Implement the logic
+const todos = ref<Todo[]>([])
+const newTodo = ref('')
+const filter = ref<'all' | 'active' | 'completed'>('all')
+
+// Computed property for filtered todos
+const filteredTodos = computed(() => {
+  // Your implementation
+})
+
+// Methods
+function addTodo() {
+  // Your implementation
+}
+
+function removeTodo(id: number) {
+  // Your implementation
+}
+
+function toggleTodo(id: number) {
+  // Your implementation
+}
+</script>
+
+<template>
+  <!-- Your template here -->
+</template>
+```
+
+---
+
+## Next Steps
+
+<Card className="my-6">
+  <CardContent className="pt-6">
+    <p className="text-muted-foreground mb-4">
+      Now that you understand Vue's template syntax, let's learn about components and how to build reusable UI pieces!
+    </p>
+    <div className="flex justify-between items-center pt-4 border-t">
+      <span className="text-muted-foreground">Next Lesson:</span>
+      <span className="font-semibold">Components & Props</span>
+    </div>
+  </CardContent>
+</Card>
+
+<Alert>
+  <AlertTitle>📚 Additional Resources</AlertTitle>
+  <AlertDescription>
+    <ul className="mt-2 space-y-1">
+      <li>• <a href="https://vuejs.org/guide/essentials/template-syntax.html" className="underline">Vue Template Syntax Guide</a></li>
+      <li>• <a href="https://vuejs.org/guide/essentials/reactivity-fundamentals.html" className="underline">Reactivity Fundamentals</a></li>
+      <li>• <a href="https://vuejs.org/guide/essentials/forms.html" className="underline">Form Input Bindings</a></li>
+    </ul>
+  </AlertDescription>
+</Alert>
