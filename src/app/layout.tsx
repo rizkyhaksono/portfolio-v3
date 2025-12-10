@@ -1,25 +1,22 @@
-import type { Metadata } from "next";
-import { Montserrat as FontSans } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/layout/theme-provider";
-import { Toaster } from 'sonner';
+import type { Metadata } from "next"
+import { Montserrat as FontSans } from "next/font/google"
+import { cn } from "@/lib/utils"
+import { ThemeProvider } from "@/components/layout/theme-provider"
+import { Toaster } from "sonner"
 import { Analytics } from "@vercel/analytics/react"
-import { MetadataConstants } from "@/commons/constants/metadata";
+import { MetadataConstants } from "@/commons/constants/metadata"
+import ScrollToTop from "@/components/ui/scroll-to-top"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
-import "./globals.css";
+import "./globals.css"
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-});
+})
 
 export const metadata: Metadata = {
   title: "Rizky Haksono | Software Engineer",
-  metadataBase: new URL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.DOMAIN ?? ""
-  ),
+  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
@@ -40,18 +37,19 @@ export const metadata: Metadata = {
     follow: true,
   },
   abstract: MetadataConstants.description,
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
+          <ScrollToTop />
           <Toaster position="top-right" />
           {/* <div className="hidden sm:block">
             <SmoothCursor />
@@ -59,6 +57,6 @@ export default function RootLayout({
           <Analytics />
         </ThemeProvider>
       </body>
-    </html >
-  );
+    </html>
+  )
 }
