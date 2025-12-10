@@ -1,11 +1,11 @@
 "use client"
 
-import { publicDashboardMenu } from "@/commons/constants/navigation-menu";
-import { MdVerified as VerifiedIcon } from "react-icons/md";
-import Typography from "@/components/ui/typography";
-import { Avatar } from "@/components/ui/avatar";
-import Image from "next/image";
-import SidebarSecondary from "./sidebar-secondary";
+import { publicDashboardMenu } from "@/commons/constants/navigation-menu"
+import { MdVerified as VerifiedIcon } from "react-icons/md"
+import Typography from "@/components/ui/typography"
+import { Avatar } from "@/components/ui/avatar"
+import Image from "next/image"
+import SidebarSecondary from "./sidebar-secondary"
 
 const SidebarMain = () => {
   return (
@@ -29,9 +29,7 @@ const SidebarMain = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500" />
                 <div className="absolute inset-0 w-3 h-3 rounded-full bg-green-500 animate-ping opacity-75" />
               </div>
-              <Typography.P className="text-xs font-medium text-green-600 dark:text-green-400">
-                Online
-              </Typography.P>
+              <Typography.P className="text-xs font-medium text-green-600 dark:text-green-400">Online</Typography.P>
             </div>
             <Typography.P className="text-xs text-primary/55">@nateenese</Typography.P>
           </div>
@@ -39,7 +37,7 @@ const SidebarMain = () => {
       </div>
       <SidebarSecondary menu={publicDashboardMenu} />
     </div>
-  );
-};
+  )
+}
 
-export default SidebarMain;
+export default SidebarMain

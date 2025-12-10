@@ -8,7 +8,7 @@ interface FallbackImageProps extends Omit<ImageProps, "onError"> {
   fallbackClassName?: string
 }
 
-export function FallbackImage({ src, alt, className, fallbackClassName, ...props }: FallbackImageProps) {
+export function FallbackImage({ src, alt, className, fallbackClassName, ...props }: Readonly<FallbackImageProps>) {
   const [hasError, setHasError] = useState(false)
 
   if (hasError || !src) {
