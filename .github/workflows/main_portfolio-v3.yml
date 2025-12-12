@@ -41,19 +41,12 @@ jobs:
         run: |
           npm install
           npm run build
-          # --- FIX START ---
-          # We remove node_modules so Azure installs them fresh.
-          # This prevents the "next: not found" error caused by broken shortcuts.
-          rm -rf node_modules
-          # --- FIX END ---
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
           path: .
-          # Optional: Exclude .git and .github to save space
-          if-no-files-found: error
 
   deploy:
     runs-on: ubuntu-latest
