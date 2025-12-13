@@ -22,7 +22,8 @@ jobs:
 
       - name: Install and build
         env:
-          NODE_ENV: ${{ secrets.NODE_ENV }}
+          # Pastikan semua ENV VARS Anda ada di sini seperti sebelumnya
+          NODE_ENV: production # Wajib set production
           DOMAIN: ${{ secrets.DOMAIN }}
           API_URL: ${{ secrets.API_URL }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -39,14 +40,20 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
-          npm install
+          npm ci
           npm run build
+          
+          # --- LANGKAH PENTING UNTUK STANDALONE ---
+          # Copy folder public ke folder standalone
+          cp -r public .next/standalone/
+          # Copy folder static build ke folder standalone
+          cp -r .next/static .next/standalone/.next/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
-          path: .
+          path: .next/standalone/ # Kita hanya upload hasil build standalone yang ringan
 
   deploy:
     runs-on: ubuntu-latest
@@ -74,3 +81,5 @@ jobs:
           app-name: 'portfolio-v3'
           slot-name: 'Production'
           package: .
+          # Override perintah start default agar menjalankan server.js langsung
+          startup-command: 'node server.js'
