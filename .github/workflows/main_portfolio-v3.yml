@@ -81,5 +81,5 @@ jobs:
           app-name: 'portfolio-v3'
           slot-name: 'Production'
           package: .
-          # Override perintah start default agar menjalankan server.js langsung
-          startup-command: 'node server.js'
+          startup-command: 'node node_modules/next/dist/bin/next start'
+
