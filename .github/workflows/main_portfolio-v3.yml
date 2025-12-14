@@ -18,7 +18,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '24.x'
+          node-version: "24.x"
 
       - name: Install and build
         env:
@@ -42,18 +42,16 @@ jobs:
         run: |
           npm ci
           npm run build
-          
-          # --- LANGKAH PENTING UNTUK STANDALONE ---
-          # Copy folder public ke folder standalone
-          cp -r public .next/standalone/
-          # Copy folder static build ke folder standalone
-          cp -r .next/static .next/standalone/.next/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
-          path: .next/standalone/ # Kita hanya upload hasil build standalone yang ringan
+          path: |
+            .next/
+            public/
+            package.json
+            next.config.ts
 
   deploy:
     runs-on: ubuntu-latest
@@ -78,8 +76,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'portfolio-v3'
-          slot-name: 'Production'
+          app-name: "portfolio-v3"
+          slot-name: "Production"
           package: .
-          startup-command: 'node node_modules/next/dist/bin/next start'
-
+          startup-command: "node node_modules/next/dist/bin/next start"
