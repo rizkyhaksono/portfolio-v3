@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start --port 3001",
+    "start": "node_modules/next/dist/bin/next start --port 3001",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
