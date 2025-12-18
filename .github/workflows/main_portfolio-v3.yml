@@ -18,11 +18,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '24.x'
+          node-version: "24.x"
 
       - name: Install and build
         env:
-          NODE_ENV: ${{ secrets.NODE_ENV }}
+          # Pastikan semua ENV VARS Anda ada di sini seperti sebelumnya
+          NODE_ENV: production # Wajib set production
           DOMAIN: ${{ secrets.DOMAIN }}
           API_URL: ${{ secrets.API_URL }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -39,14 +40,18 @@ jobs:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
-          npm install
+          npm ci
           npm run build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
-          path: .
+          path: |
+            .next/
+            public/
+            package.json
+            next.config.ts
 
   deploy:
     runs-on: ubuntu-latest
@@ -71,6 +76,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'portfolio-v3'
-          slot-name: 'Production'
+          app-name: "portfolio-v3"
+          slot-name: "Production"
           package: .
+          startup-command: "node node_modules/next/dist/bin/next start"
