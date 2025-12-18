@@ -16,12 +16,14 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 ## 🚀 Tech Stack
 
 ### Core Framework
+
 - **[Next.js 16](https://nextjs.org/)** - React framework with App Router
 - **[React 19](https://react.dev/)** - Latest React with Server Components
 - **[TypeScript](https://www.typescriptlang.org/)** - Type-safe development
 - **[Turbopack](https://turbo.build/pack)** - Ultra-fast bundler for development
 
 ### Styling & UI
+
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
 - **[Shadcn/ui](https://ui.shadcn.com/)** - Re-usable components built with Radix UI
 - **[Magic UI](https://magicui.design/)** - Beautiful animated components
@@ -29,25 +31,30 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 - **[Lucide React](https://lucide.dev/)** - Beautiful icon library
 
 ### Backend & Database
+
 - **[Supabase](https://supabase.com/)** - PostgreSQL database and authentication
 - **[Zod](https://zod.dev/)** - TypeScript-first schema validation
 
 ### Forms & Validation
+
 - **[React Hook Form](https://react-hook-form.com/)** - Performant form library
 - **[@hookform/resolvers](https://github.com/react-hook-form/resolvers)** - Validation resolvers
 
 ### Content Management
+
 - **[MDX](https://mdxjs.com/)** - Markdown with JSX components
 - **[gray-matter](https://github.com/jonschlinkert/gray-matter)** - YAML front matter parser
 - **[next-mdx-remote](https://github.com/hashicorp/next-mdx-remote)** - Load MDX content
 - **[highlight.js](https://highlightjs.org/)** - Syntax highlighting
 
 ### Testing
+
 - **[Jest](https://jestjs.io/)** - JavaScript testing framework
 - **[React Testing Library](https://testing-library.com/)** - Component testing
 - **[Playwright](https://playwright.dev/)** - End-to-end testing
 
 ### Developer Experience
+
 - **[ESLint](https://eslint.org/)** - Code linting
 - **[Vercel Analytics](https://vercel.com/analytics)** - Web analytics
 
@@ -111,16 +118,19 @@ portfolio-v3/
 ### Design Patterns
 
 #### Component Architecture
+
 - **Atomic Design**: Components organized from atoms to organisms
 - **Composition over Inheritance**: Flexible component composition
 - **Server & Client Components**: Optimized for React Server Components
 
 #### State Management
+
 - **React Hooks**: useState, useEffect for local state
 - **Server Actions**: Form submissions and mutations
 - **Theme Provider**: Global theme state with next-themes
 
 #### Data Fetching
+
 - **Server Components**: Data fetched on the server by default
 - **Supabase Client**: Direct database queries
 - **API Routes**: RESTful endpoints for external integrations
@@ -128,6 +138,7 @@ portfolio-v3/
 ## ✨ Features
 
 ### Visitor Features
+
 - 🏠 **Portfolio Showcase** - Projects, skills, and experience
 - 📝 **Blog** - Technical blog with MDX support
 - 🌓 **Dark Mode** - System-aware theme switching
@@ -137,6 +148,7 @@ portfolio-v3/
 - 🔍 **SEO Optimized** - Meta tags, sitemap, robots.txt
 
 ### Admin Features
+
 - 🔐 **Authentication** - Supabase Auth with protected routes
 - 📊 **Dashboard** - Analytics and content management
 - ✏️ **Content Editor** - Create and edit blog posts
@@ -144,6 +156,7 @@ portfolio-v3/
 - 💬 **LinkedIn Recommendations** - Display recommendations
 
 ### Developer Features
+
 - 🧪 **Testing Suite** - Unit, component, and E2E tests
 - 📏 **Type Safety** - Full TypeScript coverage
 - 🔄 **Hot Reload** - Instant feedback with Turbopack
@@ -153,6 +166,7 @@ portfolio-v3/
 ## 🛠️ Installation
 
 ### Prerequisites
+
 - Node.js 18+ or Bun
 - npm, yarn, pnpm, or bun
 - Supabase account (for database)
@@ -181,12 +195,14 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
 ### Setup Steps
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/rizkyhaksono/portfolio-v3.git
    cd portfolio-v3
    ```
 
 2. **Install dependencies**
+
    ```bash
    # Using npm
    npm install
@@ -196,17 +212,20 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your values
    ```
 
 4. **Run database migrations** (if applicable)
+
    ```bash
    # Follow Supabase documentation for migrations
    ```
 
 5. **Start development server**
+
    ```bash
    npm run dev
    # or
@@ -259,21 +278,292 @@ npm run test:e2e:debug
 - ✅ Page navigation and routing
 - ✅ Theme switching functionality
 
-For detailed testing documentation, see [__tests__/README.md](./__tests__/README.md).
+For detailed testing documentation, see [**tests**/README.md](./__tests__/README.md).
+
+## 🔌 API Endpoints
+
+### Public Endpoints
+
+#### GET `/api/ping`
+
+Health check endpoint to verify server status.
+
+**Response:**
+
+```json
+{
+  "timestamp": "2025-12-16T10:30:00Z",
+  "status": "ok",
+  "uptime": 3600
+}
+```
+
+#### GET `/api/spotify`
+
+Fetch current Spotify playback information (requires Spotify API setup).
+
+**Response:**
+
+```json
+{
+  "isPlaying": true,
+  "title": "Song Name",
+  "artist": "Artist Name",
+  "album": "Album Name",
+  "albumArt": "https://...",
+  "url": "https://open.spotify.com/track/..."
+}
+```
+
+**Setup Required:**
+
+- Spotify Client ID & Client Secret
+- Add to environment variables: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
+
+#### GET `/api/weather`
+
+Fetch weather information (requires weather API setup).
+
+**Response:**
+
+```json
+{
+  "temperature": 25,
+  "condition": "Partly Cloudy",
+  "humidity": 65,
+  "windSpeed": 12,
+  "location": "City Name"
+}
+```
+
+**Setup Required:**
+
+- Add weather API credentials to environment variables
+
+## 📁 Service Layer
+
+The service layer is organized by role/context:
+
+### `/src/services/visitor/`
+
+Public-facing services:
+
+- **ping.ts** - Server health check
+- **spotify.ts** - Spotify integration
+- **weather.ts** - Weather data fetching
+
+### `/src/services/user/`
+
+User-authenticated services for logged-in users.
+
+### `/src/services/admin/`
+
+Admin-only services for dashboard and content management.
+
+## 🗄️ Database Schema
+
+### Supabase Tables
+
+The project uses Supabase PostgreSQL. Key tables include:
+
+**Example User Table:**
+
+```sql
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  display_name TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Example Visitor Tracking Table:**
+
+```sql
+CREATE TABLE page_views (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id),
+  page_path TEXT NOT NULL,
+  referrer TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+For your specific schema, check Supabase dashboard or migration files.
+
+## 🛠️ Development Guidelines
+
+### Code Style
+
+- **TypeScript**: Strict mode enabled - utilize full type safety
+- **File Naming**: Use kebab-case for files (e.g., `my-component.tsx`)
+- **Components**: Use PascalCase for component names
+- **Utilities**: Use camelCase for function/variable names
+
+### Component Guidelines
+
+1. **Folder Structure**:
+
+   ```
+   components/category/
+   ├── component-name.tsx       # Component file
+   ├── component-name.test.tsx  # Tests
+   └── index.ts                 # Named export
+   ```
+
+2. **Server vs Client Components**:
+
+   - Default to Server Components unless you need interactivity
+   - Use `'use client'` directive only when necessary
+   - Minimize client component boundaries
+
+3. **Props & Typing**:
+
+   ```typescript
+   interface ComponentProps {
+     title: string
+     isActive?: boolean
+     children: React.ReactNode
+   }
+
+   export function MyComponent({ title, isActive, children }: ComponentProps) {
+     return <div>{children}</div>
+   }
+   ```
+
+### Styling
+
+- Use Tailwind CSS utility classes
+- Create custom styles in `globals.css` only when necessary
+- Leverage Shadcn/ui components for consistency
+- Use CSS modules for scoped styles if needed: `styles.module.css`
+
+### Error Handling
+
+- Use Zod for schema validation
+- Create typed error responses
+- Log errors to monitoring service (Sentry, etc.)
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Port Already in Use
+
+```bash
+# Kill process on port 3000
+# Windows
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+
+# macOS/Linux
+lsof -i :3000
+kill -9 <PID>
+```
+
+#### Supabase Connection Issues
+
+- Verify `.env` variables are set correctly
+- Check Supabase project is active
+- Ensure Row Level Security (RLS) policies allow your queries
+
+#### Build Errors
+
+```bash
+# Clear build cache
+rm -rf .next
+npm run build
+```
+
+#### Tests Failing
+
+```bash
+# Clear Jest cache
+npm run test -- --clearCache
+
+# Run tests with verbose output
+npm run test -- --verbose
+```
+
+### Hot Reload Not Working
+
+- Check if Turbopack is running: `next dev --turbopack`
+- Restart dev server
+- Clear browser cache
+
+## 📊 Performance Optimization
+
+### Image Optimization
+
+- Use Next.js `Image` component for automatic optimization
+- Specify `width` and `height` props
+- Use `priority` prop for above-the-fold images
+
+### Code Splitting
+
+- Next.js automatically code-splits at route level
+- Use dynamic imports for heavy components:
+  ```typescript
+  import dynamic from "next/dynamic"
+  const HeavyComponent = dynamic(() => import("./HeavyComponent"))
+  ```
+
+### Database Queries
+
+- Use Supabase indexes for frequently queried columns
+- Implement pagination for large result sets
+- Consider caching strategies with `revalidate` options
+
+## 🔒 Security Considerations
+
+### Environment Variables
+
+- **Public Variables**: Use `NEXT_PUBLIC_` prefix only for truly public data
+- **Secret Variables**: Keep database credentials, API keys secure
+- Never commit `.env` files
+
+### Authentication
+
+- Use Supabase Auth for user management
+- Implement RLS (Row Level Security) policies
+- Validate all form inputs with Zod
+
+### API Routes
+
+- Validate request data
+- Check user authentication/authorization
+- Rate-limit sensitive endpoints using the helper in `commons/helpers/rate-limit.ts`
+
+## 📈 Monitoring & Analytics
+
+### Vercel Analytics
+
+- Automatically enabled in production on Vercel
+- Monitor Web Vitals, user interactions
+- View dashboard at vercel.com
+
+### Custom Tracking
+
+- Implement tracking in `src/commons/helpers/`
+- Log important events to database
+- Track page views in `api/` routes
 
 ## 📜 Available Scripts
 
 ```json
 {
-  "dev": "next dev --turbopack",          // Start development server with Turbopack
-  "build": "next build",                   // Build for production
-  "start": "next start --port 3001",       // Start production server
-  "lint": "next lint",                     // Run ESLint
-  "test": "jest",                          // Run unit tests
-  "test:watch": "jest --watch",            // Run tests in watch mode
-  "test:coverage": "jest --coverage",      // Generate coverage report
-  "test:e2e": "playwright test",           // Run E2E tests
-  "test:e2e:ui": "playwright test --ui",   // Run E2E with UI
+  "dev": "next dev --turbopack", // Start development server with Turbopack
+  "build": "next build", // Build for production
+  "start": "next start --port 3001", // Start production server
+  "lint": "next lint", // Run ESLint
+  "test": "jest", // Run unit tests
+  "test:watch": "jest --watch", // Run tests in watch mode
+  "test:coverage": "jest --coverage", // Generate coverage report
+  "test:e2e": "playwright test", // Run E2E tests
+  "test:e2e:ui": "playwright test --ui", // Run E2E with UI
   "test:e2e:debug": "playwright test --debug" // Debug E2E tests
 }
 ```
@@ -290,6 +580,7 @@ For detailed testing documentation, see [__tests__/README.md](./__tests__/README
 ### Other Platforms
 
 This project can be deployed to any platform that supports Next.js:
+
 - **Netlify**
 - **Railway**
 - **AWS Amplify**
