@@ -22,9 +22,7 @@ Before you can start building with React, you need to set up your development en
 <Alert className="my-6">
   <Download className="h-4 w-4" />
   <AlertTitle>Prerequisites</AlertTitle>
-  <AlertDescription>
-    You'll need a code editor (we recommend VS Code) and a modern web browser (Chrome, Firefox, or Edge).
-  </AlertDescription>
+  <AlertDescription>You'll need a code editor (we recommend VS Code) and a modern web browser (Chrome, Firefox, or Edge).</AlertDescription>
 </Alert>
 
 ## Installing Node.js and npm
@@ -41,7 +39,7 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
     <TabsTrigger value="macos">macOS</TabsTrigger>
     <TabsTrigger value="linux">Linux</TabsTrigger>
   </TabsList>
-  
+
   <TabsContent value="windows">
     <Card>
       <CardContent className="pt-6">
@@ -51,13 +49,14 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
           <li>Verify installation by opening Command Prompt and running:</li>
         </ol>
         <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
       </CardContent>
     </Card>
   </TabsContent>
-  
+
   <TabsContent value="macos">
     <Card>
       <CardContent className="pt-6">
@@ -67,7 +66,8 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
           <li>Verify installation by opening Terminal and running:</li>
         </ol>
         <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
         <Alert className="mt-4">
@@ -79,18 +79,19 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
       </CardContent>
     </Card>
   </TabsContent>
-  
+
   <TabsContent value="linux">
     <Card>
       <CardContent className="pt-6">
         <p className="mb-4">For Ubuntu/Debian:</p>
         <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br/>
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br />
           sudo apt-get install -y nodejs
         </div>
         <p className="mb-2">Verify installation:</p>
         <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
       </CardContent>
@@ -122,8 +123,7 @@ npm run dev
   </CardHeader>
   <CardContent className="text-green-800 dark:text-green-200">
     <p>
-      Your React app should now be running at <code className="font-mono">http://localhost:5173</code>. 
-      Open it in your browser to see your first React application!
+      Your React app should now be running at <code className="font-mono">http://localhost:5173</code>. Open it in your browser to see your first React application!
     </p>
   </CardContent>
 </Card>
@@ -186,25 +186,9 @@ my-react-app/
 ## Video Tutorial
 
 <div className="relative aspect-video my-8 rounded-lg overflow-hidden">
-  <iframe
-    className="w-full h-full"
-    src={frontmatter.videoUrl}
-    title="Setting Up Your Environment"
-    frameBorder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  />
+  <iframe className="w-full h-full" src={frontmatter.videoUrl} title="Setting Up Your Environment" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
 </div>
 
 ## Next Steps
 
-With your development environment set up, you're ready to learn about JSX syntax and start writing React components!
-
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="flex justify-between items-center">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">JSX Syntax</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson title="JSX Syntax" description="With your development environment set up, you're ready to learn about JSX syntax and start writing React components!" href="/roadmap/react-fundamentals-jsx-and-components" />

@@ -47,29 +47,23 @@ Vue.js is a progressive JavaScript framework for building user interfaces. Unlik
       <Zap className="h-8 w-8 mx-auto text-yellow-500" />
       <CardTitle className="text-lg">Approachable</CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Builds on standard HTML, CSS, and JavaScript with intuitive API
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Builds on standard HTML, CSS, and JavaScript with intuitive API</CardContent>
   </Card>
-  
+
   <Card className="text-center">
     <CardHeader>
       <Code2 className="h-8 w-8 mx-auto text-blue-500" />
       <CardTitle className="text-lg">Versatile</CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Incrementally adoptable ecosystem scales between a library and full framework
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Incrementally adoptable ecosystem scales between a library and full framework</CardContent>
   </Card>
-  
+
   <Card className="text-center">
     <CardHeader>
       <Heart className="h-8 w-8 mx-auto text-red-500" />
       <CardTitle className="text-lg">Performant</CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Truly reactive, compiler-optimized rendering with minimal manual optimization
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Truly reactive, compiler-optimized rendering with minimal manual optimization</CardContent>
   </Card>
 </div>
 
@@ -83,9 +77,9 @@ Every Vue application starts by creating a new Vue instance:
 
 ```vue
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
 
-const message = ref('Hello Vue!')
+const message = ref("Hello Vue!")
 </script>
 
 <template>
@@ -104,9 +98,7 @@ h1 {
 <Alert className="my-6">
   <Lightbulb className="h-4 w-4" />
   <AlertTitle>Single-File Components (SFC)</AlertTitle>
-  <AlertDescription>
-    Vue uses `.vue` files that encapsulate template, logic, and styles in a single file. This is one of Vue's most beloved features!
-  </AlertDescription>
+  <AlertDescription>Vue uses `.vue` files that encapsulate template, logic, and styles in a single file. This is one of Vue's most beloved features!</AlertDescription>
 </Alert>
 
 ### Reactivity System
@@ -264,12 +256,24 @@ Vue's reactivity system is at the heart of the framework. It automatically track
     <AccordionTrigger>✅ Vue is Great For</AccordionTrigger>
     <AccordionContent className="space-y-2">
       <ul className="list-disc pl-4 space-y-2">
-        <li><strong>Progressive Enhancement</strong> — Adding interactivity to existing pages</li>
-        <li><strong>Single Page Applications</strong> — Full-featured SPAs with Vue Router</li>
-        <li><strong>Server-Side Rendering</strong> — Using Nuxt.js for SSR/SSG</li>
-        <li><strong>Mobile Apps</strong> — Cross-platform with Vue Native or Capacitor</li>
-        <li><strong>Desktop Apps</strong> — Using Electron with Vue</li>
-        <li><strong>Rapid Prototyping</strong> — Quick to set up and iterate</li>
+        <li>
+          <strong>Progressive Enhancement</strong> — Adding interactivity to existing pages
+        </li>
+        <li>
+          <strong>Single Page Applications</strong> — Full-featured SPAs with Vue Router
+        </li>
+        <li>
+          <strong>Server-Side Rendering</strong> — Using Nuxt.js for SSR/SSG
+        </li>
+        <li>
+          <strong>Mobile Apps</strong> — Cross-platform with Vue Native or Capacitor
+        </li>
+        <li>
+          <strong>Desktop Apps</strong> — Using Electron with Vue
+        </li>
+        <li>
+          <strong>Rapid Prototyping</strong> — Quick to set up and iterate
+        </li>
       </ul>
     </AccordionContent>
   </AccordionItem>
@@ -277,12 +281,24 @@ Vue's reactivity system is at the heart of the framework. It automatically track
     <AccordionTrigger>🔧 Vue Ecosystem</AccordionTrigger>
     <AccordionContent className="space-y-2">
       <ul className="list-disc pl-4 space-y-2">
-        <li><strong>Vue Router</strong> — Official routing library</li>
-        <li><strong>Pinia</strong> — Modern state management (official recommendation)</li>
-        <li><strong>Nuxt.js</strong> — Full-stack framework with SSR, SSG, and more</li>
-        <li><strong>Vite</strong> — Lightning-fast build tool (created by Vue author)</li>
-        <li><strong>VueUse</strong> — Collection of essential composition utilities</li>
-        <li><strong>Vuetify/PrimeVue</strong> — UI component libraries</li>
+        <li>
+          <strong>Vue Router</strong> — Official routing library
+        </li>
+        <li>
+          <strong>Pinia</strong> — Modern state management (official recommendation)
+        </li>
+        <li>
+          <strong>Nuxt.js</strong> — Full-stack framework with SSR, SSG, and more
+        </li>
+        <li>
+          <strong>Vite</strong> — Lightning-fast build tool (created by Vue author)
+        </li>
+        <li>
+          <strong>VueUse</strong> — Collection of essential composition utilities
+        </li>
+        <li>
+          <strong>Vuetify/PrimeVue</strong> — UI component libraries
+        </li>
       </ul>
     </AccordionContent>
   </AccordionItem>
@@ -296,7 +312,7 @@ Here's a complete Vue 3 component showcasing the basics:
 
 ```vue
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from "vue"
 
 interface Todo {
   id: number
@@ -305,56 +321,46 @@ interface Todo {
 }
 
 const todos = ref<Todo[]>([])
-const newTodo = ref('')
+const newTodo = ref("")
 
-const completedCount = computed(() => 
-  todos.value.filter(t => t.completed).length
-)
+const completedCount = computed(() => todos.value.filter((t) => t.completed).length)
 
 function addTodo() {
   if (newTodo.value.trim()) {
     todos.value.push({
       id: Date.now(),
       text: newTodo.value,
-      completed: false
+      completed: false,
     })
-    newTodo.value = ''
+    newTodo.value = ""
   }
 }
 
 function toggleTodo(id: number) {
-  const todo = todos.value.find(t => t.id === id)
+  const todo = todos.value.find((t) => t.id === id)
   if (todo) todo.completed = !todo.completed
 }
 
 onMounted(() => {
-  console.log('Component mounted!')
+  console.log("Component mounted!")
 })
 </script>
 
 <template>
   <div class="todo-app">
     <h1>Vue Todo App</h1>
-    
+
     <form @submit.prevent="addTodo">
-      <input 
-        v-model="newTodo" 
-        placeholder="Add a todo..."
-      />
+      <input v-model="newTodo" placeholder="Add a todo..." />
       <button type="submit">Add</button>
     </form>
-    
+
     <ul>
-      <li 
-        v-for="todo in todos" 
-        :key="todo.id"
-        :class="{ completed: todo.completed }"
-        @click="toggleTodo(todo.id)"
-      >
+      <li v-for="todo in todos" :key="todo.id" :class="{ completed: todo.completed }" @click="toggleTodo(todo.id)">
         {{ todo.text }}
       </li>
     </ul>
-    
+
     <p>Completed: {{ completedCount }} / {{ todos.length }}</p>
   </div>
 </template>
@@ -371,31 +377,16 @@ onMounted(() => {
 
 ## Next Steps
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <BookOpen className="h-5 w-5" />
-      Continue Learning
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <p className="text-muted-foreground mb-4">
-      Now that you understand what Vue.js is, let's set up your development environment and create your first Vue application!
-    </p>
-    <div className="flex justify-between items-center pt-4 border-t">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Setting Up Vue Development Environment</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson
+  title="Setting Up Vue Development Environment"
+  description="Now that you understand what Vue.js is, let's set up your development environment and create your first Vue application!"
+  href="/roadmap/vue-fundamentals-setup-environment"
+/>
 
-<Alert>
-  <AlertTitle>📚 Additional Resources</AlertTitle>
-  <AlertDescription>
-    <ul className="mt-2 space-y-1">
-      <li>• <a href="https://vuejs.org/guide/introduction.html" className="underline">Official Vue.js Guide</a></li>
-      <li>• <a href="https://vuejs.org/tutorial/" className="underline">Interactive Vue Tutorial</a></li>
-      <li>• <a href="https://vuejs.org/examples/" className="underline">Vue.js Examples</a></li>
-    </ul>
-  </AlertDescription>
-</Alert>
+<Resources
+  resources={[
+    { title: "Official Vue.js Guide", href: "https://vuejs.org/guide/introduction.html" },
+    { title: "Interactive Vue Tutorial", href: "https://vuejs.org/tutorial/" },
+    { title: "Vue.js Examples", href: "https://vuejs.org/examples/" },
+  ]}
+/>

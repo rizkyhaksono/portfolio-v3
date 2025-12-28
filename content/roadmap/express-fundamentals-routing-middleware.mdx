@@ -47,42 +47,42 @@ The Express Router is a mini Express application capable of handling routes and 
 
 ```javascript
 // routes/products.js
-const express = require('express');
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
 // All routes here are relative to /api/products
-router.get('/', (req, res) => {
-  res.json({ message: 'Get all products' });
-});
+router.get("/", (req, res) => {
+  res.json({ message: "Get all products" })
+})
 
-router.get('/:id', (req, res) => {
-  res.json({ message: `Get product ${req.params.id}` });
-});
+router.get("/:id", (req, res) => {
+  res.json({ message: `Get product ${req.params.id}` })
+})
 
-router.post('/', (req, res) => {
-  res.status(201).json({ message: 'Create product' });
-});
+router.post("/", (req, res) => {
+  res.status(201).json({ message: "Create product" })
+})
 
-module.exports = router;
+module.exports = router
 ```
 
 ### Mounting Routers
 
 ```javascript
 // app.js
-const express = require('express');
-const productsRouter = require('./routes/products');
-const usersRouter = require('./routes/users');
-const ordersRouter = require('./routes/orders');
+const express = require("express")
+const productsRouter = require("./routes/products")
+const usersRouter = require("./routes/users")
+const ordersRouter = require("./routes/orders")
 
-const app = express();
+const app = express()
 
 // Mount routers with prefixes
-app.use('/api/products', productsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/orders', ordersRouter);
+app.use("/api/products", productsRouter)
+app.use("/api/users", usersRouter)
+app.use("/api/orders", ordersRouter)
 
-module.exports = app;
+module.exports = app
 ```
 
 ---
@@ -114,6 +114,7 @@ module.exports = app;
         ```
       </CardContent>
     </Card>
+
   </TabsContent>
   
   <TabsContent value="multiple">
@@ -140,6 +141,7 @@ module.exports = app;
         ```
       </CardContent>
     </Card>
+
   </TabsContent>
   
   <TabsContent value="optional">
@@ -171,6 +173,7 @@ module.exports = app;
         ```
       </CardContent>
     </Card>
+
   </TabsContent>
 </Tabs>
 
@@ -183,27 +186,21 @@ Query strings are used for filtering, pagination, and search:
 ```javascript
 // GET /api/products?category=electronics&sort=price&order=desc&page=1&limit=10
 
-app.get('/api/products', (req, res) => {
-  const {
-    category,
-    sort = 'createdAt',
-    order = 'asc',
-    page = 1,
-    limit = 10
-  } = req.query;
+app.get("/api/products", (req, res) => {
+  const { category, sort = "createdAt", order = "asc", page = 1, limit = 10 } = req.query
 
   console.log({
-    category,     // 'electronics'
-    sort,         // 'price'
-    order,        // 'desc'
-    page,         // '1' (string!)
-    limit         // '10' (string!)
-  });
+    category, // 'electronics'
+    sort, // 'price'
+    order, // 'desc'
+    page, // '1' (string!)
+    limit, // '10' (string!)
+  })
 
   // Convert to numbers
-  const pageNum = parseInt(page, 10);
-  const limitNum = parseInt(limit, 10);
-  const skip = (pageNum - 1) * limitNum;
+  const pageNum = parseInt(page, 10)
+  const limitNum = parseInt(limit, 10)
+  const skip = (pageNum - 1) * limitNum
 
   // Build query...
   res.json({
@@ -211,18 +208,16 @@ app.get('/api/products', (req, res) => {
     pagination: {
       page: pageNum,
       limit: limitNum,
-      total: 100
-    }
-  });
-});
+      total: 100,
+    },
+  })
+})
 ```
 
 <Alert className="my-6">
   <Lightbulb className="h-4 w-4" />
   <AlertTitle>Important</AlertTitle>
-  <AlertDescription>
-    Query string values are always strings! Remember to parse numbers with parseInt() or parseFloat().
-  </AlertDescription>
+  <AlertDescription>Query string values are always strings! Remember to parse numbers with parseInt() or parseFloat().</AlertDescription>
 </Alert>
 
 ---
@@ -230,6 +225,7 @@ app.get('/api/products', (req, res) => {
 ## Middleware Deep Dive
 
 Middleware functions are the heart of Express. They execute in the order they're defined and can:
+
 - Execute code
 - Modify request and response objects
 - End the request-response cycle
@@ -264,6 +260,7 @@ Middleware functions are the heart of Express. They execute in the order they're
       });
       ```
     </AccordionContent>
+
   </AccordionItem>
   
   <AccordionItem value="router">
@@ -280,7 +277,7 @@ Middleware functions are the heart of Express. They execute in the order they're
       });
 
       // Specific to a route
-      router.get('/profile', 
+      router.get('/profile',
         authenticateUser, // middleware
         authorizeUser,    // middleware
         (req, res) => {   // handler
@@ -289,6 +286,7 @@ Middleware functions are the heart of Express. They execute in the order they're
       );
       ```
     </AccordionContent>
+
   </AccordionItem>
   
   <AccordionItem value="error">
@@ -333,6 +331,7 @@ Middleware functions are the heart of Express. They execute in the order they're
       });
       ```
     </AccordionContent>
+
   </AccordionItem>
   
   <AccordionItem value="builtin">
@@ -353,6 +352,7 @@ Middleware functions are the heart of Express. They execute in the order they're
       app.use('/assets', express.static('public'));
       ```
     </AccordionContent>
+
   </AccordionItem>
 </Accordion>
 
@@ -364,39 +364,39 @@ Middleware functions are the heart of Express. They execute in the order they're
 
 ```javascript
 // middleware/auth.js
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken")
 
 const authenticate = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'No token provided' });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No token provided" })
   }
 
-  const token = authHeader.split(' ')[1];
+  const token = authHeader.split(" ")[1]
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = decoded
+    next()
   } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+    return res.status(401).json({ error: "Invalid token" })
   }
-};
+}
 
 // Role-based authorization
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ 
-        error: 'Not authorized to access this resource' 
-      });
+      return res.status(403).json({
+        error: "Not authorized to access this resource",
+      })
     }
-    next();
-  };
-};
+    next()
+  }
+}
 
-module.exports = { authenticate, authorize };
+module.exports = { authenticate, authorize }
 ```
 
 ### Request Validation Middleware
@@ -405,33 +405,30 @@ module.exports = { authenticate, authorize };
 // middleware/validate.js
 const validateBody = (schema) => {
   return (req, res, next) => {
-    const { error, value } = schema.validate(req.body);
-    
+    const { error, value } = schema.validate(req.body)
+
     if (error) {
       return res.status(400).json({
-        error: 'Validation error',
-        details: error.details.map(d => d.message)
-      });
+        error: "Validation error",
+        details: error.details.map((d) => d.message),
+      })
     }
-    
-    req.body = value; // Use validated/sanitized data
-    next();
-  };
-};
+
+    req.body = value // Use validated/sanitized data
+    next()
+  }
+}
 
 // Usage with Joi
-const Joi = require('joi');
+const Joi = require("joi")
 
 const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(8).required()
-});
+  password: Joi.string().min(8).required(),
+})
 
-router.post('/users', 
-  validateBody(createUserSchema),
-  usersController.create
-);
+router.post("/users", validateBody(createUserSchema), usersController.create)
 ```
 
 ### Rate Limiting Middleware
@@ -439,41 +436,40 @@ router.post('/users',
 ```javascript
 // middleware/rateLimit.js
 const rateLimit = (options = {}) => {
-  const { 
+  const {
     windowMs = 60000, // 1 minute
-    max = 100,        // requests per window
-    message = 'Too many requests'
-  } = options;
+    max = 100, // requests per window
+    message = "Too many requests",
+  } = options
 
-  const requests = new Map();
+  const requests = new Map()
 
   return (req, res, next) => {
-    const key = req.ip;
-    const now = Date.now();
-    
+    const key = req.ip
+    const now = Date.now()
+
     // Clean old entries
-    const windowStart = now - windowMs;
-    
+    const windowStart = now - windowMs
+
     if (!requests.has(key)) {
-      requests.set(key, []);
+      requests.set(key, [])
     }
-    
-    const userRequests = requests.get(key)
-      .filter(time => time > windowStart);
-    
+
+    const userRequests = requests.get(key).filter((time) => time > windowStart)
+
     if (userRequests.length >= max) {
-      return res.status(429).json({ error: message });
+      return res.status(429).json({ error: message })
     }
-    
-    userRequests.push(now);
-    requests.set(key, userRequests);
-    
-    next();
-  };
-};
+
+    userRequests.push(now)
+    requests.set(key, userRequests)
+
+    next()
+  }
+}
 
 // Usage
-app.use('/api', rateLimit({ max: 100, windowMs: 60000 }));
+app.use("/api", rateLimit({ max: 100, windowMs: 60000 }))
 ```
 
 ---
@@ -509,6 +505,7 @@ app.use('/api', rateLimit({ max: 100, windowMs: 60000 }));
       res.status(500).json({ error: err.message });
     });
     ```
+
   </CardContent>
 </Card>
 
@@ -520,25 +517,15 @@ Express allows you to chain route handlers:
 
 ```javascript
 // Method 1: Multiple callbacks
-app.get('/users/:id',
-  validateParams,
-  authenticate,
-  authorize('admin'),
-  async (req, res) => {
-    // All middleware passed!
-    res.json(user);
-  }
-);
+app.get("/users/:id", validateParams, authenticate, authorize("admin"), async (req, res) => {
+  // All middleware passed!
+  res.json(user)
+})
 
 // Method 2: router.route() for same path, different methods
-router.route('/users')
-  .get(getUsers)
-  .post(validateBody(userSchema), createUser);
+router.route("/users").get(getUsers).post(validateBody(userSchema), createUser)
 
-router.route('/users/:id')
-  .get(getUser)
-  .patch(validateBody(updateSchema), updateUser)
-  .delete(authorize('admin'), deleteUser);
+router.route("/users/:id").get(getUser).patch(validateBody(updateSchema), updateUser).delete(authorize("admin"), deleteUser)
 ```
 
 ---
@@ -551,12 +538,24 @@ router.route('/users/:id')
   </CardHeader>
   <CardContent className="text-green-800 dark:text-green-200">
     <ol className="list-decimal list-inside space-y-2">
-      <li><strong>Keep routes organized</strong> — Group related routes in separate files</li>
-      <li><strong>Use async/await with try-catch</strong> — Or use an async handler wrapper</li>
-      <li><strong>Validate input early</strong> — Use validation middleware before handlers</li>
-      <li><strong>Keep middleware focused</strong> — One middleware, one responsibility</li>
-      <li><strong>Order matters</strong> — Error handlers must be last</li>
-      <li><strong>Use meaningful HTTP status codes</strong> — 200, 201, 400, 401, 403, 404, 500</li>
+      <li>
+        <strong>Keep routes organized</strong> — Group related routes in separate files
+      </li>
+      <li>
+        <strong>Use async/await with try-catch</strong> — Or use an async handler wrapper
+      </li>
+      <li>
+        <strong>Validate input early</strong> — Use validation middleware before handlers
+      </li>
+      <li>
+        <strong>Keep middleware focused</strong> — One middleware, one responsibility
+      </li>
+      <li>
+        <strong>Order matters</strong> — Error handlers must be last
+      </li>
+      <li>
+        <strong>Use meaningful HTTP status codes</strong> — 200, 201, 400, 401, 403, 404, 500
+      </li>
     </ol>
   </CardContent>
 </Card>
@@ -565,31 +564,12 @@ router.route('/users/:id')
 
 ## Next Steps
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <BookOpen className="h-5 w-5" />
-      Continue Learning
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <p className="text-muted-foreground mb-4">
-      Now that you understand routing and middleware, let's connect to a database and build real CRUD operations!
-    </p>
-    <div className="flex justify-between items-center pt-4 border-t">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Database Integration with MongoDB/PostgreSQL</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson title="Database Integration with MongoDB/PostgreSQL" description="Now that you understand routing and middleware, let's connect to a database and build real CRUD operations!" />
 
-<Alert>
-  <AlertTitle>📚 Additional Resources</AlertTitle>
-  <AlertDescription>
-    <ul className="mt-2 space-y-1">
-      <li>• <a href="https://expressjs.com/en/guide/routing.html" className="underline">Express Routing Guide</a></li>
-      <li>• <a href="https://expressjs.com/en/guide/using-middleware.html" className="underline">Using Middleware</a></li>
-      <li>• <a href="https://expressjs.com/en/guide/error-handling.html" className="underline">Error Handling</a></li>
-    </ul>
-  </AlertDescription>
-</Alert>
+<Resources
+  resources={[
+    { title: "Express Routing Guide", href: "https://expressjs.com/en/guide/routing.html" },
+    { title: "Using Middleware", href: "https://expressjs.com/en/guide/using-middleware.html" },
+    { title: "Error Handling", href: "https://expressjs.com/en/guide/error-handling.html" },
+  ]}
+/>

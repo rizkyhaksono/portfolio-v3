@@ -22,9 +22,7 @@ JSX (JavaScript XML) is a syntax extension for JavaScript that looks similar to 
 
 <Alert>
   <AlertTitle>💡 Key Concept</AlertTitle>
-  <AlertDescription>
-    JSX is not a string or HTML—it's a syntax that gets compiled to regular JavaScript function calls.
-  </AlertDescription>
+  <AlertDescription>JSX is not a string or HTML—it's a syntax that gets compiled to regular JavaScript function calls.</AlertDescription>
 </Alert>
 
 ### Why Use JSX?
@@ -34,10 +32,8 @@ JSX (JavaScript XML) is a syntax extension for JavaScript that looks similar to 
     <CardTitle>Benefits of JSX</CardTitle>
   </CardHeader>
   <CardContent>
-    - **Familiar Syntax**: Looks like HTML, easy to read and write
-    - **Type Safety**: Can be statically analyzed with TypeScript
-    - **Prevents Injection Attacks**: Escapes values by default
-    - **JavaScript Power**: Use variables, expressions, and functions
+    - **Familiar Syntax**: Looks like HTML, easy to read and write - **Type Safety**: Can be statically analyzed with TypeScript - **Prevents Injection Attacks**: Escapes values by default - **JavaScript Power**: Use variables, expressions,
+    and functions
   </CardContent>
 </Card>
 
@@ -48,8 +44,8 @@ JSX (JavaScript XML) is a syntax extension for JavaScript that looks similar to 
 You can embed any JavaScript expression in JSX by wrapping it in curly braces:
 
 ```jsx
-const name = "React Developer";
-const greeting = <h1>Hello, {name}!</h1>;
+const name = "React Developer"
+const greeting = <h1>Hello, {name}!</h1>
 
 // You can use any expression
 const element = (
@@ -57,7 +53,7 @@ const element = (
     <h1>2 + 2 = {2 + 2}</h1>
     <p>Current time: {new Date().toLocaleTimeString()}</p>
   </div>
-);
+)
 ```
 
 ### JSX Attributes
@@ -118,22 +114,22 @@ The modern way to create React components:
 
 ```tsx
 function Welcome(props) {
-  return <h1>Hello, {props.name}</h1>;
+  return <h1>Hello, {props.name}</h1>
 }
 
 // Arrow function syntax
 const Welcome = ({ name }) => {
-  return <h1>Hello, {name}</h1>;
-};
+  return <h1>Hello, {name}</h1>
+}
 
 // With TypeScript
 interface WelcomeProps {
-  name: string;
+  name: string
 }
 
 const Welcome: React.FC<WelcomeProps> = ({ name }) => {
-  return <h1>Hello, {name}</h1>;
-};
+  return <h1>Hello, {name}</h1>
+}
 ```
 
 ### Component Composition
@@ -142,13 +138,7 @@ Build complex UIs by composing smaller components:
 
 ```tsx
 function Avatar({ user }) {
-  return (
-    <img
-      src={user.avatarUrl}
-      alt={user.name}
-      className="rounded-full"
-    />
-  );
+  return <img src={user.avatarUrl} alt={user.name} className="rounded-full" />
 }
 
 function UserInfo({ user }) {
@@ -160,7 +150,7 @@ function UserInfo({ user }) {
         <p>{user.email}</p>
       </div>
     </div>
-  );
+  )
 }
 
 function UserCard({ user }) {
@@ -169,7 +159,7 @@ function UserCard({ user }) {
       <UserInfo user={user} />
       <button>Follow</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -257,17 +247,15 @@ function UserCard({ user }) {
     <CardTitle>✅ Component Best Practices</CardTitle>
   </CardHeader>
   <CardContent>
-    1. **Keep components small and focused** - One component, one responsibility
-    2. **Use meaningful names** - Component names should be descriptive
-    3. **Validate props** - Use TypeScript or PropTypes
-    4. **Avoid deep nesting** - Extract nested components
-    5. **Use composition over inheritance** - Compose smaller components
+    1. **Keep components small and focused** - One component, one responsibility 2. **Use meaningful names** - Component names should be descriptive 3. **Validate props** - Use TypeScript or PropTypes 4. **Avoid deep nesting** - Extract
+    nested components 5. **Use composition over inheritance** - Compose smaller components
   </CardContent>
 </Card>
 
 ## Practice Exercise
 
 Try creating a `ProfileCard` component that displays:
+
 - User avatar
 - User name and bio
 - Social media links
@@ -275,13 +263,13 @@ Try creating a `ProfileCard` component that displays:
 
 ```tsx
 interface User {
-  name: string;
-  bio: string;
-  avatar: string;
+  name: string
+  bio: string
+  avatar: string
   social: {
-    twitter?: string;
-    github?: string;
-  };
+    twitter?: string
+    github?: string
+  }
 }
 
 function ProfileCard({ user }: { user: User }) {
@@ -291,15 +279,12 @@ function ProfileCard({ user }: { user: User }) {
 
 ## Next Steps
 
-In the next lesson, we'll explore **State and Hooks** to make our components interactive!
+<NextLesson title="State and Hooks" description="In the next lesson, we'll explore State and Hooks to make our components interactive!" />
 
-<Alert>
-  <AlertTitle>📚 Additional Resources</AlertTitle>
-  <AlertDescription>
-    - [React JSX Documentation](https://react.dev/learn/writing-markup-with-jsx)
-    - [Component Props Guide](https://react.dev/learn/passing-props-to-a-component)
-    - [Thinking in React](https://react.dev/learn/thinking-in-react)
-  </AlertDescription>
-</Alert>
-
-
+<Resources
+  resources={[
+    { title: "React JSX Documentation", href: "https://react.dev/learn/writing-markup-with-jsx" },
+    { title: "Component Props Guide", href: "https://react.dev/learn/passing-props-to-a-component" },
+    { title: "Thinking in React", href: "https://react.dev/learn/thinking-in-react" },
+  ]}
+/>

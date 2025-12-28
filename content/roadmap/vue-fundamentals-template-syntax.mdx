@@ -45,21 +45,21 @@ The most basic form of data binding is text interpolation using the "Mustache" s
 
 ```vue
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
 
-const message = ref('Hello, Vue!')
+const message = ref("Hello, Vue!")
 const rawHtml = ref('<span style="color: red">This is red</span>')
 </script>
 
 <template>
   <!-- Text interpolation -->
   <p>Message: {{ message }}</p>
-  
+
   <!-- Expressions in templates -->
-  <p>Reversed: {{ message.split('').reverse().join('') }}</p>
+  <p>Reversed: {{ message.split("").reverse().join("") }}</p>
   <p>{{ 1 + 1 }}</p>
-  <p>{{ ok ? 'YES' : 'NO' }}</p>
-  
+  <p>{{ ok ? "YES" : "NO" }}</p>
+
   <!-- Raw HTML (use with caution!) -->
   <p v-html="rawHtml"></p>
 </template>
@@ -87,9 +87,7 @@ Directives are special attributes with the `v-` prefix. Vue provides many built-
         v-bind
       </CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Dynamically bind attributes
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Dynamically bind attributes</CardContent>
   </Card>
   <Card>
     <CardHeader className="pb-2">
@@ -98,9 +96,7 @@ Directives are special attributes with the `v-` prefix. Vue provides many built-
         v-on
       </CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Listen to DOM events
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Listen to DOM events</CardContent>
   </Card>
   <Card>
     <CardHeader className="pb-2">
@@ -109,9 +105,7 @@ Directives are special attributes with the `v-` prefix. Vue provides many built-
         v-if / v-show
       </CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      Conditional rendering
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">Conditional rendering</CardContent>
   </Card>
   <Card>
     <CardHeader className="pb-2">
@@ -120,9 +114,7 @@ Directives are special attributes with the `v-` prefix. Vue provides many built-
         v-for
       </CardTitle>
     </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">
-      List rendering
-    </CardContent>
+    <CardContent className="text-sm text-muted-foreground">List rendering</CardContent>
   </Card>
 </div>
 
@@ -404,10 +396,10 @@ Directives are special attributes with the `v-` prefix. Vue provides many built-
 
 ```vue
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue"
 
 const isLoggedIn = ref(false)
-const userRole = ref('admin')
+const userRole = ref("admin")
 const isVisible = ref(true)
 </script>
 
@@ -415,23 +407,21 @@ const isVisible = ref(true)
   <!-- v-if / v-else-if / v-else -->
   <div v-if="isLoggedIn">Welcome back!</div>
   <div v-else>Please log in</div>
-  
+
   <!-- Multiple conditions -->
   <div v-if="userRole === 'admin'">Admin Panel</div>
   <div v-else-if="userRole === 'editor'">Editor Panel</div>
   <div v-else>User Panel</div>
-  
+
   <!-- v-if on template (for multiple elements) -->
   <template v-if="isLoggedIn">
     <h1>Title</h1>
     <p>Content</p>
     <button>Action</button>
   </template>
-  
+
   <!-- v-show -->
-  <div v-show="isVisible">
-    I toggle with CSS display property
-  </div>
+  <div v-show="isVisible">I toggle with CSS display property</div>
 </template>
 ```
 
@@ -465,21 +455,17 @@ const object = ref({
 <template>
   <!-- Array with index -->
   <ul>
-    <li v-for="(user, index) in users" :key="user.id">
-      {{ index + 1 }}. {{ user.name }} ({{ user.email }})
-    </li>
+    <li v-for="(user, index) in users" :key="user.id">{{ index + 1 }}. {{ user.name }} ({{ user.email }})</li>
   </ul>
-  
+
   <!-- Object iteration -->
   <ul>
-    <li v-for="(value, key, index) in object" :key="key">
-      {{ index }}. {{ key }}: {{ value }}
-    </li>
+    <li v-for="(value, key, index) in object" :key="key">{{ index }}. {{ key }}: {{ value }}</li>
   </ul>
-  
+
   <!-- Range -->
   <span v-for="n in 10" :key="n">{{ n }}</span>
-  
+
   <!-- With v-if (use template wrapper) -->
   <template v-for="user in users" :key="user.id">
     <li v-if="user.isActive">
@@ -640,7 +626,7 @@ Create a Todo List component using what you've learned:
 
 ```vue
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue"
 
 interface Todo {
   id: number
@@ -650,8 +636,8 @@ interface Todo {
 
 // TODO: Implement the logic
 const todos = ref<Todo[]>([])
-const newTodo = ref('')
-const filter = ref<'all' | 'active' | 'completed'>('all')
+const newTodo = ref("")
+const filter = ref<"all" | "active" | "completed">("all")
 
 // Computed property for filtered todos
 const filteredTodos = computed(() => {
@@ -681,25 +667,12 @@ function toggleTodo(id: number) {
 
 ## Next Steps
 
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <p className="text-muted-foreground mb-4">
-      Now that you understand Vue's template syntax, let's learn about components and how to build reusable UI pieces!
-    </p>
-    <div className="flex justify-between items-center pt-4 border-t">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Components & Props</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson title="Components & Props" description="Now that you understand Vue's template syntax, let's learn about components and how to build reusable UI pieces!" />
 
-<Alert>
-  <AlertTitle>📚 Additional Resources</AlertTitle>
-  <AlertDescription>
-    <ul className="mt-2 space-y-1">
-      <li>• <a href="https://vuejs.org/guide/essentials/template-syntax.html" className="underline">Vue Template Syntax Guide</a></li>
-      <li>• <a href="https://vuejs.org/guide/essentials/reactivity-fundamentals.html" className="underline">Reactivity Fundamentals</a></li>
-      <li>• <a href="https://vuejs.org/guide/essentials/forms.html" className="underline">Form Input Bindings</a></li>
-    </ul>
-  </AlertDescription>
-</Alert>
+<Resources
+  resources={[
+    { title: "Vue Template Syntax Guide", href: "https://vuejs.org/guide/essentials/template-syntax.html" },
+    { title: "Reactivity Fundamentals", href: "https://vuejs.org/guide/essentials/reactivity-fundamentals.html" },
+    { title: "Form Input Bindings", href: "https://vuejs.org/guide/essentials/forms.html" },
+  ]}
+/>

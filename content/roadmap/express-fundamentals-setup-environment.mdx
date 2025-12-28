@@ -22,9 +22,7 @@ Before you can start building with Express.js, you need to set up your developme
 <Alert className="my-6">
   <Download className="h-4 w-4" />
   <AlertTitle>Prerequisites</AlertTitle>
-  <AlertDescription>
-    You'll need a code editor (VS Code recommended), a terminal, and basic knowledge of JavaScript and npm.
-  </AlertDescription>
+  <AlertDescription>You'll need a code editor (VS Code recommended), a terminal, and basic knowledge of JavaScript and npm.</AlertDescription>
 </Alert>
 
 ---
@@ -43,7 +41,7 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
     <TabsTrigger value="macos">macOS</TabsTrigger>
     <TabsTrigger value="linux">Linux</TabsTrigger>
   </TabsList>
-  
+
   <TabsContent value="windows">
     <Card>
       <CardContent className="pt-6">
@@ -53,41 +51,42 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
           <li>Verify installation by opening PowerShell and running:</li>
         </ol>
         <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
       </CardContent>
     </Card>
   </TabsContent>
-  
+
   <TabsContent value="macos">
     <Card>
       <CardContent className="pt-6">
         <p className="mb-4">Using Homebrew (recommended):</p>
-        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
-          brew install node
-        </div>
+        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">brew install node</div>
         <p className="mb-2">Or download the macOS Installer from nodejs.org</p>
         <p className="mb-2">Verify installation:</p>
         <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
       </CardContent>
     </Card>
   </TabsContent>
-  
+
   <TabsContent value="linux">
     <Card>
       <CardContent className="pt-6">
         <p className="mb-4">For Ubuntu/Debian:</p>
         <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br/>
+          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br />
           sudo apt-get install -y nodejs
         </div>
         <p className="mb-2">Verify installation:</p>
         <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version<br/>
+          node --version
+          <br />
           npm --version
         </div>
       </CardContent>
@@ -197,7 +196,7 @@ A well-organized project structure is crucial for maintainability:
   </CardHeader>
   <CardContent>
     <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
-{`my-express-api/
+      {`my-express-api/
 ├── src/
 │   ├── index.js          # Entry point
 │   ├── app.js            # Express app configuration
@@ -240,188 +239,188 @@ NODE_ENV=development
 ### 2. Configuration (src/config/index.js)
 
 ```javascript
-require('dotenv').config();
+require("dotenv").config()
 
 module.exports = {
   port: process.env.PORT || 3000,
-  nodeEnv: process.env.NODE_ENV || 'development',
-  isProduction: process.env.NODE_ENV === 'production',
-};
+  nodeEnv: process.env.NODE_ENV || "development",
+  isProduction: process.env.NODE_ENV === "production",
+}
 ```
 
 ### 3. Express App (src/app.js)
 
 ```javascript
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+const express = require("express")
+const cors = require("cors")
+const helmet = require("helmet")
+const morgan = require("morgan")
 
-const routes = require('./routes');
-const errorHandler = require('./middleware/error');
-const config = require('./config');
+const routes = require("./routes")
+const errorHandler = require("./middleware/error")
+const config = require("./config")
 
-const app = express();
+const app = express()
 
 // Security middleware
-app.use(helmet());
+app.use(helmet())
 
 // CORS
-app.use(cors());
+app.use(cors())
 
 // Request logging
 if (!config.isProduction) {
-  app.use(morgan('dev'));
+  app.use(morgan("dev"))
 }
 
 // Body parsers
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // API routes
-app.use('/api', routes);
+app.use("/api", routes)
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() })
+})
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+  res.status(404).json({ error: "Route not found" })
+})
 
 // Error handling
-app.use(errorHandler);
+app.use(errorHandler)
 
-module.exports = app;
+module.exports = app
 ```
 
 ### 4. Entry Point (src/index.js)
 
 ```javascript
-const app = require('./app');
-const config = require('./config');
+const app = require("./app")
+const config = require("./config")
 
 const server = app.listen(config.port, () => {
-  console.log(`🚀 Server running on http://localhost:${config.port}`);
-  console.log(`📝 Environment: ${config.nodeEnv}`);
-});
+  console.log(`🚀 Server running on http://localhost:${config.port}`)
+  console.log(`📝 Environment: ${config.nodeEnv}`)
+})
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...")
   server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
+    console.log("Server closed")
+    process.exit(0)
+  })
+})
 ```
 
 ### 5. Routes (src/routes/index.js)
 
 ```javascript
-const express = require('express');
-const usersRoutes = require('./users');
+const express = require("express")
+const usersRoutes = require("./users")
 
-const router = express.Router();
+const router = express.Router()
 
-router.use('/users', usersRoutes);
+router.use("/users", usersRoutes)
 
-module.exports = router;
+module.exports = router
 ```
 
 ### 6. User Routes (src/routes/users.js)
 
 ```javascript
-const express = require('express');
-const usersController = require('../controllers/users');
+const express = require("express")
+const usersController = require("../controllers/users")
 
-const router = express.Router();
+const router = express.Router()
 
-router.get('/', usersController.getAll);
-router.get('/:id', usersController.getById);
-router.post('/', usersController.create);
-router.patch('/:id', usersController.update);
-router.delete('/:id', usersController.remove);
+router.get("/", usersController.getAll)
+router.get("/:id", usersController.getById)
+router.post("/", usersController.create)
+router.patch("/:id", usersController.update)
+router.delete("/:id", usersController.remove)
 
-module.exports = router;
+module.exports = router
 ```
 
 ### 7. User Controller (src/controllers/users.js)
 
 ```javascript
-const usersService = require('../services/users');
+const usersService = require("../services/users")
 
 exports.getAll = async (req, res, next) => {
   try {
-    const users = await usersService.findAll();
-    res.json(users);
+    const users = await usersService.findAll()
+    res.json(users)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 exports.getById = async (req, res, next) => {
   try {
-    const user = await usersService.findById(req.params.id);
+    const user = await usersService.findById(req.params.id)
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" })
     }
-    res.json(user);
+    res.json(user)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 exports.create = async (req, res, next) => {
   try {
-    const user = await usersService.create(req.body);
-    res.status(201).json(user);
+    const user = await usersService.create(req.body)
+    res.status(201).json(user)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 exports.update = async (req, res, next) => {
   try {
-    const user = await usersService.update(req.params.id, req.body);
+    const user = await usersService.update(req.params.id, req.body)
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" })
     }
-    res.json(user);
+    res.json(user)
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 exports.remove = async (req, res, next) => {
   try {
-    const success = await usersService.remove(req.params.id);
+    const success = await usersService.remove(req.params.id)
     if (!success) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" })
     }
-    res.status(204).send();
+    res.status(204).send()
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 ```
 
 ### 8. Error Middleware (src/middleware/error.js)
 
 ```javascript
 module.exports = (err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err.stack)
 
-  const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  const statusCode = err.statusCode || 500
+  const message = err.message || "Internal Server Error"
 
   res.status(statusCode).json({
     error: message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
-};
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+  })
+}
 ```
 
 ---
@@ -436,12 +435,9 @@ module.exports = (err, req, res, next) => {
     </CardTitle>
   </CardHeader>
   <CardContent className="text-green-800 dark:text-green-200">
-    <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
-      npm run dev
-    </div>
+    <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">npm run dev</div>
     <p>
-      Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. 
-      Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
+      Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
     </p>
   </CardContent>
 </Card>
@@ -484,13 +480,4 @@ module.exports = (err, req, res, next) => {
 
 ## Next Steps
 
-With your development environment set up, you're ready to learn about advanced routing and middleware patterns!
-
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="flex justify-between items-center">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Routing and Middleware in Depth</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson title="Routing and Middleware in Depth" description="With your development environment set up, you're ready to learn about advanced routing and middleware patterns!" href="/roadmap/express-fundamentals-routing-middleware" />

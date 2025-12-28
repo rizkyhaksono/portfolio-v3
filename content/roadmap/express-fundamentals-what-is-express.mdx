@@ -20,22 +20,9 @@ import { BookOpen, Lightbulb, Target, Server, Zap, Shield, Code2 } from "lucide-
 
 Express.js is a minimal and flexible Node.js web application framework that provides a robust set of features for building web and mobile applications. It's the de facto standard server framework for Node.js.
 
-<Card className="my-6 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
-      <Target className="h-5 w-5" />
-      Learning Objectives
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <ul className="list-disc list-inside space-y-2 text-green-800 dark:text-green-200">
-      <li>Understand what Express.js is and its role in backend development</li>
-      <li>Learn about the middleware architecture</li>
-      <li>Understand routing and HTTP methods</li>
-      <li>Recognize when Express is the right choice for your project</li>
-    </ul>
-  </CardContent>
-</Card>
+<LearningObjectives
+  objectives={["Understand what Express.js is and its role in backend development", "Learn about the middleware architecture", "Understand routing and HTTP methods", "Recognize when Express is the right choice for your project"]}
+/>
 
 ---
 
@@ -50,13 +37,15 @@ Express.js is a minimal and flexible Node.js web application framework that prov
     <CardContent className="text-sm text-muted-foreground">Unopinionated framework with minimal overhead for maximum performance</CardContent>
   </Card>
 
-  <Card className="text-center">
-    <CardHeader>
-      <Code2 className="h-8 w-8 mx-auto text-blue-500" />
-      <CardTitle className="text-lg">Flexible</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Use any database, template engine, or architecture pattern you prefer</CardContent>
-  </Card>
+{" "}
+
+<Card className="text-center">
+  <CardHeader>
+    <Code2 className="h-8 w-8 mx-auto text-blue-500" />
+    <CardTitle className="text-lg">Flexible</CardTitle>
+  </CardHeader>
+  <CardContent className="text-sm text-muted-foreground">Use any database, template engine, or architecture pattern you prefer</CardContent>
+</Card>
 
   <Card className="text-center">
     <CardHeader>
@@ -91,18 +80,14 @@ app.listen(PORT, () => {
 })
 ```
 
-<Alert className="my-6">
-  <Lightbulb className="h-4 w-4" />
-  <AlertTitle>Key Insight</AlertTitle>
-  <AlertDescription>Express abstracts the complexity of Node.js's built-in HTTP module, making it incredibly easy to build web servers and APIs.</AlertDescription>
-</Alert>
+<Tip title="Key Insight">Express abstracts the complexity of Node.js's built-in HTTP module, making it incredibly easy to build web servers and APIs.</Tip>
 
 ### HTTP Methods and Routing
 
 Express provides methods for all HTTP verbs:
 
 <Tabs defaultValue="get" className="my-6">
-  <TabsList className="grid w-full grid-cols-4">
+  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
     <TabsTrigger value="get">GET</TabsTrigger>
     <TabsTrigger value="post">POST</TabsTrigger>
     <TabsTrigger value="put">PUT/PATCH</TabsTrigger>
@@ -115,21 +100,19 @@ Express provides methods for all HTTP verbs:
         <CardTitle>GET - Retrieve Data</CardTitle>
       </CardHeader>
       <CardContent>
-        ```javascript
-        // Get all users
-        app.get('/api/users', (req, res) => {
-          res.json(users);
-        });
+        <CodeSnippet language="javascript">{`// Get all users
+app.get('/api/users', (req, res) => {
+  res.json(users);
+});
 
-        // Get user by ID
-        app.get('/api/users/:id', (req, res) => {
-          const user = users.find(u => u.id === req.params.id);
-          if (!user) return res.status(404).json({ error: 'Not found' });
-          res.json(user);
-        });
-        ```
-      </CardContent>
-    </Card>
+// Get user by ID
+app.get('/api/users/:id', (req, res) => {
+const user = users.find(u => u.id === req.params.id);
+if (!user) return res.status(404).json({ error: 'Not found' });
+res.json(user);
+});`}</CodeSnippet>
+</CardContent>
+</Card>
 
   </TabsContent>
   
@@ -139,18 +122,16 @@ Express provides methods for all HTTP verbs:
         <CardTitle>POST - Create Data</CardTitle>
       </CardHeader>
       <CardContent>
-        ```javascript
-        // Create new user
-        app.post('/api/users', (req, res) => {
-          const newUser = {
-            id: generateId(),
-            name: req.body.name,
-            email: req.body.email
-          };
-          users.push(newUser);
-          res.status(201).json(newUser);
-        });
-        ```
+        <CodeSnippet language="javascript">{`// Create new user
+app.post('/api/users', (req, res) => {
+  const newUser = {
+    id: generateId(),
+    name: req.body.name,
+    email: req.body.email
+  };
+  users.push(newUser);
+  res.status(201).json(newUser);
+});`}</CodeSnippet>
       </CardContent>
     </Card>
   </TabsContent>
@@ -161,27 +142,25 @@ Express provides methods for all HTTP verbs:
         <CardTitle>PUT/PATCH - Update Data</CardTitle>
       </CardHeader>
       <CardContent>
-        ```javascript
-        // Update user (full replacement)
-        app.put('/api/users/:id', (req, res) => {
-          const index = users.findIndex(u => u.id === req.params.id);
-          if (index === -1) return res.status(404).json({ error: 'Not found' });
-          
-          users[index] = { ...req.body, id: req.params.id };
-          res.json(users[index]);
-        });
+        <CodeSnippet language="javascript">{`// Update user (full replacement)
+app.put('/api/users/:id', (req, res) => {
+  const index = users.findIndex(u => u.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Not found' });
+  
+  users[index] = { ...req.body, id: req.params.id };
+  res.json(users[index]);
+});
 
-        // Partial update
-        app.patch('/api/users/:id', (req, res) => {
-          const user = users.find(u => u.id === req.params.id);
-          if (!user) return res.status(404).json({ error: 'Not found' });
+// Partial update
+app.patch('/api/users/:id', (req, res) => {
+const user = users.find(u => u.id === req.params.id);
+if (!user) return res.status(404).json({ error: 'Not found' });
 
-          Object.assign(user, req.body);
-          res.json(user);
-        });
-        ```
-      </CardContent>
-    </Card>
+Object.assign(user, req.body);
+res.json(user);
+});`}</CodeSnippet>
+</CardContent>
+</Card>
 
   </TabsContent>
   
@@ -191,16 +170,14 @@ Express provides methods for all HTTP verbs:
         <CardTitle>DELETE - Remove Data</CardTitle>
       </CardHeader>
       <CardContent>
-        ```javascript
-        // Delete user
-        app.delete('/api/users/:id', (req, res) => {
-          const index = users.findIndex(u => u.id === req.params.id);
-          if (index === -1) return res.status(404).json({ error: 'Not found' });
-          
-          const deleted = users.splice(index, 1);
-          res.json({ message: 'User deleted', user: deleted[0] });
-        });
-        ```
+        <CodeSnippet language="javascript">{`// Delete user
+app.delete('/api/users/:id', (req, res) => {
+  const index = users.findIndex(u => u.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Not found' });
+  
+  const deleted = users.splice(index, 1);
+  res.json({ message: 'User deleted', user: deleted[0] });
+});`}</CodeSnippet>
       </CardContent>
     </Card>
   </TabsContent>
@@ -437,44 +414,16 @@ app.listen(PORT, () => {
 
 ## Next Steps
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <BookOpen className="h-5 w-5" />
-      Continue Learning
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="text-muted-foreground mb-4">Now that you understand what Express.js is, let's set up your development environment and build your first Express server!</div>
-    <div className="flex justify-between items-center pt-4 border-t">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Setting Up Express Development Environment</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson
+  title="Setting Up Express Development Environment"
+  description="Now that you understand what Express.js is, let's set up your development environment and build your first Express server!"
+  href="/roadmap/express-fundamentals-setup-environment"
+/>
 
-<Alert>
-  <AlertTitle>📚 Additional Resources</AlertTitle>
-  <AlertDescription>
-    <ul className="mt-2 space-y-1">
-      <li>
-        •{" "}
-        <a href="https://expressjs.com/en/starter/installing.html" className="underline">
-          Official Express.js Guide
-        </a>
-      </li>
-      <li>
-        •{" "}
-        <a href="https://expressjs.com/en/guide/routing.html" className="underline">
-          Express Routing Guide
-        </a>
-      </li>
-      <li>
-        •{" "}
-        <a href="https://expressjs.com/en/resources/middleware.html" className="underline">
-          Express Middleware Resources
-        </a>
-      </li>
-    </ul>
-  </AlertDescription>
-</Alert>
+<Resources
+  resources={[
+    { title: "Official Express.js Guide", href: "https://expressjs.com/en/starter/installing.html" },
+    { title: "Express Routing Guide", href: "https://expressjs.com/en/guide/routing.html" },
+    { title: "Express Middleware Resources", href: "https://expressjs.com/en/resources/middleware.html" },
+  ]}
+/>

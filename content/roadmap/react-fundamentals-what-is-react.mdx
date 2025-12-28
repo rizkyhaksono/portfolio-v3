@@ -43,7 +43,7 @@ React allows you to build encapsulated components that manage their own state, t
 
 ```jsx
 function Welcome(props) {
-  return <h1>Hello, {props.name}</h1>;
+  return <h1>Hello, {props.name}</h1>
 }
 
 function App() {
@@ -53,7 +53,7 @@ function App() {
       <Welcome name="Bob" />
       <Welcome name="Charlie" />
     </div>
-  );
+  )
 }
 ```
 
@@ -64,9 +64,7 @@ React makes it painless to create interactive UIs. Design simple views for each 
 <Alert className="my-6">
   <Lightbulb className="h-4 w-4" />
   <AlertTitle>Key Concept</AlertTitle>
-  <AlertDescription>
-    Declarative views make your code more predictable and easier to debug. You describe what the UI should look like, and React handles the how.
-  </AlertDescription>
+  <AlertDescription>Declarative views make your code more predictable and easier to debug. You describe what the UI should look like, and React handles the how.</AlertDescription>
 </Alert>
 
 ### Virtual DOM
@@ -74,6 +72,7 @@ React makes it painless to create interactive UIs. Design simple views for each 
 One of React's most powerful features is the Virtual DOM. Instead of manipulating the browser's DOM directly, React creates a virtual representation of it.
 
 When state changes occur, React:
+
 1. Creates a new virtual DOM tree
 2. Compares it with the previous version (diffing)
 3. Calculates the minimal set of changes needed
@@ -110,25 +109,13 @@ React is ideal for:
 ## Video Tutorial
 
 <div className="relative aspect-video my-8 rounded-lg overflow-hidden">
-  <iframe
-    className="w-full h-full"
-    src={frontmatter.videoUrl}
-    title="What is React?"
-    frameBorder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  />
+  <iframe className="w-full h-full" src={frontmatter.videoUrl} title="What is React?" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
 </div>
 
 ## Next Steps
 
-Now that you understand what React is, you're ready to set up your development environment and create your first React application!
-
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="flex justify-between items-center">
-      <span className="text-muted-foreground">Next Lesson:</span>
-      <span className="font-semibold">Setting Up Your Environment</span>
-    </div>
-  </CardContent>
-</Card>
+<NextLesson
+  title="Setting Up Your Environment"
+  description="Now that you understand what React is, you're ready to set up your development environment and create your first React application!"
+  href="/roadmap/react-fundamentals-setup-environment"
+/>
