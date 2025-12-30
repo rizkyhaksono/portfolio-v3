@@ -1,58 +1,58 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, Zap, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { TrendingUp, TrendingDown, Zap, Loader2 } from "lucide-react"
 
 export function Web3CryptoTab() {
-  const [prices, setPrices] = useState<any[]>([]);
-  const [trending, setTrending] = useState<any[]>([]);
-  const [gasPrice, setGasPrice] = useState<any>(null);
-  const [loading, setLoading] = useState({ prices: true, trending: true, gas: true });
+  const [prices, setPrices] = useState<any[]>([])
+  const [trending, setTrending] = useState<any[]>([])
+  const [gasPrice, setGasPrice] = useState<any>(null)
+  const [loading, setLoading] = useState({ prices: true, trending: true, gas: true })
 
   useEffect(() => {
-    fetchCryptoPrices();
-    fetchTrending();
-    fetchGasPrice();
-  }, []);
+    fetchCryptoPrices()
+    fetchTrending()
+    fetchGasPrice()
+  }, [])
 
   const fetchCryptoPrices = async () => {
     try {
-      const { getCryptoPrice } = await import("@/services/visitor/web3");
-      const response = await getCryptoPrice("bitcoin,ethereum,binancecoin,cardano,solana,polkadot");
-      setPrices(response.data || []);
+      const { getCryptoPrice } = await import("@/services/visitor/web3")
+      const response = await getCryptoPrice("bitcoin,ethereum,binancecoin,cardano,solana,polkadot")
+      setPrices(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch crypto prices:", error);
+      console.error("Failed to fetch crypto prices:", error)
     } finally {
-      setLoading(prev => ({ ...prev, prices: false }));
+      setLoading((prev) => ({ ...prev, prices: false }))
     }
-  };
+  }
 
   const fetchTrending = async () => {
     try {
-      const { getTrendingCrypto } = await import("@/services/visitor/web3");
-      const response = await getTrendingCrypto();
-      setTrending(response.data || []);
+      const { getTrendingCrypto } = await import("@/services/visitor/web3")
+      const response = await getTrendingCrypto()
+      setTrending(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch trending:", error);
+      console.error("Failed to fetch trending:", error)
     } finally {
-      setLoading(prev => ({ ...prev, trending: false }));
+      setLoading((prev) => ({ ...prev, trending: false }))
     }
-  };
+  }
 
   const fetchGasPrice = async () => {
     try {
-      const { getGasPrice } = await import("@/services/visitor/web3");
-      const response = await getGasPrice("ethereum");
-      setGasPrice(response.data);
+      const { getGasPrice } = await import("@/services/visitor/web3")
+      const response = await getGasPrice("ethereum")
+      setGasPrice(response.data)
     } catch (error) {
-      console.error("Failed to fetch gas price:", error);
+      console.error("Failed to fetch gas price:", error)
     } finally {
-      setLoading(prev => ({ ...prev, gas: false }));
+      setLoading((prev) => ({ ...prev, gas: false }))
     }
-  };
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -60,31 +60,16 @@ export function Web3CryptoTab() {
       currency: "USD",
       minimumFractionDigits: 2,
       maximumFractionDigits: price < 1 ? 6 : 2,
-    }).format(price);
-  };
+    }).format(price)
+  }
 
   const formatPercent = (percent: number) => {
-    const formatted = percent.toFixed(2);
-    return `${percent >= 0 ? "+" : ""}${formatted}%`;
-  };
+    const formatted = percent.toFixed(2)
+    return `${percent >= 0 ? "+" : ""}${formatted}%`
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-blue-500 text-white">
-              <TrendingUp size={24} />
-            </div>
-            <div>
-              <CardTitle>Web3 Crypto Dashboard</CardTitle>
-              <CardDescription>Live cryptocurrency prices, charts, and network gas prices</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
       <Tabs defaultValue="prices" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="prices">Prices</TabsTrigger>
@@ -92,7 +77,6 @@ export function Web3CryptoTab() {
           <TabsTrigger value="gas">Gas Prices</TabsTrigger>
         </TabsList>
 
-        {/* Crypto Prices */}
         <TabsContent value="prices" className="space-y-4">
           {loading.prices ? (
             <div className="flex items-center justify-center py-12">
@@ -105,9 +89,7 @@ export function Web3CryptoTab() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        {crypto.image && (
-                          <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
-                        )}
+                        {crypto.image && <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />}
                         <div>
                           <h3 className="font-semibold">{crypto.name}</h3>
                           <p className="text-xs text-muted-foreground uppercase">{crypto.symbol}</p>
@@ -117,22 +99,11 @@ export function Web3CryptoTab() {
                     <div className="space-y-2">
                       <p className="text-2xl font-bold">{formatPrice(crypto.current_price)}</p>
                       <div className="flex items-center gap-2">
-                        {crypto.price_change_percentage_24h >= 0 ? (
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-red-500" />
-                        )}
-                        <span
-                          className={`text-sm font-medium ${crypto.price_change_percentage_24h >= 0 ? "text-green-500" : "text-red-500"
-                            }`}
-                        >
-                          {formatPercent(crypto.price_change_percentage_24h)}
-                        </span>
+                        {crypto.price_change_percentage_24h >= 0 ? <TrendingUp className="w-4 h-4 text-green-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
+                        <span className={`text-sm font-medium ${crypto.price_change_percentage_24h >= 0 ? "text-green-500" : "text-red-500"}`}>{formatPercent(crypto.price_change_percentage_24h)}</span>
                         <span className="text-xs text-muted-foreground">24h</span>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Market Cap: {formatPrice(crypto.market_cap)}
-                      </p>
+                      <p className="text-xs text-muted-foreground">Market Cap: {formatPrice(crypto.market_cap)}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -141,7 +112,6 @@ export function Web3CryptoTab() {
           )}
         </TabsContent>
 
-        {/* Trending Cryptos */}
         <TabsContent value="trending" className="space-y-4">
           {loading.trending ? (
             <div className="flex items-center justify-center py-12">
@@ -157,9 +127,7 @@ export function Web3CryptoTab() {
                         <Badge variant="outline" className="w-8 h-8 flex items-center justify-center">
                           {index + 1}
                         </Badge>
-                        {crypto.thumb && (
-                          <img src={crypto.thumb} alt={crypto.name} className="w-6 h-6 rounded-full" />
-                        )}
+                        {crypto.thumb && <img src={crypto.thumb} alt={crypto.name} className="w-6 h-6 rounded-full" />}
                         <div>
                           <p className="font-medium">{crypto.name}</p>
                           <p className="text-xs text-muted-foreground uppercase">{crypto.symbol}</p>
@@ -170,16 +138,8 @@ export function Web3CryptoTab() {
                           <div className="text-right">
                             <p className="text-sm font-medium">{formatPrice(crypto.price_usd)}</p>
                             <div className="flex items-center justify-end gap-1">
-                              {crypto.price_change_24h >= 0 ? (
-                                <TrendingUp className="w-3 h-3 text-green-500" />
-                              ) : (
-                                <TrendingDown className="w-3 h-3 text-red-500" />
-                              )}
-                              <span
-                                className={`text-xs ${crypto.price_change_24h >= 0 ? "text-green-500" : "text-red-500"}`}
-                              >
-                                {formatPercent(crypto.price_change_24h)}
-                              </span>
+                              {crypto.price_change_24h >= 0 ? <TrendingUp className="w-3 h-3 text-green-500" /> : <TrendingDown className="w-3 h-3 text-red-500" />}
+                              <span className={`text-xs ${crypto.price_change_24h >= 0 ? "text-green-500" : "text-red-500"}`}>{formatPercent(crypto.price_change_24h)}</span>
                             </div>
                           </div>
                         )}
@@ -193,7 +153,6 @@ export function Web3CryptoTab() {
           )}
         </TabsContent>
 
-        {/* Gas Prices */}
         <TabsContent value="gas" className="space-y-4">
           <GasPricesContent loading={loading.gas} gasPrice={gasPrice} />
 
@@ -204,9 +163,15 @@ export function Web3CryptoTab() {
                   <strong>Note:</strong> Gas prices are displayed in Gwei for Ethereum network.
                 </p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li><strong>Slow:</strong> Lower cost, longer confirmation time(~10 mins)</li>
-                  <li><strong>Standard:</strong> Average cost, moderate confirmation time (~3 mins)</li>
-                  <li><strong>Fast:</strong> Higher cost, quick confirmation time (~30 secs)</li>
+                  <li>
+                    <strong>Slow:</strong> Lower cost, longer confirmation time(~10 mins)
+                  </li>
+                  <li>
+                    <strong>Standard:</strong> Average cost, moderate confirmation time (~3 mins)
+                  </li>
+                  <li>
+                    <strong>Fast:</strong> Higher cost, quick confirmation time (~30 secs)
+                  </li>
                 </ul>
               </div>
             </CardContent>
@@ -214,13 +179,13 @@ export function Web3CryptoTab() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }
 
 type GasPriceContentProps = Readonly<{
-  loading: boolean;
-  gasPrice: { slow: number; standard: number; fast: number; unit: string } | null;
-}>;
+  loading: boolean
+  gasPrice: { slow: number; standard: number; fast: number; unit: string } | null
+}>
 
 function GasPricesContent({ loading, gasPrice }: GasPriceContentProps) {
   if (loading) {
@@ -228,11 +193,11 @@ function GasPricesContent({ loading, gasPrice }: GasPriceContentProps) {
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
-    );
+    )
   }
 
   if (!gasPrice) {
-    return null;
+    return null
   }
 
   return (
@@ -243,9 +208,7 @@ function GasPricesContent({ loading, gasPrice }: GasPriceContentProps) {
             <p className="text-sm font-medium text-green-700 dark:text-green-400">Slow</p>
             <Zap className="w-4 h-4 text-green-500" />
           </div>
-          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
-            {gasPrice.slow}
-          </p>
+          <p className="text-3xl font-bold text-green-600 dark:text-green-400">{gasPrice.slow}</p>
           <p className="text-xs text-muted-foreground mt-1">{gasPrice.unit}</p>
         </CardContent>
       </Card>
@@ -256,9 +219,7 @@ function GasPricesContent({ loading, gasPrice }: GasPriceContentProps) {
             <p className="text-sm font-medium text-blue-700 dark:text-blue-400">Standard</p>
             <Zap className="w-4 h-4 text-blue-500" />
           </div>
-          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-            {gasPrice.standard}
-          </p>
+          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{gasPrice.standard}</p>
           <p className="text-xs text-muted-foreground mt-1">{gasPrice.unit}</p>
         </CardContent>
       </Card>
@@ -269,12 +230,10 @@ function GasPricesContent({ loading, gasPrice }: GasPriceContentProps) {
             <p className="text-sm font-medium text-orange-700 dark:text-orange-400">Fast</p>
             <Zap className="w-4 h-4 text-orange-500" />
           </div>
-          <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">
-            {gasPrice.fast}
-          </p>
+          <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{gasPrice.fast}</p>
           <p className="text-xs text-muted-foreground mt-1">{gasPrice.unit}</p>
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

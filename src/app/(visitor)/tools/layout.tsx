@@ -1,15 +1,11 @@
-import type { Metadata } from "next";
-import BaseLayout from "@/components/layout/base-layout";
-import { MetadataConstants } from "@/commons/constants/metadata";
-import SidebarMain from "@/components/layout/sidebar-main";
+import type { Metadata } from "next"
+import BaseLayout from "@/components/layout/base-layout"
+import { MetadataConstants } from "@/commons/constants/metadata"
+import SidebarMain from "@/components/layout/sidebar-main"
 
 export const metadata: Metadata = {
   title: "Tools - Japanese Quiz, Anime Generator & More | Rizky Haksono",
-  metadataBase: new URL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.DOMAIN ?? ""
-  ),
+  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
   description: "Collection of useful tools including Japanese JLPT Quiz, Anime Image Generator, Social Media Downloader, WPM Test, File Manager, and Online Compiler. Free and easy to use!",
   keywords: [
     ...MetadataConstants.keyword,
@@ -51,7 +47,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useLightRays={true}>
       {children}
     </BaseLayout>
   )

@@ -1,17 +1,35 @@
-"use client";
+"use client"
 
-import BlurFade from "@/components/magicui/blur-fade";
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { CompilerOutputPanel } from "./compiler/compiler-output-panel";
-import { CompilerCodeEditor } from "./compiler/compiler-code-editor";
-import { CompilerToolbar } from "./compiler/compiler-toolbar";
-import { CompilerState } from "@/commons/types/compiler";
-import { postExecuteCode } from "@/services/visitor/compiler";
-import { LANGUAGES, Theme } from "@/commons/constants/compiler";
+import BlurFade from "@/components/magicui/blur-fade"
+import { useState, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { CompilerOutputPanel } from "./compiler/compiler-output-panel"
+import { CompilerCodeEditor } from "./compiler/compiler-code-editor"
+import { CompilerToolbar } from "./compiler/compiler-toolbar"
+import { CompilerState } from "@/commons/types/compiler"
+import { postExecuteCode } from "@/services/visitor/compiler"
+import { LANGUAGES, Theme } from "@/commons/constants/compiler"
+import { useTheme } from "next-themes"
 
 export function CompilerTab() {
-  const [theme, setTheme] = useState<Theme>('dark');
+  const { resolvedTheme } = useTheme()
+
+  // Map site theme to a visually appealing editor theme
+  const getDefaultTheme = (): Theme => {
+    return resolvedTheme === "dark" ? "tokyo-night" : "github"
+  }
+
+  const [theme, setTheme] = useState<Theme | null>(null)
+
+  // Sync with system theme on mount and when system theme changes
+  useEffect(() => {
+    if (theme === null) {
+      setTheme(getDefaultTheme())
+    }
+  }, [resolvedTheme, theme])
+
+  // Use a fallback while theme is loading
+  const currentTheme: Theme = theme ?? "tokyo-night"
 
   const [state, setState] = useState<CompilerState>({
     code: LANGUAGES[0].defaultCode,
@@ -19,31 +37,31 @@ export function CompilerTab() {
     output: "",
     isRunning: false,
     error: null,
-  });
+  })
 
   const handleLanguageChange = (language: string) => {
-    const selectedLang = LANGUAGES.find(lang => lang.value === language);
-    setState(prev => ({
+    const selectedLang = LANGUAGES.find((lang) => lang.value === language)
+    setState((prev) => ({
       ...prev,
       language,
       code: selectedLang?.defaultCode ?? "",
       output: "",
       error: null,
-    }));
-  };
+    }))
+  }
 
   const handleRunCode = async () => {
     if (!state.code.trim()) {
-      setState(prev => ({ ...prev, error: "Please enter some code to execute." }));
-      return;
+      setState((prev) => ({ ...prev, error: "Please enter some code to execute." }))
+      return
     }
 
-    setState(prev => ({ ...prev, isRunning: true, output: "", error: null }));
+    setState((prev) => ({ ...prev, isRunning: true, output: "", error: null }))
 
     try {
-      const selectedLang = LANGUAGES.find(lang => lang.value === state.language);
+      const selectedLang = LANGUAGES.find((lang) => lang.value === state.language)
       if (!selectedLang) {
-        throw new Error("Language not found");
+        throw new Error("Language not found")
       }
 
       const request = {
@@ -54,42 +72,42 @@ export function CompilerTab() {
             content: state.code,
           },
         ],
-      };
+      }
 
-      const response = await postExecuteCode(request);
+      const response = await postExecuteCode(request)
 
-      let output = "";
+      let output = ""
       if (response.run.stdout) {
-        output += response.run.stdout;
+        output += response.run.stdout
       }
       if (response.run.stderr) {
-        output += response.run.stderr;
+        output += response.run.stderr
       }
       if (!output && response.run.output) {
-        output = response.run.output;
+        output = response.run.output
       }
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         output: output || "Program executed successfully with no output.",
         isRunning: false,
-      }));
+      }))
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: error instanceof Error ? error.message : "An unexpected error occurred",
         isRunning: false,
-      }));
+      }))
     }
-  };
+  }
 
   const handleCopyCode = async () => {
     try {
-      await navigator.clipboard.writeText(state.code);
+      await navigator.clipboard.writeText(state.code)
     } catch (error) {
-      console.error("Failed to copy code:", error);
+      console.error("Failed to copy code:", error)
     }
-  };
+  }
 
   const handleDownloadCode = () => {
     const extensions: { [key: string]: string } = {
@@ -98,46 +116,38 @@ export function CompilerTab() {
       java: "java",
       cpp: "cpp",
       c: "c",
-    };
+    }
 
-    const extension = extensions[state.language] || "txt";
-    const blob = new Blob([state.code], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `code.${extension}`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+    const extension = extensions[state.language] || "txt"
+    const blob = new Blob([state.code], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `code.${extension}`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const handleReset = () => {
-    const selectedLang = LANGUAGES.find(lang => lang.value === state.language);
-    setState(prev => ({
+    const selectedLang = LANGUAGES.find((lang) => lang.value === state.language)
+    setState((prev) => ({
       ...prev,
       code: selectedLang?.defaultCode ?? "",
       output: "",
       error: null,
-    }));
-  };
+    }))
+  }
 
   const handleCodeChange = (code: string) => {
-    setState(prev => ({ ...prev, code }));
-  };
+    setState((prev) => ({ ...prev, code }))
+  }
 
-  // Theme change handler that matches the expected signature
   const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
-  };
+    setTheme(newTheme)
+  }
 
   return (
     <BlurFade delay={0.25} inView>
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold">Online Compiler</h1>
-        <p className="text-muted-foreground">
-          Write, compile, and run code in various programming languages online.
-        </p>
-      </div>
-
       <Card>
         <CardContent className="p-4">
           <CompilerToolbar
@@ -155,20 +165,9 @@ export function CompilerTab() {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[80vh] mt-4">
-        <CompilerCodeEditor
-          code={state.code}
-          onChange={handleCodeChange}
-          language={state.language}
-          theme={theme}
-          onThemeChange={handleThemeChange}
-        />
-        <CompilerOutputPanel
-          output={state.output}
-          error={state.error}
-          isRunning={state.isRunning}
-          theme={theme}
-        />
+        <CompilerCodeEditor code={state.code} onChange={handleCodeChange} language={state.language} theme={currentTheme} onThemeChange={handleThemeChange} />
+        <CompilerOutputPanel output={state.output} error={state.error} isRunning={state.isRunning} theme={currentTheme} />
       </div>
     </BlurFade>
-  );
+  )
 }

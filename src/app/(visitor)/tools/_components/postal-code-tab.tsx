@@ -1,27 +1,27 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Search, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { MapPin, Search, Loader2 } from "lucide-react"
 
 export function PostalCodeTab() {
-  const [provinces, setProvinces] = useState<any[]>([]);
-  const [cities, setCities] = useState<any[]>([]);
-  const [districts, setDistricts] = useState<any[]>([]);
-  const [villages, setVillages] = useState<any[]>([]);
+  const [provinces, setProvinces] = useState<any[]>([])
+  const [cities, setCities] = useState<any[]>([])
+  const [districts, setDistricts] = useState<any[]>([])
+  const [villages, setVillages] = useState<any[]>([])
 
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedVillage, setSelectedVillage] = useState("");
+  const [selectedProvince, setSelectedProvince] = useState("")
+  const [selectedCity, setSelectedCity] = useState("")
+  const [selectedDistrict, setSelectedDistrict] = useState("")
+  const [selectedVillage, setSelectedVillage] = useState("")
 
-  const [postalCode, setPostalCode] = useState("");
-  const [searchCode, setSearchCode] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [postalCode, setPostalCode] = useState("")
+  const [searchCode, setSearchCode] = useState("")
+  const [searchResults, setSearchResults] = useState<any[]>([])
 
   const [loading, setLoading] = useState({
     provinces: false,
@@ -29,146 +29,130 @@ export function PostalCodeTab() {
     districts: false,
     villages: false,
     search: false,
-  });
+  })
 
   // Fetch provinces on mount
   useEffect(() => {
-    fetchProvinces();
-  }, []);
+    fetchProvinces()
+  }, [])
 
   const fetchProvinces = async () => {
-    setLoading(prev => ({ ...prev, provinces: true }));
+    setLoading((prev) => ({ ...prev, provinces: true }))
     try {
-      const { getProvinces } = await import("@/services/visitor/postal-code");
-      const response = await getProvinces();
-      setProvinces(response.data || []);
+      const { getProvinces } = await import("@/services/visitor/postal-code")
+      const response = await getProvinces()
+      setProvinces(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch provinces:", error);
+      console.error("Failed to fetch provinces:", error)
     } finally {
-      setLoading(prev => ({ ...prev, provinces: false }));
+      setLoading((prev) => ({ ...prev, provinces: false }))
     }
-  };
+  }
 
   const fetchCities = async (provinceId: string) => {
-    setLoading(prev => ({ ...prev, cities: true }));
+    setLoading((prev) => ({ ...prev, cities: true }))
     try {
-      const { getCities } = await import("@/services/visitor/postal-code");
-      const response = await getCities(provinceId);
-      setCities(response.data || []);
+      const { getCities } = await import("@/services/visitor/postal-code")
+      const response = await getCities(provinceId)
+      setCities(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch cities:", error);
+      console.error("Failed to fetch cities:", error)
     } finally {
-      setLoading(prev => ({ ...prev, cities: false }));
+      setLoading((prev) => ({ ...prev, cities: false }))
     }
-  };
+  }
 
   const fetchDistricts = async (cityId: string) => {
-    setLoading(prev => ({ ...prev, districts: true }));
+    setLoading((prev) => ({ ...prev, districts: true }))
     try {
-      const { getDistricts } = await import("@/services/visitor/postal-code");
-      const response = await getDistricts(cityId);
-      setDistricts(response.data || []);
+      const { getDistricts } = await import("@/services/visitor/postal-code")
+      const response = await getDistricts(cityId)
+      setDistricts(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch districts:", error);
+      console.error("Failed to fetch districts:", error)
     } finally {
-      setLoading(prev => ({ ...prev, districts: false }));
+      setLoading((prev) => ({ ...prev, districts: false }))
     }
-  };
+  }
 
   const fetchVillages = async (districtId: string) => {
-    setLoading(prev => ({ ...prev, villages: true }));
+    setLoading((prev) => ({ ...prev, villages: true }))
     try {
-      const { getVillages } = await import("@/services/visitor/postal-code");
-      const response = await getVillages(districtId);
-      setVillages(response.data || []);
+      const { getVillages } = await import("@/services/visitor/postal-code")
+      const response = await getVillages(districtId)
+      setVillages(response.data || [])
     } catch (error) {
-      console.error("Failed to fetch villages:", error);
+      console.error("Failed to fetch villages:", error)
     } finally {
-      setLoading(prev => ({ ...prev, villages: false }));
+      setLoading((prev) => ({ ...prev, villages: false }))
     }
-  };
+  }
 
   const handleProvinceChange = (value: string) => {
-    setSelectedProvince(value);
-    setSelectedCity("");
-    setSelectedDistrict("");
-    setSelectedVillage("");
-    setPostalCode("");
-    setCities([]);
-    setDistricts([]);
-    setVillages([]);
-    fetchCities(value);
-  };
+    setSelectedProvince(value)
+    setSelectedCity("")
+    setSelectedDistrict("")
+    setSelectedVillage("")
+    setPostalCode("")
+    setCities([])
+    setDistricts([])
+    setVillages([])
+    fetchCities(value)
+  }
 
   const handleCityChange = (value: string) => {
-    setSelectedCity(value);
-    setSelectedDistrict("");
-    setSelectedVillage("");
-    setPostalCode("");
-    setDistricts([]);
-    setVillages([]);
-    fetchDistricts(value);
-  };
+    setSelectedCity(value)
+    setSelectedDistrict("")
+    setSelectedVillage("")
+    setPostalCode("")
+    setDistricts([])
+    setVillages([])
+    fetchDistricts(value)
+  }
 
   const handleDistrictChange = (value: string) => {
-    setSelectedDistrict(value);
-    setSelectedVillage("");
-    setPostalCode("");
-    setVillages([]);
-    fetchVillages(value);
-  };
+    setSelectedDistrict(value)
+    setSelectedVillage("")
+    setPostalCode("")
+    setVillages([])
+    fetchVillages(value)
+  }
 
   const handleVillageChange = async (value: string) => {
-    setSelectedVillage(value);
+    setSelectedVillage(value)
     // Search using village code to get postal code
-    setLoading(prev => ({ ...prev, search: true }));
+    setLoading((prev) => ({ ...prev, search: true }))
     try {
-      const { searchPostalCode } = await import("@/services/visitor/postal-code");
-      const response = await searchPostalCode(value);
+      const { searchPostalCode } = await import("@/services/visitor/postal-code")
+      const response = await searchPostalCode(value)
       if (response.data.data && response.data.data.length > 0) {
-        setPostalCode(response.data.data[0].postal.toString());
+        setPostalCode(response.data.data[0].postal.toString())
       }
     } catch (error) {
-      console.error("Failed to fetch postal code:", error);
+      console.error("Failed to fetch postal code:", error)
     } finally {
-      setLoading(prev => ({ ...prev, search: false }));
+      setLoading((prev) => ({ ...prev, search: false }))
     }
-  };
+  }
 
   const handleSearchPostalCode = async () => {
-    if (!searchCode.trim()) return;
+    if (!searchCode.trim()) return
 
-    setLoading(prev => ({ ...prev, search: true }));
+    setLoading((prev) => ({ ...prev, search: true }))
     try {
-      const { searchPostalCode } = await import("@/services/visitor/postal-code");
-      const response = await searchPostalCode(searchCode.trim());
-      setSearchResults(response.data.data || []);
+      const { searchPostalCode } = await import("@/services/visitor/postal-code")
+      const response = await searchPostalCode(searchCode.trim())
+      setSearchResults(response.data.data || [])
     } catch (error) {
-      console.error("Failed to search postal code:", error);
-      setSearchResults([]);
+      console.error("Failed to search postal code:", error)
+      setSearchResults([])
     } finally {
-      setLoading(prev => ({ ...prev, search: false }));
+      setLoading((prev) => ({ ...prev, search: false }))
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-full bg-emerald-500 text-white">
-              <MapPin size={24} />
-            </div>
-            <div>
-              <CardTitle>Indonesian Postal Code Lookup</CardTitle>
-              <CardDescription>Find postal codes by location or search by postal code</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Forward Lookup: Location to Postal Code */}
       <Card>
         <CardHeader>
           <CardTitle>Find by Location</CardTitle>
@@ -176,7 +160,6 @@ export function PostalCodeTab() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Province */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Province</label>
               <Select value={selectedProvince} onValueChange={handleProvinceChange} disabled={loading.provinces}>
@@ -268,18 +251,9 @@ export function PostalCodeTab() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
-            <Input
-              placeholder="Enter postal code (e.g., 60119)"
-              value={searchCode}
-              onChange={(e) => setSearchCode(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearchPostalCode()}
-            />
+            <Input placeholder="Enter postal code (e.g., 60119)" value={searchCode} onChange={(e) => setSearchCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearchPostalCode()} />
             <Button onClick={handleSearchPostalCode} disabled={!searchCode.trim() || loading.search}>
-              {loading.search ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Search className="w-4 h-4" />
-              )}
+              {loading.search ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             </Button>
           </div>
 
@@ -303,13 +277,9 @@ export function PostalCodeTab() {
             </div>
           )}
 
-          {searchCode && searchResults.length === 0 && !loading.search && (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              No results found for postal code "{searchCode}"
-            </p>
-          )}
+          {searchCode && searchResults.length === 0 && !loading.search && <p className="text-sm text-muted-foreground text-center py-4">No results found for postal code "{searchCode}"</p>}
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
