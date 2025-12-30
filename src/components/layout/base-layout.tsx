@@ -2,7 +2,7 @@ import { isHaveValidToken } from "@/app/actions/actions"
 import Footer from "@/components/layout/footer"
 import Navbar from "@/components/layout/navbar"
 import { FlickeringGrid } from "@/components/ui/flickering-grid"
-import { LightRays } from "@/components/ui/light-rays"
+import { InteractiveGridPattern } from "@/components/magicui/interactive-grid-pattern"
 import ScrollProgress from "@/components/ui/scroll-progress"
 
 export default async function BaseLayout({
@@ -10,13 +10,13 @@ export default async function BaseLayout({
   sidebar,
   rightSidebar,
   useGridBackground = true,
-  useLightRays = false,
+  useInteractiveGrid = false,
 }: Readonly<{
   children: React.ReactNode
   sidebar?: React.ReactNode
   rightSidebar?: React.ReactNode
   useGridBackground?: boolean
-  useLightRays?: boolean
+  useInteractiveGrid?: boolean
 }>) {
   const isHaveToken = await isHaveValidToken()
 
@@ -24,7 +24,6 @@ export default async function BaseLayout({
     <>
       <ScrollProgress />
       <div className="container min-h-screen pt-12 sm:pt-24 px-6">
-        {/* Grid Background - only if useGridBackground is true */}
         {useGridBackground && (
           <div className="fixed inset-0 flex items-center justify-center overflow-hidden h-40 pointer-events-none z-[-1]">
             <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-background [-webkit-mask-image:linear-gradient(to_bottom,black,transparent)]">
@@ -32,10 +31,10 @@ export default async function BaseLayout({
             </div>
           </div>
         )}
-        {useLightRays && (
-          <div className="fixed inset-0 flex items-center justify-center overflow-hidden h-100 pointer-events-none z-[-1]">
+        {useInteractiveGrid && (
+          <div className="fixed inset-0 flex items-center justify-center overflow-hidden w-full h-40 pointer-events-none z-[-1]">
             <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-background [-webkit-mask-image:linear-gradient(to_bottom,black,transparent)]">
-              <LightRays />
+              <InteractiveGridPattern width={80} />
             </div>
           </div>
         )}

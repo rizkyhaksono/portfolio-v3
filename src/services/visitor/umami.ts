@@ -130,15 +130,16 @@ export async function getUmamiMetrics(
  */
 export async function getUmamiAnalytics(): Promise<UmamiAnalyticsData> {
   try {
-    const [stats, activeVisitors, topPages, topReferrers, countries, browsers, devices] =
+    const [stats, activeVisitors, topPages, topReferrers, countries, browsers, devices, os] =
       await Promise.all([
         getUmamiStats(),
         getActiveVisitors(),
-        getUmamiMetrics("url", 5),
-        getUmamiMetrics("referrer", 5),
-        getUmamiMetrics("country", 5),
-        getUmamiMetrics("browser", 5),
-        getUmamiMetrics("device", 5),
+        getUmamiMetrics("url", 10),
+        getUmamiMetrics("referrer", 10),
+        getUmamiMetrics("country", 10),
+        getUmamiMetrics("browser", 10),
+        getUmamiMetrics("device", 10),
+        getUmamiMetrics("os", 10),
       ]);
 
     return {
@@ -148,6 +149,7 @@ export async function getUmamiAnalytics(): Promise<UmamiAnalyticsData> {
       topReferrers,
       countries,
       browsers,
+      os,
       devices,
     };
   } catch (error) {

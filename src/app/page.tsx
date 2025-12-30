@@ -18,7 +18,7 @@ export default async function Home() {
   const recommendations = linkedinRecommendationsResponse?.data || []
 
   return (
-    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />} useGridBackground={false} useLightRays={true}>
+    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
       <IntroSection />
       <AboutSection />
       <SkillSection />

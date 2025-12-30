@@ -40,6 +40,8 @@ export interface UmamiAnalyticsData {
   countries: UmamiMetric[];
   browsers: UmamiMetric[];
   devices: UmamiMetric[];
+  os: UmamiMetric[];
+  pageviews?: UmamiPageviewData[];
 }
 
 export const EMPTY_ANALYTICS: UmamiAnalyticsData = {
@@ -48,6 +50,8 @@ export const EMPTY_ANALYTICS: UmamiAnalyticsData = {
   topPages: [],
   topReferrers: [],
   countries: [],
+  os: [],
+  pageviews: [],
   browsers: [],
   devices: [],
 };

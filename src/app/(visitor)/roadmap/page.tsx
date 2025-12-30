@@ -7,7 +7,7 @@ export default function CourseRoadmap() {
   const courses = getRoadmapCourses()
 
   return (
-    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useLightRays={true}>
+    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useInteractiveGrid={true}>
       {/* Header */}
       <div className="flex flex-col gap-6 mt-20 justify-center relative z-10">
         <div className="max-w-7xl mx-auto w-full">

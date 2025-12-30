@@ -47,7 +47,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useLightRays={true}>
+    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useInteractiveGrid={true}>
       {children}
     </BaseLayout>
   )

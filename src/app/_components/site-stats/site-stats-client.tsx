@@ -1,15 +1,17 @@
 "use client"
 
+import { useState } from "react"
 import BlurFade from "@/components/magicui/blur-fade"
 import Typography from "@/components/ui/typography"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Eye, Users, MousePointerClick, Globe, Chrome, FileText, Keyboard, Target, Timer, Activity } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Eye, Users, MousePointerClick, Globe, Monitor, FileText, Keyboard, Target, Timer, Activity, MapPin, Smartphone } from "lucide-react"
 import { UmamiAnalyticsData } from "@/commons/types/umami"
 import { MonkeyTypeUserData } from "@/commons/types/monkeytype"
 import { cn } from "@/lib/utils"
-import { Area, AreaChart, XAxis, YAxis } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
+import { Bar, BarChart, XAxis, YAxis, Cell, Pie, PieChart } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
 
 interface SiteStatsClientProps {
   analytics: UmamiAnalyticsData
@@ -35,7 +37,7 @@ function formatTime(seconds: number): string {
   return `${minutes}m`
 }
 
-function StatCard({ icon: Icon, label, value, subValue, className }: { icon: React.ElementType; label: string; value: string | number; subValue?: string; className?: string }) {
+function StatCard({ icon: Icon, label, value, subValue, className }: Readonly<{ icon: React.ElementType; label: string; value: string | number; subValue?: string; className?: string }>) {
   return (
     <Card className={cn("relative overflow-hidden", className)}>
       <CardContent className="p-4">
@@ -59,7 +61,7 @@ function MetricsList({ title, icon: Icon, items, labelFormatter }: { title: stri
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Icon className="w-4 h-4" />
           {title}
@@ -67,10 +69,12 @@ function MetricsList({ title, icon: Icon, items, labelFormatter }: { title: stri
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-2">
-          {items.slice(0, 5).map((item) => (
-            <div key={`${item.x}-${item.y}`} className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground truncate max-w-[70%]">{labelFormatter ? labelFormatter(item.x) : item.x || "Direct"}</span>
-              <Badge variant="secondary" className="text-xs">
+          {items.slice(0, 8).map((item, idx) => (
+            <div key={`${item.x}-${item.y}-${idx}`} className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground truncate max-w-[70%]" title={item.x}>
+                {labelFormatter ? labelFormatter(item.x) : item.x || "Direct"}
+              </span>
+              <Badge variant="secondary" className="text-xs font-mono">
                 {formatNumber(item.y)}
               </Badge>
             </div>
@@ -81,57 +85,96 @@ function MetricsList({ title, icon: Icon, items, labelFormatter }: { title: stri
   )
 }
 
-function MetricsChart({ title, icon: Icon, items, labelFormatter }: { title: string; icon: React.ElementType; items: { x: string; y: number }[]; labelFormatter?: (label: string) => string }) {
+const CHART_COLORS = ["hsl(var(--chart-1))", "hsl(var(--chart-2))", "hsl(var(--chart-3))", "hsl(var(--chart-4))", "hsl(var(--chart-5))"]
+
+function BarChartMetrics({ title, icon: Icon, items, labelFormatter }: { title: string; icon: React.ElementType; items: { x: string; y: number }[]; labelFormatter?: (label: string) => string }) {
   if (!items || items.length === 0) return null
 
-  const chartData = items.slice(0, 5).map((item) => ({
-    name: labelFormatter ? labelFormatter(item.x) : item.x || "Direct",
+  const chartData = items.slice(0, 8).map((item, idx) => ({
+    name: labelFormatter ? labelFormatter(item.x) : item.x || "Unknown",
     value: item.y,
+    fill: CHART_COLORS[idx % CHART_COLORS.length],
   }))
 
   const chartConfig: ChartConfig = {
     value: {
       label: title,
-      color: "hsl(var(--foreground))",
     },
   }
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Icon className="w-4 h-4" />
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
-        <ChartContainer config={chartConfig} className="h-[180px] w-full">
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id={`gradient-${title.replaceAll(/\s/g, "")}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--foreground))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--foreground))" stopOpacity={0.1} />
-              </linearGradient>
-            </defs>
-            <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} tickMargin={8} />
-            <YAxis hide />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
-            <Area type="natural" dataKey="value" stroke="hsl(var(--foreground))" strokeWidth={2} fill={`url(#gradient-${title.replaceAll(/\s/g, "")})`} />
-          </AreaChart>
+        <ChartContainer config={chartConfig} className="h-[280px] w-full">
+          <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
+            <XAxis type="number" hide />
+            <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+              {chartData.map((entry) => (
+                <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+              ))}
+            </Bar>
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
   )
 }
 
-export default function SiteStatsClient({ analytics, typingStats }: SiteStatsClientProps) {
+function PieChartMetrics({ title, icon: Icon, items, labelFormatter }: { title: string; icon: React.ElementType; items: { x: string; y: number }[]; labelFormatter?: (label: string) => string }) {
+  if (!items || items.length === 0) return null
+
+  const chartData = items.slice(0, 6).map((item, idx) => ({
+    name: labelFormatter ? labelFormatter(item.x) : item.x || "Unknown",
+    value: item.y,
+    fill: CHART_COLORS[idx % CHART_COLORS.length],
+  }))
+
+  const chartConfig: ChartConfig = chartData.reduce((acc, item, idx) => {
+    acc[item.name] = {
+      label: item.name,
+      color: CHART_COLORS[idx % CHART_COLORS.length],
+    }
+    return acc
+  }, {} as ChartConfig)
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <Icon className="w-4 h-4" />
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <ChartContainer config={chartConfig} className="h-[240px] w-full">
+          <PieChart>
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} />
+            <ChartLegend content={<ChartLegendContent />} className="flex flex-wrap gap-2 text-xs" />
+          </PieChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function SiteStatsClient({ analytics, typingStats }: Readonly<SiteStatsClientProps>) {
   const bounceRate = analytics.stats ? Math.round((analytics.stats.bounces / analytics.stats.visits) * 100) : 0
+  const [environmentTab, setEnvironmentTab] = useState("browsers")
 
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
         <div className="flex items-center gap-2 mb-6">
-          <Typography.H4>Site Stats</Typography.H4>
+          <Typography.H4>Site Statistics</Typography.H4>
           {analytics.activeVisitors > 0 && (
             <Badge variant="default" className="flex items-center gap-1 animate-pulse">
               <span className="w-2 h-2 bg-green-400 rounded-full"></span>
@@ -153,7 +196,7 @@ export default function SiteStatsClient({ analytics, typingStats }: SiteStatsCli
           <div className="mb-6">
             <Typography.P className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <Keyboard className="w-4 h-4" />
-              MonkeyType Stats
+              MonkeyType Performance
             </Typography.P>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard icon={Keyboard} label="Best WPM" value={typingStats.bestWpm || "N/A"} subValue="60s test" />
@@ -164,12 +207,54 @@ export default function SiteStatsClient({ analytics, typingStats }: SiteStatsCli
           </div>
         )}
 
-        {/* Metrics Grid - Charts for some, Lists for others */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Top Pages */}
+        <div className="mb-6">
           <MetricsList title="Top Pages" icon={FileText} items={analytics.topPages} labelFormatter={(path) => (path === "/" ? "Home" : path.replace(/^\//, ""))} />
-          <MetricsChart title="Countries" icon={Globe} items={analytics.countries} />
-          <MetricsChart title="Browsers" icon={Chrome} items={analytics.browsers} />
-          <MetricsChart title="Devices" icon={Users} items={analytics.devices} />
+        </div>
+
+        {/* Environment Section with Tabs */}
+        <div className="mb-6">
+          <Typography.P className="text-sm font-medium mb-3 flex items-center gap-2">
+            <Monitor className="w-4 h-4" />
+            Environment
+          </Typography.P>
+          <Tabs value={environmentTab} onValueChange={setEnvironmentTab} className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-3">
+              <TabsTrigger value="browsers">Browsers</TabsTrigger>
+              <TabsTrigger value="os">OS</TabsTrigger>
+              <TabsTrigger value="devices">Devices</TabsTrigger>
+            </TabsList>
+            <TabsContent value="browsers" className="mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <BarChartMetrics title="Browser Distribution" icon={Globe} items={analytics.browsers} />
+                <PieChartMetrics title="Browser Share" icon={Globe} items={analytics.browsers} />
+              </div>
+            </TabsContent>
+            <TabsContent value="os" className="mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <BarChartMetrics title="Operating Systems" icon={Monitor} items={analytics.os} />
+                <PieChartMetrics title="OS Share" icon={Monitor} items={analytics.os} />
+              </div>
+            </TabsContent>
+            <TabsContent value="devices" className="mt-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <BarChartMetrics title="Device Types" icon={Smartphone} items={analytics.devices} />
+                <PieChartMetrics title="Device Share" icon={Smartphone} items={analytics.devices} />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Location Section */}
+        <div className="mb-6">
+          <Typography.P className="text-sm font-medium mb-3 flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            Location
+          </Typography.P>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <BarChartMetrics title="Top Countries" icon={Globe} items={analytics.countries} />
+            <PieChartMetrics title="Geographic Distribution" icon={Globe} items={analytics.countries} />
+          </div>
         </div>
       </div>
     </BlurFade>
