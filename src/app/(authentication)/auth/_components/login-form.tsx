@@ -119,7 +119,7 @@ export default function LoginForm() {
             <div className="flex flex-col gap-5">
               <div className="flex flex-col items-center text-center space-y-1">
                 <Typography.H4 className="text-2xl font-bold">Welcome back</Typography.H4>
-                <Typography.P className="text-muted-foreground text-sm">Enter your credentials to access your account</Typography.P>
+                <Typography.P className="text-muted-foreground text-sm">Login to access your personalized experience</Typography.P>
               </div>
 
               <FormField
@@ -144,7 +144,12 @@ export default function LoginForm() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="password">Password</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <button type="button" className="text-xs text-primary hover:underline" onClick={() => toast.info("Password reset coming soon!")}>
+                        Forgot password?
+                      </button>
+                    </div>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

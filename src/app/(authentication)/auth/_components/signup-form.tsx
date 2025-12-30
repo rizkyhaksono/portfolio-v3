@@ -113,6 +113,7 @@ export default function SignupForm() {
                         <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
                       </div>
                     </FormControl>
+                    <p className="text-xs text-muted-foreground mt-1">Must be at least 8 characters</p>
                     <FormMessage />
                   </FormItem>
                 )}

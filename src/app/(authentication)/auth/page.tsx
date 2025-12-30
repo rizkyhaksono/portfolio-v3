@@ -18,12 +18,12 @@ export default function LoginPage() {
         <div className={cn("flex flex-col gap-6")}>
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Welcome</h1>
-            <p className="text-muted-foreground">Sign in to your account or create a new one</p>
+            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Welcome Back</h1>
+            <p className="text-muted-foreground text-base">Access your account to continue your journey</p>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 h-12">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="login" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
                 <LogIn className="h-4 w-4" />
                 Login
