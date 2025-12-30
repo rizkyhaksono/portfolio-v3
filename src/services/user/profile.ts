@@ -4,7 +4,7 @@ import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 import { ProfileResponse } from "@/commons/types/profile";
 
 const getProfile = async (): Promise<ProfileResponse> => {
-  const response = await fetch(`${process.env.API_URL}/me`, {
+  const response = await fetch(`${process.env.API_URL}/v3/me`, {
     method: "GET",
     headers: await getAuthorizationHeader(),
     next: {
