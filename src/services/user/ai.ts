@@ -4,7 +4,7 @@ import { AIResponse } from "@/commons/types/ai";
 import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
 
 const getAIChat = async (): Promise<any> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/ai`, {
     method: "GET",
     credentials: "include",
     headers: await getAuthorizationHeader(),
@@ -18,7 +18,7 @@ const getAIChat = async (): Promise<any> => {
 }
 
 const requestAIChat = async (prompt: string): Promise<AIResponse> => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/ai`, {
     method: "POST",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
@@ -29,7 +29,19 @@ const requestAIChat = async (prompt: string): Promise<AIResponse> => {
     },
   });
   revalidateByTag("ai");
-  return await response.json();
+  
+  // Check content type to handle both JSON and plain text responses
+  const contentType = response.headers.get("content-type");
+  if (contentType?.includes("application/json")) {
+    return await response.json();
+  }
+  
+  // Handle plain text response
+  const text = await response.text();
+  return {
+    status: response.status,
+    data: text,
+  };
 };
 
 export {
