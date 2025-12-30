@@ -1,31 +1,31 @@
-"use client";
+"use client"
 
-import { supabaseUser } from "@/supabase/server";
-import { useEffect, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { File, ListFilter, Pencil, Trash } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { supabaseUser } from "@/supabase/server"
+import { useEffect, useState } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { File, ListFilter, Pencil, Trash } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
 export default function AdminCareerPage() {
-  const [careerData, setCareerData] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [careerData, setCareerData] = useState<any>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const formSchema = z.object({
     title: z.string().min(2).max(50),
     subtitle: z.string().min(2).max(50),
     duration: z.string().min(2).max(50),
-  });
+  })
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,25 +34,25 @@ export default function AdminCareerPage() {
       subtitle: "",
       duration: "",
     },
-  });
+  })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    console.log(values)
   }
 
   useEffect(() => {
     const fetchCareer = async () => {
-      setIsLoading(true);
-      const { data, error } = await supabaseUser.from("career").select("*");
+      setIsLoading(true)
+      const { data, error } = await supabaseUser.from("career").select("*")
       if (error) {
-        console.log(error);
+        console.log(error)
       } else {
-        setCareerData(data);
-        setIsLoading(false);
+        setCareerData(data)
+        setIsLoading(false)
       }
-    };
-    fetchCareer();
-  }, []);
+    }
+    fetchCareer()
+  }, [])
 
   if (isLoading) {
     return (
@@ -67,7 +67,7 @@ export default function AdminCareerPage() {
         </div>
         <Skeleton className="h-72 w-full" />
       </div>
-    );
+    )
   }
 
   return (
@@ -134,7 +134,7 @@ export default function AdminCareerPage() {
                           <DialogTrigger
                             asChild
                             onClick={() => {
-                              console.log(career.id);
+                              console.log(career.id)
                             }}
                           >
                             <Button variant="outline" size="icon">
@@ -197,7 +197,7 @@ export default function AdminCareerPage() {
                         <AlertDialog>
                           <AlertDialogTrigger
                             onClick={() => {
-                              console.log(career.id);
+                              console.log(career.id)
                             }}
                           >
                             <Button variant="outline" size="icon">
@@ -279,5 +279,5 @@ export default function AdminCareerPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

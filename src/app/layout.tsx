@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Montserrat as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
@@ -46,6 +47,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <Script defer src="https://cloud.umami.is/script.js" data-website-id="3344dd5c-2e88-4ae5-95f7-e142cdbff614" strategy="afterInteractive" />
+      </head>
       <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
