@@ -317,13 +317,13 @@ export const themes: Record<Theme, EditorTheme> = {
   },
   'tokyo-night': {
     name: 'Tokyo Night',
-    background: 'from-slate-900 via-indigo-900 to-purple-900',
-    cardBackground: 'bg-slate-900',
-    textColor: 'text-slate-200',
+    background: 'from-[#1a1b26] via-[#16161e] to-[#1a1b26]',
+    cardBackground: 'bg-[#1a1b26]',
+    textColor: 'text-[#a9b1d6]',
     lineNumbers: {
-      background: 'bg-slate-800',
-      color: 'text-slate-500',
-      border: 'border-slate-700'
+      background: 'bg-[#16161e]',
+      color: 'text-[#565f89]',
+      border: 'border-[#292e42]'
     },
     syntax: {
       keyword: '#bb9af7',
@@ -333,9 +333,9 @@ export const themes: Record<Theme, EditorTheme> = {
       operator: '#f7768e',
       function: '#7aa2f7'
     },
-    selection: 'rgba(187, 154, 247, 0.3)',
+    selection: 'rgba(41, 46, 66, 0.5)',
     cursor: '#c0caf5',
-    scrollbar: 'rgba(86, 95, 137, 0.3)'
+    scrollbar: 'rgba(86, 95, 137, 0.5)'
   },
   'one-dark': {
     name: 'One Dark',
