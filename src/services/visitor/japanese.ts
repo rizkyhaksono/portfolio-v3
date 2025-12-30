@@ -34,9 +34,6 @@ export async function getJLPTQuiz(level: string, count = 100): Promise<JLPTQuizR
 export async function getJLPTQuizVerify(answer: JLPTVerifyRequest): Promise<JLPTVerifyResponse> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/japanese-quiz/verify`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify(answer),
   });
   if (!response.ok) throw new Error("Failed to verify JLPT quiz answer");

@@ -17,7 +17,7 @@ export async function getDuolingoProfile(): Promise<DuolingoApiResponse> {
   try {
     const response = await fetch(`${process.env.API_URL}/v3/duolingo/profile?username=rizkyhaksono`, {
       method: "GET",
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
@@ -26,7 +26,6 @@ export async function getDuolingoProfile(): Promise<DuolingoApiResponse> {
     }
 
     const text = await response.text();
-    // Check if response is HTML (error page) instead of JSON
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
       console.error('Duolingo API returned HTML instead of JSON');
       return EMPTY_DUOLINGO_RESPONSE;

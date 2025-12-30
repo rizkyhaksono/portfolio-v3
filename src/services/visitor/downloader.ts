@@ -10,6 +10,8 @@ export async function downloadFromFacebook(url: string): Promise<SocialMediaDown
   return await response.json();
 }
 
+// NOTE: Instagram downloader API endpoint not available in API spec
+// This is a placeholder that will throw an error until the backend endpoint is added
 export async function downloadFromInstagram(url: string): Promise<InstagramDownloadResponse | SocialMediaDownloadResult> {
   const response = await fetch(`${API_URL}/v3/tools/instagram/downloader?url=${encodeURIComponent(url)}`, {
     method: "GET",

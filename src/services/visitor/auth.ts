@@ -1,7 +1,7 @@
 "use server";
 
 const authLogin = async (email: string, password: string) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +15,7 @@ const authLogin = async (email: string, password: string) => {
 };
 
 const authSignup = async (email: string, password: string, name: string) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -30,7 +30,7 @@ const authSignup = async (email: string, password: string, name: string) => {
 };
 
 const authLogout = async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/logout`, {
     method: "POST",
     credentials: "include",
   })

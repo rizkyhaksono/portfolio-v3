@@ -1,6 +1,6 @@
 import { LinkedinRecommendationsApiResponse, LinkedinCertificationsResponse } from "@/commons/types/linkedin";
 
-const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
+const API_URL = process.env.API_URL
 
 const EMPTY_RECOMMENDATIONS: LinkedinRecommendationsApiResponse = {
   success: false,
@@ -21,12 +21,9 @@ const EMPTY_CERTIFICATIONS: LinkedinCertificationsResponse = {
 
 export async function getLinkedinRecommendations(): Promise<LinkedinRecommendationsApiResponse> {
   try {
-    const url = `${API_URL}/v3/linkedin/recommendations`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`${API_URL}/v3/linkedin/recommendations`, {
       method: "GET",
-      cache: "no-store",
-      next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
@@ -35,7 +32,6 @@ export async function getLinkedinRecommendations(): Promise<LinkedinRecommendati
     }
 
     const text = await response.text();
-    // Check if response is HTML (error page) instead of JSON
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
       console.error('LinkedIn recommendations API returned HTML instead of JSON');
       return EMPTY_RECOMMENDATIONS;
@@ -50,12 +46,9 @@ export async function getLinkedinRecommendations(): Promise<LinkedinRecommendati
 
 export async function getLinkedinCertifications(page: number = 1, limit: number = 10): Promise<LinkedinCertificationsResponse> {
   try {
-    const url = `${API_URL}/v3/linkedin/certifications?page=${page}&limit=${limit}`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`${API_URL}/v3/linkedin/certifications?page=${page}&limit=${limit}`, {
       method: "GET",
-      cache: "no-store",
-      next: { revalidate: 3600 }, // Cache for 1 hour to reduce API calls
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
@@ -64,7 +57,6 @@ export async function getLinkedinCertifications(page: number = 1, limit: number 
     }
 
     const text = await response.text();
-    // Check if response is HTML (error page) instead of JSON
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
       console.error('LinkedIn certifications API returned HTML instead of JSON');
       return { ...EMPTY_CERTIFICATIONS, page, limit };

@@ -41,7 +41,7 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
         Authorization: `Bearer ${access_token}`,
       },
       next: {
-        revalidate: 30, // Revalidate every 30 seconds
+        revalidate: 30,
       },
     });
 
