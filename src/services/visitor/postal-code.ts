@@ -6,7 +6,7 @@ import type {
   PostalCodeSearchResponse,
 } from "@/commons/types/tools";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
 export async function getProvinces(): Promise<ProvinceResponse> {
   const response = await fetch(`${API_URL}/v3/tools/provinces`, {
