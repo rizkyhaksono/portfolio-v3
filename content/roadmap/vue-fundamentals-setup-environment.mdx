@@ -13,6 +13,7 @@ illustration: "https://images.unsplash.com/photo-1537884944318-390069bb8665?q=80
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Terminal, Download, CheckCircle2, AlertCircle, Folder, Settings } from "lucide-react"
 
 ## Setting Up Your Vue Development Environment
@@ -132,35 +133,6 @@ npm run dev
 
 ---
 
-## Project Structure
-
-<Tabs defaultValue="vite" className="my-6">
-  <TabsList className="grid w-full grid-cols-2">
-    <TabsTrigger value="vite">Vite Project</TabsTrigger>
-    <TabsTrigger value="nuxt">Nuxt Project</TabsTrigger>
-  </TabsList>
-
-  <TabsContent value="vite">
-    <Card>
-      <CardContent className="pt-6">
-        ``` my-vue-project/ ├── 📁 node_modules/ ├── 📁 public/ │ └── favicon.ico ├── 📁 src/ │ ├── 📁 assets/ │ │ └── main.css │ ├── 📁 components/ │ │ └── HelloWorld.vue │ ├── 📁 router/ │ │ └── index.ts │ ├── 📁 stores/ │ │ └──
-        counter.ts │ ├── 📁 views/ │ │ ├── HomeView.vue │ │ └── AboutView.vue │ ├── App.vue │ └── main.ts ├── .eslintrc.cjs ├── .prettierrc.json ├── index.html ├── package.json ├── tsconfig.json └── vite.config.ts ```
-      </CardContent>
-    </Card>
-  </TabsContent>
-
-  <TabsContent value="nuxt">
-    <Card>
-      <CardContent className="pt-6">
-        ``` my-nuxt-app/ ├── 📁 .nuxt/ ├── 📁 node_modules/ ├── 📁 assets/ ├── 📁 components/ ├── 📁 composables/ ├── 📁 layouts/ ├── 📁 middleware/ ├── 📁 pages/ │ ├── index.vue │ └── about.vue ├── 📁 plugins/ ├── 📁 public/ ├── 📁 server/
-        ├── app.vue ├── nuxt.config.ts ├── package.json └── tsconfig.json ```
-      </CardContent>
-    </Card>
-  </TabsContent>
-</Tabs>
-
----
-
 ## IDE Setup
 
 ### VS Code Extensions
@@ -210,6 +182,7 @@ npm run dev
         </div>
       </div>
     </div>
+
   </CardContent>
 </Card>
 
