@@ -1,15 +1,11 @@
-import type { Metadata } from "next";
-import BaseLayout from "@/components/layout/base-layout";
-import { MetadataConstants } from "@/commons/constants/metadata";
-import SidebarMain from "@/components/layout/sidebar-main";
+import type { Metadata } from "next"
+import BaseLayout from "@/components/layout/base-layout"
+import { MetadataConstants } from "@/commons/constants/metadata"
+import SidebarMain from "@/components/layout/sidebar-main"
 
 export const metadata: Metadata = {
   title: "AI | Rizky Haksono",
-  metadataBase: new URL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.DOMAIN ?? ""
-  ),
+  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
@@ -29,16 +25,16 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useLightRays={true}>
       {children}
     </BaseLayout>
-  );
+  )
 }
