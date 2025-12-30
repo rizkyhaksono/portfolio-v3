@@ -1,0 +1,78 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Dev",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Next.js: Build",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run build"
+    },
+    {
+      "name": "Next.js: Start (Production)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm start",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Jest: Run All Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm test"
+    },
+    {
+      "name": "Jest: Watch Mode",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:watch"
+    },
+    {
+      "name": "Jest: Coverage",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:coverage"
+    },
+    {
+      "name": "Playwright: E2E Tests",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:e2e"
+    },
+    {
+      "name": "Playwright: E2E UI Mode",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:e2e:ui"
+    },
+    {
+      "name": "Playwright: E2E Debug",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:e2e:debug"
+    },
+    {
+      "name": "ESLint",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run lint"
+    }
+  ]
+}
