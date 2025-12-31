@@ -1,19 +1,19 @@
 # Portfolio v3
 
-> Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwind CSS
+Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwind CSS.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2-61dafb?style=flat-square&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](./LICENSE)
 
-## 📖 Overview
+## Overview
 
 This is my third iteration of my personal portfolio website, showcasing my work as a software engineer. Built with cutting-edge technologies and modern web development practices, this project demonstrates my skills in full-stack development, UI/UX design, and software architecture.
 
 **Live Site:** [nateee.com](https://nateee.com)
 
-## 🚀 Tech Stack
+## Tech Stack
 
 ### Core Framework
 
@@ -58,7 +58,7 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 - **[ESLint](https://eslint.org/)** - Code linting
 - **[Vercel Analytics](https://vercel.com/analytics)** - Web analytics
 
-## 🏗️ Architecture
+## Architecture
 
 ### Next.js App Router Structure
 
@@ -135,35 +135,35 @@ portfolio-v3/
 - **Supabase Client**: Direct database queries
 - **API Routes**: RESTful endpoints for external integrations
 
-## ✨ Features
+## Features
 
-### Visitor Features
+### For Visitors
 
-- 🏠 **Portfolio Showcase** - Projects, skills, and experience
-- 📝 **Blog** - Technical blog with MDX support
-- 🌓 **Dark Mode** - System-aware theme switching
-- 📱 **Responsive Design** - Mobile-first approach
-- ⚡ **Performance** - Optimized with Next.js 16
-- 🎨 **Animations** - Smooth Framer Motion animations
-- 🔍 **SEO Optimized** - Meta tags, sitemap, robots.txt
+- **Portfolio Showcase** - Projects, skills, and professional experience
+- **Blog** - Technical writing with MDX support for rich content
+- **Dark Mode** - Automatically adapts to your system preferences
+- **Responsive Design** - Works seamlessly on all devices
+- **Performance** - Lightning-fast page loads with Next.js 16
+- **Smooth Animations** - Polished interactions using Framer Motion
+- **SEO Optimized** - Proper meta tags, sitemap, and robots.txt
 
-### Admin Features
+### For Admins
 
-- 🔐 **Authentication** - Supabase Auth with protected routes
-- 📊 **Dashboard** - Analytics and content management
-- ✏️ **Content Editor** - Create and edit blog posts
-- 👥 **Visitor Tracking** - See who visited your portfolio
-- 💬 **LinkedIn Recommendations** - Display recommendations
+- **Authentication** - Secure login with Supabase Auth
+- **Dashboard** - Analytics and content management in one place
+- **Content Editor** - Easy blog post creation and editing
+- **Visitor Tracking** - See who's checking out your portfolio
+- **LinkedIn Integration** - Display your recommendations
 
-### Developer Features
+### For Developers
 
-- 🧪 **Testing Suite** - Unit, component, and E2E tests
-- 📏 **Type Safety** - Full TypeScript coverage
-- 🔄 **Hot Reload** - Instant feedback with Turbopack
-- 🎯 **Linting** - ESLint configuration
-- 📦 **Modern Tooling** - Latest web technologies
+- **Comprehensive Testing** - Unit, component, and end-to-end tests
+- **Type Safety** - Full TypeScript coverage throughout
+- **Hot Reload** - Instant feedback with Turbopack
+- **Code Quality** - ESLint configuration included
+- **Modern Stack** - Built with the latest web technologies
 
-## 🛠️ Installation
+## Installation
 
 ### Prerequisites
 
@@ -237,7 +237,7 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
    http://localhost:3000
    ```
 
-## 🧪 Testing
+## Testing
 
 This project includes comprehensive testing using Jest, React Testing Library, and Playwright.
 
@@ -280,7 +280,7 @@ npm run test:e2e:debug
 
 For detailed testing documentation, see [**tests**/README.md](./__tests__/README.md).
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Public Endpoints
 
@@ -394,7 +394,7 @@ CREATE TABLE page_views (
 
 For your specific schema, check Supabase dashboard or migration files.
 
-## 🛠️ Development Guidelines
+## Development Guidelines
 
 ### Code Style
 
@@ -447,7 +447,7 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create typed error responses
 - Log errors to monitoring service (Sentry, etc.)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -494,7 +494,7 @@ npm run test -- --verbose
 - Restart dev server
 - Clear browser cache
 
-## 📊 Performance Optimization
+## Performance Optimization
 
 ### Image Optimization
 
@@ -517,7 +517,7 @@ npm run test -- --verbose
 - Implement pagination for large result sets
 - Consider caching strategies with `revalidate` options
 
-## 🔒 Security Considerations
+## Security Considerations
 
 ### Environment Variables
 
@@ -537,7 +537,7 @@ npm run test -- --verbose
 - Check user authentication/authorization
 - Rate-limit sensitive endpoints using the helper in `commons/helpers/rate-limit.ts`
 
-## 📈 Monitoring & Analytics
+## Monitoring & Analytics
 
 ### Vercel Analytics
 
@@ -551,7 +551,7 @@ npm run test -- --verbose
 - Log important events to database
 - Track page views in `api/` routes
 
-## 📜 Available Scripts
+## Available Scripts
 
 ```json
 {
@@ -568,7 +568,7 @@ npm run test -- --verbose
 }
 ```
 
-## 🚢 Deployment
+## Deployment
 
 ### Vercel (Recommended)
 
@@ -586,7 +586,7 @@ This project can be deployed to any platform that supports Next.js:
 - **AWS Amplify**
 - **DigitalOcean App Platform**
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -596,11 +596,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
-## 👤 Author
+## Author
 
 **Muhammad Rizky Haksono**
 
@@ -609,15 +609,17 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 - LinkedIn: [rizkyhaksono](https://www.linkedin.com/in/rizkyhaksono)
 - Email: mrizkyhaksono@gmail.com
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- [Next.js](https://nextjs.org/) - The React framework
-- [Shadcn/ui](https://ui.shadcn.com/) - Beautiful components
-- [Vercel](https://vercel.com/) - Deployment platform
-- [Supabase](https://supabase.com/) - Backend as a service
+Special thanks to the amazing tools and platforms that made this project possible:
+
+- [Next.js](https://nextjs.org/) - The React framework that powers everything
+- [Shadcn/ui](https://ui.shadcn.com/) - Beautiful, accessible components
+- [Vercel](https://vercel.com/) - Seamless deployment and hosting
+- [Supabase](https://supabase.com/) - Powerful backend infrastructure
 
 ---
 
 <div align="center">
-  Made with ❤️ by Rizky Haksono
+  Made by Rizky Haksono
 </div>
