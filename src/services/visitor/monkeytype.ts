@@ -45,7 +45,7 @@ export async function getMonkeyTypePersonalBests(): Promise<MonkeyTypePersonalBe
   }
 
   try {
-    const response = await fetch(`${MONKEYTYPE_API_URL}/users/personalBests`, {
+    const response = await fetch(`${MONKEYTYPE_API_URL}/users/personalBests?mode=words&mode2=25`, {
       method: "GET",
       headers: {
         Authorization: `ApeKey ${API_KEY}`,
@@ -78,29 +78,32 @@ export async function getMonkeyTypeData(): Promise<MonkeyTypeUserData> {
 
     let bestWpm = 0;
     let bestAccuracy = 0;
+    let totalWpm = 0;
+    let testCount = 0;
 
-    if (personalBests?.time) {
-      const timeTests = ["60", "30", "15"];
-      for (const time of timeTests) {
-        if (personalBests.time[time]?.length > 0) {
-          const best = personalBests.time[time].reduce(
-            (a, b) => (a.wpm > b.wpm ? a : b),
-            personalBests.time[time][0]
-          );
-          if (best.wpm > bestWpm) {
-            bestWpm = Math.round(best.wpm);
-            bestAccuracy = Math.round(best.acc);
-          }
+    // personalBests is an array of test results
+    if (personalBests && Array.isArray(personalBests)) {
+      for (const test of personalBests) {
+        // Find the highest WPM across all tests
+        if (test.wpm > bestWpm) {
+          bestWpm = Math.round(test.wpm);
+          bestAccuracy = Math.round(test.acc);
         }
+        
+        // Calculate average WPM
+        totalWpm += test.wpm;
+        testCount++;
       }
     }
+
+    const averageWpm = testCount > 0 ? Math.round(totalWpm / testCount) : 0;
 
     return {
       stats,
       personalBests,
       bestWpm,
       bestAccuracy,
-      averageWpm: 0,
+      averageWpm,
     };
   } catch (error) {
     console.error("Failed to fetch MonkeyType data:", error);

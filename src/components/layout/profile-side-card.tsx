@@ -1,75 +1,62 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import Typography from "@/components/ui/typography";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { authLogout } from "@/services/visitor/auth";
-import { removeCookie } from "@/app/actions/actions";
-import { toast } from "sonner";
-import { getProfile } from "@/services/user/profile";
-import { useRouter } from "next/navigation";
-import AuthCard from "./auth-card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Home, LogOutIcon, User } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
+import Typography from "@/components/ui/typography"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { authLogout } from "@/services/visitor/auth"
+import { removeCookie } from "@/app/actions/actions"
+import { toast } from "sonner"
+import { getProfile } from "@/services/user/profile"
+import { useRouter } from "next/navigation"
+import AuthCard from "./auth-card"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Home, LogOutIcon, User } from "lucide-react"
+import Link from "next/link"
 
 const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
-  const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const router = useRouter()
+  const [profile, setProfile] = useState<any>(null)
 
   useEffect(() => {
-    (async () => {
-      await getProfile().then(setProfile);
-    })();
-  }, []);
+    ;(async () => {
+      await getProfile().then(setProfile)
+    })()
+  }, [])
 
   const handleLogout = async () => {
-    toast.promise(authLogout(), {
-      loading: "Back to home...",
-      success: async () => {
-        await removeCookie("NATEE_V3_TOKEN");
-        return "Logged out successfully";
-      },
-      error: (err) => err,
-      finally: () => router.refresh()
-    })
+    try {
+      await removeCookie("NATEE_V3_TOKEN")
+
+      // Clear any local storage
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("chat_user")
+      }
+
+      toast.success("Logged out successfully")
+
+      // Redirect to auth page
+      window.location.href = "/auth"
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast.error("Failed to logout")
+    }
   }
 
-  if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />;
+  if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
-        <div
-          data-cy="auth-card-side"
-          className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}
-        >
-          <Avatar className="h-10 w-10">
-            {profile?.data?.name && <AvatarFallback>{profile?.data?.name?.slice(0, 1)}</AvatarFallback>}
-          </Avatar>
+        <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
+          <Avatar className="h-10 w-10">{profile?.data?.name && <AvatarFallback>{profile?.data?.name?.slice(0, 1)}</AvatarFallback>}</Avatar>
           <div className="flex flex-col gap-1">
-            <Typography.P className="text-sm text-start font-medium text-ellipsis">
-              {profile?.data?.name}
-            </Typography.P>
-            <Typography.P className="text-xs text-start opacity-75 text-ellipsis">
-              {profile?.data?.email}
-            </Typography.P>
+            <Typography.P className="text-sm text-start font-medium text-ellipsis truncate max-w-[140px]">{profile?.data?.name}</Typography.P>
+            <Typography.P className="text-xs text-start opacity-75 text-ellipsis truncate max-w-[140px]">{profile?.data?.email}</Typography.P>
           </div>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        side="right"
-        align="start"
-        className="w-[--radix-popper-anchor-width]"
-      >
+      <DropdownMenuContent side="right" align="start" className="w-[--radix-popper-anchor-width]">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href="/profile">
@@ -93,7 +80,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-};
+  )
+}
 
-export default ProfileSideCard;
+export default ProfileSideCard

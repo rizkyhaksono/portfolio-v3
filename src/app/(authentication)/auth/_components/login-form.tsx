@@ -23,8 +23,6 @@ const formSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
-
 export default function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -80,7 +78,7 @@ export default function LoginForm() {
   }
 
   const handleOAuthLogin = (provider: string) => {
-    // Redirect to OAuth endpoint
+    const API_URL = process.env.NEXT_PUBLIC_API_URL
     globalThis.window.location.href = `${API_URL}/v3/auth/${provider}`
   }
 
@@ -90,24 +88,28 @@ export default function LoginForm() {
       icon: FcGoogle,
       provider: "google",
       className: "hover:bg-red-50 dark:hover:bg-red-950/20",
+      status: "supported",
     },
     {
       name: "GitHub",
       icon: FaGithub,
       provider: "github",
       className: "hover:bg-gray-100 dark:hover:bg-gray-800",
+      status: "not_supported",
     },
     {
       name: "Discord",
       icon: FaDiscord,
       provider: "discord",
       className: "hover:bg-indigo-50 dark:hover:bg-indigo-950/20",
+      status: "not_supported",
     },
     {
       name: "Facebook",
       icon: FaFacebook,
       provider: "facebook",
       className: "hover:bg-blue-50 dark:hover:bg-blue-950/20",
+      status: "not_supported",
     },
   ]
 
@@ -185,7 +187,14 @@ export default function LoginForm() {
               {/* OAuth Providers */}
               <div className="grid grid-cols-2 gap-2">
                 {oauthProviders.map((provider) => (
-                  <Button key={provider.provider} variant="outline" type="button" onClick={() => handleOAuthLogin(provider.provider)} className={`w-full transition-colors ${provider.className}`}>
+                  <Button
+                    key={provider.provider}
+                    variant="outline"
+                    type="button"
+                    onClick={() => handleOAuthLogin(provider.provider)}
+                    className={`w-full transition-colors ${provider.className}`}
+                    disabled={provider.status === "not_supported"}
+                  >
                     <provider.icon className="mr-2 h-4 w-4" />
                     {provider.name}
                   </Button>

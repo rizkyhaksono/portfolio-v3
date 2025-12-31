@@ -7,6 +7,7 @@ const getProfile = async (): Promise<ProfileResponse> => {
   const response = await fetch(`${process.env.API_URL}/v3/me`, {
     method: "GET",
     headers: await getAuthorizationHeader(),
+    credentials: "include",
     next: {
       tags: ["profile"],
       revalidate: 0,
