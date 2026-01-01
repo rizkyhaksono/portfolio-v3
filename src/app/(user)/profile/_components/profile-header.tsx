@@ -19,7 +19,6 @@ import { format } from "date-fns"
 import Image from "next/image"
 
 export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileData }>) {
-  console.log("Profile Data:", profile)
   const router = useRouter()
 
   const getOAuthIcon = (provider: string) => {

@@ -102,8 +102,6 @@ function BarChartMetrics({ title, icon: Icon, items, labelFormatter }: { title: 
 }
 
 export default function SiteStatsClient({ analytics }: Readonly<SiteStatsClientProps>) {
-  console.log("Umami Analytics Data:", analytics)
-
   const bounceRate = analytics.stats ? Math.round((analytics.stats.bounces / analytics.stats.visits) * 100) : 0
   const avgSessionDuration = analytics.stats && analytics.stats.visits > 0 ? Math.round(analytics.stats.totaltime / analytics.stats.visits) : 0
 
