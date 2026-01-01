@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { isHaveValidToken } from "./app/actions/actions"
 
-export async function proxy(request: NextRequest, response: NextResponse) {
+export async function proxy(request: NextRequest, _response: NextResponse) {
   const isHaveToken = await isHaveValidToken();
-  const userCookieValue = request.cookies.get("USER_SUPABASE_AUTH_COOKIE")
   const adminCookieValue = request.cookies.get("ADMIN_SUPABASE_AUTH_COOKIE")
   const nateeToken = request.cookies.get("NATEE_V3_TOKEN")
 
@@ -11,11 +10,6 @@ export async function proxy(request: NextRequest, response: NextResponse) {
     return NextResponse.redirect(new URL("/admin/auth/login", request.url))
   }
 
-  // if (request.nextUrl.pathname.startsWith("/ai") && !userCookieValue) {
-  //   return NextResponse.redirect(new URL("/auth", request.url))
-  // }
-
-  // Redirect authenticated users away from auth page
   if (request.nextUrl.pathname.startsWith("/auth") && nateeToken) {
     return NextResponse.redirect(new URL("/", request.url))
   }

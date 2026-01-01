@@ -195,12 +195,14 @@ export default function AdminCareerPage() {
                           </DialogContent>
                         </Dialog>
                         <AlertDialog>
-                          <AlertDialogTrigger
-                            onClick={() => {
-                              console.log(career.id)
-                            }}
-                          >
-                            <Button variant="outline" size="icon">
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => {
+                                console.log(career.id)
+                              }}
+                            >
                               <Trash className="h-5 w-5" />
                             </Button>
                           </AlertDialogTrigger>
