@@ -1,5 +1,5 @@
 export async function getWeather() {
-  const response = await fetch("https://api.openweathermap.org/data/2.5/weather?id=1636722&appid=5796abbde9106b7da4febfae8c44c232", {
+  const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?id=1636722&appid=${process.env.OPENWEATHERMAP_API_KEY}`, {
     method: "GET",
     next: {
       revalidate: 180,
