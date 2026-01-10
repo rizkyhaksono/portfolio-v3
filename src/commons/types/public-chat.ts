@@ -2,7 +2,9 @@ export interface PublicChatUser {
   id: string;
   name: string;
   avatarUrl: string | null;
+  iconUrl?: string | null;
   headline?: string | null;
+  role?: string;
 }
 
 export interface PublicChatMessage {
