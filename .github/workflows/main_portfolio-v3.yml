@@ -39,17 +39,20 @@ jobs:
         run: |
           npm ci
           npm run build
-          # Verify build output exists
+          echo "=== Verify build ==="
           ls -la .next/BUILD_ID
+          cat .next/BUILD_ID
 
       - name: Install production deps only
         run: |
           rm -rf node_modules
           npm ci --omit=dev
 
-      # Zip everything untuk preserve structure
-      - name: Create deployment package
+      - name: Clean and package
         run: |
+          # Remove Oryx artifacts that cause interference
+          rm -f oryx-manifest.toml node_modules.tar.gz 2>/dev/null || true
+          # Create clean zip
           zip -r deploy.zip .next/ node_modules/ public/ package.json next.config.ts -x "node_modules/.cache/*"
 
       - name: Upload artifact
@@ -70,7 +73,11 @@ jobs:
           name: next-app
 
       - name: Unzip
-        run: unzip deploy.zip -d ./app
+        run: |
+          mkdir app
+          unzip deploy.zip -d ./app
+          echo "=== Verify structure ==="
+          ls -la ./app/.next/BUILD_ID
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
