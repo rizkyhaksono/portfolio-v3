@@ -39,24 +39,24 @@ jobs:
         run: |
           npm ci
           npm run build
+          # Verify build output exists
+          ls -la .next/BUILD_ID
 
-      # Install production-only deps (lebih kecil dari full node_modules)
-      - name: Install production dependencies
+      - name: Install production deps only
         run: |
           rm -rf node_modules
           npm ci --omit=dev
+
+      # Zip everything untuk preserve structure
+      - name: Create deployment package
+        run: |
+          zip -r deploy.zip .next/ node_modules/ public/ package.json next.config.ts -x "node_modules/.cache/*"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
-          path: |
-            .next/
-            node_modules/
-            public/
-            package.json
-            package-lock.json
-            next.config.ts
+          path: deploy.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -69,10 +69,13 @@ jobs:
         with:
           name: next-app
 
+      - name: Unzip
+        run: unzip deploy.zip -d ./app
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: "portfolio-v3"
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: .
+          package: ./app
