@@ -1,5 +1,4 @@
 name: Build and deploy Node.js app to Azure Web App - portfolio-v3
-
 on:
   push:
     branches:
@@ -11,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +20,7 @@ jobs:
 
       - name: Install and build
         env:
-          # Pastikan semua ENV VARS Anda ada di sini seperti sebelumnya
-          NODE_ENV: production # Wajib set production
+          NODE_ENV: production
           DOMAIN: ${{ secrets.DOMAIN }}
           API_URL: ${{ secrets.API_URL }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -43,14 +40,22 @@ jobs:
           npm ci
           npm run build
 
+      # Install production-only deps (lebih kecil dari full node_modules)
+      - name: Install production dependencies
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: next-app
           path: |
             .next/
+            node_modules/
             public/
             package.json
+            package-lock.json
             next.config.ts
 
   deploy:
@@ -59,7 +64,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -79,4 +83,3 @@ jobs:
           app-name: "portfolio-v3"
           slot-name: "Production"
           package: .
-          startup-command: "node node_modules/next/dist/bin/next start"
