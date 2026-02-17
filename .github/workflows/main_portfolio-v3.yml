@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -39,45 +39,11 @@ jobs:
         run: |
           npm ci
           npm run build
-          echo "=== Verify build ==="
-          ls -la .next/BUILD_ID
-          cat .next/BUILD_ID
 
-      - name: Install production deps only
+      - name: Prepare standalone package
         run: |
-          rm -rf node_modules
-          npm ci --omit=dev
-
-      - name: Clean and package
-        run: |
-          # Remove Oryx artifacts that cause interference
-          rm -f oryx-manifest.toml node_modules.tar.gz 2>/dev/null || true
-          # Create clean zip
-          zip -r deploy.zip .next/ node_modules/ public/ package.json next.config.ts -x "node_modules/.cache/*"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: next-app
-          path: deploy.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      contents: read
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: next-app
-
-      - name: Unzip
-        run: |
-          mkdir app
-          unzip deploy.zip -d ./app
-          echo "=== Verify structure ==="
-          ls -la ./app/.next/BUILD_ID
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -85,4 +51,4 @@ jobs:
           app-name: "portfolio-v3"
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./app
+          package: .next/standalone
