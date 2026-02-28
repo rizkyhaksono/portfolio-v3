@@ -1,13 +1,8 @@
 import Image from "next/image"
 import Link from "next/link"
-import {
-  Card,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button";
-import { Globe, GitBranch } from "lucide-react";
+import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Globe, GitBranch } from "lucide-react"
 
 export default function CardProject({
   id,
@@ -20,45 +15,42 @@ export default function CardProject({
   id: string
   title: string
   description: string
-  source?: string,
+  source?: string
   image?: string
   href?: string
 }>) {
   return (
-    <Card className="flex flex-col overflow-hidden border hover:shadow-lg transition-all duration-300 ease-out h-full">
-      <Link href={`/project/${id}`} className="block">
+    <Card className="group flex flex-col overflow-hidden border border-muted/40 hover:border-primary/30 bg-background/50 hover:bg-muted/10 shadow-sm hover:shadow-xl transition-all duration-500 ease-out h-full">
+      <Link href={`/project/${id}`} className="block overflow-hidden">
         {image && (
-          <Image
-            src={image}
-            alt={title}
-            width={500}
-            height={300}
-            className="h-40 w-full overflow-hidden object-cover object-top"
-          />
+          <div className="relative h-48 w-full overflow-hidden bg-muted">
+            <Image src={image} alt={title} fill className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-105" />
+            {/* Subtle gradient overlay for better text contrast if ever overlaid, and premium feel */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </div>
         )}
-        <CardHeader className="px-2">
-          <div className="space-y-1">
-            <CardTitle className="mt-1 text-base font-bold hover:underline">{title}</CardTitle>
-            <div
-              className="prose max-w-full text-pretty font-sans text-xs text-muted-foreground dark:prose-invert pt-2 line-clamp-3"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
+        <CardHeader className="p-4 pb-2">
+          <div className="space-y-1.5">
+            <CardTitle className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">{title}</CardTitle>
+            <div className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert line-clamp-2 leading-snug" dangerouslySetInnerHTML={{ __html: description }} />
           </div>
         </CardHeader>
       </Link>
-      <CardFooter className="px-2 mt-auto">
-        <div className="flex flex-row flex-wrap items-start gap-2">
+      <CardFooter className="p-4 pt-4 mt-auto border-t border-border/10">
+        <div className="flex flex-row flex-wrap items-center gap-2">
           {href && href.length > 0 && (
             <Link href={href} target="_blank">
-              <Button size={"sm"} className="gap-1">
-                <Globe className="text-muted size-4" /> Website
+              <Button size="sm" variant="secondary" className="h-8 gap-1.5 rounded-md hover:bg-primary hover:text-primary-foreground transition-colors">
+                <Globe className="size-3.5" />
+                <span className="text-xs font-medium">Website</span>
               </Button>
             </Link>
           )}
           {source && source.length > 0 && (
             <Link href={source} target="_blank">
-              <Button size={"sm"} className="gap-1">
-                <GitBranch className="text-muted size-4" /> Source
+              <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-md hover:bg-primary/10 transition-colors">
+                <GitBranch className="size-3.5" />
+                <span className="text-xs font-medium">Source</span>
               </Button>
             </Link>
           )}

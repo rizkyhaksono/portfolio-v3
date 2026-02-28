@@ -10,6 +10,25 @@ const UMAMI_API_URL = "https://api.umami.is/v1";
 const WEBSITE_ID = "3344dd5c-2e88-4ae5-95f7-e142cdbff614";
 const API_KEY = process.env.UMAMI_API_KEY;
 
+// Helper to quickly add timeouts to fetches
+const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 3000) => {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal })
+    clearTimeout(id)
+    return response
+  } catch (error: any) {
+    clearTimeout(id)
+    // Handle timeout or connection errors specifically to prevent loud crashes
+    if (error.name === 'AbortError' || error.code === 'UND_ERR_CONNECT_TIMEOUT') {
+      console.warn(`[Umami] Fetch timeout or connection blocked for ${url}`)
+      return null
+    }
+    throw error
+  }
+}
+
 /**
  * Get summarized website statistics
  */
@@ -29,7 +48,7 @@ export async function getUmamiStats(
 
     const url = `${UMAMI_API_URL}/websites/${WEBSITE_ID}/stats?startAt=${start}&endAt=${end}`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
@@ -38,9 +57,11 @@ export async function getUmamiStats(
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
 
+    if (!response) return null; // Handled timeout
+
     if (!response.ok) {
       const text = await response.text();
-      console.error(`Umami stats API returned ${response.status}: ${text.slice(0, 100)}`);
+      console.error(`Umami stats API returned ${response.status} - ${text.substring(0, 100)}`);
       return null;
     }
 
@@ -62,7 +83,7 @@ export async function getActiveVisitors(): Promise<number> {
   try {
     const url = `${UMAMI_API_URL}/websites/${WEBSITE_ID}/active`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
@@ -70,6 +91,8 @@ export async function getActiveVisitors(): Promise<number> {
       },
       next: { revalidate: 60 }, // Cache for 1 minute
     });
+
+    if (!response) return 0; // Handled timeout
 
     if (!response.ok) {
       console.error(`Umami active API returned ${response.status}`);
@@ -104,7 +127,7 @@ export async function getUmamiMetrics(
 
     const url = `${UMAMI_API_URL}/websites/${WEBSITE_ID}/metrics?startAt=${start}&endAt=${end}&type=${type}&limit=${limit}`;
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
@@ -112,6 +135,8 @@ export async function getUmamiMetrics(
       },
       next: { revalidate: 3600 }, // Cache for 1 hour
     });
+
+    if (!response) return []; // Handled timeout
 
     if (!response.ok) {
       console.error(`Umami metrics API returned ${response.status}`);

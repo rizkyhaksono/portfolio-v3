@@ -95,17 +95,19 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
 
             return (
               <Link key={tool.id} href={`/tools?tab=${tool.id}`} className="block">
-                <Card className={`hover:shadow-lg transition-all cursor-pointer  ${isActive ? "ring-2 ring-primary shadow-lg" : ""}`}>
+                <Card
+                  className={`group border border-muted/40 bg-background/50 transition-all duration-500 ease-out cursor-pointer hover:shadow-xl hover:bg-muted/10 ${isActive ? "border-primary/50 bg-primary/5 shadow-md" : "hover:border-primary/30"}`}
+                >
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-foreground text-background">
-                        <IconComponent size={20} />
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className={`p-2.5 rounded-xl transition-all duration-300 ${isActive ? "bg-primary text-primary-foreground shadow-sm scale-110" : "bg-primary/10 text-primary group-hover:scale-110 group-hover:bg-primary/20"}`}>
+                        <IconComponent size={20} className={isActive ? "" : "transition-transform duration-300 group-hover:-rotate-3"} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-sm">{tool.name}</h3>
-                        <p className="text-xs text-muted-foreground">{tool.description}</p>
+                        <h3 className={`font-semibold text-sm tracking-tight transition-colors ${isActive ? "text-foreground" : "group-hover:text-primary"}`}>{tool.name}</h3>
+                        <p className="text-xs text-muted-foreground leading-snug mt-0.5">{tool.description}</p>
                       </div>
-                      {isActive && <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />}
+                      {isActive && <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_hsl(var(--primary))]" />}
                     </div>
                   </CardContent>
                 </Card>

@@ -100,8 +100,8 @@ export function AdminLoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1 text-center">
+    <Card className="w-full max-w-md border-white/20 dark:border-white/10 shadow-2xl bg-background/60 dark:bg-background/40 backdrop-blur-xl rounded-2xl overflow-hidden relative z-10 p-2">
+      <CardHeader className="space-y-1 text-center pb-2">
         <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
         <CardDescription>Sign in to your admin account to manage your portfolio</CardDescription>
       </CardHeader>

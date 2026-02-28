@@ -264,22 +264,24 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     <>
       {/* Login Notice */}
       {!currentUser && (
-        <Card className="border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent mb-6 shadow-sm">
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-primary/5 to-transparent mb-6 shadow-sm hover:shadow-md transition-all duration-300">
           <CardContent className="p-5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-start gap-3 flex-1">
-                <div className="p-2.5 rounded-full bg-primary/15 ring-2 ring-primary/20">
-                  <LogIn className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-4 flex-1">
+                <div className="p-3 rounded-xl bg-primary/10 text-primary">
+                  <LogIn className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-base mb-1">Join the conversation</h3>
+                  <h3 className="font-semibold text-base mb-1 tracking-tight">Join the conversation</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">Login to post messages, reply to others, and participate in discussions</p>
                 </div>
               </div>
               <Link href="/auth" className="w-full sm:w-auto">
-                <Button className="gap-2 w-full sm:w-auto shadow-sm hover:shadow-md transition-shadow">
-                  <LogIn className="w-4 h-4" />
-                  Login
+                <Button asChild className="gap-2 w-full sm:w-auto shadow-sm hover:shadow-md transition-all rounded-full px-6">
+                  <div>
+                    <LogIn className="w-4 h-4" />
+                    Login
+                  </div>
                 </Button>
               </Link>
             </div>
@@ -288,7 +290,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
       )}
 
       {/* Chat Container */}
-      <Card className="flex flex-col shadow-lg border-border/50">
+      <Card className="flex flex-col shadow-sm border-muted/50 overflow-hidden bg-background/50 backdrop-blur-sm">
         <CardHeader className="pb-4 pt-5 border-b bg-muted/20 flex-row items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-primary/10">
