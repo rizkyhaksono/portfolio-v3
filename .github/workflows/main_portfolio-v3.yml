@@ -18,7 +18,10 @@ jobs:
         with:
           node-version: "24.x"
 
-      - name: Install and build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
         env:
           NODE_ENV: production
           DOMAIN: ${{ secrets.DOMAIN }}
@@ -36,9 +39,7 @@ jobs:
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-        run: |
-          npm ci
-          npm run build
+        run: npm run build
 
       - name: Prepare standalone package
         run: |
