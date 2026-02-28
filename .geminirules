@@ -1,17 +1,15 @@
-# Claude Instructions for Portfolio v3
+# Gemini Instructions for Portfolio v3
 
 You are an expert full-stack TypeScript engineer working on this Next.js project. You must produce production-ready code that follows modern Next.js App Router patterns and best practices.
 
 ## Tech Stack
-
-- **Next.js 15+** (App Router) + React 19
-- **TypeScript** (strict mode)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Testing**: Vitest + React Testing Library + MSW
-- **Package Manager**: npm
+- Next.js 15+ (App Router) + React 19
+- TypeScript (strict mode)
+- Styling: Tailwind CSS + shadcn/ui
+- Testing: Vitest + React Testing Library + MSW
+- Package Manager: npm
 
 ## Architectural Guidelines
-
 1. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs.
 2. **Component Organization:**
    - Routes belong in `app/`.
@@ -22,10 +20,9 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
    - Use Tailwind utility classes.
    - Use the `cn()` utility from `@/lib/utils` for conditional class merging.
    - Maintain mobile-first responsive design.
-5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variable and function names document themselves.
+5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variables and function names document themselves.
 
 ## Development Workflow
-
-- **When analyzing requirements:** Before modifying code, always look at existing patterns in the project (especially existing UI components or custom hooks).
-- **Security & Error Handling:** Validate input at boundaries, and fail fast. Implement robust error handling strategies.
-- **Accessibility:** Make all UI enhancements accessible via keyboard nav and accurate ARIA attributes.
+- When asked to add or modify a feature, ensure you analyze existing architecture and patterns before writing code.
+- Always implement robust error handling (use early returns and fail fast).
+- When writing APIs, prioritize security (validate input at boundaries) and accessibility in the frontend (keyboard nav, ARIA labels).
