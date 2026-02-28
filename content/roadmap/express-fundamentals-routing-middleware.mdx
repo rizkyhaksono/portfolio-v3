@@ -237,7 +237,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   <AccordionItem value="application">
     <AccordionTrigger>Application-Level Middleware</AccordionTrigger>
     <AccordionContent>
-      <p className="mb-4">Bound to the app instance using app.use() or app.METHOD():</p>
+      Bound to the app instance using app.use() or app.METHOD():
       ```javascript
       const app = express();
 
@@ -266,7 +266,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   <AccordionItem value="router">
     <AccordionTrigger>Router-Level Middleware</AccordionTrigger>
     <AccordionContent>
-      <p className="mb-4">Works like application-level but bound to a router instance:</p>
+      Works like application-level but bound to a router instance:
       ```javascript
       const router = express.Router();
 
@@ -292,7 +292,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   <AccordionItem value="error">
     <AccordionTrigger>Error-Handling Middleware</AccordionTrigger>
     <AccordionContent>
-      <p className="mb-4">Takes 4 arguments (err, req, res, next):</p>
+      Takes 4 arguments (err, req, res, next):
       ```javascript
       // Custom error class
       class AppError extends Error {
@@ -337,7 +337,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   <AccordionItem value="builtin">
     <AccordionTrigger>Built-in Middleware</AccordionTrigger>
     <AccordionContent>
-      <p className="mb-4">Express includes several built-in middleware:</p>
+      Express includes several built-in middleware:
       ```javascript
       // Parse JSON request body
       app.use(express.json());

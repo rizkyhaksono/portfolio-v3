@@ -42,48 +42,51 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
     <TabsTrigger value="linux">Linux</TabsTrigger>
   </TabsList>
 
-  <TabsContent value="windows">
-    <Card>
-      <CardContent className="pt-6">
-        <ol className="list-decimal list-inside space-y-2">
-          <li>Download the Windows Installer (.msi) from nodejs.org</li>
-          <li>Run the installer and follow the installation wizard</li>
-          <li>Verify installation by opening PowerShell and running:</li>
-        </ol>
-        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version
-          <br />
-          npm --version
-        </div>
-      </CardContent>
-    </Card>
-  </TabsContent>
+{" "}
 
-  <TabsContent value="macos">
-    <Card>
-      <CardContent className="pt-6">
-        <p className="mb-4">Using Homebrew (recommended):</p>
-        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">brew install node</div>
-        <p className="mb-2">Or download the macOS Installer from nodejs.org</p>
-        <p className="mb-2">Verify installation:</p>
-        <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version
-          <br />
-          npm --version
-        </div>
-      </CardContent>
-    </Card>
-  </TabsContent>
+<TabsContent value="windows">
+  <Card>
+    <CardContent className="pt-6">
+      <ol className="list-decimal list-inside space-y-2">
+        <li>Download the Windows Installer (.msi) from nodejs.org</li>
+        <li>Run the installer and follow the installation wizard</li>
+        <li>Verify installation by opening PowerShell and running:</li>
+      </ol>
+      <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+        node --version
+        <br />
+        npm --version
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
+
+{" "}
+
+<TabsContent value="macos">
+  <Card>
+    <CardContent className="pt-6">
+      Using Homebrew (recommended):
+      <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">brew install node</div>
+      Or download the macOS Installer from nodejs.org Verify installation:
+      <div className="p-4 bg-muted rounded-lg font-mono text-sm">
+        node --version
+        <br />
+        npm --version
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
 
   <TabsContent value="linux">
     <Card>
       <CardContent className="pt-6">
-        <p className="mb-4">For Ubuntu/Debian:</p>
+        For Ubuntu/Debian:
         <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
           curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br />
           sudo apt-get install -y nodejs
         </div>
-        <p className="mb-2">Verify installation:</p>
+        Verify installation:
         <div className="p-4 bg-muted rounded-lg font-mono text-sm">
           node --version
           <br />
@@ -436,9 +439,7 @@ module.exports = (err, req, res, next) => {
   </CardHeader>
   <CardContent className="text-green-800 dark:text-green-200">
     <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">npm run dev</div>
-    <p>
-      Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
-    </p>
+    Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
   </CardContent>
 </Card>
 

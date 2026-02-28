@@ -1,0 +1,123 @@
+---
+title: "What is Kubernetes?"
+description: "Understanding Kubernetes (K8s) architecture, Pods, Nodes, and Clusters."
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "beginner"
+duration: "15 min"
+order: 1
+video: "https://www.youtube.com/embed/VnvRFRk_51k"
+illustration: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { BookOpen, Lightbulb, Target, Server } from "lucide-react"
+
+## Introduction to Kubernetes (K8s)
+
+**Kubernetes** (often abbreviated as **K8s**) is an open-source container orchestration platform originally designed by Google. It automates the deployment, scaling, and management of containerized applications (like Docker containers).
+
+When your application grows and you need to run hundreds of containers across dozens of physical or virtual machines, managing them manually becomes impossible. That's where Kubernetes shines.
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Target className="h-5 w-5" />
+      Learning Objectives
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2">
+      <li>Understand the purpose of container orchestration.</li>
+      <li>Identify the components of a Kubernetes Cluster (Master vs Worker Nodes).</li>
+      <li>Grasp the concept of a Pod, the smallest deployable unit.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+## Kubernetes Architecture
+
+A Kubernetes environment consists of multiple machines working together. This group of machines is called a **Cluster**. The cluster is split into two primary roles:
+
+### 1. The Control Plane (Master Node)
+
+Think of the Control Plane as the "brain". It maintains the desired state of the cluster, schedules containers, and monitors machine health.
+
+- **kube-apiserver**: The frontend of the cluster. Every command you run goes through the API server.
+- **etcd**: A consistent, highly-available key-value store containing all cluster data.
+- **kube-scheduler**: Watches for newly created Pods with no assigned node, and selects a node for them to run on.
+- **kube-controller-manager**: Runs controller processes that watch the cluster state (acting like a thermostat).
+
+### 2. Worker Nodes
+
+Worker nodes are the actual workhorses where your application containers run.
+
+- **kubelet**: An agent running on each node ensuring that containers are running in a Pod.
+- **kube-proxy**: Maintains network rules on nodes allowing communication to your Pods from network sessions.
+
+<Alert className="my-6">
+  <Server className="h-4 w-4" />
+  <AlertTitle>What is a Node?</AlertTitle>
+  <AlertDescription>A **Node** is just a machine. It could be a physical hardware server in a datacenter, or a virtual machine (VM) in a cloud provider like AWS EC2 or Google Compute Engine.</AlertDescription>
+</Alert>
+
+## What is a Pod?
+
+In Kubernetes, you don't run containers directly. Instead, containers are wrapped inside **Pods**.
+
+A **Pod** is the smallest and most basic deployable object in Kubernetes. It represents a single instance of a running process in your cluster.
+
+- A Pod usually contains **one** container.
+- However, it can contain **multiple** containers that are tightly coupled and share the same network namespace and storage volumes.
+
+<Card className="my-6 border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+      <BookOpen className="h-5 w-5" />
+      Analogy Time
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="text-blue-800 dark:text-blue-200">
+    
+      If your application container (Docker) is a <strong>whale</strong>, then the <strong>Pod</strong> is the protective cage or tank surrounding it that gets transported across the ocean. Kubernetes manages the Pods, not the raw container
+      directly.
+    
+  </CardContent>
+</Card>
+
+## Creating Your First Pod
+
+Normally, you define Kubernetes resources using declarative **YAML** files.
+
+```yaml
+# nginx-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-first-pod
+  labels:
+    app: webserver
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:latest
+      ports:
+        - containerPort: 80
+```
+
+You apply this file to your cluster using the CLI tool **kubectl**:
+
+```bash
+kubectl apply -f nginx-pod.yaml
+```
+
+## Next Steps
+
+While creating raw Pods is helpful for learning, production applications _never_ run bare Pods because if a Pod dies, it doesn't restart automatically! To fix this, we use higher-level controllers.
+
+<NextLesson
+  title="Deployments and Services"
+  description="Learn how to self-heal your Pods, scale intelligently, and expose them to the network using Kubernetes Deployments and Services."
+  href="/roadmap/kubernetes-fundamentals-deployments-services"
+/>

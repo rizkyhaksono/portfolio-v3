@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MonkeyTypeUserData } from "@/commons/types/monkeytype"
 import { Keyboard, Target, MousePointerClick, Timer, TrendingUp, Zap, Award, Activity } from "lucide-react"
 import { Bar, BarChart, XAxis, YAxis, Line, LineChart } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 
 interface MonkeyTypeStatsProps {
@@ -32,23 +34,23 @@ function formatTime(seconds: number): string {
 
 function StatCard({ icon: Icon, label, value, subValue, trend }: { icon: React.ElementType; label: string; value: string | number; subValue?: string; trend?: string }) {
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden group border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md hover:bg-white/10 dark:hover:bg-neutral-800/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
+          <div className="p-2 rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
             <Icon className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold truncate">{value}</p>
+            <div className="flex items-center gap-2 mb-0.5">
+              <p className="text-2xl font-bold tracking-tight truncate">{value}</p>
               {trend && (
                 <Badge variant="secondary" className="text-xs">
                   {trend}
                 </Badge>
               )}
             </div>
-            <p className="text-xs text-muted-foreground truncate">{label}</p>
-            {subValue && <p className="text-xs text-muted-foreground/70 truncate">{subValue}</p>}
+            <p className="text-xs font-medium text-muted-foreground truncate">{label}</p>
+            {subValue && <p className="text-[10px] text-muted-foreground/80 truncate">{subValue}</p>}
           </div>
         </div>
       </CardContent>
@@ -57,6 +59,8 @@ function StatCard({ icon: Icon, label, value, subValue, trend }: { icon: React.E
 }
 
 export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
+  const [selectedTest, setSelectedTest] = useState<any>(null)
+
   if (!typingStats.bestWpm && !typingStats.stats) {
     return null
   }
@@ -111,14 +115,14 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
           <Keyboard className="w-4 h-4" />
           MonkeyType Performance
         </p>
-        <Badge variant="outline" className="text-xs">
-          <Activity className="w-3 h-3 mr-1" />
+        <Badge variant="outline" className="text-xs px-2 py-0.5 bg-background/50 backdrop-blur-sm">
+          <Activity className="w-3 h-3 mr-1 text-primary" />
           Last 10 Tests
         </Badge>
       </div>
 
       {/* Main Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
         <StatCard icon={Keyboard} label="Best WPM" value={typingStats.bestWpm || "N/A"} subValue={`Avg: ${typingStats.averageWpm} WPM`} />
         <StatCard icon={Target} label="Best Accuracy" value={typingStats.bestAccuracy ? `${typingStats.bestAccuracy}%` : "N/A"} subValue={bestConsistency ? `Consistency: ${bestConsistency}%` : undefined} />
         <StatCard icon={MousePointerClick} label="Tests Completed" value={formatNumber(typingStats.stats?.completedTests || 0)} subValue={completionRate > 0 ? `${completionRate}% completion` : undefined} />
@@ -127,7 +131,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
 
       {/* Additional Stats */}
       {(bestRaw > 0 || typingStats.averageWpm > 0) && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-5">
           {bestRaw > 0 && <StatCard icon={Zap} label="Best Raw WPM" value={bestRaw} subValue="Uncorrected speed" />}
           {typingStats.averageWpm > 0 && <StatCard icon={TrendingUp} label="Average WPM" value={typingStats.averageWpm} subValue="Across all tests" />}
           {bestConsistency > 0 && <StatCard icon={Award} label="Best Consistency" value={`${bestConsistency}%`} subValue="Typing stability" />}
@@ -137,47 +141,95 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
       {/* Charts */}
       {wpmChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
+          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+            <CardHeader className="pb-3 pt-4 px-5">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <div className="p-1.5 rounded-md bg-primary/10">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                </div>
                 WPM Progress
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 px-4 pb-4">
               <ChartContainer config={wpmChartConfig} className="h-[200px] w-full">
                 <LineChart data={wpmChartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <XAxis dataKey="test" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="wpm" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 4 }} />
-                  <Line type="monotone" dataKey="raw" stroke="hsl(var(--muted-foreground))" strokeWidth={2} strokeDasharray="5 5" dot={{ fill: "hsl(var(--muted-foreground))", r: 3 }} />
+                  <Line type="monotone" dataKey="wpm" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 4 }} activeDot={{ r: 6, onClick: (data: any) => setSelectedTest(data.payload) }} />
+                  <Line
+                    type="monotone"
+                    dataKey="raw"
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={{ fill: "hsl(var(--muted-foreground))", r: 3 }}
+                    activeDot={{ r: 5, onClick: (data: any) => setSelectedTest(data.payload) }}
+                  />
                 </LineChart>
               </ChartContainer>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Target className="w-4 h-4" />
+          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+            <CardHeader className="pb-3 pt-4 px-5">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <div className="p-1.5 rounded-md bg-primary/10">
+                  <Target className="w-4 h-4 text-primary" />
+                </div>
                 Accuracy & Consistency
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="pt-0 px-4 pb-4">
               <ChartContainer config={accuracyChartConfig} className="h-[200px] w-full">
                 <BarChart data={accuracyChartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                   <XAxis dataKey="test" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 100]} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="consistency" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} onClick={(data) => setSelectedTest({ ...data, isAccuracyMode: true })} cursor="pointer" />
+                  <Bar dataKey="consistency" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} onClick={(data) => setSelectedTest({ ...data, isAccuracyMode: true })} cursor="pointer" />
                 </BarChart>
               </ChartContainer>
             </CardContent>
           </Card>
         </div>
       )}
+
+      {/* Detail Dialog */}
+      <Dialog open={!!selectedTest} onOpenChange={(open) => !open && setSelectedTest(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Test Details - {selectedTest?.test}</DialogTitle>
+            <DialogDescription>Detailed performance metrics for this specific typing test.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            {selectedTest?.wpm !== undefined && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="col-span-2 text-sm font-medium">WPM:</span>
+                <span className="col-span-2 text-2xl font-bold text-primary">{selectedTest.wpm}</span>
+              </div>
+            )}
+            {selectedTest?.raw !== undefined && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="col-span-2 text-sm font-medium">Raw WPM:</span>
+                <span className="col-span-2 text-lg font-semibold">{selectedTest.raw}</span>
+              </div>
+            )}
+            {selectedTest?.accuracy !== undefined && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="col-span-2 text-sm font-medium">Accuracy:</span>
+                <span className="col-span-2 text-lg font-semibold">{selectedTest.accuracy}%</span>
+              </div>
+            )}
+            {selectedTest?.consistency !== undefined && (
+              <div className="grid grid-cols-4 items-center gap-4">
+                <span className="col-span-2 text-sm font-medium">Consistency:</span>
+                <span className="col-span-2 text-lg font-semibold">{selectedTest.consistency}%</span>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

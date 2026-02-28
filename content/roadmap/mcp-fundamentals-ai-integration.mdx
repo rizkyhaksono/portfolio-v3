@@ -1,0 +1,97 @@
+---
+title: "Integrating MCP with AI Agents"
+description: "Hook up an MCP server to Claude Desktop or arbitrary LangChain scripts."
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "advanced"
+duration: "20 min"
+order: 3
+video: "https://www.youtube.com/embed/Sxg3b3bB5k"
+illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { CheckCircle2, Bot } from "lucide-react"
+
+## Using MCP with Claude Desktop
+
+The absolute easiest way to consume your custom Model Context Protocol is via Anthropic's official Claude Desktop application.
+
+### Step 1: Locate the Config File
+
+Claude Desktop reads a central JSON configuration to discover external servers when it powers on.
+
+- **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+### Step 2: Register your Server
+
+Open the `.json` file and append your server module. In this scenario, we use our `mcp-weather-server` built in the last course.
+
+```json
+{
+  "mcpServers": {
+    "weather-server": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/your/mcp-weather-server/index.ts"]
+    }
+  }
+}
+```
+
+### Step 3: Prompt Claude
+
+Restart Claude Desktop. Look for the small **plug** icon near your chat bar indicating an active connection. You can now prompt the LLM directly:
+
+> _"What is the weather in Tokyo?"_
+
+Claude will detect your `get_weather` tool, execute it natively under the hood, and parse the resulting JSON string inside its standard conversation pipeline!
+
+<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
+      <CheckCircle2 className="h-5 w-5" />
+      Success!
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="text-green-800 dark:text-green-200">
+    You have successfully enabled an intelligent AI to autonomously trigger local server execution without giving it root-level API access to everything you own!
+  </CardContent>
+</Card>
+
+## Orchestrating MCP in Code (LangChain)
+
+If you aren't using an isolated GUI like Claude Desktop, you must build an **MCP Client**. Below is a conceptual look at how a custom LangChain AI proxy script consumes MCP dynamically using Python.
+
+```python
+from langchain_mcp_adapters.client import ClientSession
+from langchain_openai import ChatOpenAI
+
+# 1. Establish the connection to the custom remote/local server
+session = ClientSession(
+    server_transport="stdio",
+    command="npx",
+    args=["tsx", "index.ts"]
+)
+
+# 2. Extract tools dynamically requested by the Server
+mcp_tools = await session.list_tools()
+
+# 3. Mount those tools into your target LLM (OpenAI, Anthropic, Gemini)
+agent = ChatOpenAI(model="gpt-4o").bind_tools(mcp_tools)
+
+# 4. Invoke LLM and let it act autonomously based on user question
+response = await agent.ainvoke("What is the weather in Tokyo today?")
+print(response)
+```
+
+<Alert className="my-6">
+  <Bot className="h-4 w-4" />
+  <AlertTitle>Agent Autonomy</AlertTitle>
+  <AlertDescription>Using standard protocols means you can easily switch the underlying foundation model (from OpenAI to Gemini to Claude) without modifying a single line of your external backend integrations!</AlertDescription>
+</Alert>
+
+## Completion
+
+Congratulations, you've completed the **MCP Fundamentals** course! You learned the theoretical architecture of the Model Context Protocol, implemented a functional local server, and hooked it into high-level LLM clients.

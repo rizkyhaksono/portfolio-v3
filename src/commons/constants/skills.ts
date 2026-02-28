@@ -58,6 +58,8 @@ export const skills_data: SkillCategory[] = [
       "REST API",
       "tRPC",
       "Socket.io",
+      "FastAPI",
+      "RabbitMQ",
     ],
     icon: "Server",
     color: "from-green-500 to-emerald-400"
@@ -182,6 +184,14 @@ export const skills_data: SkillCategory[] = [
       "Keras",
       "OpenCV",
       "Matplotlib",
+      "MCP",
+      "Fastmcp",
+      "Data Warehouse",
+      "ETL",
+      "RAG",
+      "Fine tuning",
+      "Chunking",
+      "Embedding",
     ],
     icon: "Brain",
     color: "from-fuchsia-500 to-pink-400"
@@ -218,6 +228,9 @@ export const skills_data_top = [
   "Svelte",
   "HTML5",
   "CSS3",
+  "RAG",
+  "MCP",
+  "FastAPI",
 ];
 
 export const skills_data_bottom = [
@@ -233,6 +246,8 @@ export const skills_data_bottom = [
   "ASP .NET",
   "Python",
   "Figma",
+  "Data Warehouse",
+  "RabbitMQ",
 ];
 
 export const getAllSkills = (): string[] => {

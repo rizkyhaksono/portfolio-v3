@@ -1,0 +1,130 @@
+---
+title: "Creating Your First MCP Server"
+description: "Learn to build an MCP server in TypeScript using the official SDK."
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "intermediate"
+duration: "25 min"
+order: 2
+video: "https://www.youtube.com/embed/5yR1W-S48mY"
+illustration: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Terminal, Download, Code } from "lucide-react"
+
+## Setup the Environment
+
+We'll build a simple TypeScript MCP Server that provides a "Weather" Tool to our LLM.
+
+### Step 1: Initialize Project
+
+Create a new directory and initialize npm:
+
+```bash
+mkdir mcp-weather-server
+cd mcp-weather-server
+npm init -y
+npm install @modelcontextprotocol/sdk zod
+npm install -D typescript @types/node tsx
+npx tsc --init
+```
+
+### Step 2: Write the Server Code
+
+Create an `index.ts` file in your root folder:
+
+```typescript
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+import { z } from "zod"
+
+// 1. Initialize Server Metadata
+const server = new Server(
+  {
+    name: "weather-mcp",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  },
+)
+
+// 2. Define the Tool (Instructing the LLM what it does)
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: [
+      {
+        name: "get_weather",
+        description: "Fetch the current weather for a specific city.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            city: { type: "string", description: "City name e.g. Tokyo" },
+          },
+          required: ["city"],
+        },
+      },
+    ],
+  }
+})
+
+// 3. Handle the Execution (When the LLM calls the Tool)
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  if (request.params.name === "get_weather") {
+    const { city } = request.params.arguments as { city: string }
+
+    // Hardcoded logic for simplicity
+    const temp = Math.floor(Math.random() * 35)
+
+    return {
+      content: [{ type: "text", text: `The weather in ${city} is ${temp}°C and sunny.` }],
+    }
+  }
+
+  throw new Error("Tool not found")
+})
+
+// 4. Start the Server Pipeline using Stdio
+async function run() {
+  const transport = new StdioServerTransport()
+  await server.connect(transport)
+  console.log("Weather MCP Server running on stdio")
+}
+
+run().catch(console.error)
+```
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Code className="h-5 w-5" />
+      Why Stdio?
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    The <code>StdioServerTransport</code> allows the MCP Client (like Claude Desktop) to start your MCP server seamlessly as a background process simply by invoking your script path. All communication happens invisibly over the standard
+    input/output streams via JSON-RPC.
+  </CardContent>
+</Card>
+
+## Test the Server Externally
+
+Your server is fully built! You can run it via `npx tsx index.ts`. By itself, it won't do much because it expects external JSON-RPC requests on its standard input.
+
+<Alert className="my-6 bg-blue-50/50">
+  <Terminal className="h-4 w-4 text-blue-500" />
+  <AlertTitle>Testing with MCP Inspector</AlertTitle>
+  <AlertDescription>
+    Anthropic provides a great tool to test your server without needing an AI. Run this in your terminal:
+    <div className="mt-2 text-sm font-mono bg-zinc-900 text-green-400 p-2 rounded">npx @modelcontextprotocol/inspector npx tsx index.ts</div>
+  </AlertDescription>
+</Alert>
+
+## Next Steps
+
+<NextLesson title="Integrating MCP with AI Agents" description="Connect our newly created Weather server to Claude and LangChain so our AI can read the weather live!" href="/roadmap/mcp-fundamentals-ai-integration" />

@@ -1,0 +1,74 @@
+---
+title: "What is Model Context Protocol?"
+description: "An introduction to MCP, its architecture, and why it's revolutionizing AI integrations."
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "beginner"
+duration: "10 min"
+order: 1
+video: "https://www.youtube.com/embed/Sxg3b3bB5k"
+illustration: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { BookOpen, Lightbulb, Target } from "lucide-react"
+
+## Introduction to MCP
+
+The **Model Context Protocol (MCP)** is an open standard that enables AI models to securely connect to data sources, tools, and integrations. Developed initially by Anthropic, it acts as a universal bridge, standardizing how AI Assistants like Claude, Cursor, and custom agents fetch context from local or external environments.
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Target className="h-5 w-5" />
+      Learning Objectives
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2">
+      <li>Understand what MCP is and the problems it solves.</li>
+      <li>Learn the architectural difference between MCP Clients and Servers.</li>
+      <li>Recognize the three core capabilities: Resources, Prompts, and Tools.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+## Why Do We Need MCP?
+
+Before MCP, AI developers had to build custom, tightly-coupled API wrappers for every new data source they wanted an LLM to access. This lead to scattered codebases, security risks (granting AI full API access), and a lack of interoperability.
+
+MCP solves this by introducing a standardized client-server architecture:
+
+- **Universal Protocol**: Write an MCP Server once, and _any_ MCP-compatible client (like Claude Desktop) can connect to it.
+- **Security-First**: The MCP Server retains full control over the data it exposes. The AI client cannot execute arbitrary code unless explicitly exposed as a "Tool".
+
+## Core Architecture
+
+### 1. MCP Hosts / Clients
+
+The AI application hosting the model. Examples include Claude Desktop, Cursor IDE, or your own custom LangChain wrapper. The client decides _when_ to ping the server.
+
+### 2. MCP Servers
+
+Lightweight programs (written in TypeScript, Python, etc.) that connect directly to your databases, APIs, or local files. They expose capabilities back to the Client.
+
+### 3. The Transport Layer
+
+MCP relies on transport mechanisms (typically **stdio** for local servers executing as subprocesses, or **SSE** for remote network servers) using JSON-RPC messages.
+
+## Capabilities
+
+<Alert className="my-6">
+  <Lightbulb className="h-4 w-4" />
+  <AlertTitle>Resources, Prompts, and Tools</AlertTitle>
+  <AlertDescription>An MCP Server can provide three distinct types of context to the LLM:</AlertDescription>
+</Alert>
+
+- **Resources**: Read-only data files. Think of it like giving the AI a URL `file:///local/log.txt` to read from.
+- **Prompts**: Reusable prompt templates. Instead of copy-pasting complex system messages, the server fetches pre-defined intelligent templates.
+- **Tools**: Executable functions (e.g., "query_database", "create_jira_ticket"). The AI asks to run the tool, the Server executes it, and sends the result back.
+
+## Next Steps
+
+<NextLesson title="Creating your first MCP Server" description="Now that we understand the architecture, let's write our first TypeScript MCP Server from scratch." href="/roadmap/mcp-fundamentals-creating-server" />

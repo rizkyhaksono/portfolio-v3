@@ -1,0 +1,121 @@
+---
+title: "Deployments and Services"
+description: "How to manage Pod lifecycles using Deployments, and expose them to the network via Services."
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "intermediate"
+duration: "20 min"
+order: 2
+video: "https://www.youtube.com/embed/X48VuDVv0do"
+illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Layers, Route, ArrowRight } from "lucide-react"
+
+## Understanding Deployments
+
+In the previous lesson, we learned about Pods. The golden rule of Kubernetes is: **Never deploy naked Pods to production**.
+If a node crashes, the Pods on that node disappear permanently.
+
+Instead, we use a **Deployment** controller. A Deployment provides declarative updates for Pods and ReplicaSets. You describe a _desired state_ in a Deployment, and the Controller changes the actual state to the desired state at a controlled rate.
+
+### Features of a Deployment
+
+- **Scaling**: Increase or decrease the number of identical Pod replicas.
+- **Self-Healing**: If a Pod within a Deployment crashes, the Deployment immediately spins up a replacement.
+- **Rolling Updates**: Update your application version with zero downtime.
+
+### Anatomy of a Deployment YAML
+
+Here is an example `deployment.yaml` file that spins up 3 Replicas of our Nginx web server:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webserver
+  template:
+    metadata:
+      labels:
+        app: webserver
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:1.14.2 # Specify the version here!
+          ports:
+            - containerPort: 80
+```
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Layers className="h-5 w-5" />
+      What is the Template?
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    Notice the `template` block inside the Deployment spec. That is essentially the exact same Pod definition we saw in the first lesson embedded *inside* the Deployment. The Deployment uses this template cookie-cutter to stamp out the 3
+    requested replicas.
+  </CardContent>
+</Card>
+
+## Understanding Services
+
+Now we have 3 identical running Nginx Pods. How do we send traffic to them?
+
+Pods are ephemeral—they die, get recreated, and receive completely _new IP addresses_ every time. If your frontend application relies on a hardcoded IP address from an Nginx Pod, it will break immediately when the Pod restarts.
+
+This is where a **Service** comes in. A Service is an abstraction which defines a logical set of Pods and a policy by which to access them (Micro-services). It provides a **stable, permanent IP address** and DNS name.
+
+### Types of Services
+
+1. **ClusterIP**: Exposes the Service on a cluster-internal IP. Reaching this Service is _only_ possible from within the cluster. (Default)
+2. **NodePort**: Exposes the Service on each Node's IP at a static port. You can reach the `NodePort` Service from outside the cluster by requesting `<NodeIP>:<NodePort>`.
+3. **LoadBalancer**: Exposes the Service externally using a cloud provider's physical load balancer. It automatically provisions a public IP address.
+
+### Anatomy of a Service YAML
+
+Here is how we expose our `webserver` Deployment:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-nginx-service
+spec:
+  type: LoadBalancer # Automatically gets a public IP if on AWS/Azure/GCP
+  selector:
+    app: webserver # CRITICAL: This links the service to the Deployment Pods!
+  ports:
+    - protocol: TCP
+      port: 80 # Port the Service listens on
+      targetPort: 80 # Port the Container listens on
+```
+
+<Alert className="my-6">
+  <Route className="h-4 w-4" />
+  <AlertTitle>Selector Labels are the Glue</AlertTitle>
+  <AlertDescription>The Service knows exactly which Pods to route traffic to by checking the `selector` block. Notice how `app: webserver` exactly matches the label we defined in our Deployment YAML!</AlertDescription>
+</Alert>
+
+## Reviewing the Flow
+
+1. You applied the **Deployment**, which created 3 identical **Pods** containing your application.
+2. You applied the **Service**, which created a stable Virtual IP and a Load Balancer.
+3. A user visits the Load Balancer IP over port 80.
+4. The Service receives the request and dynamically round-robin routes the request to one of the 3 healthy Pods.
+
+## Next Steps
+
+<NextLesson
+  title="ConfigMaps, Secrets, and Ingress"
+  description="Learn to inject environmental variables securely, and how to route complex HTTP traffic into your cluster via Ingress Rules."
+  href="/roadmap/kubernetes-fundamentals-config-ingress"
+/>

@@ -6,7 +6,7 @@ category: "frontend"
 difficulty: "beginner"
 duration: "25 min"
 order: 3
-video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+video: "https://www.youtube.com/embed/Rh3tobg7hEo"
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
@@ -51,7 +51,7 @@ const greeting = <h1>Hello, {name}!</h1>
 const element = (
   <div>
     <h1>2 + 2 = {2 + 2}</h1>
-    <p>Current time: {new Date().toLocaleTimeString()}</p>
+    Current time: {new Date().toLocaleTimeString()}
   </div>
 )
 ```
@@ -147,7 +147,7 @@ function UserInfo({ user }) {
       <Avatar user={user} />
       <div className="user-details">
         <h3>{user.name}</h3>
-        <p>{user.email}</p>
+        {user.email}
       </div>
     </div>
   )
@@ -208,7 +208,7 @@ function UserCard({ user }) {
       
       // Usage
       <Card title="My Card">
-        <p>This is the card content</p>
+        This is the card content
         <button>Action</button>
       </Card>
       ```
@@ -276,6 +276,12 @@ function ProfileCard({ user }: { user: User }) {
   // Your implementation here
 }
 ```
+
+## Video Tutorial
+
+<div className="relative aspect-video my-8 rounded-lg overflow-hidden">
+  <iframe className="w-full h-full" src={frontmatter.video} title="JSX and Components in React" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+</div>
 
 ## Next Steps
 

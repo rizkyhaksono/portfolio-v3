@@ -9,6 +9,7 @@ import AnimatedShinyText from "@/components/ui/animated-shiny-text"
 import { cn } from "@/lib/utils"
 import { media_socials } from "@/commons/constants/contact"
 import { Sparkles, ArrowRight } from "lucide-react"
+import SpotifyCard from "./spotify-card"
 
 const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
 
@@ -39,7 +40,7 @@ export default function IntroSection() {
 
         {/* Name with HyperText */}
         <BlurFade delay={0.2} inView>
-          <HyperText className="font-bold text-3xl md:text-4xl mb-2">{`Hi, I'm Muhammad Rizky Haksono`}</HyperText>
+          <HyperText duration={10} className="font-bold text-3xl md:text-4xl mb-2">{`Hi, I'm Muhammad Rizky Haksono`}</HyperText>
         </BlurFade>
 
         {/* Typing Animation for Roles */}
@@ -78,19 +79,21 @@ export default function IntroSection() {
         <BlurFade delay={0.6} inView>
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground">Find me on</span>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               {media_socials.map((social) => (
                 <Link
                   key={social.title}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg border border-border bg-background hover:bg-accent hover:scale-105 transition-all duration-200"
+                  className="p-2.5 rounded-lg border border-border bg-background hover:bg-accent hover:scale-105 transition-all duration-200"
                   title={social.title}
                 >
                   <social.icon className="size-4" />
                 </Link>
               ))}
+              <div className="hidden sm:block w-px h-8 bg-border mx-2"></div>
+              <SpotifyCard />
             </div>
           </div>
         </BlurFade>

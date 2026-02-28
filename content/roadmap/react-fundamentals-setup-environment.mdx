@@ -6,7 +6,7 @@ category: "frontend"
 difficulty: "beginner"
 duration: "15 min"
 order: 2
-video: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+video: "https://www.youtube.com/embed/SqcY0GlETPk"
 illustration: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2944&auto=format&fit=crop"
 ---
 
@@ -40,55 +40,57 @@ Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) 
     <TabsTrigger value="linux">Linux</TabsTrigger>
   </TabsList>
 
-  <TabsContent value="windows">
-    <Card>
-      <CardContent className="pt-6">
-        <ol className="list-decimal list-inside space-y-2">
-          <li>Download the Windows Installer (.msi) from nodejs.org</li>
-          <li>Run the installer and follow the installation wizard</li>
-          <li>Verify installation by opening Command Prompt and running:</li>
-        </ol>
-        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version
-          <br />
-          npm --version
-        </div>
-      </CardContent>
-    </Card>
-  </TabsContent>
+{" "}
+<TabsContent value="windows">
+  <Card>
+    <CardContent className="pt-6">
+      <ol className="list-decimal list-inside space-y-2">
+        <li>Download the Windows Installer (.msi) from nodejs.org</li>
+        <li>Run the installer and follow the installation wizard</li>
+        <li>Verify installation by opening Command Prompt and running:</li>
+      </ol>
+      <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+        node --version
+        <br />
+        npm --version
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
 
-  <TabsContent value="macos">
-    <Card>
-      <CardContent className="pt-6">
-        <ol className="list-decimal list-inside space-y-2">
-          <li>Download the macOS Installer (.pkg) from nodejs.org</li>
-          <li>Run the installer and follow the installation steps</li>
-          <li>Verify installation by opening Terminal and running:</li>
-        </ol>
-        <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version
-          <br />
-          npm --version
-        </div>
-        <Alert className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Alternatively, you can use Homebrew: <code className="text-sm">brew install node</code>
-          </AlertDescription>
-        </Alert>
-      </CardContent>
-    </Card>
-  </TabsContent>
+{" "}
+<TabsContent value="macos">
+  <Card>
+    <CardContent className="pt-6">
+      <ol className="list-decimal list-inside space-y-2">
+        <li>Download the macOS Installer (.pkg) from nodejs.org</li>
+        <li>Run the installer and follow the installation steps</li>
+        <li>Verify installation by opening Terminal and running:</li>
+      </ol>
+      <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
+        node --version
+        <br />
+        npm --version
+      </div>
+      <Alert className="mt-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Alternatively, you can use Homebrew: <code className="text-sm">brew install node</code>
+        </AlertDescription>
+      </Alert>
+    </CardContent>
+  </Card>
+</TabsContent>
 
   <TabsContent value="linux">
     <Card>
       <CardContent className="pt-6">
-        <p className="mb-4">For Ubuntu/Debian:</p>
+        For Ubuntu/Debian:
         <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
           curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br />
           sudo apt-get install -y nodejs
         </div>
-        <p className="mb-2">Verify installation:</p>
+        Verify installation:
         <div className="p-4 bg-muted rounded-lg font-mono text-sm">
           node --version
           <br />
@@ -122,9 +124,9 @@ npm run dev
     </CardTitle>
   </CardHeader>
   <CardContent className="text-green-800 dark:text-green-200">
-    <p>
+    
       Your React app should now be running at <code className="font-mono">http://localhost:5173</code>. Open it in your browser to see your first React application!
-    </p>
+    
   </CardContent>
 </Card>
 
@@ -186,7 +188,7 @@ my-react-app/
 ## Video Tutorial
 
 <div className="relative aspect-video my-8 rounded-lg overflow-hidden">
-  <iframe className="w-full h-full" src={frontmatter.videoUrl} title="Setting Up Your Environment" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+  <iframe className="w-full h-full" src={frontmatter.video} title="Setting Up Your Environment" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
 </div>
 
 ## Next Steps

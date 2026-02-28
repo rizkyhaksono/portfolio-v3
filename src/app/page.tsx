@@ -22,13 +22,16 @@ export default async function Home() {
       <IntroSection />
       <AboutSection />
       <SkillSection />
+      <ContributionSection />
       <CarrerSection />
       <EducationSection />
-      <CertificationSection />
-      <ContributionSection />
-      <SiteStatsSection />
-      <LinkedinRecommendations recommendations={recommendations} />
-      <ContactSection />
+
+      <div className="mt-12 space-y-12">
+        <CertificationSection />
+        <SiteStatsSection />
+        <LinkedinRecommendations recommendations={recommendations} />
+        <ContactSection />
+      </div>
     </BaseLayout>
   )
 }

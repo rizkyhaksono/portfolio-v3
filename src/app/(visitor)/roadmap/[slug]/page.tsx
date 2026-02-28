@@ -9,6 +9,7 @@ import { MDXRemote } from "next-mdx-remote/rsc"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { TableOfContents } from "@/components/ui/toc"
 
 const difficultyColors = {
   beginner: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
@@ -32,9 +33,9 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
     <div className="min-h-screen">
       {/* Back Button - Sticky */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
-        <div className="container max-w-4xl py-3">
+        <div className="container max-w-7xl py-3 px-4 xl:px-8">
           <Link href="/roadmap">
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted -ml-2">
               <ArrowLeft className="size-4" />
               Back to Roadmap
             </Button>
@@ -42,75 +43,82 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <div className="container max-w-4xl py-8">
-        {/* Header Section */}
-        <header className="mb-8">
-          {/* Badges */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {meta.difficulty && (
-              <Badge variant="outline" className={`capitalize ${difficultyClass}`}>
-                <GraduationCap className="size-3 mr-1" />
-                {meta.difficulty}
-              </Badge>
-            )}
-            {meta.category && (
-              <Badge variant="secondary" className="capitalize">
-                <Layers className="size-3 mr-1" />
-                {meta.category}
-              </Badge>
-            )}
-          </div>
+      <div className="container max-w-7xl py-8 flex flex-col xl:flex-row gap-12">
+        <div className="flex-1 max-w-4xl mx-auto xl:mx-0 w-full min-w-0">
+          {/* Header Section */}
+          <header className="mb-8">
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {meta.difficulty && (
+                <Badge variant="outline" className={`capitalize ${difficultyClass}`}>
+                  <GraduationCap className="size-3 mr-1" />
+                  {meta.difficulty}
+                </Badge>
+              )}
+              {meta.category && (
+                <Badge variant="secondary" className="capitalize">
+                  <Layers className="size-3 mr-1" />
+                  {meta.category}
+                </Badge>
+              )}
+            </div>
 
-          {/* Title */}
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{meta.title}</h1>
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{meta.title}</h1>
 
-          {/* Description */}
-          {meta.description && <p className="text-lg text-muted-foreground leading-relaxed mb-6">{meta.description}</p>}
+            {/* Description */}
+            {meta.description && <p className="text-lg text-muted-foreground leading-relaxed mb-6">{meta.description}</p>}
 
-          {/* Meta Info Bar */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground p-4 rounded-lg bg-muted/50 border">
-            {meta.course && (
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                <span className="capitalize font-medium">{meta.course.replace(/-/g, " ")}</span>
-              </div>
-            )}
-            {meta.course && meta.duration && <Separator orientation="vertical" className="h-4" />}
-            {meta.duration && (
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                <span>{meta.duration} read</span>
-              </div>
-            )}
-          </div>
-        </header>
+            {/* Meta Info Bar */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground p-4 rounded-lg bg-muted/50 border">
+              {meta.course && (
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  <span className="capitalize font-medium">{meta.course.replace(/-/g, " ")}</span>
+                </div>
+              )}
+              {meta.course && meta.duration && <Separator orientation="vertical" className="h-4" />}
+              {meta.duration && (
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>{meta.duration} read</span>
+                </div>
+              )}
+            </div>
+          </header>
 
-        {/* Video Embed */}
-        {meta.video && (
-          <Card className="mb-8 overflow-hidden border-2">
-            <CardContent className="p-0">
-              <div className="relative aspect-video w-full">
-                <iframe src={meta.video} title={meta.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {/* Video Embed */}
+          {meta.video && (
+            <Card className="mb-8 overflow-hidden border-2">
+              <CardContent className="p-0">
+                <div className="relative aspect-video w-full">
+                  <iframe src={meta.video} title={meta.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Illustration */}
-        {meta.illustration && !meta.video && (
-          <Card className="mb-8 overflow-hidden">
-            <CardContent className="p-0">
-              <div className="relative aspect-video w-full">
-                <Image src={meta.illustration} alt={meta.title} fill className="object-cover" priority />
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {/* Illustration */}
+          {meta.illustration && !meta.video && (
+            <Card className="mb-8 overflow-hidden">
+              <CardContent className="p-0">
+                <div className="relative aspect-video w-full">
+                  <Image src={meta.illustration} alt={meta.title} fill className="object-cover" priority />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* MDX Content */}
-        <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:border-b prose-h2:pb-2 prose-h2:mt-10 prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-pre:bg-zinc-950 prose-pre:border prose-code:before:content-none prose-code:after:content-none">
-          <MDXRemote source={content} components={components} />
-        </article>
+          {/* MDX Content */}
+          <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:border-b prose-h2:pb-2 prose-h2:mt-10 prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-pre:bg-zinc-950 prose-pre:border prose-code:before:content-none prose-code:after:content-none">
+            <MDXRemote source={content} components={components} />
+          </article>
+        </div>
+
+        {/* Table of Contents sidebar for Desktop */}
+        <div className="hidden xl:block w-72 shrink-0">
+          <TableOfContents />
+        </div>
       </div>
     </div>
   )

@@ -71,7 +71,7 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
       songUrl,
     };
   } catch (error) {
-    console.error("Error fetching Spotify now playing:", error);
+    console.error("Error fetching Spotify now playing:", error instanceof Error ? error.message : "Unknown error");
     return { isPlaying: false };
   }
 };

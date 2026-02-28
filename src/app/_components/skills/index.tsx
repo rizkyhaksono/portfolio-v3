@@ -50,19 +50,19 @@ export default function SkillSection() {
         {/* Detailed Skills Display */}
         {showDetailed && (
           <BlurFade delay={0.1} inView>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {skills_data.map((category, index) => (
                 <BlurFade key={category.name} delay={0.1 + index * 0.05} inView>
                   <Card className="h-full">
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-lg flex items-center justify-between">
+                    <CardHeader className="p-4 pb-2">
+                      <CardTitle className="text-sm font-semibold flex items-center justify-between">
                         {category.name}
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
                           {category.skills.length}
                         </Badge>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-4 pt-0">
                       <div className="flex flex-wrap gap-2">
                         {category.skills.map((skill) => (
                           <Badge key={skill} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200">

@@ -42,6 +42,7 @@ import {
   Layers,
   ArrowRight,
   ExternalLink,
+  Bot,
 } from "lucide-react"
 
 const createHeading = (level: number) => {
@@ -318,6 +319,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Layers,
     ArrowRight,
     ExternalLink,
+    Bot,
     h1: createHeading(1),
     h2: createHeading(2),
     h3: createHeading(3),

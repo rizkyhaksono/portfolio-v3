@@ -156,9 +156,9 @@ app.patch('/api/users/:id', (req, res) => {
 const user = users.find(u => u.id === req.params.id);
 if (!user) return res.status(404).json({ error: 'Not found' });
 
-Object.assign(user, req.body);
 res.json(user);
 });`}</CodeSnippet>
+
 </CardContent>
 </Card>
 

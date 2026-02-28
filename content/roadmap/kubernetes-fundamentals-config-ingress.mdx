@@ -1,0 +1,120 @@
+---
+title: "ConfigMaps, Secrets, & Ingress"
+description: "Isolating configuration data from application code and managing incoming web traffic."
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "advanced"
+duration: "25 min"
+order: 3
+video: "https://www.youtube.com/embed/8vIjBtdBfs"
+illustration: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Shield, Settings, Route, ArrowRight } from "lucide-react"
+
+## Managing Configuration
+
+In the Twelve-Factor App methodology, configuration (like environment variables, API keys, and connection strings) should _never_ be hardcoded into your application code.
+
+Kubernetes provides two native objects to manage configuration securely and decouple it from your container image:
+
+### 1. ConfigMaps
+
+A **ConfigMap** is an API object used to store non-confidential data in key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-config
+data:
+  # property-like keys; each key maps to a simple value
+  player_initial_lives: "3"
+  ui_properties_file_name: "user-interface.properties"
+```
+
+### 2. Secrets
+
+A **Secret** is very similar to a ConfigMap, but it's specifically designed to hold sensitive data such as passwords, OAuth tokens, and SSH keys. Storing confidential data in a Secret is safer and more flexible than storing it verbatim in a Pod definition or container image.
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  # Data must be base64 encoded!
+  username: YWRtaW4=
+  password: MWYyZDFlMmU2N2Rm
+```
+
+<Alert className="my-6">
+  <Shield className="h-4 w-4" />
+  <AlertTitle>Base64 is Not Encryption</AlertTitle>
+  <AlertDescription>
+    Secret values are only base64 *encoded*, not encrypted by default! Anyone with access to the cluster's API (or the raw `etcd` datastore) can decode them. You should always enable Encryption at Rest in your cluster settings or use
+    external services like HashiCorp Vault.
+  </AlertDescription>
+</Alert>
+
+## Routing External Traffic: Ingress
+
+We learned earlier about **LoadBalancer** Services. While they work great for exposing a single application, they have a massive flaw: _Cost_.
+
+If your cluster has 10 microservices, defining 10 LoadBalancer Services means your Cloud Provider (AWS/GCP) will literally provision 10 physical Load Balancers. That means paying for 10 separate Load Balancer bills every month!
+
+### The Solution: Ingress Controllers
+
+An **Ingress** is an API object that manages external access to the services in a cluster, typically via HTTP/HTTPS.
+
+Instead of provisioning multiple Load Balancers, you provision **one** Load Balancer pointing to an **Ingress Controller** (like Nginx Ingress or Traefik). The Ingress Controller acts as an intelligent router inside the cluster.
+
+### Anatomy of an Ingress Rule
+
+You write Ingress Rules to define how URL paths map to your internal ClusterIP Services.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minimal-ingress
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/v1/users
+            pathType: Prefix
+            backend:
+              service:
+                name: user-microservice-clusterip # Traffic hits this service!
+                port:
+                  number: 8080
+          - path: /api/v1/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: payment-microservice-clusterip # Or this service!
+                port:
+                  number: 5000
+```
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Route className="h-5 w-5" />
+      Intelligent Routing
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    The Ingress Controller reads this file and instantly updates its internal routing table. Now, a single load balancer can accept all traffic from the internet and route it down to different backend services based purely on the URL path
+    (`/users` vs `/payments`) or even the Hostname (`api.app.com` vs `web.app.com`).
+  </CardContent>
+</Card>
+
+## Course Completion
+
+Congratulations, you have finished the **Kubernetes Fundamentals** roadmap!
+You went from understanding raw container infrastructure (Pods and Nodes) to wrapping them in self-healing lifecycles (Deployments), decoupling network routing (Services and Ingress), and securely managing configuration (Secrets and ConfigMaps).
