@@ -24,7 +24,7 @@ export default function SpotifyCard() {
     }
 
     fetchSpotify()
-    const interval = setInterval(fetchSpotify, 10000) // Poll every 10s
+    const interval = setInterval(fetchSpotify, 30000) // Poll every 30s
     return () => clearInterval(interval)
   }, [])
 

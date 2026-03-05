@@ -1,17 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, lazy, Suspense } from "react"
 import BlurFade from "@/components/magicui/blur-fade"
 import Typography from "@/components/ui/typography"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Eye, Users, MousePointerClick, Globe, Monitor, FileText, Activity, Smartphone, ExternalLink, TrendingUp, Clock } from "lucide-react"
 import { UmamiAnalyticsData } from "@/commons/types/umami"
 import { cn } from "@/lib/utils"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { CardHeader, CardTitle } from "@/components/ui/card"
+
+const LazyBarChart = lazy(() => import("./lazy-bar-chart"))
 
 interface SiteStatsClientProps {
   analytics: UmamiAnalyticsData
@@ -91,12 +92,6 @@ function BarChartMetrics({
     value: item.y,
   }))
 
-  const chartConfig: ChartConfig = {
-    value: {
-      label: title,
-    },
-  }
-
   return (
     <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg h-full">
       <CardHeader className="pb-3 pt-4 px-4 md:px-5">
@@ -108,14 +103,9 @@ function BarChartMetrics({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-1 px-4 pb-4 md:px-5 md:pb-5">
-        <ChartContainer config={chartConfig} className="h-[220px] md:h-[240px] w-full">
-          <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 20, top: 5, bottom: 5 }}>
-            <XAxis type="number" hide />
-            <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Bar dataKey="value" radius={[0, 4, 4, 0]} fill="hsl(var(--primary))" onClick={onBarClick} cursor="pointer" />
-          </BarChart>
-        </ChartContainer>
+        <Suspense fallback={<div className="h-[220px] md:h-[240px] w-full flex items-center justify-center text-muted-foreground text-sm">Loading chart...</div>}>
+          <LazyBarChart chartData={chartData} title={title} onBarClick={onBarClick} />
+        </Suspense>
       </CardContent>
     </Card>
   )

@@ -155,145 +155,140 @@ export default function ContactSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
-          {/* Left Side - Social Cards */}
+          {/* Left Side - Social Cards (single container, no per-item BlurFade) */}
           <div className="md:col-span-2 flex flex-col gap-4">
-            <BlurFade delay={0.3} inView className="flex-1">
-              <Card className="h-full overflow-hidden border-border/50">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <MessageSquare className="size-5 text-primary" />
-                    Connect With Me
-                  </CardTitle>
-                  <CardDescription>Find me on these platforms</CardDescription>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 gap-3">
-                  {media_socials.map((social, index) => (
-                    <BlurFade key={social.title} delay={0.35 + index * 0.05} inView>
-                      <Link
-                        href={social.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={cn(
-                          "group flex items-center gap-3 p-3 rounded-xl border border-border/50",
-                          "bg-background/50 hover:bg-accent/50 hover:border-primary/30",
-                          "transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5"
-                        )}
-                      >
-                        <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                          <social.icon className="size-4 text-primary" />
-                        </div>
-                        <span className="font-medium text-xs">{social.title}</span>
-                      </Link>
-                    </BlurFade>
-                  ))}
-                </CardContent>
-              </Card>
-            </BlurFade>
+            <Card className="h-full overflow-hidden border-border/50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MessageSquare className="size-5 text-primary" />
+                  Connect With Me
+                </CardTitle>
+                <CardDescription>Find me on these platforms</CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 gap-3">
+                {media_socials.map((social, index) => (
+                  <Link
+                    key={social.title}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      "group flex items-center gap-3 p-3 rounded-xl border border-border/50",
+                      "bg-background/50 hover:bg-accent/50 hover:border-primary/30",
+                      "transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5",
+                      "animate-fade-in-up",
+                    )}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                      <social.icon className="size-4 text-primary" />
+                    </div>
+                    <span className="font-medium text-xs">{social.title}</span>
+                  </Link>
+                ))}
+              </CardContent>
+            </Card>
 
             {/* Quick Info Card */}
-            <BlurFade delay={0.5} inView>
-              <Card className="border-border/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10">
-                      <Mail className="size-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">Prefer email?</p>
-                      <p className="text-muted-foreground text-xs mt-1">
-                        Use the form or reach out at{" "}
-                        <a href="mailto:mrizkyhaksono@gmail.com" className="text-primary hover:underline">
-                          mrizkyhaksono@gmail.com
-                        </a>
-                      </p>
-                    </div>
+            <Card className="border-border/50">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Mail className="size-5 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
-            </BlurFade>
+                  <div>
+                    <p className="font-medium text-sm">Prefer email?</p>
+                    <p className="text-muted-foreground text-xs mt-1">
+                      Use the form or reach out at{" "}
+                      <a href="mailto:mrizkyhaksono@gmail.com" className="text-primary hover:underline">
+                        mrizkyhaksono@gmail.com
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Side - Contact Form */}
           <div className="md:col-span-3">
-            <BlurFade delay={0.4} inView className="h-full">
-              <Card className="h-full border-border/50">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Send className="size-5 text-primary" />
-                    Send a Message
-                  </CardTitle>
-                  <CardDescription>I&apos;ll get back to you as soon as possible</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* Rate Limit Warning */}
-                  {rateLimitRemaining !== null && rateLimitRemaining > 0 && (
-                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400">
-                      <Clock className="size-4 shrink-0" />
-                      <p>Please wait {formatRemainingTime(rateLimitRemaining)} before sending another message.</p>
-                    </div>
-                  )}
+            <Card className="h-full border-border/50">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Send className="size-5 text-primary" />
+                  Send a Message
+                </CardTitle>
+                <CardDescription>I&apos;ll get back to you as soon as possible</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Rate Limit Warning */}
+                {rateLimitRemaining !== null && rateLimitRemaining > 0 && (
+                  <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-600 dark:text-amber-400">
+                    <Clock className="size-4 shrink-0" />
+                    <p>Please wait {formatRemainingTime(rateLimitRemaining)} before sending another message.</p>
+                  </div>
+                )}
 
-                  <form onSubmit={sendEmail} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label htmlFor="email" className="text-sm font-medium">
-                          Email
-                        </label>
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="your@email.com"
-                          value={formState.email}
-                          onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
-                          disabled={isFormDisabled}
-                          required
-                          className="bg-background/50"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label htmlFor="name" className="text-sm font-medium">
-                          Name
-                        </label>
-                        <Input id="name" type="text" placeholder="Your name" value={formState.name} onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })} disabled={isFormDisabled} required className="bg-background/50" />
-                      </div>
-                    </div>
-
+                <form onSubmit={sendEmail} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label htmlFor="message" className="text-sm font-medium">
-                        Message
+                      <label htmlFor="email" className="text-sm font-medium">
+                        Email
                       </label>
-                      <Textarea
-                        id="message"
-                        placeholder="Tell me about your project or just say hi..."
-                        className="min-h-[150px] resize-none bg-background/50"
-                        value={formState.message}
-                        onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={formState.email}
+                        onChange={(e) => dispatch({ type: "SET_EMAIL", payload: e.target.value })}
                         disabled={isFormDisabled}
                         required
+                        className="bg-background/50"
                       />
                     </div>
-
-                    {/* Cloudflare Turnstile */}
-                    <div className="flex justify-start">
-                      <Turnstile
-                        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
-                        onSuccess={(token) => setTurnstileToken(token)}
-                        onError={() => setTurnstileToken("")}
-                        onExpire={() => setTurnstileToken("")}
-                        options={{
-                          theme: "auto",
-                          size: "normal",
-                        }}
-                      />
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="text-sm font-medium">
+                        Name
+                      </label>
+                      <Input id="name" type="text" placeholder="Your name" value={formState.name} onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })} disabled={isFormDisabled} required className="bg-background/50" />
                     </div>
+                  </div>
 
-                    <Button type="submit" disabled={!turnstileToken || isFormDisabled} className="w-full md:w-auto gap-2">
-                      {renderButtonContent()}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </BlurFade>
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="text-sm font-medium">
+                      Message
+                    </label>
+                    <Textarea
+                      id="message"
+                      placeholder="Tell me about your project or just say hi..."
+                      className="min-h-[150px] resize-none bg-background/50"
+                      value={formState.message}
+                      onChange={(e) => dispatch({ type: "SET_MESSAGE", payload: e.target.value })}
+                      disabled={isFormDisabled}
+                      required
+                    />
+                  </div>
+
+                  {/* Cloudflare Turnstile */}
+                  <div className="flex justify-start">
+                    <Turnstile
+                      siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
+                      onSuccess={(token) => setTurnstileToken(token)}
+                      onError={() => setTurnstileToken("")}
+                      onExpire={() => setTurnstileToken("")}
+                      options={{
+                        theme: "auto",
+                        size: "normal",
+                      }}
+                    />
+                  </div>
+
+                  <Button type="submit" disabled={!turnstileToken || isFormDisabled} className="w-full md:w-auto gap-2">
+                    {renderButtonContent()}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

@@ -118,6 +118,16 @@ const config = {
 					to: {
 						transform: 'translate(calc(-50% - 0.5rem))'
 					}
+				},
+				'fade-in-up': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
@@ -128,7 +138,8 @@ const config = {
 				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
 				gradient: 'gradient 8s linear infinite',
 				'shiny-text': 'shiny-text 8s infinite',
-				scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite'
+				scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
+				'fade-in-up': 'fade-in-up 0.5s ease-out both'
 			}
 		}
 	},

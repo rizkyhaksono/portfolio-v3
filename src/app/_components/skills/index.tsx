@@ -47,35 +47,31 @@ export default function SkillSection() {
           </Marquee>
         </div>
 
-        {/* Detailed Skills Display */}
+        {/* Detailed Skills Display - No nested BlurFade per card */}
         {showDetailed && (
-          <BlurFade delay={0.1} inView>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {skills_data.map((category, index) => (
-                <BlurFade key={category.name} delay={0.1 + index * 0.05} inView>
-                  <Card className="h-full">
-                    <CardHeader className="p-4 pb-2">
-                      <CardTitle className="text-sm font-semibold flex items-center justify-between">
-                        {category.name}
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                          {category.skills.length}
-                        </Badge>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 pt-0">
-                      <div className="flex flex-wrap gap-2">
-                        {category.skills.map((skill) => (
-                          <Badge key={skill} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </BlurFade>
-              ))}
-            </div>
-          </BlurFade>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 animate-fade-in-up">
+            {skills_data.map((category) => (
+              <Card key={category.name} className="h-full">
+                <CardHeader className="p-4 pb-2">
+                  <CardTitle className="text-sm font-semibold flex items-center justify-between">
+                    {category.name}
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                      {category.skills.length}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.map((skill) => (
+                      <Badge key={skill} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors duration-200">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
     </BlurFade>

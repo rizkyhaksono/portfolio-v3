@@ -1,13 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, lazy, Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MonkeyTypeUserData } from "@/commons/types/monkeytype"
 import { Keyboard, Target, MousePointerClick, Timer, TrendingUp, Zap, Award, Activity } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis, Line, LineChart } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+
+const LazyCharts = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: () => null })))
+const LazyWpmChartComponent = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: mod.LazyWpmChart })))
+const LazyAccuracyChartComponent = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: mod.LazyAccuracyChart })))
 
 interface MonkeyTypeStatsProps {
   typingStats: MonkeyTypeUserData
@@ -88,16 +90,6 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
     consistency: Math.round(test.consistency),
   }))
 
-  const wpmChartConfig: ChartConfig = {
-    wpm: { label: "WPM" },
-    raw: { label: "Raw WPM" },
-  }
-
-  const accuracyChartConfig: ChartConfig = {
-    accuracy: { label: "Accuracy" },
-    consistency: { label: "Consistency" },
-  }
-
   // Find best stats across all tests
   let bestRaw = 0
   let bestConsistency = 0
@@ -107,6 +99,8 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
       if (test.consistency > bestConsistency) bestConsistency = Math.round(test.consistency)
     })
   }
+
+  const chartFallback = <div className="h-[200px] w-full flex items-center justify-center text-muted-foreground text-sm">Loading chart...</div>
 
   return (
     <div className="mt-6">
@@ -138,7 +132,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
         </div>
       )}
 
-      {/* Charts */}
+      {/* Charts - Lazy loaded */}
       {wpmChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
@@ -151,23 +145,9 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 px-4 pb-4">
-              <ChartContainer config={wpmChartConfig} className="h-[200px] w-full">
-                <LineChart data={wpmChartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-                  <XAxis dataKey="test" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="wpm" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 4 }} activeDot={{ r: 6, onClick: (data: any) => setSelectedTest(data.payload) }} />
-                  <Line
-                    type="monotone"
-                    dataKey="raw"
-                    stroke="hsl(var(--muted-foreground))"
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    dot={{ fill: "hsl(var(--muted-foreground))", r: 3 }}
-                    activeDot={{ r: 5, onClick: (data: any) => setSelectedTest(data.payload) }}
-                  />
-                </LineChart>
-              </ChartContainer>
+              <Suspense fallback={chartFallback}>
+                <LazyWpmChartComponent wpmChartData={wpmChartData} onDotClick={(data: any) => setSelectedTest(data.payload)} />
+              </Suspense>
             </CardContent>
           </Card>
 
@@ -181,15 +161,9 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 px-4 pb-4">
-              <ChartContainer config={accuracyChartConfig} className="h-[200px] w-full">
-                <BarChart data={accuracyChartData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-                  <XAxis dataKey="test" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 100]} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} onClick={(data) => setSelectedTest({ ...data, isAccuracyMode: true })} cursor="pointer" />
-                  <Bar dataKey="consistency" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} onClick={(data) => setSelectedTest({ ...data, isAccuracyMode: true })} cursor="pointer" />
-                </BarChart>
-              </ChartContainer>
+              <Suspense fallback={chartFallback}>
+                <LazyAccuracyChartComponent accuracyChartData={accuracyChartData} onBarClick={(data) => setSelectedTest({ ...data, isAccuracyMode: true })} />
+              </Suspense>
             </CardContent>
           </Card>
         </div>

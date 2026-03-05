@@ -22,9 +22,9 @@ export default async function Home() {
       <IntroSection />
       <AboutSection />
       <SkillSection />
-      <ContributionSection />
       <CarrerSection />
       <EducationSection />
+      <ContributionSection />
 
       <div className="mt-12 space-y-12">
         <CertificationSection />
