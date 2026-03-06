@@ -10,6 +10,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { TableOfContents } from "@/components/ui/toc"
+import { LessonCompleteButton } from "../_components/lesson-complete-button"
 
 const difficultyColors = {
   beginner: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
@@ -113,6 +114,11 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
           <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:border-b prose-h2:pb-2 prose-h2:mt-10 prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-pre:bg-zinc-950 prose-pre:border prose-code:before:content-none prose-code:after:content-none">
             <MDXRemote source={content} components={components} />
           </article>
+
+          {/* Completion Action */}
+          <div className="mt-12 mb-8">
+            <LessonCompleteButton courseId={meta.course || "unknown"} slug={slug} />
+          </div>
         </div>
 
         {/* Table of Contents sidebar for Desktop */}
