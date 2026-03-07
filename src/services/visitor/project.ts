@@ -36,27 +36,37 @@ export const getSupabaseProjectById = async (id: string) => {
 }
 
 export const getProjects = async () => {
-  const response = await fetch(`${process.env.API_URL}/project`,
-    {
-      method: "GET",
-      headers: await authHeaders(),
-      next: {
-        revalidate: 0,
+  try {
+    const response = await fetch(`${process.env.API_URL}/project`,
+      {
+        method: "GET",
+        headers: await authHeaders(),
+        next: {
+          revalidate: 0,
+        }
       }
-    }
-  ).then(async (res) => await res.json());
-  return response;
+    ).then(async (res) => await res.json());
+    return response;
+  } catch (error) {
+    console.error("fetch timeout/error in getProjects:", error);
+    return [];
+  }
 }
 
 export const getProjectById = async (id: number) => {
-  const response = await fetch(`${process.env.API_URL}/project/${id}`,
-    {
-      method: "GET",
-      headers: await authHeaders(),
-      next: {
-        revalidate: 0,
+  try {
+    const response = await fetch(`${process.env.API_URL}/project/${id}`,
+      {
+        method: "GET",
+        headers: await authHeaders(),
+        next: {
+          revalidate: 0,
+        }
       }
-    }
-  ).then(async (res) => await res.json());
-  return response;
+    ).then(async (res) => await res.json());
+    return response;
+  } catch (error) {
+    console.error("fetch timeout/error in getProjectById:", error);
+    return null;
+  }
 }

@@ -14,10 +14,15 @@ export interface PingResponse {
 }
 
 export async function getPing() {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ping`, {
-    method: "GET",
-    next: { revalidate: 0 },
-  });
-  if (response.status !== 200) return null;
-  return response.json();
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ping`, {
+      method: "GET",
+      next: { revalidate: 0 },
+    });
+    if (response.status !== 200) return null;
+    return response.json();
+  } catch (error) {
+    console.error("fetch timeout/error in getPing:", error);
+    return null;
+  }
 }
