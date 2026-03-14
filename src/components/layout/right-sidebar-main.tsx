@@ -8,11 +8,89 @@ import { SiSpotify } from "react-icons/si"
 import Image from "next/image"
 import Link from "next/link"
 import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
+import type { ReactNode } from "react"
 
 const RightSidebarMain = async () => {
   const ping = await getPing()
   const weather = await getWeather()
   const spotify = await getNowPlaying()
+  let spotifyState: "playing" | "recently_played" | "idle" | "error" = spotify.status ?? "idle"
+  if (!spotify.status) {
+    if (spotify.isPlaying) {
+      spotifyState = "playing"
+    } else if (spotify.isRecentlyPlayed) {
+      spotifyState = "recently_played"
+    }
+  }
+
+  let spotifyTitle = "Spotify"
+  if (spotifyState === "playing") {
+    spotifyTitle = "Now Playing"
+  } else if (spotifyState === "recently_played") {
+    spotifyTitle = "Recently Played"
+  }
+  const hasSpotifyTrack = Boolean(spotify.title && spotify.artist)
+
+  let spotifyContent: ReactNode
+  if ((spotifyState === "playing" || spotifyState === "recently_played") && hasSpotifyTrack) {
+    if (spotify.songUrl) {
+      spotifyContent = (
+        <Link href={spotify.songUrl} target="_blank" rel="noopener noreferrer">
+          <div className="flex items-center gap-3 hover:bg-secondary/30 rounded-lg p-2 -m-2 transition-colors">
+            {spotify.albumImageUrl ? (
+              <Image src={spotify.albumImageUrl} alt={spotify.album || "Album cover"} width={48} height={48} className="w-12 h-12 rounded-lg" />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                <SiSpotify className="text-white" size={24} />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <Typography.P className="text-xs font-medium text-primary/90 truncate">{spotify.title}</Typography.P>
+              <Typography.P className="text-xs text-primary/60 truncate">{spotify.artist}</Typography.P>
+              {spotify.album && <Typography.P className="text-[11px] text-primary/50 truncate">{spotify.album}</Typography.P>}
+            </div>
+          </div>
+
+          {spotifyState === "playing" ? (
+            <div className="mt-2 flex items-center gap-1">
+              <div className="w-1 h-3 bg-green-500 rounded animate-pulse"></div>
+              <div className="w-1 h-2 bg-green-500 rounded animate-pulse delay-75"></div>
+              <div className="w-1 h-4 bg-green-500 rounded animate-pulse delay-150"></div>
+              <div className="w-1 h-2 bg-green-500 rounded animate-pulse delay-200"></div>
+            </div>
+          ) : (
+            <Typography.P className="mt-2 text-[11px] text-primary/60">Last played track</Typography.P>
+          )}
+        </Link>
+      )
+    } else {
+      spotifyContent = (
+        <div>
+          <div className="flex items-center gap-3 rounded-lg p-2 -m-2">
+            {spotify.albumImageUrl ? (
+              <Image src={spotify.albumImageUrl} alt={spotify.album || "Album cover"} width={48} height={48} className="w-12 h-12 rounded-lg" />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                <SiSpotify className="text-white" size={24} />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <Typography.P className="text-xs font-medium text-primary/90 truncate">{spotify.title}</Typography.P>
+              <Typography.P className="text-xs text-primary/60 truncate">{spotify.artist}</Typography.P>
+              {spotify.album && <Typography.P className="text-[11px] text-primary/50 truncate">{spotify.album}</Typography.P>}
+            </div>
+          </div>
+          <Typography.P className="mt-2 text-[11px] text-primary/60">Last played track</Typography.P>
+        </div>
+      )
+    }
+  } else {
+    spotifyContent = (
+      <div className="flex items-center justify-center py-4">
+        <Typography.P className="text-xs text-primary/60">{spotifyState === "error" ? (spotify.message ?? "Last played unavailable") : "Last played unavailable"}</Typography.P>
+      </div>
+    )
+  }
 
   const temperature = weather?.main?.temp ? Math.round(weather.main.temp - 273.15) : null
 
@@ -115,37 +193,10 @@ const RightSidebarMain = async () => {
       <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
         <div className="flex items-center gap-2 mb-3">
           <SiSpotify size={16} className="text-green-500" />
-          <Typography.P className="text-sm font-semibold text-primary/80">{spotify.isPlaying ? "Now Playing" : "Spotify"}</Typography.P>
+          <Typography.P className="text-sm font-semibold text-primary/80">{spotifyTitle}</Typography.P>
         </div>
 
-        {spotify.isPlaying && spotify.songUrl ? (
-          <Link href={spotify.songUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex items-center gap-3 hover:bg-secondary/30 rounded-lg p-2 -m-2 transition-colors">
-              {spotify.albumImageUrl ? (
-                <Image src={spotify.albumImageUrl} alt={spotify.album || "Album cover"} width={48} height={48} className="w-12 h-12 rounded-lg" />
-              ) : (
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                  <SiSpotify className="text-white" size={24} />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <Typography.P className="text-xs font-medium text-primary/90 truncate">{spotify.title}</Typography.P>
-                <Typography.P className="text-xs text-primary/60 truncate">{spotify.artist}</Typography.P>
-              </div>
-            </div>
-
-            <div className="mt-2 flex items-center gap-1">
-              <div className="w-1 h-3 bg-green-500 rounded animate-pulse"></div>
-              <div className="w-1 h-2 bg-green-500 rounded animate-pulse delay-75"></div>
-              <div className="w-1 h-4 bg-green-500 rounded animate-pulse delay-150"></div>
-              <div className="w-1 h-2 bg-green-500 rounded animate-pulse delay-200"></div>
-            </div>
-          </Link>
-        ) : (
-          <div className="flex items-center justify-center py-4">
-            <Typography.P className="text-xs text-primary/60">Not playing</Typography.P>
-          </div>
-        )}
+        {spotifyContent}
       </div>
 
       {/* Weather */}

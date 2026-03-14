@@ -43,6 +43,33 @@ export default function SpotifyCard() {
   }
 
   if (!data?.isPlaying) {
+    if (data?.isRecentlyPlayed && data.title) {
+      return (
+        <Link
+          href={data.songUrl || "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-3 rounded-xl border border-border/50 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md p-2 max-w-sm transition-all hover:bg-white/10 dark:hover:bg-neutral-800/60 hover:shadow-md hover:-translate-y-0.5"
+        >
+          {data.albumImageUrl ? (
+            <img src={data.albumImageUrl} alt={data.album} className="size-10 object-cover rounded-md shadow-sm opacity-70 group-hover:opacity-100 transition-opacity" />
+          ) : (
+            <div className="p-2 bg-[#1DB954]/10 rounded-md text-[#1DB954]">
+              <SiSpotify className="size-6" />
+            </div>
+          )}
+          <div className="flex flex-col min-w-0 pr-2">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <SiSpotify className="size-3 text-[#1DB954] flex-shrink-0" />
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Last played</p>
+            </div>
+            <p className="text-sm font-semibold truncate text-foreground group-hover:text-[#1DB954] transition-colors">{data.title}</p>
+            <p className="text-xs text-muted-foreground truncate">{data.artist}</p>
+          </div>
+        </Link>
+      )
+    }
+
     return (
       <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-2 pr-4 max-w-[300px] text-xs transition-colors hover:bg-accent/50 cursor-default">
         <div className="p-1.5 bg-[#1DB954]/10 rounded-md text-[#1DB954]">
