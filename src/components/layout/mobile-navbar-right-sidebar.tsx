@@ -46,7 +46,7 @@ const MobileNavbarRightSidebar = () => {
   const hasSpotifyTrack = Boolean(spotify?.title && spotify?.artist)
 
   let spotifyContent: ReactNode
-  if ((spotifyState === "playing" || spotifyState === "recently_played") && hasSpotifyTrack) {
+  if (spotify && (spotifyState === "playing" || spotifyState === "recently_played") && hasSpotifyTrack) {
     if (spotify?.songUrl) {
       spotifyContent = (
         <Link href={spotify.songUrl} target="_blank" rel="noopener noreferrer">

@@ -4,6 +4,8 @@ import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Card, CardContent } from "@/components/ui/card"
 
+export const dynamic = "force-dynamic"
+
 function ProfileSkeleton() {
   return (
     <Card className="overflow-hidden">

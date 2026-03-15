@@ -1,36 +1,39 @@
-import BlurFade from "@/components/magicui/blur-fade";
-import { Award, ChevronLeft, ChevronRight } from "lucide-react";
-import { getLinkedinCertifications } from "@/services/visitor/linkedin";
-import { CertificationCard } from "@/app/_components/certification/certification-card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import BlurFade from "@/components/magicui/blur-fade"
+import { Award, ChevronLeft, ChevronRight } from "lucide-react"
+import { getLinkedinCertifications } from "@/services/visitor/linkedin"
+import { CertificationCard } from "@/app/_components/certification/certification-card"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { logNonCriticalError } from "@/lib/logging"
+
+export const dynamic = "force-dynamic"
 
 interface CertificatesPageProps {
   searchParams: Promise<{
-    page?: string;
-  }>;
+    page?: string
+  }>
 }
 
 export default async function CertificatesPage({ searchParams }: CertificatesPageProps) {
-  const params = await searchParams;
-  const currentPage = parseInt(params.page || "1", 10);
-  const limit = 10;
+  const params = await searchParams
+  const currentPage = parseInt(params.page || "1", 10)
+  const limit = 10
 
-  let certifications: any[] = [];
-  let totalPages = 1;
-  let total = 0;
+  let certifications: any[] = []
+  let totalPages = 1
+  let total = 0
 
   try {
-    const response = await getLinkedinCertifications(currentPage, limit);
-    certifications = response.data || [];
-    totalPages = response.totalPages || 1;
-    total = response.total || 0;
+    const response = await getLinkedinCertifications(currentPage, limit)
+    certifications = response.data || []
+    totalPages = response.totalPages || 1
+    total = response.total || 0
   } catch (error) {
-    console.error("Failed to fetch certifications:", error);
+    logNonCriticalError("Failed to fetch certifications:", error)
   }
 
-  const hasPrevPage = currentPage > 1;
-  const hasNextPage = currentPage < totalPages;
+  const hasPrevPage = currentPage > 1
+  const hasNextPage = currentPage < totalPages
 
   return (
     <BlurFade delay={0.25} inView>
@@ -38,9 +41,7 @@ export default async function CertificatesPage({ searchParams }: CertificatesPag
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-base font-bold">Certifications</h1>
-          <p className="text-muted-foreground text-sm">
-            {total} professional certifications and completed courses
-          </p>
+          <p className="text-muted-foreground text-sm">{total} professional certifications and completed courses</p>
         </div>
 
         {/* Certifications Grid - Compact */}
@@ -55,15 +56,8 @@ export default async function CertificatesPage({ searchParams }: CertificatesPag
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-4 pt-4">
-                <Link
-                  href={`/certificates?page=${currentPage - 1}`}
-                  className={!hasPrevPage ? "pointer-events-none opacity-50" : ""}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasPrevPage}
-                  >
+                <Link href={`/certificates?page=${currentPage - 1}`} className={!hasPrevPage ? "pointer-events-none opacity-50" : ""}>
+                  <Button variant="outline" size="sm" disabled={!hasPrevPage}>
                     <ChevronLeft className="w-4 h-4 mr-1" />
                     Previous
                   </Button>
@@ -75,15 +69,8 @@ export default async function CertificatesPage({ searchParams }: CertificatesPag
                   </span>
                 </div>
 
-                <Link
-                  href={`/certificates?page=${currentPage + 1}`}
-                  className={!hasNextPage ? "pointer-events-none opacity-50" : ""}
-                >
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!hasNextPage}
-                  >
+                <Link href={`/certificates?page=${currentPage + 1}`} className={!hasNextPage ? "pointer-events-none opacity-50" : ""}>
+                  <Button variant="outline" size="sm" disabled={!hasNextPage}>
                     Next
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
@@ -99,6 +86,5 @@ export default async function CertificatesPage({ searchParams }: CertificatesPag
         )}
       </div>
     </BlurFade>
-  );
+  )
 }
-

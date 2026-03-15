@@ -3,6 +3,8 @@ import BaseLayout from "@/components/layout/base-layout"
 import { RoadmapClient } from "./roadmap-client"
 import SidebarMain from "@/components/layout/sidebar-main"
 
+export const dynamic = "force-dynamic"
+
 export default function CourseRoadmap() {
   const courses = getRoadmapCourses()
 

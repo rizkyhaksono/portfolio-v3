@@ -1,4 +1,5 @@
 import { DuolingoApiResponse } from "@/commons/types/duolingo";
+import { logNonCriticalError } from "@/lib/logging";
 
 const EMPTY_DUOLINGO_RESPONSE: DuolingoApiResponse = {
   success: false,
@@ -21,19 +22,19 @@ export async function getDuolingoProfile(): Promise<DuolingoApiResponse> {
     });
 
     if (!response.ok) {
-      console.error(`Duolingo API returned ${response.status}`);
+      logNonCriticalError(`Duolingo API returned ${response.status}`);
       return EMPTY_DUOLINGO_RESPONSE;
     }
 
     const text = await response.text();
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-      console.error('Duolingo API returned HTML instead of JSON');
+      logNonCriticalError('Duolingo API returned HTML instead of JSON');
       return EMPTY_DUOLINGO_RESPONSE;
     }
 
     return JSON.parse(text);
   } catch (error) {
-    console.error('Failed to fetch Duolingo profile:', error);
+    logNonCriticalError('Failed to fetch Duolingo profile:', error);
     return EMPTY_DUOLINGO_RESPONSE;
   }
 }

@@ -1,3 +1,5 @@
+import { logNonCriticalError } from "@/lib/logging";
+
 export interface SpotifyNowPlaying {
   isPlaying: boolean;
   isRecentlyPlayed?: boolean;
@@ -188,7 +190,7 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
     saveLastKnownSpotify(nowPlayingResult);
     return nowPlayingResult;
   } catch (error) {
-    console.error("Error fetching Spotify now playing:", error instanceof Error ? error.message : "Unknown error");
+    logNonCriticalError("Error fetching Spotify now playing:", error instanceof Error ? error.message : "Unknown error");
     const cachedTrack = getLastKnownSpotify("Spotify temporarily unavailable. Showing last track.");
     if (cachedTrack) {
       return cachedTrack;

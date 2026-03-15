@@ -13,6 +13,8 @@ import SidebarMain from "@/components/layout/sidebar-main"
 import RightSidebarMain from "@/components/layout/right-sidebar-main"
 import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
 
+export const dynamic = "force-dynamic"
+
 export default async function Home() {
   const linkedinRecommendationsResponse = await getLinkedinRecommendations()
   const recommendations = linkedinRecommendationsResponse?.data || []

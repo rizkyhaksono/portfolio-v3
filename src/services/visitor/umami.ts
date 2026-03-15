@@ -5,6 +5,7 @@ import {
   UmamiAnalyticsData,
   EMPTY_ANALYTICS,
 } from "@/commons/types/umami";
+import { logNonCriticalError } from "@/lib/logging";
 
 const UMAMI_API_URL = "https://api.umami.is/v1";
 const WEBSITE_ID = "3344dd5c-2e88-4ae5-95f7-e142cdbff614";
@@ -61,13 +62,13 @@ export async function getUmamiStats(
 
     if (!response.ok) {
       const text = await response.text();
-      console.error(`Umami stats API returned ${response.status} - ${text.substring(0, 100)}`);
+      logNonCriticalError(`Umami stats API returned ${response.status} - ${text.substring(0, 100)}`);
       return null;
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Failed to fetch Umami stats:", error);
+    logNonCriticalError("Failed to fetch Umami stats:", error);
     return null;
   }
 }
@@ -95,14 +96,14 @@ export async function getActiveVisitors(): Promise<number> {
     if (!response) return 0; // Handled timeout
 
     if (!response.ok) {
-      console.error(`Umami active API returned ${response.status}`);
+      logNonCriticalError(`Umami active API returned ${response.status}`);
       return 0;
     }
 
     const data: UmamiActiveResponse = await response.json();
     return data.visitors || 0;
   } catch (error) {
-    console.error("Failed to fetch active visitors:", error);
+    logNonCriticalError("Failed to fetch active visitors:", error);
     return 0;
   }
 }
@@ -139,13 +140,13 @@ export async function getUmamiMetrics(
     if (!response) return []; // Handled timeout
 
     if (!response.ok) {
-      console.error(`Umami metrics API returned ${response.status}`);
+      logNonCriticalError(`Umami metrics API returned ${response.status}`);
       return [];
     }
 
     return await response.json();
   } catch (error) {
-    console.error(`Failed to fetch Umami ${type} metrics:`, error);
+    logNonCriticalError(`Failed to fetch Umami ${type} metrics:`, error);
     return [];
   }
 }
@@ -178,7 +179,7 @@ export async function getUmamiAnalytics(): Promise<UmamiAnalyticsData> {
       devices,
     };
   } catch (error) {
-    console.error("Failed to fetch Umami analytics:", error);
+    logNonCriticalError("Failed to fetch Umami analytics:", error);
     return EMPTY_ANALYTICS;
   }
 }

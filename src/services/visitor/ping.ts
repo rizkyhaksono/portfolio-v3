@@ -1,3 +1,5 @@
+import { logNonCriticalError } from "@/lib/logging";
+
 export interface PingResponse {
   status: number;
   message: string;
@@ -22,7 +24,7 @@ export async function getPing() {
     if (response.status !== 200) return null;
     return response.json();
   } catch (error) {
-    console.error("fetch timeout/error in getPing:", error);
+    logNonCriticalError("fetch timeout/error in getPing:", error);
     return null;
   }
 }

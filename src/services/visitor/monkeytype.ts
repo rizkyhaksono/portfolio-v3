@@ -4,6 +4,7 @@ import {
   MonkeyTypeUserData,
   EMPTY_MONKEYTYPE,
 } from "@/commons/types/monkeytype";
+import { logNonCriticalError } from "@/lib/logging";
 
 const MONKEYTYPE_API_URL = "https://api.monkeytype.com";
 const API_KEY = process.env.MONKEYTYPE_API_KEY;
@@ -26,7 +27,7 @@ export async function getMonkeyTypeStats(): Promise<MonkeyTypeStats | null> {
 
     if (!response.ok) {
       if (response.status !== 401 && response.status !== 471) {
-        console.error(`MonkeyType stats API returned ${response.status}`);
+        logNonCriticalError(`MonkeyType stats API returned ${response.status}`);
       }
       return null;
     }
@@ -34,7 +35,7 @@ export async function getMonkeyTypeStats(): Promise<MonkeyTypeStats | null> {
     const result = await response.json();
     return result.data || null;
   } catch (error) {
-    console.error("Failed to fetch MonkeyType stats:", error);
+    logNonCriticalError("Failed to fetch MonkeyType stats:", error);
     return null;
   }
 }
@@ -56,7 +57,7 @@ export async function getMonkeyTypePersonalBests(): Promise<MonkeyTypePersonalBe
 
     if (!response.ok) {
       if (response.status !== 401 && response.status !== 471) {
-        console.error(`MonkeyType personal bests API returned ${response.status}`);
+        logNonCriticalError(`MonkeyType personal bests API returned ${response.status}`);
       }
       return null;
     }
@@ -64,7 +65,7 @@ export async function getMonkeyTypePersonalBests(): Promise<MonkeyTypePersonalBe
     const result = await response.json();
     return result.data || null;
   } catch (error) {
-    console.error("Failed to fetch MonkeyType personal bests:", error);
+    logNonCriticalError("Failed to fetch MonkeyType personal bests:", error);
     return null;
   }
 }
@@ -106,7 +107,7 @@ export async function getMonkeyTypeData(): Promise<MonkeyTypeUserData> {
       averageWpm,
     };
   } catch (error) {
-    console.error("Failed to fetch MonkeyType data:", error);
+    logNonCriticalError("Failed to fetch MonkeyType data:", error);
     return EMPTY_MONKEYTYPE;
   }
 }

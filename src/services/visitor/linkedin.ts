@@ -1,4 +1,5 @@
 import { LinkedinRecommendationsApiResponse, LinkedinCertificationsResponse } from "@/commons/types/linkedin";
+import { logNonCriticalError } from "@/lib/logging";
 
 const API_URL = process.env.API_URL
 
@@ -27,19 +28,19 @@ export async function getLinkedinRecommendations(): Promise<LinkedinRecommendati
     });
 
     if (!response.ok) {
-      console.error(`LinkedIn recommendations API returned ${response.status}`);
+      logNonCriticalError(`LinkedIn recommendations API returned ${response.status}`);
       return EMPTY_RECOMMENDATIONS;
     }
 
     const text = await response.text();
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-      console.error('LinkedIn recommendations API returned HTML instead of JSON');
+      logNonCriticalError('LinkedIn recommendations API returned HTML instead of JSON');
       return EMPTY_RECOMMENDATIONS;
     }
 
     return JSON.parse(text);
   } catch (error) {
-    console.error('Failed to fetch LinkedIn recommendations:', error);
+    logNonCriticalError('Failed to fetch LinkedIn recommendations:', error);
     return EMPTY_RECOMMENDATIONS;
   }
 }
@@ -52,19 +53,19 @@ export async function getLinkedinCertifications(page: number = 1, limit: number 
     });
 
     if (!response.ok) {
-      console.error(`LinkedIn certifications API returned ${response.status}`);
+      logNonCriticalError(`LinkedIn certifications API returned ${response.status}`);
       return { ...EMPTY_CERTIFICATIONS, page, limit };
     }
 
     const text = await response.text();
     if (text.startsWith('<!DOCTYPE') || text.startsWith('<html')) {
-      console.error('LinkedIn certifications API returned HTML instead of JSON');
+      logNonCriticalError('LinkedIn certifications API returned HTML instead of JSON');
       return { ...EMPTY_CERTIFICATIONS, page, limit };
     }
 
     return JSON.parse(text);
   } catch (error) {
-    console.error('Failed to fetch LinkedIn certifications:', error);
+    logNonCriticalError('Failed to fetch LinkedIn certifications:', error);
     return { ...EMPTY_CERTIFICATIONS, page, limit };
   }
 }

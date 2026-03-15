@@ -1,23 +1,23 @@
-import BlurFade from "@/components/magicui/blur-fade";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { getSupabaseProjectById } from "@/services/visitor/project";
-import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import BlurFade from "@/components/magicui/blur-fade"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { getSupabaseProjectById } from "@/services/visitor/project"
+import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 
 type Props = {
   params: Promise<{ id: string }>
 }
 
 export default async function ProjectDetailPage({ params }: Readonly<Props>) {
-  const { id } = await params;
-  const project = await getSupabaseProjectById(id);
+  const { id } = await params
+  const project = await getSupabaseProjectById(id)
 
-  if (!project) return notFound();
+  if (!project) return notFound()
 
   return (
     <BlurFade delay={0.25} inView>
@@ -36,20 +36,26 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
             <div className="flex items-center gap-2">
               <Calendar className="size-4" />
-              <span>Created: {new Date(project.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}</span>
+              <span>
+                Created:{" "}
+                {new Date(project.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
             </div>
             {project.updated_at && project.updated_at !== project.created_at && (
               <div className="flex items-center gap-2">
                 <Calendar className="size-4" />
-                <span>Updated: {new Date(project.updated_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}</span>
+                <span>
+                  Updated:{" "}
+                  {new Date(project.updated_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             )}
           </div>
@@ -57,13 +63,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
           {/* Project Image */}
           {project.image && (
             <div className="relative w-full h-[400px] rounded-lg overflow-hidden mb-6">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                className="object-cover"
-                priority
-              />
+              <Image src={project.image} alt={project.title} fill className="object-cover" priority />
             </div>
           )}
         </div>
@@ -76,10 +76,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
                 <CardTitle>Project Description</CardTitle>
               </CardHeader>
               <CardContent>
-                <div
-                  className="prose dark:prose-invert max-w-none text-muted-foreground"
-                  dangerouslySetInnerHTML={{ __html: project.description }}
-                />
+                <div className="prose dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: project.description }} />
               </CardContent>
             </Card>
 
@@ -118,10 +115,10 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
                     <div className="pb-4">
                       <p className="text-sm font-medium">Project Created</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(project.created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
+                        {new Date(project.created_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
                         })}
                       </p>
                     </div>
@@ -134,10 +131,10 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
                       <div>
                         <p className="text-sm font-medium">Last Updated</p>
                         <p className="text-xs text-muted-foreground">
-                          {new Date(project.updated_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
+                          {new Date(project.updated_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
                           })}
                         </p>
                       </div>
@@ -191,5 +188,5 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
         </div>
       </div>
     </BlurFade>
-  );
+  )
 }

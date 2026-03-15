@@ -12,6 +12,9 @@ import { CompilerTab } from "./_components/compiler-tab"
 import { PostalCodeTab } from "./_components/postal-code-tab"
 import { Web3CryptoTab } from "./_components/web3-crypto-tab"
 import Link from "next/link"
+import { logNonCriticalError } from "@/lib/logging"
+
+export const dynamic = "force-dynamic"
 
 interface ToolsPageProps {
   searchParams: Promise<{
@@ -73,7 +76,7 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
     const response = await getJLPTLevels()
     jlptLevels = response.levels
   } catch (error) {
-    console.error("Failed to fetch JLPT levels:", error)
+    logNonCriticalError("Failed to fetch JLPT levels:", error)
   }
 
   return (

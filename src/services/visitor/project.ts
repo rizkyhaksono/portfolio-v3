@@ -2,6 +2,7 @@
 
 import { supabaseUser } from "@/supabase/server";
 import { authHeaders } from "@/lib/header.config";
+import { logNonCriticalError } from "@/lib/logging";
 
 type projectType = {
   id: string;
@@ -48,7 +49,7 @@ export const getProjects = async () => {
     ).then(async (res) => await res.json());
     return response;
   } catch (error) {
-    console.error("fetch timeout/error in getProjects:", error);
+    logNonCriticalError("fetch timeout/error in getProjects:", error);
     return [];
   }
 }
@@ -66,7 +67,7 @@ export const getProjectById = async (id: number) => {
     ).then(async (res) => await res.json());
     return response;
   } catch (error) {
-    console.error("fetch timeout/error in getProjectById:", error);
+    logNonCriticalError("fetch timeout/error in getProjectById:", error);
     return null;
   }
 }

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
-const revalidateByTag = (path: string) => {
+const revalidateByTag = async (path: string) => {
   revalidatePath(path);
 };
 

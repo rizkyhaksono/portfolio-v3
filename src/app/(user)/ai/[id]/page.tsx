@@ -1,8 +1,10 @@
-import BlurFade from "@/components/magicui/blur-fade";
+import BlurFade from "@/components/magicui/blur-fade"
+
+export const dynamic = "force-static"
 
 type AIChatProps = {
-  params: Promise<{ id: string }>;
-};
+  params: Promise<{ id: string }>
+}
 
 const AIChatID = async (props: AIChatProps) => {
   return (
@@ -12,4 +14,4 @@ const AIChatID = async (props: AIChatProps) => {
   )
 }
 
-export default AIChatID;
+export default AIChatID

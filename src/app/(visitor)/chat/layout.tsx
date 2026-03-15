@@ -3,9 +3,11 @@ import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import SidebarMain from "@/components/layout/sidebar-main"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Chat | Rizky Haksono",
-  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
+  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : (process.env.DOMAIN ?? "")),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
