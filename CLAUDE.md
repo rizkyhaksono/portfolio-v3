@@ -12,17 +12,22 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 ## Architectural Guidelines
 
-1. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs.
-2. **Component Organization:**
+1. **AI Instruction Context (Multiple Agents):** Note that this project uses multiple AI assistants. For detailed rules and specific use-cases, refer to:
+   - **Claude**: `CLAUDE.md` and `.claude/` directory
+   - **Cursor**: `.cursorrules` and `.cursor/rules/*.mdc`
+   - **Gemini**: `.geminirules`
+   - **Copilot**: `.github/copilot-instructions.md`
+2. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs.
+3. **Component Organization:**
    - Routes belong in `app/`.
    - Reusable UI elements belong in `components/ui/`.
    - Feature-specific code belongs in `components/[feature]/`.
-3. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid using `any` completely.
-4. **Styling:**
+4. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid using `any` completely.
+5. **Styling:**
    - Use Tailwind utility classes.
    - Use the `cn()` utility from `@/lib/utils` for conditional class merging.
    - Maintain mobile-first responsive design.
-5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variable and function names document themselves.
+6. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variable and function names document themselves.
 
 ## Development Workflow
 

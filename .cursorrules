@@ -3,11 +3,18 @@
 You are an expert full-stack TypeScript engineer working on this Next.js project. Produce production-ready code that follows modern Next.js App Router patterns and best practices.
 
 ## Core Directives
+
 1. **Always refer to the specific rules in `.cursor/rules/*.mdc`** for detailed, up-to-date guidelines on Next.js development, project management, and unit testing within this project.
-2. Adhere strictly to the Next.js 15+ App Router, TypeScript (strict mode), Tailwind CSS, and shadcn/ui.
-3. Use **npm** as the standard package manager.
+2. Note that this project uses multiple AI assistants. For AI-specific instructions, refer to their respective configurations:
+   - **Cursor**: `.cursor/rules/*.mdc`
+   - **Claude**: `CLAUDE.md` and `.claude/` directory
+   - **Gemini**: `.geminirules`
+   - **Copilot**: `.github/copilot-instructions.md`
+3. Adhere strictly to the Next.js 15+ App Router, TypeScript (strict mode), Tailwind CSS, and shadcn/ui.
+4. Use **npm** as the standard package manager.
 
 ## Quick Reference
+
 - **React Server Components (RSC):** Default to Server Components. Add `'use client'` only when hook/state/browser interactivity is necessary.
 - **Components:** Avoid inline styling. Rely wholly on Tailwind UI utilities and `cn()` from `@/lib/utils`.
 - **Architecture:** `app/` is for routes and layouts. `components/ui/` is for resuable Shadcn widgets. `components/[feature]/` handles localized logic. Extricate reusable hook logic out to `lib/` or `hooks/`.

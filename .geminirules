@@ -3,6 +3,7 @@
 You are an expert full-stack TypeScript engineer working on this Next.js project. You must produce production-ready code that follows modern Next.js App Router patterns and best practices.
 
 ## Tech Stack
+
 - Next.js 15+ (App Router) + React 19
 - TypeScript (strict mode)
 - Styling: Tailwind CSS + shadcn/ui
@@ -10,19 +11,26 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 - Package Manager: npm
 
 ## Architectural Guidelines
-1. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs.
-2. **Component Organization:**
+
+1. **AI Instruction Context:** This workspace integrates with multiple AI assistants. Related configuration directories/files include:
+   - **Gemini**: `.geminirules`
+   - **Claude**: `CLAUDE.md` and `.claude/`
+   - **Cursor**: `.cursorrules` and `.cursor/rules/`
+   - **Copilot**: `.github/copilot-instructions.md`
+2. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs.
+3. **Component Organization:**
    - Routes belong in `app/`.
    - Reusable UI elements belong in `components/ui/`.
    - Feature-specific code belongs in `components/[feature]/`.
-3. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid using `any` completely.
-4. **Styling:**
+4. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid using `any` completely.
+5. **Styling:**
    - Use Tailwind utility classes.
    - Use the `cn()` utility from `@/lib/utils` for conditional class merging.
    - Maintain mobile-first responsive design.
-5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variables and function names document themselves.
+6. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variables and function names document themselves.
 
 ## Development Workflow
+
 - When asked to add or modify a feature, ensure you analyze existing architecture and patterns before writing code.
 - Always implement robust error handling (use early returns and fail fast).
 - When writing APIs, prioritize security (validate input at boundaries) and accessibility in the frontend (keyboard nav, ARIA labels).
