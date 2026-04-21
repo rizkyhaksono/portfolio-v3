@@ -7,6 +7,7 @@ import { Toaster } from "sonner"
 import { Analytics } from "@vercel/analytics/react"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import ScrollToTop from "@/components/ui/scroll-to-top"
+import { CommandPalette } from "@/components/ui/command-palette"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
@@ -38,6 +39,14 @@ export const metadata: Metadata = {
     follow: true,
   },
   abstract: MetadataConstants.description,
+  alternates: {
+    types: {
+      "application/rss+xml": [
+        { url: "/feed.xml", title: "Rizky Haksono — Blog" },
+        { url: "/changelog.xml", title: "Rizky Haksono — Changelog" },
+      ],
+    },
+  },
 }
 
 export default function RootLayout({
@@ -53,6 +62,7 @@ export default function RootLayout({
       <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
+          <CommandPalette />
           <ScrollToTop />
           <Toaster position="top-right" />
           {/* <div className="hidden sm:block">

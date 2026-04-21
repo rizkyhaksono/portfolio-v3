@@ -19,9 +19,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const cleanDescription = project.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
+  const ogImage = project.image ?? `/api/og?type=project&title=${encodeURIComponent(project.title)}&subtitle=${encodeURIComponent(cleanDescription)}`;
+
   return {
     title: `${project.title} | Rizky Haksono`,
-    description: project.description.replace(/<[^>]*>?/gm, '').substring(0, 160),
+    description: cleanDescription,
     metadataBase: new URL(
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000"
@@ -35,12 +38,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       title: project.title,
-      description: project.description.replace(/<[^>]*>?/gm, '').substring(0, 160),
-      images: project.image ? [project.image] : [MetadataConstants.profile],
+      description: cleanDescription,
+      images: [ogImage],
       url: MetadataConstants.openGraph.url,
       siteName: MetadataConstants.openGraph.siteName,
       locale: MetadataConstants.openGraph.locale,
       type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: cleanDescription,
+      images: [ogImage],
     },
     robots: {
       index: true,

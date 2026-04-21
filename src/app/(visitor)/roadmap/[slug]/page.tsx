@@ -148,6 +148,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const { meta } = lesson
+  const ogImage = meta.illustration ?? `/api/og?type=roadmap&title=${encodeURIComponent(meta.title)}&subtitle=${encodeURIComponent(meta.description ?? "")}`
 
   return {
     title: `${meta.title} | Roadmap`,
@@ -156,7 +157,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: meta.title,
       description: meta.description,
       type: "article",
-      images: meta.illustration ? [{ url: meta.illustration }] : [],
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: meta.title,
+      description: meta.description,
+      images: [ogImage],
     },
   }
 }
