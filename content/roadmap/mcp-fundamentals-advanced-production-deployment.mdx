@@ -1,0 +1,38 @@
+---
+title: "Production Deployment"
+description: "Deploy MCP servers with Docker, health checks, and scaling strategies"
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "advanced"
+level: "advanced"
+duration: "22 min"
+order: 7
+illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Production MCP Servers
+
+<LearningObjectives objectives={["Containerize stdio/SSE servers", "Add health and readiness endpoints", "Configure env-based secrets", "Run behind reverse proxy for SSE"]} />
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY dist ./dist
+CMD ["node", "dist/index.js"]
+```
+
+<Card><CardHeader><CardTitle>SSE transport</CardTitle></CardHeader><CardContent>Expose HTTP endpoint with TLS; stdio remains best for local IDE integrations.</CardContent></Card>
+
+---
+
+## Next Steps
+
+<NextLesson title="Security & Sandboxing" description="Scopes and validation." href="/roadmap/mcp-fundamentals-advanced-security-sandboxing" />
+
+<Resources resources={[{"title":"MCP SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"}]} />

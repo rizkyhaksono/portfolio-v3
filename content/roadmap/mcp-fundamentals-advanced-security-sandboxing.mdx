@@ -1,0 +1,38 @@
+---
+title: "Security & Sandboxing"
+description: "Permission scopes, input validation, and secure tool execution boundaries"
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "advanced"
+level: "advanced"
+duration: "20 min"
+order: 8
+illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## MCP Security
+
+<LearningObjectives objectives={["Validate all tool inputs", "Limit filesystem and network access", "Audit tool invocations", "Run servers with minimal OS permissions"]} />
+
+```typescript
+const schema = z.object({ path: z.string().max(256).regex(/^[a-zA-Z0-9_/.-]+$/) })
+
+server.tool("read_file", schema, async ({ path }) => {
+  if (!path.startsWith(ALLOWED_ROOT)) throw new Error("Path not allowed")
+  return { content: [{ type: "text", text: await fs.readFile(path, "utf8") }] }
+})
+```
+
+<Warning>Never execute arbitrary shell commands from LLM-provided strings without strict allowlists.</Warning>
+
+---
+
+## Next Steps
+
+<NextLesson title="Custom Transports" description="stdio, SSE, WebSocket." href="/roadmap/mcp-fundamentals-advanced-custom-transports" />
+
+<Resources resources={[{"title":"MCP Security","href":"https://modelcontextprotocol.io/"}]} />

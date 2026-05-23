@@ -1,0 +1,38 @@
+---
+title: "MCP Protocol Deep Dive"
+description: "JSON-RPC message flow, capability negotiation, and transport layers"
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "20 min"
+order: 4
+illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## MCP Protocol
+
+<LearningObjectives objectives={["Understand JSON-RPC request/response flow", "Negotiate server capabilities at init", "Handle notifications vs requests", "Debug with structured logging"]} />
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "tools/list",
+  "params": {}
+}
+```
+
+<Accordion type="single" collapsible className="not-prose"><AccordionItem value="init"><AccordionTrigger>Initialize handshake</AccordionTrigger><AccordionContent>Client sends initialize with protocol version; server responds with capabilities (tools, resources, prompts).</AccordionContent></AccordionItem></Accordion>
+
+---
+
+## Next Steps
+
+<NextLesson title="Resources & Prompts" description="Expose data and templates." href="/roadmap/mcp-fundamentals-intermediate-resources-prompts" />
+
+<Resources resources={[{"title":"MCP Specification","href":"https://modelcontextprotocol.io/"}]} />

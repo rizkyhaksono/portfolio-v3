@@ -1,0 +1,36 @@
+---
+title: "Multi-Tool Orchestration"
+description: "Chain multiple MCP tools, handle errors, and design composable tool APIs"
+course: "mcp-fundamentals"
+category: "ai-engineering"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "24 min"
+order: 6
+illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Tool Orchestration
+
+<LearningObjectives objectives={["Design single-purpose tools", "Compose workflows across tools", "Propagate errors with context", "Validate tool inputs with Zod"]} />
+
+```typescript
+server.tool("search_repo", { query: z.string() }, async ({ query }) => {
+  const files = await search(query)
+  return { content: [{ type: "text", text: JSON.stringify(files) }] }
+})
+```
+
+<Tip>Keep tools idempotent where possible so retries are safe.</Tip>
+
+---
+
+## Next Steps
+
+<NextLesson title="Production Deployment" description="Docker and health checks." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
+
+<Resources resources={[{"title":"MCP Tools","href":"https://modelcontextprotocol.io/docs/concepts/tools"}]} />
