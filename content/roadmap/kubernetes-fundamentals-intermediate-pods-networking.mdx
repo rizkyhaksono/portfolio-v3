@@ -1,0 +1,43 @@
+---
+title: "Pods & Networking"
+description: "Pod lifecycle, Services, DNS, NetworkPolicies, and cluster networking basics"
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "22 min"
+order: 4
+illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Pods & Networking
+
+<LearningObjectives objectives={["Write Pod and Deployment manifests", "Expose apps with ClusterIP and LoadBalancer Services", "Understand cluster DNS", "Restrict traffic with NetworkPolicy"]} />
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP
+```
+
+<Tabs defaultValue="dns"><TabsList><TabsTrigger value="dns">DNS</TabsTrigger><TabsTrigger value="policy">NetworkPolicy</TabsTrigger></TabsList><TabsContent value="dns">Pods reach services at http://api-service.default.svc.cluster.local.</TabsContent><TabsContent value="policy">NetworkPolicy uses label selectors to allow/deny ingress and egress.</TabsContent></Tabs>
+
+---
+
+## Next Steps
+
+<NextLesson title="Helm Charts" description="Package apps with Helm." href="/roadmap/kubernetes-fundamentals-intermediate-helm-charts" />
+
+<Resources resources={[{"title":"Kubernetes Services","href":"https://kubernetes.io/docs/concepts/services-networking/service/"}]} />

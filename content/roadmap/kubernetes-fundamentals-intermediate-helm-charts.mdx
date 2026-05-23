@@ -1,0 +1,46 @@
+---
+title: "Helm Charts"
+description: "Package applications with Helm, values files, and chart templating"
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "20 min"
+order: 5
+illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Helm Charts
+
+<LearningObjectives objectives={["Understand chart directory structure", "Parameterize with values.yaml", "Template manifests with Go templates", "Install and upgrade releases"]} />
+
+```yaml
+# values.yaml
+replicaCount: 2
+image:
+  repository: myapp
+  tag: "1.0.0"
+```
+
+```yaml
+# templates/deployment.yaml
+replicas: {{ .Values.replicaCount }}
+image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+```
+
+```bash
+helm install myapp ./chart -f values.prod.yaml
+helm upgrade myapp ./chart --set replicaCount=3
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Monitoring & Logging" description="Prometheus and Grafana." href="/roadmap/kubernetes-fundamentals-intermediate-monitoring-logging" />
+
+<Resources resources={[{"title":"Helm","href":"https://helm.sh/docs/"}]} />

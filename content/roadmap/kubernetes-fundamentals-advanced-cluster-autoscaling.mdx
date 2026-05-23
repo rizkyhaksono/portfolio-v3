@@ -1,0 +1,48 @@
+---
+title: "Cluster Autoscaling"
+description: "HPA, VPA, cluster autoscaler, and resource quota management"
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "advanced"
+level: "advanced"
+duration: "22 min"
+order: 7
+illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Autoscaling
+
+<LearningObjectives objectives={["Configure HorizontalPodAutoscaler", "Set CPU/memory requests and limits", "Use VPA for right-sizing", "Scale nodes with cluster autoscaler"]} />
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Security & RBAC" description="Roles and Pod Security." href="/roadmap/kubernetes-fundamentals-advanced-security-rbac" />
+
+<Resources resources={[{"title":"HPA","href":"https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"}]} />

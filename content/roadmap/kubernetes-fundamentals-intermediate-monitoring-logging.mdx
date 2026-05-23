@@ -1,0 +1,43 @@
+---
+title: "Monitoring & Logging"
+description: "Prometheus metrics, Grafana dashboards, and centralized logging with Loki"
+course: "kubernetes-fundamentals"
+category: "devops"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "24 min"
+order: 6
+illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Observability Stack
+
+<LearningObjectives objectives={["Scrape metrics with Prometheus", "Create Grafana dashboards", "Ship logs to Loki", "Define alerts for SLOs"]} />
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: api-metrics
+spec:
+  selector:
+    matchLabels:
+      app: api
+  endpoints:
+    - port: metrics
+      interval: 30s
+```
+
+<Card><CardHeader><CardTitle>Golden signals</CardTitle></CardHeader><CardContent>Latency, traffic, errors, saturation — monitor these per service.</CardContent></Card>
+
+---
+
+## Next Steps
+
+<NextLesson title="Cluster Autoscaling" description="HPA and VPA." href="/roadmap/kubernetes-fundamentals-advanced-cluster-autoscaling" />
+
+<Resources resources={[{"title":"Prometheus","href":"https://prometheus.io/docs/"}]} />
