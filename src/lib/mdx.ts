@@ -18,12 +18,15 @@ export interface ChangelogContent {
   slug: string
 }
 
+export type RoadmapLevel = "beginner" | "intermediate" | "advanced"
+
 export interface RoadmapMeta {
   title: string
   description: string
   course: string
   category: string
   difficulty: string
+  level: RoadmapLevel
   duration: string
   video?: string
   illustration?: string

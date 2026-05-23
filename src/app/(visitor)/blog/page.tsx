@@ -3,12 +3,16 @@ import CardBlog from "@/app/_components/blog/card-blog"
 import BlurFade from "@/components/magicui/blur-fade"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog"
+import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
 
-export const revalidate = 60
+export const dynamic = "force-dynamic"
 
 export default async function BlogPage() {
-  const blogs = await getBlogData()
-  const medium = await getBlogMedium()
+  const [blogs, medium, onsite] = await Promise.all([
+    getBlogData(),
+    getBlogMedium(),
+    getOnsiteBlogPosts(),
+  ])
 
   return (
     <BlurFade delay={0.25} inView>
@@ -20,6 +24,7 @@ export default async function BlogPage() {
         <TabsList>
           <TabsTrigger value="devto">Dev To</TabsTrigger>
           <TabsTrigger value="medium">Medium</TabsTrigger>
+          <TabsTrigger value="onsite">Written here</TabsTrigger>
         </TabsList>
         <TabsContent value="devto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
@@ -33,6 +38,23 @@ export default async function BlogPage() {
             {medium?.items?.map((blog: any) => (
               <CardBlogMedium key={blog.guid} title={blog.title} description={blog.description} href={blog.link} />
             ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="onsite">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
+            {onsite.length === 0 ? (
+              <p className="text-sm text-muted-foreground col-span-2 text-center py-8">No on-site posts yet.</p>
+            ) : (
+              onsite.map((post) => (
+                <CardBlog
+                  key={post.id}
+                  title={post.title}
+                  description={post.description}
+                  image={post.coverImage ?? undefined}
+                  href={`/blog/onsite/${post.slug}`}
+                />
+              ))
+            )}
           </div>
         </TabsContent>
       </Tabs>

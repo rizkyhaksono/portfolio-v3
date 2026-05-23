@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import Typography from "@/components/ui/typography"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { authLogout } from "@/services/visitor/auth"
 import { removeCookie } from "@/app/actions/actions"
 import { toast } from "sonner"
@@ -13,6 +13,15 @@ import AuthCard from "./auth-card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Home, LogOutIcon, User } from "lucide-react"
 import Link from "next/link"
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n.charAt(0).toUpperCase())
+    .join("")
+    .slice(0, 2)
+}
 
 const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   const router = useRouter()
@@ -45,11 +54,21 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
 
   if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />
 
+  const avatarSrc = profile.data.iconUrl || profile.data.avatarUrl
+  const avatarClass = cn(
+    "h-10 w-10",
+    avatarSize === 8 && "h-8 w-8",
+    avatarSize === 12 && "h-12 w-12"
+  )
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
         <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
-          <Avatar className="h-10 w-10">{profile?.data?.name && <AvatarFallback>{profile?.data?.name?.slice(0, 1)}</AvatarFallback>}</Avatar>
+          <Avatar className={cn(avatarClass)}>
+            {avatarSrc ? <AvatarImage src={avatarSrc} alt={profile.data.name} className="object-cover" /> : null}
+            <AvatarFallback>{getInitials(profile.data.name)}</AvatarFallback>
+          </Avatar>
           <div className="flex flex-col gap-1">
             <Typography.P className="text-sm text-start font-medium text-ellipsis truncate max-w-[140px]">{profile?.data?.name}</Typography.P>
             <Typography.P className="text-xs text-start opacity-75 text-ellipsis truncate max-w-[140px]">{profile?.data?.email}</Typography.P>

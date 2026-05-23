@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { SpotifyNowPlaying } from "@/services/visitor/spotify"
 import { SiSpotify } from "react-icons/si"
 import Link from "next/link"
+import Image from "next/image"
 import { Music } from "lucide-react"
 
 export default function SpotifyCard() {
@@ -52,7 +53,7 @@ export default function SpotifyCard() {
           className="group flex items-center gap-3 rounded-xl border border-border/50 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md p-2 max-w-sm transition-all hover:bg-white/10 dark:hover:bg-neutral-800/60 hover:shadow-md hover:-translate-y-0.5"
         >
           {data.albumImageUrl ? (
-            <img src={data.albumImageUrl} alt={data.album} className="size-10 object-cover rounded-md shadow-sm opacity-70 group-hover:opacity-100 transition-opacity" />
+            <Image src={data.albumImageUrl} alt={data.album ?? ""} width={40} height={40} className="size-10 object-cover rounded-md shadow-sm opacity-70 group-hover:opacity-100 transition-opacity" />
           ) : (
             <div className="p-2 bg-[#1DB954]/10 rounded-md text-[#1DB954]">
               <SiSpotify className="size-6" />
@@ -89,7 +90,7 @@ export default function SpotifyCard() {
       className="group flex flex-col md:flex-row items-center gap-3 rounded-xl border border-border/50 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md p-2 max-w-sm transition-all hover:bg-white/10 dark:hover:bg-neutral-800/60 hover:shadow-md hover:-translate-y-0.5"
     >
       {data.albumImageUrl ? (
-        <img src={data.albumImageUrl} alt={data.album} className="size-10 object-cover rounded-md shadow-sm group-hover:shadow-md transition-shadow" />
+        <Image src={data.albumImageUrl} alt={data.album ?? ""} width={40} height={40} className="size-10 object-cover rounded-md shadow-sm group-hover:shadow-md transition-shadow" />
       ) : (
         <div className="p-2 bg-[#1DB954]/10 rounded-md text-[#1DB954]">
           <SiSpotify className="size-6" />

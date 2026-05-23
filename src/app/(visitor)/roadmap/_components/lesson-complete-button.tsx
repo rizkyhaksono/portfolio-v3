@@ -45,7 +45,7 @@ export function LessonCompleteButton({ courseId, slug }: LessonCompleteButtonPro
             <p className="text-sm text-muted-foreground">You have finished this module.</p>
           </div>
         </div>
-        <Link href="/roadmap">
+        <Link href={`/roadmap?course=${courseId}`}>
           <Button variant="outline" className="gap-2">
             Return to Track
             <ArrowRight className="h-4 w-4" />

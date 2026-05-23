@@ -35,7 +35,7 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
       {/* Back Button - Sticky */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
         <div className="container max-w-7xl py-3 px-4 xl:px-8">
-          <Link href="/roadmap">
+          <Link href={meta.course ? `/roadmap?course=${meta.course}` : "/roadmap"}>
             <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted -ml-2">
               <ArrowLeft className="size-4" />
               Back to Roadmap

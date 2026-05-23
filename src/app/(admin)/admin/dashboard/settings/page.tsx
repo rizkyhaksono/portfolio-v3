@@ -17,7 +17,13 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
 import { User, Bell, Shield, Palette, Globe, Key, Trash2, Save, Loader2, Moon, Sun, Monitor } from "lucide-react"
-import { getCurrentUserClient } from "@/services/admin/client-services"
+import {
+  getCurrentUserClient,
+  getAdminSettingsClient,
+  updateAdminSettingsClient,
+  updateUserClient,
+} from "@/services/admin/client-services"
+import { useTheme } from "next-themes"
 
 // Profile settings schema
 const profileSchema = z.object({
@@ -52,11 +58,15 @@ interface UserData {
   id: string
   name: string
   email: string
+  about?: string
+  location?: string
   image?: string
+  avatarUrl?: string
   role?: string
 }
 
 export default function AdminDashboardSettingPage() {
+  const { setTheme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
@@ -99,16 +109,36 @@ export default function AdminDashboardSettingPage() {
     async function fetchUser() {
       setIsLoading(true)
       try {
-        const userData = await getCurrentUserClient()
+        const [userData, settings] = await Promise.all([
+          getCurrentUserClient(),
+          getAdminSettingsClient().catch(() => null),
+        ])
         if (userData) {
           setUser(userData)
           profileForm.reset({
             name: userData.name || "",
             email: userData.email || "",
-            bio: "",
-            website: "",
-            location: "",
+            bio: userData.about || "",
+            website: settings?.website || "",
+            location: userData.location || "",
           })
+        }
+        if (settings) {
+          notificationForm.reset({
+            emailNotifications: settings.emailNotifications,
+            pushNotifications: settings.pushNotifications,
+            weeklyDigest: settings.weeklyDigest,
+            projectUpdates: settings.projectUpdates,
+            securityAlerts: settings.securityAlerts,
+          })
+          appearanceForm.reset({
+            theme: (settings.theme as "light" | "dark" | "system") || "system",
+            language: settings.language || "en",
+            timezone: settings.timezone || "UTC",
+          })
+          if (settings.theme === "light" || settings.theme === "dark" || settings.theme === "system") {
+            setTheme(settings.theme)
+          }
         }
       } catch (error) {
         console.error("Failed to fetch user:", error)
@@ -117,13 +147,19 @@ export default function AdminDashboardSettingPage() {
       }
     }
     fetchUser()
-  }, [profileForm])
+  }, [profileForm, notificationForm, appearanceForm, setTheme])
 
   async function onProfileSubmit(data: ProfileFormValues) {
+    if (!user?.id) return
     setIsSaving(true)
     try {
-      // TODO: Implement API call to update profile
-      console.log("Profile data:", data)
+      await updateUserClient(user.id, {
+        name: data.name,
+        email: data.email,
+        about: data.bio,
+        location: data.location,
+      })
+      await updateAdminSettingsClient({ website: data.website || "" })
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -143,8 +179,7 @@ export default function AdminDashboardSettingPage() {
   async function onNotificationSubmit(data: NotificationFormValues) {
     setIsSaving(true)
     try {
-      // TODO: Implement API call to update notification settings
-      console.log("Notification data:", data)
+      await updateAdminSettingsClient(data)
       toast({
         title: "Notifications updated",
         description: "Your notification preferences have been saved.",
@@ -164,8 +199,8 @@ export default function AdminDashboardSettingPage() {
   async function onAppearanceSubmit(data: AppearanceFormValues) {
     setIsSaving(true)
     try {
-      // TODO: Implement theme/appearance changes
-      console.log("Appearance data:", data)
+      await updateAdminSettingsClient(data)
+      setTheme(data.theme)
       toast({
         title: "Appearance updated",
         description: "Your appearance settings have been saved.",
@@ -233,7 +268,7 @@ export default function AdminDashboardSettingPage() {
                   {/* Avatar Section */}
                   <div className="flex items-center gap-6">
                     <Avatar className="h-20 w-20">
-                      <AvatarImage src={user?.image} alt={user?.name} />
+                      <AvatarImage src={user?.avatarUrl ?? user?.image} alt={user?.name} />
                       <AvatarFallback className="text-lg">{user?.name?.charAt(0)?.toUpperCase() || "A"}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-2">

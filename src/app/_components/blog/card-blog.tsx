@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowBigRightDash } from "lucide-react"
+import { ArrowBigRightDash, BookOpen } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -18,10 +18,14 @@ export default function CardBlog({
   return (
     <Card className="group flex flex-col overflow-hidden border border-muted/40 hover:border-primary/30 bg-background/50 hover:bg-muted/10 shadow-sm hover:shadow-xl transition-all duration-500 ease-out h-full">
       <Link href={href} className="block overflow-hidden flex-1">
-        {image && (
+        {image ? (
           <div className="relative h-48 w-full overflow-hidden bg-muted">
             <Image src={image} alt={title} fill className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-105" draggable={false} loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </div>
+        ) : (
+          <div className="h-48 w-full bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center">
+            <BookOpen className="h-12 w-12 text-muted-foreground/30" />
           </div>
         )}
         <CardHeader className="p-4 pb-2">

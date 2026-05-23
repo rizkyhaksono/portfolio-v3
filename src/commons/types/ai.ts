@@ -1,6 +1,7 @@
 export type AIResponse = {
   status: number;
   data: string;
+  chatId?: string;
 }
 
 export type AIChat = {

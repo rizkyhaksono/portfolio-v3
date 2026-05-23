@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import ScrollToTop from "@/components/ui/scroll-to-top"
 import { CommandPalette } from "@/components/ui/command-palette"
+import JsonLd from "@/components/seo/json-ld"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
@@ -57,6 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <JsonLd />
         <Script defer src="https://cloud.umami.is/script.js" data-website-id="3344dd5c-2e88-4ae5-95f7-e142cdbff614" strategy="afterInteractive" />
       </head>
       <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>

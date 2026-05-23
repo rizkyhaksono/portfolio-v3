@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { storeCookie } from "@/app/actions/actions"
 import Image from "next/image"
+import Link from "next/link"
 import Typography from "@/components/ui/typography"
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub, FaDiscord, FaFacebook } from "react-icons/fa"
@@ -95,21 +96,21 @@ export default function LoginForm() {
       icon: FaGithub,
       provider: "github",
       className: "hover:bg-gray-100 dark:hover:bg-gray-800",
-      status: "not_supported",
+      status: "supported",
     },
     {
       name: "Discord",
       icon: FaDiscord,
       provider: "discord",
       className: "hover:bg-indigo-50 dark:hover:bg-indigo-950/20",
-      status: "not_supported",
+      status: "supported",
     },
     {
       name: "Facebook",
       icon: FaFacebook,
       provider: "facebook",
       className: "hover:bg-blue-50 dark:hover:bg-blue-950/20",
-      status: "not_supported",
+      status: "supported",
     },
   ]
 
@@ -148,9 +149,9 @@ export default function LoginForm() {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel htmlFor="password">Password</FormLabel>
-                      <button type="button" className="text-xs text-primary hover:underline" onClick={() => toast.info("Password reset coming soon!")}>
+                      <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
                         Forgot password?
-                      </button>
+                      </Link>
                     </div>
                     <FormControl>
                       <div className="relative">

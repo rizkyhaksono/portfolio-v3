@@ -5,13 +5,6 @@ export const getBrowserInfo = (userAgent: string) => {
   return '🌐 Browser';
 };
 
-export const quickStats = [
-  { label: "Projects", value: "15+" },
-  { label: "Experience", value: "2+ Years" },
-  { label: "Technologies", value: "20+" },
-  { label: "Coffee Cups", value: "∞" }
-];
-
 export const getWeatherEmoji = (weatherMain: string, icon: string) => {
   const isNight = icon.includes('n');
   switch (weatherMain.toLowerCase()) {

@@ -3,7 +3,7 @@ import { logNonCriticalError } from "@/lib/logging";
 export interface SpotifyNowPlaying {
   isPlaying: boolean;
   isRecentlyPlayed?: boolean;
-  status?: "playing" | "recently_played" | "idle" | "error";
+  status?: "playing" | "recently_played" | "idle" | "error" | "link";
   title?: string;
   artist?: string;
   album?: string;
@@ -38,6 +38,21 @@ const errorState = (message = "Unable to load Spotify status."): SpotifyNowPlayi
   message,
 });
 
+const linkState = (): SpotifyNowPlaying => ({
+  isPlaying: false,
+  status: "link",
+});
+
+function isPremiumBlocked(detail?: string): boolean {
+  return (detail ?? "").toLowerCase().includes("premium");
+}
+
+function shouldShowProfileLink(status: number, detail?: string): boolean {
+  if (status === 403 && isPremiumBlocked(detail)) return true;
+  if (status === 401) return false;
+  return false;
+}
+
 const saveLastKnownSpotify = (data: SpotifyNowPlaying) => {
   const canCache = data.status === "playing" || data.status === "recently_played";
   if (!canCache) {
@@ -71,9 +86,48 @@ const getLastKnownSpotify = (message?: string): SpotifyNowPlaying | null => {
   };
 };
 
+async function parseSpotifyErrorBody(response: Response): Promise<string> {
+  try {
+    const body = await response.json();
+    if (body?.error?.message) {
+      return `${response.status}: ${body.error.message}`;
+    }
+    if (body?.error_description) {
+      return `${response.status}: ${body.error_description}`;
+    }
+  } catch {
+    // ignore JSON parse errors
+  }
+  return `HTTP ${response.status}`;
+}
+
+function spotifyUserErrorMessage(status: number, detail?: string): string {
+  if (status === 401) {
+    return "Spotify token expired. Regenerate refresh token.";
+  }
+  if (status === 403) {
+    const lower = (detail ?? "").toLowerCase();
+    if (lower.includes("premium")) {
+      return "Spotify Premium is required for the Developer app owner account.";
+    }
+    if (lower.includes("scope")) {
+      return "Spotify missing scopes. Regenerate token with user-read-currently-playing and user-read-recently-played.";
+    }
+    return detail
+      ? `Spotify access denied (${detail}).`
+      : "Spotify access denied. Check Premium subscription or Developer app user allowlist.";
+  }
+  if (detail) {
+    return `Spotify is currently unavailable (${detail}).`;
+  }
+  return "Spotify is currently unavailable.";
+}
+
 const getAccessToken = async () => {
   if (!client_id || !client_secret || !refresh_token) {
-    throw new Error("Missing Spotify environment variables.");
+    throw new Error(
+      "Spotify credentials not configured. Set SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, and SPOTIFY_REFRESH_TOKEN."
+    );
   }
 
   const basic = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
@@ -91,13 +145,22 @@ const getAccessToken = async () => {
   });
 
   if (!response.ok) {
-    throw new Error(`Spotify token request failed with status ${response.status}.`);
+    const detail = await parseSpotifyErrorBody(response);
+    throw new Error(`Spotify token request failed: ${detail}`);
   }
 
   const data = await response.json();
   if (data.error) {
     throw new Error(`Spotify token error: ${data.error} - ${data.error_description}`);
   }
+
+  if (data.refresh_token && data.refresh_token !== refresh_token) {
+    logNonCriticalError(
+      "Spotify refresh token rotated. Update SPOTIFY_REFRESH_TOKEN in Azure/GitHub secrets with the new token.",
+      "See docs/SPOTIFY_SETUP.md for regeneration steps."
+    );
+  }
+
   return data;
 };
 
@@ -114,7 +177,7 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
       },
     });
 
-    if (response.status === 204) {
+    if (response.status === 204 || response.status === 404) {
       return getRecentlyPlayed(access_token);
     }
 
@@ -138,11 +201,19 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
     }
 
     if (response.status >= 400) {
+      const detail = await parseSpotifyErrorBody(response);
+      logNonCriticalError("Spotify currently-playing error:", detail);
+
       const fallbackTrack = await getRecentlyPlayed(access_token);
       if (fallbackTrack.status === "recently_played") {
         return fallbackTrack;
       }
-      return errorState("Spotify is currently unavailable.");
+
+      if (shouldShowProfileLink(response.status, detail)) {
+        return linkState();
+      }
+
+      return errorState(spotifyUserErrorMessage(response.status, detail));
     }
 
     const song = await response.json();
@@ -190,11 +261,21 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
     saveLastKnownSpotify(nowPlayingResult);
     return nowPlayingResult;
   } catch (error) {
-    logNonCriticalError("Error fetching Spotify now playing:", error instanceof Error ? error.message : "Unknown error");
+    const message = error instanceof Error ? error.message : "Unknown error";
+    logNonCriticalError("Error fetching Spotify now playing:", message);
+
     const cachedTrack = getLastKnownSpotify("Spotify temporarily unavailable. Showing last track.");
     if (cachedTrack) {
       return cachedTrack;
     }
+
+    if (message.includes("credentials not configured")) {
+      return linkState();
+    }
+    if (message.includes("token request failed") || message.includes("token error")) {
+      return errorState("Spotify token expired. Regenerate refresh token.");
+    }
+
     return errorState();
   }
 };
@@ -220,7 +301,24 @@ const getRecentlyPlayed = async (access_token: string): Promise<SpotifyNowPlayin
       return idleState("Spotify rate limited. Last track not available.");
     }
 
-    if (!response.ok) return idleState();
+    if (!response.ok) {
+      const detail = await parseSpotifyErrorBody(response);
+      logNonCriticalError("Spotify recently-played error:", detail);
+
+      if (response.status === 401 || response.status === 403) {
+        if (shouldShowProfileLink(response.status, detail)) {
+          return linkState();
+        }
+        return errorState(spotifyUserErrorMessage(response.status, detail));
+      }
+
+      const cachedTrack = getLastKnownSpotify();
+      if (cachedTrack) {
+        return cachedTrack;
+      }
+
+      return idleState();
+    }
 
     const data = await response.json();
     const recentlyPlayedItem = data.items?.[0];
@@ -242,7 +340,11 @@ const getRecentlyPlayed = async (access_token: string): Promise<SpotifyNowPlayin
 
     saveLastKnownSpotify(recentlyPlayedResult);
     return recentlyPlayedResult;
-  } catch {
+  } catch (error) {
+    logNonCriticalError(
+      "Error fetching Spotify recently played:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     const cachedTrack = getLastKnownSpotify("Spotify temporarily unavailable. Showing last track.");
     if (cachedTrack) {
       return cachedTrack;

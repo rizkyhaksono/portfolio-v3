@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { ModeToggle } from "./mode-toggle";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Separator } from "@/components/ui/separator";
 import { mainNavData } from "@/commons/constants/navigation-menu";
 import MobileNavbarExpand from "./mobile-navbar-expand";

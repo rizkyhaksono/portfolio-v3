@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { motion, Variants } from "framer-motion";
+import { motion, Variants } from "motion/react";
 
 interface WakatimeProgressProps {
   data: { name: string; percent?: number };

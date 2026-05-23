@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { isHaveValidToken } from "@/app/actions/actions"
 import { requestAIChat } from "@/services/user/ai"
@@ -19,6 +20,8 @@ const RATE_LIMIT = 3 // Max requests
 const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute in milliseconds
 
 export default function AIForm() {
+  const router = useRouter()
+  const [activeChatId, setActiveChatId] = useState<string | undefined>()
   const [query, setQuery] = useState("")
   const [data, setData] = useState("")
   const [inputValue, setInputValue] = useState("")
@@ -71,8 +74,12 @@ export default function AIForm() {
     if (query && isTokenValid) {
       setLoading(true)
       toast.promise(
-        requestAIChat(query).then((res) => {
+        requestAIChat(query, activeChatId).then((res) => {
           setData(res?.data)
+          if (res?.chatId) {
+            setActiveChatId(res.chatId)
+            router.push(`/ai/${res.chatId}`)
+          }
           setLoading(false)
         }),
         {
@@ -82,7 +89,7 @@ export default function AIForm() {
         }
       )
     }
-  }, [query, isTokenValid])
+  }, [query, isTokenValid, activeChatId, router])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -89,7 +90,7 @@ export function Web3CryptoTab() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        {crypto.image && <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />}
+                        {crypto.image && <Image src={crypto.image} alt={crypto.name} width={32} height={32} className="w-8 h-8 rounded-full" unoptimized />}
                         <div>
                           <h3 className="font-semibold">{crypto.name}</h3>
                           <p className="text-xs text-muted-foreground uppercase">{crypto.symbol}</p>
@@ -127,7 +128,7 @@ export function Web3CryptoTab() {
                         <Badge variant="outline" className="w-8 h-8 flex items-center justify-center">
                           {index + 1}
                         </Badge>
-                        {crypto.thumb && <img src={crypto.thumb} alt={crypto.name} className="w-6 h-6 rounded-full" />}
+                        {crypto.thumb && <Image src={crypto.thumb} alt={crypto.name} width={24} height={24} className="w-6 h-6 rounded-full" unoptimized />}
                         <div>
                           <p className="font-medium">{crypto.name}</p>
                           <p className="text-xs text-muted-foreground uppercase">{crypto.symbol}</p>

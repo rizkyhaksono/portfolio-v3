@@ -1,5 +1,6 @@
 import {
   Wrench,
+  BarChart2,
   CatIcon,
   Coffee,
   Home,
@@ -71,6 +72,11 @@ export const publicDashboardMenu = [
         href: "/roadmap",
         label: "Roadmap",
         icon: BookOpen,
+      },
+      {
+        href: "/stats",
+        label: "Stats",
+        icon: BarChart2,
       },
     ],
   },

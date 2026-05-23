@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback } from "react"
+import Link from "next/link"
 import { getAIChat } from "@/services/user/ai"
 import MDXComponent from "@/components/ui/mdx-components"
 import { MessageCircle, Bot, User } from "lucide-react"
@@ -75,7 +76,9 @@ export default function AIChat() {
                     <MessageCircle className="h-4 w-4 text-violet-500" />
                   </div>
                   <div className="flex-1 text-left min-w-0">
-                    <p className="font-medium truncate pr-4">{item.title}</p>
+                    <Link href={`/ai/${item.id}`} className="font-medium truncate pr-4 hover:underline block">
+                      {item.title}
+                    </Link>
                     <div className="flex items-center gap-2 mt-0.5">
                       <Badge variant="secondary" className="text-xs font-normal">
                         {item.messages?.length || 0} messages
@@ -88,33 +91,22 @@ export default function AIChat() {
                 <CardContent className="pt-0 pb-4">
                   <div className="space-y-4 pl-2 border-l-2 border-muted ml-5">
                     {item.messages?.map((message: any, msgIndex: number) => (
-                      <div key={message.id || `msg-${msgIndex}`} className="pl-4 space-y-4">
-                        {/* User Message */}
-                        <div className="flex items-start gap-3">
-                          <Avatar className="h-7 w-7 border">
-                            <AvatarImage src="https://api.dicebear.com/7.x/initials/svg?seed=You" />
-                            <AvatarFallback>
+                      <div key={message.id || `msg-${msgIndex}`} className="pl-4 flex items-start gap-3">
+                        <Avatar className="h-7 w-7 border">
+                          <AvatarFallback>
+                            {message.role === "user" ? (
                               <User className="h-3.5 w-3.5" />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-muted-foreground mb-1">You</p>
-                            <p className="text-sm">{item.title}</p>
-                          </div>
-                        </div>
-
-                        {/* AI Response */}
-                        <div className="flex items-start gap-3">
-                          <Avatar className="h-7 w-7 border bg-gradient-to-br from-violet-500/20 to-purple-500/20">
-                            <AvatarFallback>
+                            ) : (
                               <Bot className="h-3.5 w-3.5 text-violet-500" />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-muted-foreground mb-1">Etan AI</p>
-                            <div className="prose prose-sm dark:prose-invert max-w-none">
-                              <MDXComponent>{message.msg}</MDXComponent>
-                            </div>
+                            )}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-muted-foreground mb-1">
+                            {message.role === "user" ? "You" : "Etan AI"}
+                          </p>
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <MDXComponent>{message.msg}</MDXComponent>
                           </div>
                         </div>
                       </div>

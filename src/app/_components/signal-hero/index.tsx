@@ -15,29 +15,27 @@ export default function SignalHero() {
 
   useGSAP(
     () => {
-      // Timeline for the entry animation
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+      const mm = gsap.matchMedia()
 
-      // Animate the background overlay (simulate sunrise/glow)
-      tl.fromTo(".bg-glow", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 2 })
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+        tl.fromTo(".bg-glow", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 2 })
+        tl.fromTo(".portal-container", { y: 100, opacity: 0, scale: 0.8 }, { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "expo.out" }, "-=1.5")
+        tl.fromTo(".text-reveal", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.15 }, "-=1")
+        tl.fromTo(".logos-container", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, "-=0.5")
 
-      // Animate the portal appearing
-      tl.fromTo(".portal-container", { y: 100, opacity: 0, scale: 0.8 }, { y: 0, opacity: 1, scale: 1, duration: 1.5, ease: "expo.out" }, "-=1.5")
+        gsap.to(".portal-container", {
+          y: -15,
+          duration: 3,
+          ease: "sine.inOut",
+          yoyo: true,
+          repeat: -1,
+          delay: 2,
+        })
+      })
 
-      // Animate the text staggering in
-      tl.fromTo(".text-reveal", { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.15 }, "-=1")
-
-      // Animate the logos fading in
-      tl.fromTo(".logos-container", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 1 }, "-=0.5")
-
-      // Floating animation for the portal
-      gsap.to(".portal-container", {
-        y: -15,
-        duration: 3,
-        ease: "sine.inOut",
-        yoyo: true,
-        repeat: -1,
-        delay: 2,
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set([".bg-glow", ".portal-container", ".text-reveal", ".logos-container"], { opacity: 1, y: 0, scale: 1 })
       })
     },
     { scope: container },

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -10,8 +10,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { ChevronLeft, ChevronRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, type LucideIcon } from "lucide-react"
-import { removeCookieValue } from "@/commons/helpers/cookies"
+import { ChevronLeft, ChevronRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, type LucideIcon } from "lucide-react"
+import { performAdminLogout } from "@/lib/admin-logout"
 
 interface NavItem {
   title: string
@@ -26,6 +26,7 @@ const mainNavItems: NavItem[] = [
   { title: "Work Experience", href: "/admin/dashboard/work", icon: Briefcase },
   { title: "Education", href: "/admin/dashboard/education", icon: GraduationCap },
   { title: "Career", href: "/admin/dashboard/career", icon: School },
+  { title: "Blog", href: "/admin/dashboard/blog", icon: NotebookPen },
 ]
 
 const bottomNavItems: NavItem[] = [{ title: "Settings", href: "/admin/dashboard/settings", icon: Settings }]
@@ -107,14 +108,18 @@ interface AdminExpandableSidebarProps {
 }
 
 export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebarProps>) {
-  const router = useRouter()
   const { isExpanded, setIsExpanded } = useSidebar()
   const [showLogoutDialog, setShowLogoutDialog] = React.useState(false)
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false)
 
-  const handleLogout = () => {
-    removeCookieValue("ADMIN_SUPABASE_AUTH_COOKIE")
-    removeCookieValue("NATEE_V3_TOKEN")
-    router.push("/")
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await performAdminLogout()
+    } catch {
+      setIsLoggingOut(false)
+      setShowLogoutDialog(false)
+    }
   }
 
   return (
@@ -235,7 +240,9 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLogout}>Log out</AlertDialogAction>
+            <AlertDialogAction onClick={handleLogout} disabled={isLoggingOut}>
+              {isLoggingOut ? "Logging out…" : "Log out"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

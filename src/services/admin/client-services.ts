@@ -291,6 +291,127 @@ export async function getCurrentUserClient() {
     throw new Error(`Failed to fetch user: ${response.status}`)
   }
 
+  const json = await response.json()
+  return json.data ?? json
+}
+
+export async function updateUserClient(
+  id: string,
+  data: { name?: string; email?: string; about?: string; location?: string; headline?: string }
+) {
+  const response = await fetch(`${API_URL}/v3/me/${id}`, {
+    method: "PATCH",
+    headers: getClientAuthorizationHeader(),
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update user: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+export interface AdminSettings {
+  website?: string | null
+  emailNotifications: boolean
+  pushNotifications: boolean
+  weeklyDigest: boolean
+  projectUpdates: boolean
+  securityAlerts: boolean
+  theme: string
+  language: string
+  timezone: string
+}
+
+export async function getAdminSettingsClient(): Promise<AdminSettings> {
+  const response = await fetch(`${API_URL}/v3/me/settings`, {
+    method: "GET",
+    headers: getClientAuthorizationHeader(),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch settings: ${response.status}`)
+  }
+
+  const json = await response.json()
+  return json.data
+}
+
+export async function updateAdminSettingsClient(data: Partial<AdminSettings>) {
+  const response = await fetch(`${API_URL}/v3/me/settings`, {
+    method: "PATCH",
+    headers: getClientAuthorizationHeader(),
+    body: JSON.stringify(data),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update settings: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
+export interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  description: string
+  content: string
+  coverImage?: string | null
+  published: boolean
+  publishedAt?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function getBlogPostsClient(publishedOnly = false) {
+  const url = publishedOnly
+    ? `${API_URL}/v3/blog/?publishedOnly=true`
+    : `${API_URL}/v3/blog/`
+  const response = await fetch(url, { method: "GET" })
+  if (!response.ok) throw new Error(`Failed to fetch blog posts: ${response.status}`)
+  const json = await response.json()
+  return (json.data ?? []) as BlogPost[]
+}
+
+export async function createBlogPostClient(
+  post: Omit<BlogPost, "id" | "created_at" | "updated_at" | "publishedAt">
+) {
+  const response = await fetch(`${API_URL}/v3/blog/`, {
+    method: "POST",
+    headers: getClientAuthorizationHeader(),
+    body: JSON.stringify(post),
+  })
+  if (!response.ok) throw new Error(`Failed to create blog post: ${response.status}`)
+  return await response.json()
+}
+
+export async function updateBlogPostClient(id: string, post: Partial<BlogPost>) {
+  const response = await fetch(`${API_URL}/v3/blog/${id}`, {
+    method: "PATCH",
+    headers: getClientAuthorizationHeader(),
+    body: JSON.stringify(post),
+  })
+  if (!response.ok) throw new Error(`Failed to update blog post: ${response.status}`)
+  return await response.json()
+}
+
+export async function deleteBlogPostClient(id: string) {
+  const response = await fetch(`${API_URL}/v3/blog/${id}`, {
+    method: "DELETE",
+    headers: getClientAuthorizationHeader(),
+  })
+  if (!response.ok) throw new Error(`Failed to delete blog post: ${response.status}`)
+  return await response.json()
+}
+
+export async function reindexPortfolioClient() {
+  const response = await fetch(`${API_URL}/v3/ai/reindex`, {
+    method: "POST",
+    headers: getClientAuthorizationHeader(),
+  })
+  if (!response.ok) throw new Error(`Failed to reindex portfolio: ${response.status}`)
   return await response.json()
 }
 

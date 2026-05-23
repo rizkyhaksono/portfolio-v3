@@ -41,8 +41,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
-import { usePathname, useRouter } from "next/navigation";
-import { removeCookieValue } from "@/commons/helpers/cookies";
+import { usePathname } from "next/navigation";
+import { performAdminLogout } from "@/lib/admin-logout";
 import { useTheme } from "next-themes";
 
 interface NavItem {
@@ -95,21 +95,21 @@ const MobileNavItem = ({ href, icon: Icon, label }: NavItem) => {
 };
 
 export default function AdminSidebar() {
-  const router = useRouter();
   const { setTheme } = useTheme();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleLogout = () => {
-    removeCookieValue("ADMIN_SUPABASE_AUTH_COOKIE");
-    router.push("/");
-  };
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleOpenDialog = () => setIsDialogOpen(true);
   const handleCloseDialog = () => setIsDialogOpen(false);
-  const handleConfirmLogout = () => {
-    handleLogout();
-    handleCloseDialog();
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await performAdminLogout();
+    } catch {
+      setIsLoggingOut(false);
+      handleCloseDialog();
+    }
   };
 
   return (
@@ -199,7 +199,9 @@ export default function AdminSidebar() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCloseDialog}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmLogout}>Yes</AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmLogout} disabled={isLoggingOut}>
+              {isLoggingOut ? "Logging out…" : "Yes"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

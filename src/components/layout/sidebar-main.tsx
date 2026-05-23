@@ -31,7 +31,7 @@ const SidebarMain = () => {
               </div>
               <Typography.P className="text-xs font-medium text-green-600 dark:text-green-400">Online</Typography.P>
             </div>
-            <Typography.P className="text-xs text-primary/55">@nateenese</Typography.P>
+            <Typography.P className="text-xs text-primary/55">@rizkyhaksono</Typography.P>
           </div>
         </div>
       </div>
