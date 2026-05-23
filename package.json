@@ -21,7 +21,9 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "spotify:token": "node --env-file=.env scripts/spotify-get-refresh-token.mjs",
+    "spotify:verify": "node --env-file=.env scripts/spotify-verify-token.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -59,7 +61,6 @@
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "feed": "^5.2.0",
-    "framer-motion": "^12.23.12",
     "gray-matter": "^4.0.3",
     "gsap": "^3.14.2",
     "lucide-react": "^0.548.0",
@@ -82,7 +83,6 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.167.1",
     "usehooks-ts": "^3.1.1",
     "zod": "^3.25.76"
   },

@@ -1,0 +1,58 @@
+---
+title: "Performance & Caching"
+description: "Redis caching, compression, rate limiting, and response optimization"
+course: "express-fundamentals"
+category: "backend"
+difficulty: "advanced"
+level: "advanced"
+duration: "20 min"
+order: 7
+illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
+
+## Performance & Caching
+
+Caching reduces database load and improves response times for read-heavy endpoints.
+
+<LearningObjectives objectives={["Set up Redis with ioredis", "Build cache-aside middleware", "Add compression and rate limiting", "Measure latency improvements"]} />
+
+```javascript
+import Redis from "ioredis"
+import compression from "compression"
+import rateLimit from "express-rate-limit"
+
+const redis = new Redis(process.env.REDIS_URL)
+app.use(compression())
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }))
+
+async function cacheMiddleware(ttl = 60) {
+  return async (req, res, next) => {
+    const key = `cache:${req.originalUrl}`
+    const cached = await redis.get(key)
+    if (cached) return res.json(JSON.parse(cached))
+    const originalJson = res.json.bind(res)
+    res.json = (body) => {
+      redis.setex(key, ttl, JSON.stringify(body))
+      return originalJson(body)
+    }
+    next()
+  }
+}
+```
+
+<Tip title="Cache invalidation">Invalidate keys on POST/PATCH/DELETE, or use short TTLs for eventually consistent data.</Tip>
+
+
+---
+
+## Next Steps
+
+<NextLesson title="Microservices Architecture" description="Split services and communicate via HTTP." href="/roadmap/express-fundamentals-advanced-microservices" />
+
+<Resources resources={[{"title":"Redis","href":"https://redis.io/docs/"}]} />

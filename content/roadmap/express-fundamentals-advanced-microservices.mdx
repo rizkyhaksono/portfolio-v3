@@ -1,0 +1,49 @@
+---
+title: "Microservices Architecture"
+description: "Split monoliths into services with API gateways and inter-service communication"
+course: "express-fundamentals"
+category: "backend"
+difficulty: "advanced"
+level: "advanced"
+duration: "28 min"
+order: 8
+illustration: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
+
+## Microservices with Express
+
+Break large apps into independently deployable services with clear boundaries.
+
+<LearningObjectives objectives={["Identify service boundaries by domain", "Call services via HTTP with timeouts", "Introduce an API gateway", "Handle partial failures gracefully"]} />
+
+### Service Communication
+
+```javascript
+// user-service calls order-service
+const res = await fetch(`${ORDER_SERVICE_URL}/orders?userId=${userId}`, {
+  signal: AbortSignal.timeout(5000),
+  headers: { "x-internal-key": process.env.INTERNAL_KEY },
+})
+if (!res.ok) throw new Error("Order service unavailable")
+const orders = await res.json()
+```
+
+<Accordion type="multiple" className="not-prose">
+  <AccordionItem value="gateway"><AccordionTrigger>API Gateway</AccordionTrigger><AccordionContent>Single entry point that routes `/users/*` to User Service and `/orders/*` to Order Service. Handles auth, rate limits, and SSL termination.</AccordionContent></AccordionItem>
+  <AccordionItem value="tradeoffs"><AccordionTrigger>Trade-offs</AccordionTrigger><AccordionContent>More operational complexity (deployments, observability) vs better team autonomy and scaling per service.</AccordionContent></AccordionItem>
+</Accordion>
+
+
+---
+
+## Next Steps
+
+<NextLesson title="Testing & Deployment" description="Supertest, Docker, and CI/CD." href="/roadmap/express-fundamentals-advanced-testing-deployment" />
+
+<Resources resources={[{"title":"Microservices patterns","href":"https://microservices.io/patterns/index.html"}]} />

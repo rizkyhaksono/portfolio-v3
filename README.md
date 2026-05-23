@@ -317,8 +317,13 @@ Fetch current Spotify playback information (requires Spotify API setup).
 
 **Setup Required:**
 
-- Spotify Client ID & Client Secret
-- Add to environment variables: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
+- Spotify app from [Developer Dashboard](https://developer.spotify.com/dashboard)
+- Environment variables (runtime on Azure App Service **and** local `.env`):
+  - `SPOTIFY_CLIENT_ID`
+  - `SPOTIFY_CLIENT_SECRET`
+  - `SPOTIFY_REFRESH_TOKEN` (OAuth refresh token with scopes `user-read-currently-playing` and `user-read-recently-played`)
+- Full setup guide: [docs/SPOTIFY_SETUP.md](docs/SPOTIFY_SETUP.md)
+- Helper script: `node scripts/spotify-get-refresh-token.mjs`
 
 #### GET `/api/weather`
 
