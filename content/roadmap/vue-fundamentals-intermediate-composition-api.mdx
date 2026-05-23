@@ -1,0 +1,53 @@
+---
+title: "Composition API"
+description: "ref, reactive, computed, watch, and composables for reusable logic"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "22 min"
+order: 4
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Vue Composition API
+
+<LearningObjectives objectives={["Use ref and reactive correctly", "Derive state with computed", "React to changes with watch/watchEffect", "Extract composables for reuse"]} />
+
+```vue
+<script setup>
+import { ref, computed, watch } from 'vue'
+
+const count = ref(0)
+const doubled = computed(() => count.value * 2)
+
+watch(count, (n) => console.log('count:', n))
+
+function increment() { count.value++ }
+</script>
+```
+
+```js
+// composables/useFetch.js
+export function useFetch(url) {
+  const data = ref(null)
+  const error = ref(null)
+  watchEffect(async () => {
+    try { data.value = await (await fetch(url)).json() }
+    catch (e) { error.value = e }
+  })
+  return { data, error }
+}
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Pinia State Management" description="Global stores with Pinia." href="/roadmap/vue-fundamentals-intermediate-pinia-state" />
+
+<Resources resources={[{"title":"Composition API","href":"https://vuejs.org/guide/extras/composition-api-faq.html"}]} />

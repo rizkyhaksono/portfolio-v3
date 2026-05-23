@@ -1,0 +1,37 @@
+---
+title: "Vue Performance Optimization"
+description: "v-memo, async components, keep-alive, and bundle size optimization"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "20 min"
+order: 7
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Vue Performance
+
+<LearningObjectives objectives={["Use v-memo for expensive lists", "Lazy-load heavy components", "Cache views with keep-alive", "Analyze bundle with rollup-plugin-visualizer"]} />
+
+```vue
+<template>
+  <KeepAlive>
+    <component :is="activeTab" />
+  </KeepAlive>
+</template>
+```
+
+<Tip>Use defineAsyncComponent for code-splitting route-level chunks.</Tip>
+
+---
+
+## Next Steps
+
+<NextLesson title="SSR with Nuxt" description="Nuxt 3 rendering." href="/roadmap/vue-fundamentals-advanced-ssr-nuxt" />
+
+<Resources resources={[{"title":"Vue Performance","href":"https://vuejs.org/guide/best-practices/performance.html"}]} />

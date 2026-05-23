@@ -1,0 +1,43 @@
+---
+title: "Pinia State Management"
+description: "Stores, actions, getters, and modular state architecture with Pinia"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "20 min"
+order: 5
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Pinia Stores
+
+<LearningObjectives objectives={["Create stores with defineStore", "Define actions for async logic", "Use getters for derived state", "Split stores by domain"]} />
+
+```js
+export const useUserStore = defineStore('user', {
+  state: () => ({ user: null, token: null }),
+  getters: {
+    isLoggedIn: (s) => !!s.token,
+  },
+  actions: {
+    async login(email, password) {
+      const res = await api.post('/auth/login', { email, password })
+      this.user = res.user
+      this.token = res.token
+    },
+  },
+})
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Vue Router" description="Routing and guards." href="/roadmap/vue-fundamentals-intermediate-vue-router" />
+
+<Resources resources={[{"title":"Pinia","href":"https://pinia.vuejs.org/"}]} />

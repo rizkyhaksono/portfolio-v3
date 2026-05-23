@@ -1,0 +1,35 @@
+---
+title: "SSR with Nuxt"
+description: "Server-side rendering, hydration, data fetching, and deployment with Nuxt"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "28 min"
+order: 8
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Nuxt 3 SSR
+
+<LearningObjectives objectives={["Fetch data with useFetch/useAsyncData", "Understand SSR vs CSR trade-offs", "Deploy to Vercel or Node server", "Use server routes for secrets"]} />
+
+```vue
+<script setup>
+const { data: posts } = await useFetch('/api/posts')
+</script>
+```
+
+<Card><CardHeader><CardTitle>Server routes</CardTitle></CardHeader><CardContent>Place API keys in server/api/` — never expose them to the client bundle.</CardContent></Card>
+
+---
+
+## Next Steps
+
+<NextLesson title="Testing Vue Applications" description="Vitest + Vue Test Utils." href="/roadmap/vue-fundamentals-advanced-testing-vue" />
+
+<Resources resources={[{"title":"Nuxt","href":"https://nuxt.com/docs"}]} />

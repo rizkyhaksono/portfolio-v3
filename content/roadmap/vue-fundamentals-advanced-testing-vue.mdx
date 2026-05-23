@@ -1,0 +1,38 @@
+---
+title: "Testing Vue Applications"
+description: "Component testing with Vitest, Vue Test Utils, and E2E with Playwright"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "22 min"
+order: 9
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Testing Vue
+
+<LearningObjectives objectives={["Mount components with Vue Test Utils", "Test emitted events and slots", "Mock Pinia stores", "Write E2E flows with Playwright"]} />
+
+```js
+import { mount } from '@vue/test-utils'
+import Counter from './Counter.vue'
+
+test('increments', async () => {
+  const wrapper = mount(Counter)
+  await wrapper.find('button').trigger('click')
+  expect(wrapper.text()).toContain('1')
+})
+```
+
+---
+
+## Next Steps
+
+
+
+<Resources resources={[{"title":"Vue Test Utils","href":"https://test-utils.vuejs.org/"}]} />

@@ -1,0 +1,37 @@
+---
+title: "Vue Router"
+description: "Dynamic routes, navigation guards, lazy-loaded views, and route meta"
+course: "vue-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "18 min"
+order: 6
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Vue Router
+
+<LearningObjectives objectives={["Configure dynamic routes", "Add navigation guards", "Lazy-load route components", "Use route meta for permissions"]} />
+
+```js
+const routes = [
+  { path: '/users/:id', component: () => import('./UserView.vue'), meta: { requiresAuth: true } },
+]
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !useUserStore().isLoggedIn) return '/login'
+})
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Vue Performance Optimization" description="Optimize renders." href="/roadmap/vue-fundamentals-advanced-performance-optimization" />
+
+<Resources resources={[{"title":"Vue Router","href":"https://router.vuejs.org/"}]} />
