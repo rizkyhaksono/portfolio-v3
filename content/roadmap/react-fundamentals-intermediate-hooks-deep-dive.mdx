@@ -1,0 +1,45 @@
+---
+title: "Hooks Deep Dive"
+description: "Custom hooks, useEffect cleanup, useMemo, useCallback, and performance hooks"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "25 min"
+order: 5
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Advanced Hooks
+
+<LearningObjectives objectives={["Write cleanup functions in useEffect", "Memoize expensive computations with useMemo", "Stabilize callbacks with useCallback", "Extract reusable logic into custom hooks"]} />
+
+```tsx
+function useDebounce(value, delay = 300) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(id)
+  }, [value, delay])
+  return debounced
+}
+```
+
+<Tip title="Dependency array">Include every value from component scope that changes between renders and is used inside the effect.</Tip>
+
+```tsx
+const sorted = useMemo(() => heavySort(items), [items])
+const onSave = useCallback(() => save(form), [form])
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="React Router" description="Client-side routing and protected routes." href="/roadmap/react-fundamentals-intermediate-react-router" />
+
+<Resources resources={[{"title":"Rules of Hooks","href":"https://react.dev/reference/rules/rules-of-hooks"}]} />

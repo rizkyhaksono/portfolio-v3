@@ -1,0 +1,41 @@
+---
+title: "Performance Optimization"
+description: "React.memo, lazy loading, code splitting, and profiling with DevTools"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "24 min"
+order: 7
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## React Performance
+
+<LearningObjectives objectives={["Profile with React DevTools Profiler", "Split bundles with React.lazy and Suspense", "Prevent wasted renders with memo", "Virtualize long lists"]} />
+
+```tsx
+const HeavyChart = lazy(() => import("./HeavyChart"))
+
+function Page() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <HeavyChart data={data} />
+    </Suspense>
+  )
+}
+```
+
+<Warning>Don't memo everything — measure first. Premature memoization adds complexity.</Warning>
+
+---
+
+## Next Steps
+
+<NextLesson title="Server Components" description="RSC and streaming." href="/roadmap/react-fundamentals-advanced-server-components" />
+
+<Resources resources={[{"title":"React Performance","href":"https://react.dev/learn/render-and-commit"}]} />

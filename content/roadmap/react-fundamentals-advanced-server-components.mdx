@@ -1,0 +1,37 @@
+---
+title: "Server Components"
+description: "React Server Components, streaming, and hybrid rendering with Next.js"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "26 min"
+order: 8
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## React Server Components
+
+<LearningObjectives objectives={["Distinguish Server vs Client Components", "Fetch data on the server without useEffect", "Stream UI with Suspense boundaries", "Choose 'use client' only when needed"]} />
+
+```tsx
+// app/posts/page.tsx — Server Component (default in App Router)
+export default async function PostsPage() {
+  const posts = await db.post.findMany()
+  return <PostList posts={posts} />
+}
+```
+
+<Card><CardHeader><CardTitle>When to use 'use client'</CardTitle></CardHeader><CardContent>Event handlers, hooks, browser APIs, and local state require Client Components.</CardContent></Card>
+
+---
+
+## Next Steps
+
+<NextLesson title="Testing Patterns" description="Vitest and Testing Library." href="/roadmap/react-fundamentals-advanced-testing-patterns" />
+
+<Resources resources={[{"title":"Server Components","href":"https://react.dev/reference/rsc/server-components"}]} />

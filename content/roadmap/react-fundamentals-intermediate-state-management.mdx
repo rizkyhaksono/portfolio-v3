@@ -1,0 +1,46 @@
+---
+title: "State Management Patterns"
+description: "Context API, useReducer, and when to reach for external state libraries"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "20 min"
+order: 4
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## State Management in React
+
+<LearningObjectives objectives={["Use Context + useReducer for shared state", "Avoid unnecessary re-renders with split contexts", "Know when to adopt Zustand or Redux", "Lift state only as high as needed"]} />
+
+```tsx
+const CartContext = createContext(null)
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case "ADD": return { items: [...state.items, action.item] }
+    case "CLEAR": return { items: [] }
+    default: return state
+  }
+}
+
+export function CartProvider({ children }) {
+  const [state, dispatch] = useReducer(cartReducer, { items: [] })
+  return <CartContext.Provider value={{ state, dispatch }}>{children}</CartContext.Provider>
+}
+```
+
+<Tabs defaultValue="context"><TabsList><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="when">When to escalate</TabsTrigger></TabsList><TabsContent value="context">Split **state** and **dispatch** into separate contexts so consumers that only dispatch don't re-render on state changes.</TabsContent><TabsContent value="when">Reach for Zustand/Redux when you have cross-route global state, middleware, or devtools time-travel needs.</TabsContent></Tabs>
+
+---
+
+## Next Steps
+
+<NextLesson title="Hooks Deep Dive" description="Master useEffect, useMemo, and custom hooks." href="/roadmap/react-fundamentals-intermediate-hooks-deep-dive" />
+
+<Resources resources={[{"title":"React useReducer","href":"https://react.dev/reference/react/useReducer"}]} />

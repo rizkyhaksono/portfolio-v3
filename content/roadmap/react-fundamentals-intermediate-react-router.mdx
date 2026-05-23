@@ -1,0 +1,50 @@
+---
+title: "React Router"
+description: "Client-side routing, nested routes, loaders, and protected route patterns"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "intermediate"
+level: "intermediate"
+duration: "22 min"
+order: 6
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## React Router v6+
+
+<LearningObjectives objectives={["Define routes with createBrowserRouter", "Use nested layouts and Outlet", "Load data with loaders", "Protect routes with auth checks"]} />
+
+```tsx
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "dashboard", element: <Protected><Dashboard /></Protected>, loader: dashboardLoader },
+    ],
+  },
+])
+```
+
+### Protected Routes
+
+```tsx
+function Protected({ children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  return children
+}
+```
+
+---
+
+## Next Steps
+
+<NextLesson title="Performance Optimization" description="Memoization and code splitting." href="/roadmap/react-fundamentals-advanced-performance-optimization" />
+
+<Resources resources={[{"title":"React Router","href":"https://reactrouter.com/"}]} />

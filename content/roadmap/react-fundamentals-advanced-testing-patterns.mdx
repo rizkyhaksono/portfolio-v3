@@ -1,0 +1,39 @@
+---
+title: "Testing Patterns"
+description: "Unit and integration testing with Vitest, React Testing Library, and MSW"
+course: "react-fundamentals"
+category: "frontend"
+difficulty: "advanced"
+level: "advanced"
+duration: "22 min"
+order: 9
+illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+
+## Testing React Apps
+
+<LearningObjectives objectives={["Query by role with Testing Library", "Mock API calls with MSW", "Test user flows not implementation details", "Run tests in CI with Vitest"]} />
+
+```tsx
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+
+test("submits form", async () => {
+  render(<LoginForm />)
+  await userEvent.type(screen.getByLabelText(/email/i), "a@b.com")
+  await userEvent.click(screen.getByRole("button", { name: /sign in/i }))
+  expect(await screen.findByText(/welcome/i)).toBeInTheDocument()
+})
+```
+
+---
+
+## Next Steps
+
+
+
+<Resources resources={[{"title":"Testing Library","href":"https://testing-library.com/docs/react-testing-library/intro/"},{"title":"MSW","href":"https://mswjs.io/"}]} />
