@@ -14,7 +14,15 @@ export const skills_data: SkillCategory[] = [
       "Typescript",
       "Javascript",
       "Vue.js",
+      "Nuxt.js",
+      "Angular",
+      "Svelte",
+      "SolidJS",
       "Astro.js",
+      "Remix",
+      "Gatsby",
+      "Qwik",
+      "Module Federation",
       "HTML5",
       "CSS3",
       "React Native",
@@ -59,6 +67,10 @@ export const skills_data: SkillCategory[] = [
       "tRPC",
       "Socket.io",
       "FastAPI",
+      "Elysia.js",
+      "Bun",
+      "Hapi.js",
+      "Ruby on Rails",
       "RabbitMQ",
     ],
     icon: "Server",
@@ -79,6 +91,7 @@ export const skills_data: SkillCategory[] = [
       "Rust",
       "Dart",
       "PHP",
+      "Ruby",
     ],
     icon: "Code2",
     color: "from-violet-500 to-purple-400"
@@ -95,6 +108,7 @@ export const skills_data: SkillCategory[] = [
       "Firebase",
       "Supabase",
       "Prisma",
+      "MinIO",
     ],
     icon: "Database",
     color: "from-orange-500 to-amber-400"
@@ -118,6 +132,8 @@ export const skills_data: SkillCategory[] = [
       "DigitalOcean",
       "Nginx",
       "Apache",
+      "Terraform",
+      "Kubernetes",
     ],
     icon: "Cloud",
     color: "from-sky-500 to-blue-400"
@@ -143,6 +159,7 @@ export const skills_data: SkillCategory[] = [
       "Recoil",
       "Jotai",
       "React Query",
+      "Pinia",
     ],
     icon: "Layers",
     color: "from-indigo-500 to-violet-400"
@@ -192,6 +209,15 @@ export const skills_data: SkillCategory[] = [
       "Fine tuning",
       "Chunking",
       "Embedding",
+      "LangChain",
+      "AI Agents",
+      "LLM",
+      "SLM",
+      "Neural Networks",
+      "NLP",
+      "Computer Vision",
+      "MLOps",
+      "Gemini API",
     ],
     icon: "Brain",
     color: "from-fuchsia-500 to-pink-400"
@@ -201,9 +227,23 @@ export const skills_data: SkillCategory[] = [
     skills: [
       "Solidity (Learning)",
       "Web3.js (Learning)",
+      "Ethers.js",
     ],
     icon: "Blocks",
     color: "from-slate-500 to-zinc-400"
+  },
+  {
+    name: "Monitoring & Observability",
+    skills: [
+      "Grafana",
+      "Grafana Loki",
+      "Prometheus",
+      "OpenTelemetry",
+      "Pino",
+      "Upptime",
+    ],
+    icon: "Activity",
+    color: "from-red-500 to-orange-400"
   }
 ];
 
@@ -231,6 +271,10 @@ export const skills_data_top = [
   "RAG",
   "MCP",
   "FastAPI",
+  "Grafana",
+  "LangChain",
+  "Bun",
+  "Elysia.js",
 ];
 
 export const skills_data_bottom = [
@@ -248,6 +292,10 @@ export const skills_data_bottom = [
   "Figma",
   "Data Warehouse",
   "RabbitMQ",
+  "Terraform",
+  "OpenTelemetry",
+  "Kubernetes",
+  "Nuxt.js",
 ];
 
 export const getAllSkills = (): string[] => {
