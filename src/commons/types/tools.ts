@@ -319,7 +319,9 @@ export type ToolTab =
   | "files"
   | "compiler"
   | "postal-code"
-  | "web3-crypto";
+  | "web3-crypto"
+  | "pokemon"
+  | "starwars";
 
 export interface ToolCategory {
   id: ToolTab;
