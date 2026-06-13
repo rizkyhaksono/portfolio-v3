@@ -38,3 +38,7 @@ next-env.d.ts
 
 # claude
 .claude/settings.local.json
+
+# docker compose
+docker-compose*.yml
+docker-compose*.yaml
