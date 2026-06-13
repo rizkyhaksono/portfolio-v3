@@ -96,21 +96,21 @@ export default function LoginForm() {
       icon: FaGithub,
       provider: "github",
       className: "hover:bg-gray-100 dark:hover:bg-gray-800",
-      status: "supported",
+      status: "not_supported",
     },
     {
       name: "Discord",
       icon: FaDiscord,
       provider: "discord",
       className: "hover:bg-indigo-50 dark:hover:bg-indigo-950/20",
-      status: "supported",
+      status: "not_supported",
     },
     {
       name: "Facebook",
       icon: FaFacebook,
       provider: "facebook",
       className: "hover:bg-blue-50 dark:hover:bg-blue-950/20",
-      status: "supported",
+      status: "not_supported",
     },
   ]
 

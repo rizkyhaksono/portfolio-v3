@@ -312,6 +312,25 @@ export async function updateUserClient(
   return await response.json()
 }
 
+export async function uploadAvatarClient(file: File) {
+  const formData = new FormData()
+  formData.append("file", file)
+  const headers = { ...getClientAuthorizationHeader() } as Record<string, string>
+  delete headers["Content-Type"]
+
+  const response = await fetch(`${API_URL}/v3/me/avatar`, {
+    method: "POST",
+    headers,
+    body: formData,
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload avatar: ${response.status}`)
+  }
+
+  return await response.json()
+}
+
 export interface AdminSettings {
   website?: string | null
   emailNotifications: boolean

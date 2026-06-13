@@ -1,274 +1,184 @@
-import { useState, useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Copy, Check, Terminal, AlertCircle, CheckCircle, Download, TerminalSquare } from "lucide-react";
-import { Theme, themes } from "@/commons/constants/compiler";
+"use client"
 
-interface CompilerOutputPanelProps {
-  output: string;
-  error: string | null;
-  isRunning: boolean;
-  theme?: Theme;
+import { useEffect, useRef, useState } from "react";
+import { Trash2, Copy, Check, ChevronRight, TerminalSquare } from "lucide-react";
+
+// VSCode-terminal-style syntax coloring for program stdout.
+const TOKEN_RE = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b|\b(?:true|false|null|undefined|NaN|Infinity)\b|[{}[\]()])/gi;
+
+function colorizeOutput(text: string) {
+  return text.split(TOKEN_RE).map((part, i) => {
+    if (!part) return null;
+    let cls = "";
+    if (/^["'`]/.test(part)) cls = "text-[#ce9178]"; // strings → orange
+    else if (/^\d+(\.\d+)?(e[+-]?\d+)?$/i.test(part)) cls = "text-[#dcdcaa]"; // numbers → yellow
+    else if (/^(true|false|null|undefined|nan|infinity)$/i.test(part)) cls = "text-[#569cd6]"; // keywords → blue
+    else if (/^[{}[\]()]$/.test(part)) cls = "text-[#e5c07b]"; // brackets → gold
+    return (
+      <span key={i} className={cls || undefined}>
+        {part}
+      </span>
+    );
+  });
 }
 
-export function CompilerOutputPanel({
-  output,
+interface CompilerTerminalProps {
+  stdout: string;
+  stderr: string;
+  error: string | null;
+  isRunning: boolean;
+  exitCode: number | null;
+  time: string | null;
+  runCommand: string;
+  hasRun: boolean;
+  stdin: string;
+  onStdinChange: (value: string) => void;
+  onClear: () => void;
+}
+
+export function CompilerTerminal({
+  stdout,
+  stderr,
   error,
   isRunning,
-  theme = 'dark'
-}: Readonly<CompilerOutputPanelProps>) {
+  exitCode,
+  time,
+  runCommand,
+  hasRun,
+  stdin,
+  onStdinChange,
+  onClear,
+}: Readonly<CompilerTerminalProps>) {
+  const [tab, setTab] = useState<"terminal" | "stdin">("terminal");
   const [copied, setCopied] = useState(false);
-  const [executionTime, setExecutionTime] = useState<number | null>(null);
-  const outputRef = useRef<HTMLPreElement>(null);
-
-  // Use useRef to track execution timing without causing re-renders
-  const executionStartTime = useRef<number | null>(null);
-  const wasRunning = useRef(false);
-
-  const currentTheme = themes[theme];
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Handle execution timing
-    if (isRunning && !wasRunning.current) {
-      // Just started running
-      executionStartTime.current = Date.now();
-      setExecutionTime(null);
-      wasRunning.current = true;
-    } else if (!isRunning && wasRunning.current) {
-      // Just finished running
-      if (executionStartTime.current) {
-        const endTime = Date.now();
-        setExecutionTime(endTime - executionStartTime.current);
-      }
-      wasRunning.current = false;
-    }
-  }, [isRunning]);
+    if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
+  }, [stdout, stderr, error, isRunning, exitCode, tab]);
 
-  useEffect(() => {
-    // Auto-scroll to bottom when new output is added
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight;
-    }
-  }, [output, error]);
-
-  const handleCopyOutput = async () => {
-    const content = error || output || "";
+  const handleCopy = async () => {
+    const content = error ?? [stdout, stderr].filter(Boolean).join("\n");
     if (!content) return;
-
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      console.error("Failed to copy output:", error);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
     }
   };
 
-  const handleDownloadOutput = () => {
-    const content = error || output || "";
-    if (!content) return;
-
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `output_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const getStatusInfo = () => {
-    // Define theme-aware colors
-    const getThemeColors = () => {
-      const isLightTheme = theme === 'light' || theme === 'github' || theme === 'solarized';
-
-      return {
-        running: {
-          dot: isLightTheme ? 'bg-blue-600' : 'bg-blue-500',
-          text: isLightTheme ? 'text-blue-700' : 'text-blue-400'
-        },
-        error: {
-          icon: isLightTheme ? 'text-red-600' : 'text-red-400',
-          text: isLightTheme ? 'text-red-700' : 'text-red-400'
-        },
-        success: {
-          icon: isLightTheme ? 'text-green-600' : 'text-green-400',
-          text: isLightTheme ? 'text-green-700' : 'text-green-400'
-        },
-        ready: {
-          icon: isLightTheme ? 'text-gray-600' : 'text-slate-400',
-          text: isLightTheme ? 'text-gray-700' : 'text-slate-400'
-        }
-      };
-    };
-
-    const colors = getThemeColors();
-
-    if (isRunning) {
-      return {
-        icon: <div className={`w-2 h-2 ${colors.running.dot} rounded-full animate-pulse`} />,
-        text: "Running...",
-        variant: "secondary" as const,
-        color: colors.running.text
-      };
-    }
-    if (error) {
-      return {
-        icon: <AlertCircle className={`w-4 h-4 ${colors.error.icon}`} />,
-        text: "Error",
-        variant: "destructive" as const,
-        color: colors.error.text
-      };
-    }
-    if (output) {
-      return {
-        icon: <CheckCircle className={`w-4 h-4 ${colors.success.icon}`} />,
-        text: "Success",
-        variant: "secondary" as const,
-        color: colors.success.text
-      };
-    }
-    return {
-      icon: <Terminal className={`w-4 h-4 ${colors.ready.icon}`} />,
-      text: "Ready",
-      variant: "outline" as const,
-      color: colors.ready.text
-    };
-  };
-
-  const getDisplayContent = () => {
-    if (error) {
-      return formatError(error);
-    }
-    if (output) {
-      return output;
-    }
-    return "Click 'Run' to execute your code and see the output here...";
-  };
-
-  const formatError = (errorMessage: string) => {
-    // Basic error formatting
-    return errorMessage
-      .replace(/Error:/g, '❌ Error:')
-      .replace(/Warning:/g, '⚠️ Warning:')
-      .replace(/at line (\d+)/g, '→ at line $1');
-  };
-
-  const getOutputClassName = () => {
-    const isLightTheme = theme === 'light' || theme === 'github' || theme === 'solarized';
-
-    if (error) {
-      return isLightTheme
-        ? 'text-red-800 bg-red-50 border-l-4 border-red-500'
-        : 'text-red-300 bg-red-950/20 border-l-4 border-red-500';
-    }
-    if (output) {
-      return isLightTheme
-        ? 'text-green-800 bg-green-50 border-l-4 border-green-500'
-        : 'text-green-300 bg-green-950/20 border-l-4 border-green-500';
-    }
-
-    // Default text color for empty state
-    return isLightTheme
-      ? 'text-gray-700'
-      : currentTheme.textColor.replace('text-slate-100', 'text-slate-400').replace('text-purple-100', 'text-purple-400');
-  };
-
-  const statusInfo = getStatusInfo();
+  const TabButton = ({ id, label }: { id: "terminal" | "stdin"; label: string }) => (
+    <button
+      onClick={() => setTab(id)}
+      className={`px-3 h-full text-[11px] uppercase tracking-wide transition-colors border-t-2 ${
+        tab === id
+          ? "border-t-[#007acc] text-[#e7e7e7]"
+          : "border-t-transparent text-[#8a8a8a] hover:text-[#cccccc]"
+      }`}
+    >
+      {label}
+      {id === "stdin" && stdin ? <span className="ml-1 text-[#007acc]">●</span> : null}
+    </button>
+  );
 
   return (
-    <Card className={`flex flex-col h-full shadow-lg border-0 bg-gradient-to-br ${currentTheme.background}`}>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <TerminalSquare className={`w-5 h-5 ${currentTheme.lineNumbers.color}`} />
-            <CardTitle className={`text-lg ${currentTheme.textColor}`}>Output</CardTitle>
-            <Badge variant={statusInfo.variant} className="flex items-center gap-2 text-xs">
-              {statusInfo.icon}
-              {statusInfo.text}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1">
-            {executionTime && (
-              <Badge
-                variant="outline"
-                className={`text-xs ${theme === 'light' || theme === 'github' || theme === 'solarized'
-                  ? 'text-gray-700 border-gray-300'
-                  : currentTheme.lineNumbers.color
-                  }`}
-              >
-                {executionTime}ms
-              </Badge>
-            )}
-            {(output || error) && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleDownloadOutput}
-                  className={`${currentTheme.lineNumbers.color} hover:${currentTheme.textColor} hover:bg-opacity-20`}
-                >
-                  <Download className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyOutput}
-                  className={`${currentTheme.lineNumbers.color} hover:${currentTheme.textColor} hover:bg-opacity-20`}
-                >
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
-              </>
-            )}
-          </div>
+    <div className="flex flex-col h-full bg-[#1e1e1e] text-[#cccccc]">
+      {/* Panel header / tabs */}
+      <div className="flex items-center justify-between h-9 px-1 border-b border-[#2b2b2b] bg-[#252526] shrink-0">
+        <div className="flex items-center h-full">
+          <TabButton id="terminal" label="Terminal" />
+          <TabButton id="stdin" label="Input" />
         </div>
-      </CardHeader>
-      <Separator className={`${currentTheme.lineNumbers.border.replace('border-', 'bg-')}`} />
-      <CardContent className="flex-1 p-0 relative overflow-hidden">
-        <div className="relative h-full">
-          {/* Output content */}
-          <pre
-            ref={outputRef}
-            className={`h-full overflow-auto p-4 font-mono text-sm whitespace-pre-wrap ${currentTheme.cardBackground} ${getOutputClassName()}`}
-            style={{
-              fontFamily: "'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', monospace",
-              fontFeatureSettings: "'liga' 1, 'calt' 1",
-              lineHeight: "1.5",
-              scrollbarWidth: "thin",
-              scrollbarColor: `${currentTheme.scrollbar} transparent`
-            }}
+        <div className="flex items-center gap-1 pr-1">
+          <button
+            onClick={handleCopy}
+            title="Copy output"
+            className="p-1.5 rounded text-[#8a8a8a] hover:text-white hover:bg-white/10"
           >
-            {getDisplayContent()}
-          </pre>
+            {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+          <button
+            onClick={onClear}
+            title="Clear terminal"
+            className="p-1.5 rounded text-[#8a8a8a] hover:text-white hover:bg-white/10"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
 
-          {/* Running indicator overlay */}
-          {isRunning && (
-            <div className={`absolute inset-0 ${currentTheme.cardBackground}/80 backdrop-blur-sm flex items-center justify-center`}>
-              <div className={`flex items-center gap-3 ${currentTheme.textColor}`}>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+      {tab === "terminal" ? (
+        <div
+          ref={bodyRef}
+          className="flex-1 overflow-auto p-3 text-[13px] leading-relaxed"
+          style={{
+            fontFamily: "'Fira Code', 'JetBrains Mono', 'Consolas', monospace",
+            scrollbarColor: "#424242 transparent",
+            scrollbarWidth: "thin",
+          }}
+        >
+          {!hasRun && !isRunning ? (
+            <div className="flex flex-col items-center justify-center h-full text-[#6a6a6a] gap-2">
+              <TerminalSquare className="w-8 h-8 opacity-50" />
+              <p className="text-xs">Press Run to execute your code</p>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-[#23d18b]">
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+                <span className="text-[#cccccc]">{runCommand}</span>
+              </div>
+
+              {stdout && (
+                <pre className="whitespace-pre-wrap mt-1 text-[#d4d4d4]">{colorizeOutput(stdout)}</pre>
+              )}
+
+              {(stderr || error) && (
+                <pre className="whitespace-pre-wrap mt-1 text-[#f48771]">{error ?? stderr}</pre>
+              )}
+
+              {isRunning && (
+                <div className="flex items-center gap-2 mt-2 text-[#8a8a8a]">
+                  <span className="inline-flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#007acc] animate-bounce [animation-delay:0ms]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#007acc] animate-bounce [animation-delay:150ms]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#007acc] animate-bounce [animation-delay:300ms]" />
+                  </span>
+                  Running…
                 </div>
-                <span className="text-sm">Executing code...</span>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Empty state */}
-          {!output && !error && !isRunning && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className={`text-center ${currentTheme.lineNumbers.color}`}>
-                <Terminal className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="text-sm">No output yet</p>
-                <p className="text-xs mt-1">Run your code to see results here</p>
-              </div>
-            </div>
+              {!isRunning && hasRun && exitCode !== null && (
+                <div
+                  className={`mt-2 text-xs ${exitCode === 0 ? "text-[#23d18b]" : "text-[#f48771]"}`}
+                >
+                  [Process exited with code {exitCode}
+                  {time ? ` · ${time}s` : ""}]
+                </div>
+              )}
+            </>
           )}
         </div>
-      </CardContent>
-    </Card>
+      ) : (
+        <div className="flex-1 flex flex-col p-3 gap-2">
+          <label className="text-[11px] uppercase tracking-wide text-[#8a8a8a]">
+            Standard input (stdin)
+          </label>
+          <textarea
+            value={stdin}
+            onChange={(e) => onStdinChange(e.target.value)}
+            placeholder="Type input that your program reads from stdin…"
+            spellCheck={false}
+            className="flex-1 resize-none rounded bg-[#1a1a1a] border border-[#2b2b2b] focus:border-[#007acc] outline-none p-3 text-[13px] text-[#d4d4d4]"
+            style={{ fontFamily: "'Fira Code', 'JetBrains Mono', 'Consolas', monospace" }}
+          />
+          <p className="text-[11px] text-[#6a6a6a]">
+            Provide input here before running. Each line is fed to your program in order.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

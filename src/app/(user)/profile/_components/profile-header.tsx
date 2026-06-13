@@ -91,7 +91,7 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
             <Tooltip>
               <TooltipTrigger asChild>
                 <Avatar className="h-28 w-28 border-4 border-background shadow-2xl ring-2 ring-primary/20">
-                  {profile.iconUrl || profile.avatarUrl ? <AvatarImage src={profile.iconUrl || profile.avatarUrl || ""} alt={profile.name} /> : null}
+                  {profile.iconUrl || profile.avatarUrl ? <AvatarImage src={profile.iconUrl || profile.avatarUrl || ""} alt={profile.name} referrerPolicy="no-referrer" /> : null}
                   <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-primary/20 to-secondary/20">{getInitials(profile.name)}</AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
@@ -238,6 +238,12 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
+          {(profile.isAdmin || profile.role === "ADMIN") && (
+            <Button variant="secondary" className="flex-1 gap-2 shadow-sm" size="lg" onClick={() => router.push(`/admin/dashboard`)}>
+              <Shield className="h-4 w-4" />
+              Admin Dashboard
+            </Button>
+          )}
           <Button className="flex-1 gap-2 shadow-sm" size="lg" onClick={() => router.push(`/profile/edit`)}>
             <Pencil className="h-4 w-4" />
             Edit Profile

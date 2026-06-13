@@ -78,6 +78,9 @@ export function AnimeGeneratorTab() {
       setImageUrl(url)
     } catch (error) {
       console.error("Failed to generate image:", error)
+      toast.error("Failed to Generate Image", {
+        description: error instanceof Error ? error.message : "Please try again later.",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -93,6 +96,10 @@ export function AnimeGeneratorTab() {
       if (response?.data) {
         setQuote(response.data)
         toast.success("Quote loaded successfully!")
+      } else {
+        toast.error("No Quote Available", {
+          description: "The quote service returned no data. Please try again later.",
+        })
       }
     } catch (error: any) {
       console.error("Failed to generate quote:", error)
@@ -194,7 +201,7 @@ export function AnimeGeneratorTab() {
                 <Card>
                   <CardContent className="p-4 space-y-4">
                     <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-muted-foreground/10">
-                      <Image src={imageUrl} alt={`Anime ${selectedType}`} fill className="object-contain" priority />
+                      <Image src={imageUrl} alt={`Anime ${selectedType}`} fill className="object-contain" priority unoptimized />
                     </div>
                     <div className="flex flex-col md:flex-row gap-2">
                       <Button onClick={handleGenerate} variant="outline" className="flex-1">

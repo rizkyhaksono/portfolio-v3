@@ -130,6 +130,20 @@ export default function WPMTest() {
       newCompletedWords[currentWordIndex] = true;
       setCompletedWords(newCompletedWords);
 
+      // Finalize the completed word's errors: mark wrong AND missed (untyped) chars
+      setIncorrectChars(prev => {
+        const next = new Set(prev);
+        for (let i = 0; i < currentWord.length; i++) {
+          const key = `${currentWordIndex}-${i}`;
+          if (i >= typedWord.length || typedWord[i] !== currentWord[i]) {
+            next.add(key);
+          } else {
+            next.delete(key);
+          }
+        }
+        return next;
+      });
+
       setCurrentWordIndex(prev => prev + 1);
       setCurrentCharIndex(0);
       setUserInput("");
@@ -142,15 +156,19 @@ export default function WPMTest() {
     setUserInput(value);
     setCurrentCharIndex(value.length);
 
-    // Track incorrect characters
-    const newIncorrectChars = new Set<string>();
-    for (let i = 0; i < value.length; i++) {
-      const key = `${currentWordIndex}-${i}`;
-      if (i < currentWord.length && value[i] !== currentWord[i]) {
-        newIncorrectChars.add(key);
+    // Track incorrect characters for the current word while preserving prior words
+    setIncorrectChars(prev => {
+      const next = new Set(prev);
+      for (let i = 0; i < currentWord.length; i++) {
+        const key = `${currentWordIndex}-${i}`;
+        if (i < value.length && value[i] !== currentWord[i]) {
+          next.add(key);
+        } else {
+          next.delete(key);
+        }
       }
-    }
-    setIncorrectChars(newIncorrectChars);
+      return next;
+    });
   };
 
   const calculateStats = (typedWord: string, targetWord: string) => {
@@ -194,7 +212,9 @@ export default function WPMTest() {
     let className = "transition-all duration-75";
 
     if (isCompleted) {
-      className += " text-green-500";
+      className += incorrectChars.has(key)
+        ? " text-red-500 bg-red-500/20"
+        : " text-green-500";
     } else if (isCurrentWord && charIndex < userInput.length) {
       if (incorrectChars.has(key)) {
         className += " text-red-500 bg-red-500/20";

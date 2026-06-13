@@ -1,22 +1,17 @@
-export interface PistonExecuteRequest {
+export interface ExecuteCodeRequest {
   language: string;
-  version: string;
-  files: Array<{
-    content: string;
-    name?: string;
-  }>;
+  version?: string;
+  code: string;
+  stdin?: string;
 }
 
-export interface PistonExecuteResponse {
+export interface ExecuteCodeResult {
+  stdout: string;
+  stderr: string;
+  output: string;
+  exitCode: number;
+  time: string | null;
   language: string;
-  version: string;
-  run: {
-    stdout: string;
-    stderr: string;
-    code: number;
-    signal: string | null;
-    output: string;
-  };
 }
 
 export interface Language {
@@ -29,7 +24,11 @@ export interface Language {
 export interface CompilerState {
   code: string;
   language: string;
+  stdin: string;
   output: string;
+  stderr: string;
+  exitCode: number | null;
+  time: string | null;
   isRunning: boolean;
   error: string | null;
 }

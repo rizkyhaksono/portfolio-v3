@@ -1,24 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ProfileResponse } from "@/commons/types/profile"
-import { updateProfile } from "@/app/actions/profile"
+import { updateProfile, uploadProfileBanner } from "@/app/actions/profile"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { Mail, User, FileText, Briefcase, MapPin, ArrowLeft, Loader2, Save, X } from "lucide-react"
+import { Mail, User, FileText, Briefcase, MapPin, ArrowLeft, Loader2, Save, X, ImageIcon, Upload } from "lucide-react"
 import Typography from "@/components/ui/typography"
 
 export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse }>) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
 
   const formSchema = z.object({
     name: z
@@ -104,6 +107,28 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse
     })
   }
 
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsUploadingBanner(true)
+    const fd = new FormData()
+    fd.append("file", file)
+
+    try {
+      const res = await uploadProfileBanner(fd)
+      form.setValue("bannerUrl", res.bannerUrl, { shouldDirty: true })
+      toast.success("Cover image uploaded")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to upload cover image")
+    } finally {
+      setIsUploadingBanner(false)
+      if (bannerInputRef.current) bannerInputRef.current.value = ""
+    }
+  }
+
+  const bannerUrl = form.watch("bannerUrl")
+
   const handleCancel = () => {
     if (form.formState.isDirty) {
       if (globalThis.window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
@@ -129,6 +154,58 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Cover Image Section */}
+              <div className="space-y-4">
+                <Typography.H4 className="text-lg font-semibold border-b pb-2">Cover Image</Typography.H4>
+
+                <div className="relative h-36 w-full overflow-hidden rounded-lg border bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20">
+                  {bannerUrl ? (
+                    <Image src={bannerUrl} alt="Cover preview" fill className="object-cover" unoptimized />
+                  ) : (
+                    <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <ImageIcon className="h-5 w-5" />
+                      No cover image
+                    </div>
+                  )}
+                  {isUploadingBanner && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  ref={bannerInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleBannerChange}
+                />
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => bannerInputRef.current?.click()}
+                    disabled={isUploadingBanner || isSubmitting}
+                  >
+                    {isUploadingBanner ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                    {bannerUrl ? "Change Cover" : "Upload Cover"}
+                  </Button>
+                  {bannerUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={() => form.setValue("bannerUrl", "", { shouldDirty: true })}
+                      disabled={isUploadingBanner || isSubmitting}
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      Remove
+                    </Button>
+                  )}
+                </div>
+                <FormDescription>Recommended a wide image. PNG, JPG, GIF or WebP, up to 5MB.</FormDescription>
+              </div>
+
               {/* Basic Information Section */}
               <div className="space-y-4">
                 <Typography.H4 className="text-lg font-semibold border-b pb-2">Basic Information</Typography.H4>

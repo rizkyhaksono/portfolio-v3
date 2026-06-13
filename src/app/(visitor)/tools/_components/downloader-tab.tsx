@@ -174,6 +174,7 @@ export function DownloaderTab() {
   }
 
   const currentPlatform = PLATFORMS.find((p) => p.id === activePlatform)!
+  const ResultIcon = currentPlatform.icon
 
   return (
     <div className="space-y-6">
@@ -279,37 +280,61 @@ export function DownloaderTab() {
 
       {/* Standard Download Result */}
       {result?.type === "standard" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{result.data.downloadLinks && result.data.downloadLinks.length > 0 ? "Download Ready" : "Download Failed"}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-4">
-              <Image src={result.data.thumbnail || "/no-image.jpg"} width={160} height={90} alt="Thumbnail" className="w-40 h-24 object-cover rounded-lg flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold mb-1 line-clamp-2">{result.data.title}</h3>
-                {result.data.author && <p className="text-sm text-muted-foreground mb-1">{result.data.downloadLinks && result.data.downloadLinks.length > 0 ? `By ${result.data.author}` : result.data.author}</p>}
-                {result.data.duration && (
-                  <Badge variant="secondary" className="text-xs">
-                    {result.data.duration}
-                  </Badge>
+        <Card className="overflow-hidden border-muted/40">
+          {result.data.downloadLinks && result.data.downloadLinks.length > 0 ? (
+            <CardContent className="p-0">
+              {/* Media preview */}
+              <div className="relative flex h-40 w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-background">
+                {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" ? (
+                  <Image src={result.data.thumbnail} alt={result.data.title} fill className="object-cover" unoptimized />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-background/60 text-primary/70 shadow-sm backdrop-blur-sm">
+                    <ResultIcon className="h-8 w-8" />
+                  </div>
                 )}
+                <Badge className="absolute left-3 top-3 gap-1 border-0 bg-green-500/90 text-white">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Ready
+                </Badge>
               </div>
-            </div>
 
-            {result.data.downloadLinks && result.data.downloadLinks.length > 0 && (
-              <div className="space-y-2">
-                {result.data.downloadLinks.map((link) => (
-                  <Button key={link.url} variant="outline" className="w-full justify-between" asChild>
-                    <a href={link.url} download target="_blank" rel="noopener noreferrer">
-                      <span>{link.quality}</span>
-                      <span className="text-xs text-muted-foreground">{link.size || "Unknown size"}</span>
-                    </a>
-                  </Button>
-                ))}
+              {/* Info + actions */}
+              <div className="space-y-4 p-5">
+                <div className="space-y-1.5">
+                  <h3 className="break-all text-base font-semibold leading-snug line-clamp-2">{result.data.title}</h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="text-xs">{currentPlatform.name}</Badge>
+                    {result.data.duration && <Badge variant="secondary" className="text-xs">{result.data.duration}</Badge>}
+                    {result.data.author && <span className="text-xs text-muted-foreground">By {result.data.author}</span>}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {result.data.downloadLinks.map((link, i) => (
+                    <Button key={link.url} variant={i === 0 ? "default" : "outline"} className="w-full justify-between gap-2" asChild>
+                      <a href={link.url} download target="_blank" rel="noopener noreferrer">
+                        <span className="flex items-center gap-2">
+                          <Download className="h-4 w-4" />
+                          {link.quality}
+                        </span>
+                        {link.size && <span className="text-xs opacity-70">{link.size}</span>}
+                      </a>
+                    </Button>
+                  ))}
+                </div>
               </div>
-            )}
-          </CardContent>
+            </CardContent>
+          ) : (
+            <CardContent className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+              <div className="rounded-full bg-destructive/10 p-3">
+                <Info className="h-6 w-6 text-destructive" />
+              </div>
+              <p className="font-semibold">Download failed</p>
+              <p className="max-w-sm text-sm text-muted-foreground">
+                {result.data.author || "Couldn't fetch this URL. Check the link and try again."}
+              </p>
+            </CardContent>
+          )}
         </Card>
       )}
     </div>

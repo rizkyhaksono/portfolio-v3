@@ -1,6 +1,6 @@
 "use server";
 
-import { putProfile } from "@/services/user/profile";
+import { putProfile, uploadBannerImage } from "@/services/user/profile";
 
 export async function updateProfile(id: string, formData: FormData) {
   const profileData = {
@@ -12,4 +12,12 @@ export async function updateProfile(id: string, formData: FormData) {
     bannerUrl: formData.get("bannerUrl") as string,
   };
   return await putProfile(id, profileData);
+}
+
+export async function uploadProfileBanner(formData: FormData): Promise<{ bannerUrl: string }> {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    throw new Error("Please select an image to upload.");
+  }
+  return await uploadBannerImage(file);
 }

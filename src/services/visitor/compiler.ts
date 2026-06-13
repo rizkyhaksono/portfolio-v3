@@ -1,21 +1,22 @@
-import { PistonExecuteRequest, PistonExecuteResponse } from "@/commons/types/compiler";
+import { ExecuteCodeRequest, ExecuteCodeResult } from "@/commons/types/compiler";
 
-const PISTON_API_URL = 'https://emkc.org/api/v2/piston/execute';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function postExecuteCode(request: PistonExecuteRequest): Promise<PistonExecuteResponse> {
-  const response = await fetch(PISTON_API_URL, {
+export async function postExecuteCode(request: ExecuteCodeRequest): Promise<ExecuteCodeResult> {
+  const response = await fetch(`${API_URL}/v3/tools/compiler/execute`, {
     method: "POST",
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
-      "DNT": "1" // Do Not Track header
     },
-    body: JSON.stringify(request)
-  })
+    body: JSON.stringify(request),
+  });
 
-  if (!response.ok) {
-    throw new Error(`Error: ${response.status} - ${response.statusText}`);
+  const json = await response.json();
+
+  if (!response.ok || json?.status >= 400 || !json?.data) {
+    throw new Error(json?.message || `Error: ${response.status} - ${response.statusText}`);
   }
 
-  return await response.json();
+  return json.data as ExecuteCodeResult;
 }

@@ -1,43 +1,40 @@
-import type { SocialMediaDownloadResult, InstagramDownloadResponse } from "@/commons/types/tools";
+import type { SocialMediaDownloadResult } from "@/commons/types/tools";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function downloadFromFacebook(url: string): Promise<SocialMediaDownloadResult> {
-  const response = await fetch(`${API_URL}/v3/tools/facebook/downloader?url=${encodeURIComponent(url)}`, {
+/**
+ * Universal downloader — one backend endpoint (powered by self-hosted Cobalt)
+ * handles every platform; it auto-detects YouTube / TikTok / Instagram / X / Facebook
+ * from the URL.
+ */
+async function download(url: string): Promise<SocialMediaDownloadResult> {
+  const response = await fetch(`${API_URL}/v3/tools/download?url=${encodeURIComponent(url)}`, {
     method: "GET",
   });
-  if (!response.ok) throw new Error("Failed to download from Facebook");
-  return await response.json();
+
+  const json = await response.json();
+  if (!response.ok || json?.status >= 400 || !json?.data) {
+    throw new Error(json?.message || "Failed to download. Check the URL and try again.");
+  }
+  return json;
 }
 
-export async function downloadFromInstagram(url: string): Promise<InstagramDownloadResponse | SocialMediaDownloadResult> {
-  const response = await fetch(`${API_URL}/v3/tools/instagram/downloader?url=${encodeURIComponent(url)}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to download from Instagram");
-  return await response.json();
+export async function downloadFromFacebook(url: string): Promise<SocialMediaDownloadResult> {
+  return download(url);
+}
+
+export async function downloadFromInstagram(url: string): Promise<SocialMediaDownloadResult> {
+  return download(url);
 }
 
 export async function downloadFromTikTok(url: string): Promise<SocialMediaDownloadResult> {
-  const response = await fetch(`${API_URL}/v3/tools/tiktok/downloader?url=${encodeURIComponent(url)}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to download from TikTok");
-  return await response.json();
+  return download(url);
 }
 
 export async function downloadFromX(url: string): Promise<SocialMediaDownloadResult> {
-  const response = await fetch(`${API_URL}/v3/tools/x/downloader?url=${encodeURIComponent(url)}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to download from X/Twitter");
-  return await response.json();
+  return download(url);
 }
 
 export async function downloadFromYouTube(url: string): Promise<SocialMediaDownloadResult> {
-  const response = await fetch(`${API_URL}/v3/tools/youtube/downloader?url=${encodeURIComponent(url)}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to download from YouTube");
-  return await response.json();
+  return download(url);
 }

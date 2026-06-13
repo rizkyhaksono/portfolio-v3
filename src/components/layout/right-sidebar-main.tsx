@@ -1,8 +1,6 @@
 import Typography from "@/components/ui/typography"
 import { getPing } from "@/services/visitor/ping"
 import { getWeather } from "@/services/visitor/weather"
-import { getNowPlaying } from "@/services/visitor/spotify"
-import { SpotifySidebarSection } from "@/components/layout/spotify-sidebar-widget"
 import { MdWifi as IpIcon, MdLocationOn, MdDevices } from "react-icons/md"
 import { BiCalendar, BiGlobe } from "react-icons/bi"
 import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
@@ -10,7 +8,6 @@ import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
 const RightSidebarMain = async () => {
   const ping = await getPing()
   const weather = await getWeather()
-  const spotify = await getNowPlaying()
 
   const temperature = weather?.main?.temp ? Math.round(weather.main.temp - 273.15) : null
 
@@ -84,8 +81,6 @@ const RightSidebarMain = async () => {
           <Typography.P className="text-xs text-green-600 dark:text-green-400">🚀 Open to opportunities</Typography.P>
         </div>
       </div>
-
-      <SpotifySidebarSection spotify={spotify} />
 
       {/* Weather */}
       <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">

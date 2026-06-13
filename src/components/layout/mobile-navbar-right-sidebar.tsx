@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Typography from "@/components/ui/typography"
-import { SpotifySidebarSection } from "@/components/layout/spotify-sidebar-widget"
 import { MdWifi as IpIcon, MdLocationOn, MdDevices } from "react-icons/md"
 import { BiCalendar } from "react-icons/bi"
 import { getBrowserInfo } from "@/commons/constants/sidebar"
 import type { PingResponse } from "@/services/visitor/ping"
-import type { SpotifyNowPlaying } from "@/services/visitor/spotify"
 
 interface WeatherResponse {
   name?: string
@@ -24,21 +22,18 @@ interface WeatherResponse {
 const MobileNavbarRightSidebar = () => {
   const [ping, setPing] = useState<PingResponse | null>(null)
   const [weather, setWeather] = useState<WeatherResponse | null>(null)
-  const [spotify, setSpotify] = useState<SpotifyNowPlaying>({ isPlaying: false, status: "link" })
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [pingRes, weatherRes, spotifyRes] = await Promise.all([
+        const [pingRes, weatherRes] = await Promise.all([
           fetch("/api/ping").then((res) => (res.ok ? res.json() : null)),
           fetch("/api/weather").then((res) => (res.ok ? res.json() : null)),
-          fetch("/api/spotify").then((res) => (res.ok ? res.json() : null)),
         ])
 
         setPing(pingRes)
         setWeather(weatherRes)
-        setSpotify(spotifyRes ?? { isPlaying: false, status: "link" })
       } catch (error) {
         console.error("Error fetching sidebar data:", error)
       } finally {
@@ -129,8 +124,6 @@ const MobileNavbarRightSidebar = () => {
           <Typography.P className="text-xs text-green-600 dark:text-green-400">🚀 Open to opportunities</Typography.P>
         </div>
       </div>
-
-      <SpotifySidebarSection spotify={spotify} />
     </div>
   )
 }

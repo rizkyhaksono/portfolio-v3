@@ -26,7 +26,7 @@ function extractPoster(description: string): string | null {
 function parseRssItems(xml: string): LetterboxdFilm[] {
   const items = xml.match(/<item>[\s\S]*?<\/item>/gi) ?? []
 
-  return items.slice(0, 6).map((itemXml) => {
+  return items.slice(0, 20).map((itemXml) => {
     const title = extractTag(itemXml, "title").replace(/<!\[CDATA\[|\]\]>/g, "")
     const ratingStr = extractTag(itemXml, "letterboxd:memberRating")
     const rating = ratingStr ? parseFloat(ratingStr) : null

@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useRef, useMemo, useCallback } from "react"
+import { useRef, useMemo, useCallback, useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -8,6 +8,7 @@ import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   BookOpen,
@@ -72,6 +73,18 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
   const activeCourseId = searchParams.get("course")
 
   const { isLoaded, isModuleComplete, getCompletedCount, isCourseComplete } = useRoadmapProgress()
+
+  const [certName, setCertName] = useState("")
+
+  useEffect(() => {
+    const stored = localStorage.getItem("roadmap-cert-name")
+    if (stored) setCertName(stored)
+  }, [])
+
+  const handleCertNameChange = useCallback((value: string) => {
+    setCertName(value)
+    localStorage.setItem("roadmap-cert-name", value)
+  }, [])
 
   const setCategory = useCallback(
     (category: string) => {
@@ -383,15 +396,40 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                       <p className="text-primary font-medium text-base md:text-lg mb-4 flex items-center gap-2 justify-center md:justify-start">
                         <CheckCircle className="h-5 w-5 shrink-0" /> Congratulations! You completed all levels.
                       </p>
+                      <div className="flex flex-col gap-2 mb-4 w-full max-w-sm mx-auto md:mx-0">
+                        <label htmlFor="cert-name" className="text-sm font-medium text-left">
+                          Name on certificate
+                        </label>
+                        <Input
+                          id="cert-name"
+                          type="text"
+                          value={certName}
+                          onChange={(e) => handleCertNameChange(e.target.value)}
+                          placeholder="Enter your full name"
+                          maxLength={60}
+                        />
+                      </div>
                       <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 justify-center md:justify-start">
-                        <a href={`/api/certificate?course=${activeCourseId}&theme=light`} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                          <Button variant="default" className="gap-2 w-full sm:w-auto min-h-[44px]">
+                        <a
+                          href={`/api/certificate?course=${activeCourseId}&theme=light&name=${encodeURIComponent(certName)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`w-full sm:w-auto ${certName.trim() ? "" : "pointer-events-none opacity-50"}`}
+                          aria-disabled={!certName.trim()}
+                        >
+                          <Button variant="default" className="gap-2 w-full sm:w-auto min-h-[44px]" disabled={!certName.trim()}>
                             <Download className="w-4 h-4" />
                             Download (Light)
                           </Button>
                         </a>
-                        <a href={`/api/certificate?course=${activeCourseId}&theme=dark`} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                          <Button variant="secondary" className="gap-2 w-full sm:w-auto min-h-[44px]">
+                        <a
+                          href={`/api/certificate?course=${activeCourseId}&theme=dark&name=${encodeURIComponent(certName)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`w-full sm:w-auto ${certName.trim() ? "" : "pointer-events-none opacity-50"}`}
+                          aria-disabled={!certName.trim()}
+                        >
+                          <Button variant="secondary" className="gap-2 w-full sm:w-auto min-h-[44px]" disabled={!certName.trim()}>
                             <Download className="w-4 h-4" />
                             Download (Dark)
                           </Button>

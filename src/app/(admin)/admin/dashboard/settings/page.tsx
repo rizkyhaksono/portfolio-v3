@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -16,13 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
-import { User, Bell, Shield, Palette, Globe, Key, Trash2, Save, Loader2, Moon, Sun, Monitor } from "lucide-react"
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint } from "lucide-react"
 import {
   getCurrentUserClient,
   getAdminSettingsClient,
   updateAdminSettingsClient,
   updateUserClient,
+  uploadAvatarClient,
 } from "@/services/admin/client-services"
+import { performAdminLogout } from "@/lib/admin-logout"
 import { useTheme } from "next-themes"
 
 // Profile settings schema
@@ -54,6 +56,12 @@ type ProfileFormValues = z.infer<typeof profileSchema>
 type NotificationFormValues = z.infer<typeof notificationSchema>
 type AppearanceFormValues = z.infer<typeof appearanceSchema>
 
+interface OAuthAccount {
+  provider?: string
+  providerId?: string
+  providerUserId?: string
+}
+
 interface UserData {
   id: string
   name: string
@@ -63,6 +71,9 @@ interface UserData {
   image?: string
   avatarUrl?: string
   role?: string
+  createdAt?: string
+  emailVerified?: boolean
+  oauthAccounts?: OAuthAccount[]
 }
 
 export default function AdminDashboardSettingPage() {
@@ -70,6 +81,9 @@ export default function AdminDashboardSettingPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [user, setUser] = useState<UserData | null>(null)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Profile form
   const profileForm = useForm<ProfileFormValues>({
@@ -217,6 +231,37 @@ export default function AdminDashboardSettingPage() {
     }
   }
 
+  async function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Avatar must be 2MB or smaller.", variant: "destructive" })
+      return
+    }
+    setIsUploadingAvatar(true)
+    try {
+      const res = (await uploadAvatarClient(file)) as { url?: string; data?: { url?: string; avatarUrl?: string } }
+      const newUrl = res?.data?.avatarUrl ?? res?.data?.url ?? res?.url
+      setUser((prev) => (prev ? { ...prev, avatarUrl: newUrl ?? prev.avatarUrl } : prev))
+      toast({ title: "Avatar updated", description: "Your profile picture has been changed." })
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload the avatar. Please try again.", variant: "destructive" })
+    } finally {
+      setIsUploadingAvatar(false)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+    }
+  }
+
+  async function handleLogout() {
+    setIsLoggingOut(true)
+    try {
+      await performAdminLogout()
+    } catch {
+      setIsLoggingOut(false)
+      toast({ title: "Error", description: "Failed to sign out. Please try again.", variant: "destructive" })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -267,17 +312,30 @@ export default function AdminDashboardSettingPage() {
                 <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
                   {/* Avatar Section */}
                   <div className="flex items-center gap-6">
-                    <Avatar className="h-20 w-20">
-                      <AvatarImage src={user?.avatarUrl ?? user?.image} alt={user?.name} />
-                      <AvatarFallback className="text-lg">{user?.name?.charAt(0)?.toUpperCase() || "A"}</AvatarFallback>
-                    </Avatar>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="group relative h-20 w-20 shrink-0 rounded-full"
+                      aria-label="Change avatar"
+                    >
+                      <Avatar className="h-20 w-20">
+                        <AvatarImage src={user?.avatarUrl ?? user?.image} alt={user?.name} referrerPolicy="no-referrer" />
+                        <AvatarFallback className="text-lg">{user?.name?.charAt(0)?.toUpperCase() || "A"}</AvatarFallback>
+                      </Avatar>
+                      <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                        {isUploadingAvatar ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
+                      </span>
+                    </button>
+                    <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={handleAvatarChange} />
                     <div className="space-y-2">
                       <h3 className="font-medium">{user?.name || "Admin User"}</h3>
                       <Badge variant="secondary">{user?.role || "Admin"}</Badge>
                       <div>
-                        <Button type="button" variant="outline" size="sm">
-                          Change Avatar
+                        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploadingAvatar}>
+                          {isUploadingAvatar ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading…</> : <><Camera className="mr-2 h-4 w-4" />Change Avatar</>}
                         </Button>
+                        <p className="mt-1.5 text-xs text-muted-foreground">PNG, JPG, GIF or WebP. Max 2MB.</p>
                       </div>
                     </div>
                   </div>
@@ -611,89 +669,104 @@ export default function AdminDashboardSettingPage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security and authentication.</CardDescription>
+              <CardTitle>Account &amp; Security</CardTitle>
+              <CardDescription>Your account details and sign-in methods.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Password Section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Key className="h-4 w-4" />
-                      Password
-                    </h3>
-                    <p className="text-sm text-muted-foreground">Change your password to keep your account secure.</p>
+              {/* Account overview */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="flex items-center gap-3 rounded-lg border p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Mail className="h-5 w-5" />
                   </div>
-                  <Button variant="outline">Change Password</Button>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">Email</p>
+                    <p className="flex items-center gap-1.5 truncate text-sm font-medium">
+                      {user?.email || "—"}
+                      {user?.emailVerified && <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" />}
+                    </p>
+                  </div>
                 </div>
-                <Separator />
+
+                <div className="flex items-center gap-3 rounded-lg border p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Shield className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">Role</p>
+                    <p className="truncate text-sm font-medium">{user?.role || "USER"}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-lg border p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <CalendarDays className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">Member since</p>
+                    <p className="truncate text-sm font-medium">
+                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-lg border p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Fingerprint className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">User ID</p>
+                    <p className="truncate font-mono text-xs font-medium">{user?.id || "—"}</p>
+                  </div>
+                </div>
               </div>
 
-              {/* Two-Factor Authentication */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      Two-Factor Authentication
-                    </h3>
-                    <p className="text-sm text-muted-foreground">Add an extra layer of security to your account.</p>
-                  </div>
-                  <Badge variant="outline">Not Enabled</Badge>
-                </div>
-                <Button variant="outline" className="w-full sm:w-auto">
-                  Enable 2FA
-                </Button>
-                <Separator />
-              </div>
+              <Separator />
 
-              {/* Active Sessions */}
-              <div className="space-y-4">
+              {/* Connected accounts */}
+              <div className="space-y-3">
                 <div className="space-y-1">
-                  <h3 className="font-medium">Active Sessions</h3>
-                  <p className="text-sm text-muted-foreground">Manage your active sessions across devices.</p>
+                  <h3 className="font-medium">Connected accounts</h3>
+                  <p className="text-sm text-muted-foreground">Sign-in providers linked to your account.</p>
                 </div>
-                <div className="rounded-lg border p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Monitor className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">Current Session</p>
-                        <p className="text-xs text-muted-foreground">Windows • Chrome • Jakarta, Indonesia</p>
-                      </div>
-                    </div>
-                    <Badge variant="secondary">Active</Badge>
+                {user?.oauthAccounts && user.oauthAccounts.length > 0 ? (
+                  <div className="space-y-2">
+                    {user.oauthAccounts.map((acc, i) => {
+                      const provider = acc.provider || acc.providerId || "OAuth"
+                      return (
+                        <div key={`${provider}-${i}`} className="flex items-center justify-between rounded-lg border p-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                              <BadgeCheck className="h-4 w-4 text-primary" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium capitalize">{provider}</p>
+                              <p className="text-xs text-muted-foreground">Connected</p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary">Active</Badge>
+                        </div>
+                      )
+                    })}
                   </div>
-                </div>
-                <Button variant="outline" className="text-destructive hover:text-destructive">
-                  Sign Out All Other Sessions
-                </Button>
-                <Separator />
+                ) : (
+                  <div className="rounded-lg border p-3 text-sm text-muted-foreground">
+                    Signed in with email &amp; password. No external providers linked.
+                  </div>
+                )}
               </div>
 
-              {/* Danger Zone */}
-              <div className="space-y-4">
+              <Separator />
+
+              {/* Sign out */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="space-y-1">
-                  <h3 className="font-medium text-destructive flex items-center gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    Danger Zone
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Irreversible and destructive actions.</p>
+                  <h3 className="font-medium">Sign out</h3>
+                  <p className="text-sm text-muted-foreground">End your admin session on this device.</p>
                 </div>
-                <div className="rounded-lg border border-destructive/50 p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <p className="font-medium text-sm">Delete Account</p>
-                      <p className="text-xs text-muted-foreground">Permanently delete your account and all associated data.</p>
-                    </div>
-                    <Button variant="destructive" size="sm">
-                      Delete Account
-                    </Button>
-                  </div>
-                </div>
+                <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleLogout} disabled={isLoggingOut}>
+                  {isLoggingOut ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing out…</> : <><LogOut className="mr-2 h-4 w-4" />Sign out</>}
+                </Button>
               </div>
             </CardContent>
           </Card>

@@ -18,13 +18,13 @@ function hasSessionToken(request: NextRequest): boolean {
 export async function proxy(request: NextRequest, _response: NextResponse) {
   const { pathname } = request.nextUrl
   const isHaveToken = await isHaveValidToken()
-  const adminCookieValue = request.cookies.get("ADMIN_SUPABASE_AUTH_COOKIE")
   const nateeToken = request.cookies.get("NATEE_V3_TOKEN")
 
-  // Admin dashboard (Supabase admin session)
+  // Admin dashboard: require the main session (works for SSO/Google + email login).
+  // The actual ADMIN role is enforced server-side in the dashboard layout.
   if (
     (pathname.startsWith("/admin/dashboard") || pathname.startsWith("/admin/profile")) &&
-    !adminCookieValue
+    !hasSessionToken(request)
   ) {
     return NextResponse.redirect(new URL("/admin/auth/login", request.url))
   }

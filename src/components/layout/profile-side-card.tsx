@@ -66,7 +66,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
         <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
           <Avatar className={cn(avatarClass)}>
-            {avatarSrc ? <AvatarImage src={avatarSrc} alt={profile.data.name} className="object-cover" /> : null}
+            {avatarSrc ? <AvatarImage src={avatarSrc} alt={profile.data.name} className="object-cover" referrerPolicy="no-referrer" /> : null}
             <AvatarFallback>{getInitials(profile.data.name)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col gap-1">

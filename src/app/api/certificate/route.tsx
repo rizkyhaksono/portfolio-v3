@@ -8,6 +8,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const course = searchParams.get("course") || "Development Course"
     const theme = searchParams.get("theme") || "light"
+    const recipientName = (searchParams.get("name") || "").trim() || "Anonymous Student"
 
     // Parse course title
     const courseTitle = course
@@ -132,19 +133,48 @@ export async function GET(req: NextRequest) {
                 display: "flex",
                 fontSize: 22,
                 color: textMuted,
-                marginBottom: "30px",
+                marginBottom: "20px",
                 textAlign: "center",
               }}
             >
-              This is to certify that the student has successfully completed:
+              This certificate is proudly presented to
             </div>
 
             <div
               style={{
                 display: "flex",
-                fontSize: 54,
+                fontSize: 52,
                 fontWeight: "bold",
                 color: textMain,
+                marginBottom: "24px",
+                paddingBottom: "10px",
+                textAlign: "center",
+                maxWidth: "85%",
+                lineHeight: 1.2,
+                borderBottom: `3px solid ${primary}`,
+              }}
+            >
+              {recipientName}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                fontSize: 22,
+                color: textMuted,
+                marginBottom: "20px",
+                textAlign: "center",
+              }}
+            >
+              for successfully completing the course
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                fontSize: 44,
+                fontWeight: "bold",
+                color: primary,
                 marginBottom: "30px",
                 textAlign: "center",
                 maxWidth: "85%",

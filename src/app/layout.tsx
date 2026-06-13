@@ -59,7 +59,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <JsonLd />
-        <Script defer src="https://cloud.umami.is/script.js" data-website-id="3344dd5c-2e88-4ae5-95f7-e142cdbff614" strategy="afterInteractive" />
+        <Script
+          defer
+          src={process.env.NEXT_PUBLIC_UMAMI_SRC ?? "https://cloud.umami.is/script.js"}
+          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614"}
+          strategy="afterInteractive"
+        />
       </head>
       <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
