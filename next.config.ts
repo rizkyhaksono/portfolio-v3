@@ -2,6 +2,9 @@ import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
 
 const nextConfig: NextConfig = {
+  // Standalone output is required by the Azure deploy workflow (.next/standalone).
+  // Disabled on Windows only, where it triggers an EBUSY file-lock during local builds.
+  output: process.platform === "win32" ? undefined : "standalone",
   async redirects() {
     return [
       {
