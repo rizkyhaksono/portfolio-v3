@@ -9,7 +9,7 @@ import SidebarSecondary from "./sidebar-secondary"
 
 const SidebarMain = () => {
   return (
-    <div className="hidden max-h-screen flex-col px-3 overflow-y-auto lg:w-64 md:w-52 top-0 pt-16 pb-6 sticky md:flex">
+    <div className="hidden max-h-[calc(100vh-4rem)] flex-col px-3 overflow-y-auto lg:w-64 md:w-52 top-16 pt-4 pb-6 sticky md:flex">
       <div className="mb-3 px-1">
         <div className="relative">
           <Avatar className={`w-24 h-24 mb-3 transition-transform duration-300`}>

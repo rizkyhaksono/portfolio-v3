@@ -4,6 +4,7 @@ import { getWeather } from "@/services/visitor/weather"
 import { MdWifi as IpIcon, MdLocationOn, MdDevices } from "react-icons/md"
 import { BiCalendar, BiGlobe } from "react-icons/bi"
 import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
+import RightSidebarWindow from "./right-sidebar-window"
 
 const RightSidebarMain = async () => {
   const ping = await getPing()
@@ -17,7 +18,7 @@ const RightSidebarMain = async () => {
   const weatherEmoji = weatherCondition ? getWeatherEmoji(weatherCondition.main, weatherCondition.icon) : "🌤️"
 
   return (
-    <div className="hidden lg:flex lg:w-64 xl:w-72 flex-col p-4 space-y-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+    <RightSidebarWindow>
       {/* Visitor Info */}
       {ping?.user_info && (
         <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
@@ -110,7 +111,7 @@ const RightSidebarMain = async () => {
           </div>
         )}
       </div>
-    </div>
+    </RightSidebarWindow>
   )
 }
 
