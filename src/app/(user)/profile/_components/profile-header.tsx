@@ -103,7 +103,7 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
 
           <div className="flex-1 sm:mb-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-3xl font-bold tracking-tight">{profile.name}</h2>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">{profile.name}</h2>
               {profile.isAdmin && (
                 <Badge variant="default" className="gap-1 shadow-sm">
                   <Shield className="h-3 w-3" />

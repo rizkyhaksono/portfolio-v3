@@ -32,7 +32,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
         {/* Project Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4">{project.title}</h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
             <div className="flex items-center gap-2">
               <Calendar className="size-4" />

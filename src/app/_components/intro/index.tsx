@@ -41,7 +41,7 @@ export default function IntroSection() {
 
           {/* Name - Simple bold text instead of HyperText scramble */}
           <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-            <h1 className="font-bold text-3xl md:text-4xl mb-2">{`Hi, I'm Muhammad Rizky Haksono`}</h1>
+            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-2">{`Hi, I'm Muhammad Rizky Haksono`}</h1>
           </div>
 
           {/* Typing Animation for Roles */}

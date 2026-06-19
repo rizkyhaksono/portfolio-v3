@@ -32,7 +32,7 @@ export default function CourseRoadmap() {
       <div className="flex flex-col gap-6 mt-20 justify-center relative z-10">
         <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col gap-2">
-            <h1 className="font-medium text-4xl md:text-5xl tracking-tighter">Learning Roadmap</h1>
+            <h1 className="font-medium text-3xl sm:text-4xl md:text-5xl tracking-tighter">Learning Roadmap</h1>
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg">
               Structured learning paths from beginner to advanced — like Dicoding
             </p>

@@ -542,7 +542,7 @@ export function AdminDashboardClient() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Overview of both Backend API and Supabase databases.</p>
         </div>
         <div className="flex items-center gap-2">

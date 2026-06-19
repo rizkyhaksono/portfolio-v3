@@ -99,7 +99,7 @@ export default async function StatsPage() {
     <BaseLayout sidebar={<SidebarMain />} useGridBackground={false}>
       <div className="flex flex-col gap-6 mt-20 max-w-6xl mx-auto w-full px-4 lg:px-0">
         <div className="flex flex-col gap-2">
-          <h1 className="font-medium text-4xl md:text-5xl tracking-tighter">Stats & Activity</h1>
+          <h1 className="font-medium text-3xl sm:text-4xl md:text-5xl tracking-tighter">Stats & Activity</h1>
           <p className="text-muted-foreground text-sm md:text-base">
             My public data from various platforms
           </p>

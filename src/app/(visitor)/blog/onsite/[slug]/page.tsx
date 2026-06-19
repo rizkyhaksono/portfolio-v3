@@ -48,7 +48,7 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
               <PenLine className="h-3.5 w-3.5" />
               Written here
             </div>
-            <h1 className="text-balance text-3xl font-bold leading-tight tracking-tight md:text-4xl">
+            <h1 className="text-balance text-2xl sm:text-3xl font-bold leading-tight tracking-tight md:text-4xl">
               {post.title}
             </h1>
             {post.description && (

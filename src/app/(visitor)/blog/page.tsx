@@ -29,7 +29,7 @@ export default async function BlogPage() {
       <div className="mb-8 text-center">
         <div className="mb-2 flex items-center justify-center gap-2">
           <Newspaper className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Blog</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Blog</h1>
         </div>
         <p className="mx-auto max-w-xl text-sm text-muted-foreground">
           I write about my experiences, thoughts, and ideas on various topics.

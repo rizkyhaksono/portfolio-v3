@@ -65,7 +65,7 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{meta.title}</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4">{meta.title}</h1>
 
             {/* Description */}
             {meta.description && <p className="text-lg text-muted-foreground leading-relaxed mb-6">{meta.description}</p>}

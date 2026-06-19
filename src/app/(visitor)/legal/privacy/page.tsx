@@ -127,7 +127,7 @@ export default function PrivacyPolicyPage() {
               <Shield className="w-8 h-8" />
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold">Privacy Policy</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">Privacy Policy</h1>
               <p className="text-muted-foreground mt-1">How I collect, use, and protect your information</p>
               <Badge variant="secondary" className="mt-3">
                 Last updated: December 28, 2025

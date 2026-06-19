@@ -217,7 +217,7 @@ export function JapaneseQuizTab({ initialLevels }: JapaneseQuizTabProps) {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center">
-                  <div className="text-6xl font-bold text-primary mb-2">
+                  <div className="text-4xl sm:text-6xl font-bold text-primary mb-2">
                     {score}/{questions.length}
                   </div>
                   <p className="text-lg text-muted-foreground">
@@ -261,8 +261,8 @@ export function JapaneseQuizTab({ initialLevels }: JapaneseQuizTabProps) {
 
                 {/* Question */}
                 <div className="text-center space-y-3 py-6">
-                  <h2 className="text-5xl font-bold">{currentQuestion.word}</h2>
-                  <p className="text-2xl text-muted-foreground">
+                  <h2 className="text-3xl sm:text-5xl font-bold break-words">{currentQuestion.word}</h2>
+                  <p className="text-xl sm:text-2xl text-muted-foreground">
                     {currentQuestion.reading}
                   </p>
                   <p className="text-sm text-muted-foreground">

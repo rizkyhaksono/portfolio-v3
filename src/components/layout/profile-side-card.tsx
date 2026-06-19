@@ -75,7 +75,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
           </div>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="start" className="w-[--radix-popper-anchor-width]">
+      <DropdownMenuContent side="top" align="start" sideOffset={8} collisionPadding={12} className="w-[--radix-popper-anchor-width] min-w-52">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href="/profile">

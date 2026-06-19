@@ -159,7 +159,7 @@ export function CompilerTab() {
         </div>
 
         {/* Workbench */}
-        <div className="flex h-[68vh] min-h-[460px]">
+        <div className="flex h-[60vh] sm:h-[68vh] min-h-[420px] sm:min-h-[460px]">
           {/* Activity bar */}
           <div className="hidden sm:flex w-12 bg-[#333333] flex-col items-center py-3 gap-5 shrink-0">
             {ACTIVITY_ICONS.map((Icon, i) => (
