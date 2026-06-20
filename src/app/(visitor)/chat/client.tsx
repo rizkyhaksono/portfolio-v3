@@ -295,17 +295,17 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
           </div>
         </div>
 
+        {/* Pinned message — fixed above the scroll area so it stays visible */}
+        <div className="flex shrink-0 items-start gap-2.5 border-b border-border/60 bg-muted/20 px-4 py-3 sm:px-6">
+          <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" />
+          <p className="text-sm leading-relaxed">
+            <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pinned ·</span>
+            <span className="font-medium text-foreground">@Rizky Haksono</span> Hello welcome to my site, enjoy 👋
+          </p>
+        </div>
+
         {/* Messages */}
         <div className="flex max-h-[58vh] min-h-[360px] flex-col gap-5 overflow-y-auto px-4 py-5 sm:px-6">
-          {/* Pinned message */}
-          <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-muted/30 px-4 py-3">
-            <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" />
-            <p className="text-sm leading-relaxed">
-              <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pinned ·</span>
-              <span className="font-medium text-foreground">@Rizky Haksono</span> Hello welcome to my site, enjoy 👋
-            </p>
-          </div>
-
           {stream.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
               <p className="font-medium">No messages yet</p>

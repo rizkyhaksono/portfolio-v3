@@ -4,7 +4,6 @@ import { Montserrat as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Toaster } from "sonner"
-import { Analytics } from "@vercel/analytics/react"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import ScrollToTop from "@/components/ui/scroll-to-top"
 import { CommandPalette } from "@/components/ui/command-palette"
@@ -75,7 +74,6 @@ export default function RootLayout({
           {/* <div className="hidden sm:block">
             <SmoothCursor />
           </div> */}
-          <Analytics />
         </ThemeProvider>
       </body>
     </html>

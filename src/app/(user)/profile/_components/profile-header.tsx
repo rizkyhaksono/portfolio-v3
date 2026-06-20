@@ -79,7 +79,7 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
       {/* Banner/Cover Section */}
       <div className="relative h-40 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/30">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,rgba(255,255,255,0.5))]" />
-        {profile.bannerUrl && <Image src={profile.bannerUrl} alt="Profile banner" fill className="object-cover" priority />}
+        {profile.bannerUrl && <Image src={profile.bannerUrl} alt="Profile banner" fill unoptimized className="object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
       </div>
 
