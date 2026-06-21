@@ -101,24 +101,6 @@ export function containsXSS(input: string): boolean {
 }
 
 /**
- * Escape HTML special characters
- */
-export function escapeHtml(input: string): string {
-  const htmlEscapes: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '/': '&#x2F;',
-    '`': '&#x60;',
-    '=': '&#x3D;',
-  };
-  
-  return input.replaceAll(/[&<>"'`=/]/g, (char) => htmlEscapes[char] || char);
-}
-
-/**
  * Sanitize message by removing/escaping dangerous content
  */
 export function sanitizeMessage(input: string): string {

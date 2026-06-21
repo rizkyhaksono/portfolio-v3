@@ -15,45 +15,44 @@ import { useRouter } from "next/navigation"
 
 const WS_LABEL = "wscat -c wss://api.nateee.com/v3/public-chat"
 
-async function createMessage(message: string, replyToId?: string): Promise<{ data?: PublicChatMessage; error?: string }> {
+const JSON_HEADERS = { "Content-Type": "application/json" }
+
+async function chatRequest(
+  url: string,
+  init: RequestInit,
+  fallback: string,
+): Promise<{ result?: { data?: PublicChatMessage; error?: string }; error?: string }> {
   try {
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, replyToId }),
-    })
-    const result = await res.json()
-    if (!res.ok) return { error: result.error || "Failed to send message" }
-    return { data: result.data }
+    const res = await fetch(url, init)
+    const result = (await res.json()) as { data?: PublicChatMessage; error?: string }
+    if (!res.ok) return { error: result.error || fallback }
+    return { result }
   } catch {
-    return { error: "Failed to send message" }
+    return { error: fallback }
   }
+}
+
+async function createMessage(message: string, replyToId?: string): Promise<{ data?: PublicChatMessage; error?: string }> {
+  const { result, error } = await chatRequest(
+    "/api/chat",
+    { method: "POST", headers: JSON_HEADERS, body: JSON.stringify({ message, replyToId }) },
+    "Failed to send message",
+  )
+  return error ? { error } : { data: result?.data }
 }
 
 async function updateMessage(messageId: string, message: string): Promise<{ data?: PublicChatMessage; error?: string }> {
-  try {
-    const res = await fetch(`/api/chat/${messageId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    })
-    const result = await res.json()
-    if (!res.ok) return { error: result.error || "Failed to update message" }
-    return { data: result.data }
-  } catch {
-    return { error: "Failed to update message" }
-  }
+  const { result, error } = await chatRequest(
+    `/api/chat/${messageId}`,
+    { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify({ message }) },
+    "Failed to update message",
+  )
+  return error ? { error } : { data: result?.data }
 }
 
 async function deleteMessage(messageId: string): Promise<{ success?: boolean; error?: string }> {
-  try {
-    const res = await fetch(`/api/chat/${messageId}`, { method: "DELETE" })
-    const result = await res.json()
-    if (!res.ok) return { error: result.error || "Failed to delete message" }
-    return { success: true }
-  } catch {
-    return { error: "Failed to delete message" }
-  }
+  const { error } = await chatRequest(`/api/chat/${messageId}`, { method: "DELETE" }, "Failed to delete message")
+  return error ? { error } : { success: true }
 }
 
 interface ChatClientProps {

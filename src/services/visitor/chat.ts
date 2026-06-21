@@ -3,12 +3,14 @@ import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+// Public chat is always fresh — never cache these reads.
+const NO_STORE = { cache: "no-store", next: { revalidate: 0 } } as const;
+
 export async function getInitialMessages(): Promise<PublicChatMessage[]> {
   try {
     const response = await fetch(`${API_URL}/v3/public-chat/public-chat/`, {
       method: "GET",
-      cache: "no-store",
-      next: { revalidate: 0 },
+      ...NO_STORE,
     });
     if (!response.ok) return [];
     const result = await response.json();
@@ -22,11 +24,7 @@ export async function getInitialMessages(): Promise<PublicChatMessage[]> {
           try {
             const repliesResponse = await fetch(
               `${API_URL}/v3/public-chat/public-chat/${message.id}/replies`,
-              {
-                method: "GET",
-                cache: "no-store",
-                next: { revalidate: 0 },
-              }
+              { method: "GET", ...NO_STORE }
             );
             if (repliesResponse.ok) {
               const repliesResult = await repliesResponse.json();
@@ -55,8 +53,7 @@ export async function getCurrentUser(): Promise<{ id: string; name: string } | n
     const response = await fetch(`${API_URL}/v3/me`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-      next: { revalidate: 0 },
+      ...NO_STORE,
     });
     if (!response.ok) return null;
     const result = await response.json();

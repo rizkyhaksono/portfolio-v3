@@ -10,9 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Mail, MapPin, Calendar, Shield, CheckCircle2, XCircle, Pencil, LogOut, Briefcase, Link2, User } from "lucide-react"
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub, FaDiscord, FaFacebook } from "react-icons/fa"
-import { authLogout } from "@/services/visitor/auth"
-import { removeCookie } from "@/app/actions/actions"
-import { toast } from "sonner"
+import { performVisitorLogout } from "@/lib/visitor-logout"
 import { useRouter } from "next/navigation"
 import { ProfileData } from "@/commons/types/profile"
 import { format } from "date-fns"
@@ -38,27 +36,6 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
 
   const getProviderName = (provider: string) => {
     return provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase()
-  }
-
-  const handleLogout = async () => {
-    try {
-      // Revoke the server session first (best-effort), then drop the client cookie.
-      await authLogout().catch(() => {})
-      await removeCookie("NATEE_V3_TOKEN")
-
-      // Clear any local storage
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("chat_user")
-      }
-
-      toast.success("Logged out successfully")
-
-      // Redirect to auth page
-      window.location.href = "/auth"
-    } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to logout")
-    }
   }
 
   const getInitials = (name: string) => {
@@ -264,7 +241,7 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                <AlertDialogAction onClick={performVisitorLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                   Yes, Log Out
                 </AlertDialogAction>
               </AlertDialogFooter>

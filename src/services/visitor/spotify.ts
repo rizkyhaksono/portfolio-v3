@@ -48,9 +48,7 @@ function isPremiumBlocked(detail?: string): boolean {
 }
 
 function shouldShowProfileLink(status: number, detail?: string): boolean {
-  if (status === 403 && isPremiumBlocked(detail)) return true;
-  if (status === 401) return false;
-  return false;
+  return status === 403 && isPremiumBlocked(detail);
 }
 
 const saveLastKnownSpotify = (data: SpotifyNowPlaying) => {

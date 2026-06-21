@@ -7,9 +7,12 @@ import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
 import RightSidebarWindow from "./right-sidebar-window"
 
 const RightSidebarMain = async () => {
-  // Degrade gracefully — a weather/ping outage must not crash the whole sidebar render.
-  const ping = await getPing().catch(() => null)
-  const weather = await getWeather().catch(() => null)
+  // Degrade gracefully — a weather/ping outage must not crash the whole sidebar render —
+  // and run them concurrently since they're independent.
+  const [ping, weather] = await Promise.all([
+    getPing().catch(() => null),
+    getWeather().catch(() => null),
+  ])
 
   const temperature = weather?.main?.temp != null ? Math.round(weather.main.temp - 273.15) : null
 

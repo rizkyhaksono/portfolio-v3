@@ -4,12 +4,9 @@ import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import Typography from "@/components/ui/typography"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { authLogout } from "@/services/visitor/auth"
-import { removeCookie } from "@/app/actions/actions"
-import { toast } from "sonner"
+import { performVisitorLogout } from "@/lib/visitor-logout"
 import { getProfile } from "@/services/user/profile"
 import type { ProfileResponse } from "@/commons/types/profile"
-import { useRouter } from "next/navigation"
 import AuthCard from "./auth-card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Home, LogOutIcon, User } from "lucide-react"
@@ -25,35 +22,11 @@ function getInitials(name: string) {
 }
 
 const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
-  const router = useRouter()
   const [profile, setProfile] = useState<ProfileResponse | null>(null)
 
   useEffect(() => {
-    ;(async () => {
-      await getProfile().then(setProfile)
-    })()
+    getProfile().then(setProfile)
   }, [])
-
-  const handleLogout = async () => {
-    try {
-      // Revoke the server session first (best-effort), then drop the client cookie.
-      await authLogout().catch(() => {})
-      await removeCookie("NATEE_V3_TOKEN")
-
-      // Clear any local storage
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("chat_user")
-      }
-
-      toast.success("Logged out successfully")
-
-      // Redirect to auth page
-      window.location.href = "/auth"
-    } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to logout")
-    }
-  }
 
   if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />
 
@@ -96,7 +69,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
           </Link>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem data-cy="sign-out" onClick={() => handleLogout()}>
+        <DropdownMenuItem data-cy="sign-out" onClick={() => performVisitorLogout()}>
           <LogOutIcon size={16} className="mr-3" />
           <span>Sign Out</span>
         </DropdownMenuItem>
