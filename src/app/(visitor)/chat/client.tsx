@@ -313,7 +313,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
             </div>
           ) : (
             stream.map((m) => {
-              const isMine = Boolean(currentUser) && m.userId === currentUser.id
+              const isMine = currentUser?.id === m.userId
               return (
                 <Bubble
                   key={m.id}
