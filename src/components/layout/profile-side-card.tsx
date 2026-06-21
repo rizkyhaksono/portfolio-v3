@@ -8,6 +8,7 @@ import { authLogout } from "@/services/visitor/auth"
 import { removeCookie } from "@/app/actions/actions"
 import { toast } from "sonner"
 import { getProfile } from "@/services/user/profile"
+import type { ProfileResponse } from "@/commons/types/profile"
 import { useRouter } from "next/navigation"
 import AuthCard from "./auth-card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -25,7 +26,7 @@ function getInitials(name: string) {
 
 const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   const router = useRouter()
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<ProfileResponse | null>(null)
 
   useEffect(() => {
     ;(async () => {
@@ -35,6 +36,8 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
 
   const handleLogout = async () => {
     try {
+      // Revoke the server session first (best-effort), then drop the client cookie.
+      await authLogout().catch(() => {})
       await removeCookie("NATEE_V3_TOKEN")
 
       // Clear any local storage
@@ -84,7 +87,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
             <span>Profile</span>
           </DropdownMenuItem>
         </Link>
-        {profile?.isAdmin && (
+        {profile?.data?.role === "ADMIN" && (
           <Link href="/admin/dashboard">
             <DropdownMenuItem data-cy="admin-btn">
               <Home size={16} className="mr-3" />

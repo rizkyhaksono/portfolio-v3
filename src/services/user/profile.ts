@@ -38,7 +38,6 @@ const putProfile = async (
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
       email,
-      emailVerified: true,
       name,
       headline,
       location,

@@ -98,14 +98,16 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       return
     }
 
-    const userMsg: Message = { id: `u-${Date.now()}`, msg: text, role: "user" }
-    const aiId = `m-${Date.now()}`
+    const sentAt = Date.now()
+    const userMsg: Message = { id: `u-${sentAt}`, msg: text, role: "user" }
+    const aiId = `m-${sentAt}`
     setMessages((prev) => [...prev, userMsg])
     setInput("")
-    setTimestamps((prev) => [...prev, Date.now()])
+    setTimestamps((prev) => [...prev, sentAt])
     setLoading(true)
 
     let full = ""
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null
     try {
       const res = await fetch("/api/ai", {
         method: "POST",
@@ -122,7 +124,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       // Empty AI bubble that fills in as chunks stream in.
       setMessages((prev) => [...prev, { id: aiId, msg: "", role: "model" }])
 
-      const reader = res.body!.getReader()
+      reader = res.body!.getReader()
       const decoder = new TextDecoder()
       while (true) {
         const { done, value } = await reader.read()
@@ -155,11 +157,14 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
         })
       }
     } catch (err) {
-      // Remove the optimistic messages so the user can retry cleanly.
+      // Remove the optimistic messages so the user can retry cleanly, and roll back
+      // the consumed rate-limit slot since the request never succeeded.
       setMessages((prev) => prev.filter((m) => m.id !== userMsg.id && m.id !== aiId))
       setInput(text)
+      setTimestamps((prev) => prev.filter((t) => t !== sentAt))
       toast.error(err instanceof Error ? err.message : "Failed to send message.")
     } finally {
+      reader?.cancel().catch(() => {})
       setLoading(false)
     }
   }

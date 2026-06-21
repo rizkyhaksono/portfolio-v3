@@ -251,7 +251,12 @@ export async function getUmamiMetrics(
       return [];
     }
 
-    return await response.json();
+    // Umami versions differ: some return a bare array, others a wrapped object.
+    // Guard so a non-array body can't crash the analytics render with .map.
+    const data = await response.json().catch(() => null);
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
   } catch (error) {
     logNonCriticalError(`Failed to fetch Umami ${type} metrics:`, error);
     return [];

@@ -193,7 +193,8 @@ export const getNowPlaying = async (): Promise<SpotifyNowPlaying> => {
       }
 
       const fallbackTrack = await getRecentlyPlayed(access_token);
-      if (fallbackTrack.status === "recently_played") {
+      // Surface a real auth/error result instead of masking it as a benign idle state.
+      if (fallbackTrack.status === "recently_played" || fallbackTrack.status === "error") {
         return fallbackTrack;
       }
 

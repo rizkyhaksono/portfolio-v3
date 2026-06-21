@@ -17,10 +17,10 @@ const XSS_PATTERNS = [
   /<script[\s\S]*?>/gi,
   /<\/script>/gi,
   
-  // Event handlers (onclick, onerror, onload, etc.)
-  /\bon\w+\s*=\s*["']?[^"']*["']?/gi,
-  /\bon\w+\s*=\s*[^>\s]*/gi,
-  
+  // Inline event handlers inside an HTML tag (onclick=, onerror=, ...).
+  // Tag context required so plain prose like "online=yes" is not flagged.
+  /<[^>]*\son\w+\s*=/gi,
+
   // JavaScript protocol
   /javascript\s*:/gi,
   /vbscript\s*:/gi,
@@ -54,26 +54,14 @@ const XSS_PATTERNS = [
   /\\u003e/gi,
 ];
 
-// Patterns that indicate malicious intent
+// Patterns that indicate malicious intent. Messages are rendered as plain text
+// (React auto-escapes), so we only flag genuinely dangerous DOM-write syntax and
+// avoid bare keywords like eval(/fetch( that appear in ordinary or dev chat.
 const MALICIOUS_PATTERNS = [
   /document\s*\.\s*cookie/gi,
   /document\s*\.\s*write/gi,
-  /document\s*\.\s*location/gi,
-  /window\s*\.\s*location/gi,
   /\.innerHTML\s*=/gi,
   /\.outerHTML\s*=/gi,
-  /eval\s*\(/gi,
-  /setTimeout\s*\(/gi,
-  /setInterval\s*\(/gi,
-  /new\s+Function\s*\(/gi,
-  /fetch\s*\(/gi,
-  /XMLHttpRequest/gi,
-  /\.src\s*=/gi,
-  /\.href\s*=/gi,
-  /fromCharCode/gi,
-  /String\s*\.\s*fromCharCode/gi,
-  /atob\s*\(/gi,
-  /btoa\s*\(/gi,
 ];
 
 /**
@@ -142,9 +130,10 @@ export function sanitizeMessage(input: string): string {
   // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replaceAll(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '');
   
-  // Escape HTML special characters
-  sanitized = escapeHtml(sanitized);
-  
+  // Do NOT HTML-escape here: the message is rendered as plain text by React, which
+  // already escapes on output. Escaping at storage time double-encodes punctuation
+  // (e.g. "a/b = c" would otherwise display as visible entities).
+
   // Trim and limit length
   sanitized = sanitized.trim().slice(0, 2000);
   
@@ -200,16 +189,15 @@ export function validateChatMessage(message: string): {
 export function isMalicious(input: string): boolean {
   if (!input) return false;
   
+  // Tag/script-injection signals only. Bare substrings like "document." or "window."
+  // match ordinary prose ("look out the window.") and were rejecting valid messages.
   const quickPatterns = [
     /<script/i,
     /javascript:/i,
-    /on\w+=/i,
     /<iframe/i,
-    /<img[^>]+onerror/i,
     /<svg/i,
-    /document\./i,
-    /window\./i,
-    /eval\(/i,
+    /<img[^>]+onerror/i,
+    /<[^>]*\son\w+\s*=/i,
   ];
   
   return quickPatterns.some(pattern => pattern.test(input));

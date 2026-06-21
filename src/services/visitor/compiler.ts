@@ -12,9 +12,9 @@ export async function postExecuteCode(request: ExecuteCodeRequest): Promise<Exec
     body: JSON.stringify(request),
   });
 
-  const json = await response.json();
+  const json = await response.json().catch(() => null);
 
-  if (!response.ok || json?.status >= 400 || !json?.data) {
+  if (!response.ok || !json || json.status >= 400 || !json.data) {
     throw new Error(json?.message || `Error: ${response.status} - ${response.statusText}`);
   }
 

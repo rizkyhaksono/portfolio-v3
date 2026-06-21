@@ -7,12 +7,13 @@ import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
 import RightSidebarWindow from "./right-sidebar-window"
 
 const RightSidebarMain = async () => {
-  const ping = await getPing()
-  const weather = await getWeather()
+  // Degrade gracefully — a weather/ping outage must not crash the whole sidebar render.
+  const ping = await getPing().catch(() => null)
+  const weather = await getWeather().catch(() => null)
 
-  const temperature = weather?.main?.temp ? Math.round(weather.main.temp - 273.15) : null
+  const temperature = weather?.main?.temp != null ? Math.round(weather.main.temp - 273.15) : null
 
-  const feelsLike = weather?.main?.feels_like ? Math.round(weather.main.feels_like - 273.15) : null
+  const feelsLike = weather?.main?.feels_like != null ? Math.round(weather.main.feels_like - 273.15) : null
 
   const weatherCondition = weather?.weather?.[0]
   const weatherEmoji = weatherCondition ? getWeatherEmoji(weatherCondition.main, weatherCondition.icon) : "🌤️"
@@ -102,7 +103,7 @@ const RightSidebarMain = async () => {
             <div className="text-right">
               <Typography.P className="text-xs text-primary/70 capitalize">{weatherCondition?.description ?? "Unknown"}</Typography.P>
               <Typography.P className="text-xs text-primary/60">{feelsLike !== null ? `Feels like ${feelsLike}°` : ""}</Typography.P>
-              {weather.main?.humidity && <Typography.P className="text-xs text-primary/60">Humidity {weather.main.humidity}%</Typography.P>}
+              {weather.main?.humidity != null && <Typography.P className="text-xs text-primary/60">Humidity {weather.main.humidity}%</Typography.P>}
             </div>
           </div>
         ) : (

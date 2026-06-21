@@ -174,6 +174,8 @@ export default function AdminDashboardSettingPage() {
         location: data.location,
       })
       await updateAdminSettingsClient({ website: data.website || "" })
+      // Keep the on-screen account card in sync without a full reload.
+      setUser((prev) => (prev ? { ...prev, name: data.name, email: data.email, about: data.bio, location: data.location } : prev))
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",

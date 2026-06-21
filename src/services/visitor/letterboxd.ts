@@ -32,11 +32,15 @@ function parseRssItems(xml: string): LetterboxdFilm[] {
     const rating = ratingStr ? parseFloat(ratingStr) : null
     const pubDate = extractTag(itemXml, "pubDate")
     const description = extractTag(itemXml, "description")
+    const watched = pubDate ? new Date(pubDate) : null
+    const watchedDate = watched && !Number.isNaN(watched.getTime())
+      ? watched.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      : ""
 
     return {
       title,
       rating: Number.isFinite(rating) ? rating : null,
-      watchedDate: pubDate ? new Date(pubDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "",
+      watchedDate,
       posterUrl: extractPoster(description),
     }
   })

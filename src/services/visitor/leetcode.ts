@@ -56,8 +56,14 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats | null> {
     const hardSolved = getCount(ac, "Hard")
     const totalSolved = easySolved + mediumSolved + hardSolved
 
-    const totalSubmissions = total.reduce((sum: number, x: { count: number }) => sum + (x.count ?? 0), 0)
-    const acceptanceRate = totalSubmissions > 0 ? Math.round((totalSolved / totalSubmissions) * 100) : 0
+    // acceptanceRate = accepted submissions / total submissions. Use the pre-aggregated
+    // "All" row's `submissions` field — `count` is the number of distinct problems, not
+    // submissions, so the old totalSolved/sum(count) produced a near-100% bogus rate.
+    const getSubs = (arr: { difficulty: string; submissions?: number }[], diff: string) =>
+      arr.find((x: { difficulty: string }) => x.difficulty === diff)?.submissions ?? 0
+    const acceptedSubmissions = getSubs(ac, "All")
+    const totalSubmissions = getSubs(total, "All")
+    const acceptanceRate = totalSubmissions > 0 ? Math.round((acceptedSubmissions / totalSubmissions) * 100) : 0
 
     return {
       username,
