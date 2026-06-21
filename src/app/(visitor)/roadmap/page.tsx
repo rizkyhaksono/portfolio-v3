@@ -3,6 +3,7 @@ import { getRoadmapCourses } from "@/lib/mdx"
 import BaseLayout from "@/components/layout/base-layout"
 import { RoadmapClient } from "./roadmap-client"
 import SidebarMain from "@/components/layout/sidebar-main"
+import { MacWindow } from "@/components/ui/mac-window"
 
 export const dynamic = "force-dynamic"
 
@@ -42,9 +43,11 @@ export default function CourseRoadmap() {
 
       {/* Roadmap Content */}
       <div className="max-w-7xl mx-auto w-full px-6 lg:px-0 relative z-10">
-        <Suspense fallback={<RoadmapSkeleton />}>
-          <RoadmapClient courses={courses} />
-        </Suspense>
+        <MacWindow title="~/roadmap">
+          <Suspense fallback={<RoadmapSkeleton />}>
+            <RoadmapClient courses={courses} />
+          </Suspense>
+        </MacWindow>
       </div>
     </BaseLayout>
   )

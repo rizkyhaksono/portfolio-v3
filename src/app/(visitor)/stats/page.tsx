@@ -3,6 +3,7 @@ import Link from "next/link"
 import BaseLayout from "@/components/layout/base-layout"
 import SidebarMain from "@/components/layout/sidebar-main"
 import Typography from "@/components/ui/typography"
+import { MacWindow } from "@/components/ui/mac-window"
 import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
 import { getLeetCodeStats } from "@/services/visitor/leetcode"
 import { getChessStats } from "@/services/visitor/chess"
@@ -105,6 +106,7 @@ export default async function StatsPage() {
           </p>
         </div>
 
+        <MacWindow title="~/stats" bodyClassName="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <PlatformCard
             title="LeetCode"
@@ -200,6 +202,7 @@ export default async function StatsPage() {
             )
           })()}
         </PlatformCard>
+        </MacWindow>
       </div>
     </BaseLayout>
   )

@@ -170,7 +170,18 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
   }
 
   return (
-    <div className="mt-6 flex h-[calc(100dvh-10rem)] min-h-[460px] overflow-hidden rounded-xl border bg-card shadow-sm">
+    <div className="mt-6 flex h-[calc(100dvh-10rem)] min-h-[460px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
+      {/* mac window title bar */}
+      <div className="flex shrink-0 items-center gap-3 border-b bg-muted/40 px-4 py-2.5">
+        <div className="flex items-center gap-1.5">
+          <span className="h-3 w-3 rounded-full bg-red-400/90" />
+          <span className="h-3 w-3 rounded-full bg-yellow-400/90" />
+          <span className="h-3 w-3 rounded-full bg-green-400/90" />
+        </div>
+        <p className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">etan-ai ~ chat</p>
+        <div className="w-[46px] shrink-0" aria-hidden />
+      </div>
+      <div className="flex min-h-0 flex-1">
       {/* Sessions sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r bg-muted/30 md:flex">
         <div className="border-b p-3">
@@ -305,6 +316,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </form>
+      </div>
       </div>
     </div>
   )

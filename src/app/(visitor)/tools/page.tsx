@@ -13,6 +13,7 @@ import { Web3CryptoTab } from "./_components/web3-crypto-tab"
 import { PokemonTab } from "./_components/pokemon-tab"
 import { StarWarsTab } from "./_components/starwars-tab"
 import ToolsBrowser from "./_components/tools-browser"
+import { MacWindow } from "@/components/ui/mac-window"
 import { logNonCriticalError } from "@/lib/logging"
 
 export const dynamic = "force-dynamic"
@@ -48,6 +49,7 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
         </div>
 
         {/* Sidebar nav + active tool content */}
+        <MacWindow title="~/tools" bodyClassName="p-3 sm:p-5">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="lg:w-60 lg:shrink-0">
             <div className="rounded-xl border border-muted/40 bg-card/40 p-3 lg:sticky lg:top-20">
@@ -69,6 +71,7 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
             </Tabs>
           </div>
         </div>
+        </MacWindow>
       </div>
     </BlurFade>
   )

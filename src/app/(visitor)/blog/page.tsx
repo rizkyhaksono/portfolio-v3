@@ -4,6 +4,7 @@ import BlurFade from "@/components/magicui/blur-fade"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog"
 import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
+import { MacWindow } from "@/components/ui/mac-window"
 import { Newspaper } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -35,6 +36,7 @@ export default async function BlogPage() {
           I write about my experiences, thoughts, and ideas on various topics.
         </p>
       </div>
+      <MacWindow title="~/blog">
       <Tabs defaultValue="devto" className="w-full">
         <div className="flex justify-center">
           <TabsList>
@@ -75,6 +77,7 @@ export default async function BlogPage() {
           </div>
         </TabsContent>
       </Tabs>
+      </MacWindow>
     </BlurFade>
   )
 }
