@@ -239,18 +239,18 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
           {(profile.isAdmin || profile.role === "ADMIN") && (
-            <Button variant="secondary" className="flex-1 gap-2 shadow-sm" size="lg" onClick={() => router.push(`/admin/dashboard`)}>
+            <Button variant="secondary" className="h-12 w-full gap-2 rounded-xl shadow-sm sm:flex-1" onClick={() => router.push(`/admin/dashboard`)}>
               <Shield className="h-4 w-4" />
               Admin Dashboard
             </Button>
           )}
-          <Button className="flex-1 gap-2 shadow-sm" size="lg" onClick={() => router.push(`/profile/edit`)}>
+          <Button className="h-12 w-full gap-2 rounded-xl shadow-sm sm:flex-1" onClick={() => router.push(`/profile/edit`)}>
             <Pencil className="h-4 w-4" />
             Edit Profile
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button className="flex-1 gap-2 shadow-sm" size="lg" variant="outline">
+              <Button variant="outline" className="h-12 w-full gap-2 rounded-xl shadow-sm sm:flex-1">
                 <LogOut className="h-4 w-4" />
                 Log Out
               </Button>
