@@ -17,8 +17,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 
+type Career = {
+  id: string
+  title: string
+  subtitle: string
+  duration: string
+  created_at: string
+  updated_at: string
+}
+
 export default function AdminCareerPage() {
-  const [careerData, setCareerData] = useState<any>([])
+  const [careerData, setCareerData] = useState<Career[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const formSchema = z.object({
@@ -47,7 +56,7 @@ export default function AdminCareerPage() {
       if (error) {
         console.log(error)
       } else {
-        setCareerData(data)
+        setCareerData((data ?? []) as Career[])
         setIsLoading(false)
       }
     }
@@ -120,7 +129,7 @@ export default function AdminCareerPage() {
                     <TableHead className="text-left">Action</TableHead>
                   </TableRow>
                 </TableHeader>
-                {careerData.map((career: any) => (
+                {careerData.map((career) => (
                   <TableBody key={career.id}>
                     <TableRow>
                       <TableCell className="hidden lg:table-cell">{career.id}</TableCell>

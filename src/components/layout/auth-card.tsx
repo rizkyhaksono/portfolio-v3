@@ -3,7 +3,7 @@ import Typography from "@/components/ui/typography";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const AuthCard = ({ className }: any) => {
+const AuthCard = ({ className }: { className?: string }) => {
   const router = useRouter();
 
   return (
