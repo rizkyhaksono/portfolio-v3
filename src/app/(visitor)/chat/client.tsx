@@ -252,7 +252,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     textareaRef.current?.focus()
   }
 
-  const handleDelete = async (messageId: string) => {
+  const handleDelete = (messageId: string) => {
     if (!currentUser) return
     startTransition(async () => {
       const result = await deleteMessage(messageId)
@@ -313,14 +313,14 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
             </div>
           ) : (
             stream.map((m) => {
-              const isMine = !!currentUser && m.userId === currentUser.id
+              const isMine = Boolean(currentUser) && m.userId === currentUser.id
               return (
                 <Bubble
                   key={m.id}
                   message={m}
                   quoted={m.replyToId ? byId.get(m.replyToId) ?? null : null}
                   alignRight={m.user?.role === "ADMIN"}
-                  canReply={!!currentUser && !isMine}
+                  canReply={Boolean(currentUser) && !isMine}
                   canManage={isMine}
                   onReply={handleReply}
                   onEdit={handleEdit}

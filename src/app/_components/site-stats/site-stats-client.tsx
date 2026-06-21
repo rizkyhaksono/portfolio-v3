@@ -3,14 +3,13 @@
 import { useState, lazy, Suspense } from "react"
 import BlurFade from "@/components/magicui/blur-fade"
 import Typography from "@/components/ui/typography"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Eye, Users, MousePointerClick, Globe, Monitor, FileText, Activity, Smartphone, ExternalLink, TrendingUp, Clock } from "lucide-react"
 import { UmamiAnalyticsData } from "@/commons/types/umami"
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { CardHeader, CardTitle } from "@/components/ui/card"
 
 const LazyBarChart = lazy(() => import("./lazy-bar-chart"))
 
