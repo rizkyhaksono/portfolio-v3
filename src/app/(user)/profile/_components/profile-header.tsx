@@ -214,8 +214,8 @@ export default function ProfileHeader({ profile }: Readonly<{ profile: ProfileDa
                 Connected Accounts
               </h3>
               <div className="flex flex-wrap gap-2">
-                {profile.oauthAccounts.map((account, index) => (
-                  <TooltipProvider key={index}>
+                {profile.oauthAccounts.map((account) => (
+                  <TooltipProvider key={account.provider}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Badge variant="outline" className="gap-2 py-1.5 px-3 hover:bg-muted/50 transition-colors">

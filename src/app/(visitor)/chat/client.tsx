@@ -89,7 +89,8 @@ function Bubble({ message, quoted, alignRight, canReply, canManage, onReply, onE
   const name = message.user?.name || "Anonymous"
   const isAdmin = message.user?.role === "ADMIN"
   const edited = message.updatedAt !== message.createdAt
-  const time = format(new Date(message.createdAt), "dd/MM/yyyy, HH:mm")
+  const parsedDate = new Date(message.createdAt)
+  const time = Number.isNaN(parsedDate.getTime()) ? "" : format(parsedDate, "dd/MM/yyyy, HH:mm")
 
   const AvatarEl = (
     <Avatar className="h-8 w-8 shrink-0 ring-2 ring-background">
@@ -160,7 +161,6 @@ function Bubble({ message, quoted, alignRight, canReply, canManage, onReply, onE
 
 export default function ChatClient({ initialMessages, currentUser }: Readonly<ChatClientProps>) {
   const router = useRouter()
-  const [messages] = useState<PublicChatMessage[]>(initialMessages)
   const [isPending, startTransition] = useTransition()
   const [inputMessage, setInputMessage] = useState("")
   const [replyTo, setReplyTo] = useState<PublicChatMessage | null>(null)
@@ -169,30 +169,42 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Flatten top-level messages + their replies into one chronological stream,
-  // and index every message by id so replies can render a quote of their parent.
+  // Derive directly from the prop (not state) so router.refresh() — which refetches
+  // the force-dynamic page after send/edit/delete — surfaces the updated messages.
+  // Flatten top-level messages + their replies into one chronological stream, dedup
+  // by id (a reply may also appear top-level; also guards against cycles), and index
+  // every message so replies can render a quote of their parent.
   const { stream, byId } = useMemo(() => {
     const byId = new Map<string, PublicChatMessage>()
     const flat: PublicChatMessage[] = []
+    const seen = new Set<string>()
     const walk = (list: PublicChatMessage[]) => {
       for (const m of list) {
+        if (seen.has(m.id)) continue
+        seen.add(m.id)
         byId.set(m.id, m)
         flat.push(m)
         if (m.replies?.length) walk(m.replies)
       }
     }
-    walk(messages)
-    flat.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    walk(initialMessages)
+    const ts = (v: string) => {
+      const t = new Date(v).getTime()
+      return Number.isNaN(t) ? 0 : t
+    }
+    flat.sort((a, b) => ts(a.createdAt) - ts(b.createdAt))
     return { stream: flat, byId }
-  }, [messages])
+  }, [initialMessages])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [])
 
+  // Scroll to the newest message on mount and whenever the stream changes.
   useEffect(() => {
-    setTimeout(scrollToBottom, 100)
-  }, [scrollToBottom])
+    const id = setTimeout(scrollToBottom, 100)
+    return () => clearTimeout(id)
+  }, [stream.length, scrollToBottom])
 
   const refresh = () => {
     setRefreshing(true)

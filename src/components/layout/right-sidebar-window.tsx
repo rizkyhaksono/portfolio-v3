@@ -9,8 +9,11 @@ export default function RightSidebarWindow({ children }: Readonly<{ children: Re
   const [open, setOpen] = useState(true)
 
   useEffect(() => {
-    if (typeof window === "undefined") return
-    if (localStorage.getItem(STORAGE_KEY) === "false") setOpen(false)
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === "false") setOpen(false)
+    } catch {
+      // localStorage unavailable (private mode / blocked) — keep default open
+    }
   }, [])
 
   const setOpenPersist = (next: boolean) => {
