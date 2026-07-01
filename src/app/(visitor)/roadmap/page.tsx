@@ -30,7 +30,7 @@ export default function CourseRoadmap() {
   return (
     <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useInteractiveGrid={true}>
       {/* Header */}
-      <div className="flex flex-col gap-6 mt-20 justify-center relative z-10">
+      <div className="flex flex-col gap-6 justify-center relative z-10">
         <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col gap-2">
             <h1 className="font-medium text-3xl sm:text-4xl md:text-5xl tracking-tighter">Learning Roadmap</h1>

@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import BlurFade from "@/components/magicui/blur-fade"
 import { TypingAnimation } from "@/components/ui/typing-animation"
@@ -8,10 +7,13 @@ import AnimatedShinyText from "@/components/ui/animated-shiny-text"
 import { cn } from "@/lib/utils"
 import { media_socials } from "@/commons/constants/contact"
 import { Sparkles, ArrowRight } from "lucide-react"
+import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
 const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
 
-export default function IntroSection() {
+export default function IntroSection({ profile }: { profile?: OwnerProfile | null }) {
+  const name = profile?.name || "Muhammad Rizky Haksono"
+  const avatar = profile?.avatarUrl || "/rizky.jpg"
   return (
     <div className="flex flex-col-reverse gap-8">
       {/* Text Content - Single BlurFade wrapper with CSS stagger */}
@@ -41,7 +43,7 @@ export default function IntroSection() {
 
           {/* Name - Simple bold text instead of HyperText scramble */}
           <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-2">{`Hi, I'm Muhammad Rizky Haksono`}</h1>
+            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-2">{`Hi, I'm ${name}`}</h1>
           </div>
 
           {/* Typing Animation for Roles */}
@@ -106,12 +108,12 @@ export default function IntroSection() {
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-purple-500/20 to-pink-500/30 blur-2xl opacity-60 dark:opacity-40" />
 
           {/* Image */}
-          <Image
-            src="/rizky.jpg"
-            alt="Muhammad Rizky Haksono"
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={avatar}
+            alt={name}
             width={200}
             height={200}
-            priority
             className="relative rounded-full object-cover size-28 md:size-40 lg:size-48 ring-2 ring-border ring-offset-2 ring-offset-background shadow-xl"
           />
 

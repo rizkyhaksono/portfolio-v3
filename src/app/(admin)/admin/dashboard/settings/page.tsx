@@ -443,7 +443,7 @@ export default function AdminDashboardSettingPage() {
           <Card>
             <CardHeader>
               <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Choose how and when you want to be notified.</CardDescription>
+              <CardDescription>Choose which events show up in your admin notification bell.</CardDescription>
             </CardHeader>
             <CardContent>
               <Form {...notificationForm}>
@@ -455,8 +455,8 @@ export default function AdminDashboardSettingPage() {
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Email Notifications</FormLabel>
-                            <FormDescription>Receive email notifications for important updates.</FormDescription>
+                            <FormLabel className="text-base">Feedback &amp; suggestions</FormLabel>
+                            <FormDescription>Show new feedback submissions in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -471,24 +471,8 @@ export default function AdminDashboardSettingPage() {
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Push Notifications</FormLabel>
-                            <FormDescription>Receive push notifications in your browser.</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={notificationForm.control}
-                      name="weeklyDigest"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-base">Weekly Digest</FormLabel>
-                            <FormDescription>Receive a weekly summary of activity.</FormDescription>
+                            <FormLabel className="text-base">New chat messages</FormLabel>
+                            <FormDescription>Show new public chat messages in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -503,8 +487,8 @@ export default function AdminDashboardSettingPage() {
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Project Updates</FormLabel>
-                            <FormDescription>Get notified when projects are updated.</FormDescription>
+                            <FormLabel className="text-base">Tracker activity</FormLabel>
+                            <FormDescription>Show new Kanban tracker cards in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -519,8 +503,8 @@ export default function AdminDashboardSettingPage() {
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between rounded-lg border p-4">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Security Alerts</FormLabel>
-                            <FormDescription>Receive alerts about security-related events.</FormDescription>
+                            <FormLabel className="text-base">Reactions &amp; claps</FormLabel>
+                            <FormDescription>Show new claps on your blog posts and projects in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { isHaveValidToken } from "./app/actions/actions"
 
-/** User API session (NATEE_V3_TOKEN) — not used for admin (Supabase cookie). */
-const USER_PROTECTED_PREFIXES = ["/profile", "/ai"]
+/** User API session (NATEE_V3_TOKEN) — not used for admin (Supabase cookie).
+ * /ai is intentionally NOT gated: logged-out visitors see a preview of the chat UI,
+ * and the chat API itself stays auth-protected server-side. */
+const USER_PROTECTED_PREFIXES = ["/profile"]
 const AUTH_PUBLIC_PATHS = ["callback", "reset-password", "forgot-password"]
 
 function isAdminPublicPath(pathname: string): boolean {
@@ -65,7 +67,6 @@ export const config = {
   matcher: [
     "/admin/:path*",
     "/auth/:path*",
-    "/ai/:path*",
     "/chat/:path*",
     "/profile/:path*",
   ],

@@ -8,7 +8,7 @@ const NO_STORE = { cache: "no-store", next: { revalidate: 0 } } as const;
 
 export async function getInitialMessages(): Promise<PublicChatMessage[]> {
   try {
-    const response = await fetch(`${API_URL}/v3/public-chat/public-chat/`, {
+    const response = await fetch(`${API_URL}/v3/public-chat/public-chat/?page=1&limit=50`, {
       method: "GET",
       ...NO_STORE,
     });
@@ -23,7 +23,7 @@ export async function getInitialMessages(): Promise<PublicChatMessage[]> {
         if (hasReplies) {
           try {
             const repliesResponse = await fetch(
-              `${API_URL}/v3/public-chat/public-chat/${message.id}/replies`,
+              `${API_URL}/v3/public-chat/public-chat/${message.id}/replies?page=1&limit=50`,
               { method: "GET", ...NO_STORE }
             );
             if (repliesResponse.ok) {

@@ -1,5 +1,6 @@
 import IntroSection from "@/app/_components/intro"
 import AboutSection from "@/app/_components/about"
+import AskResumeLauncher from "@/app/_components/ask-resume/ask-resume-launcher"
 import SkillSection from "@/app/_components/skills"
 import CarrerSection from "@/app/_components/career"
 import EducationSection from "@/app/_components/education"
@@ -12,16 +13,20 @@ import BaseLayout from "@/components/layout/base-layout"
 import SidebarMain from "@/components/layout/sidebar-main"
 import RightSidebarMain from "@/components/layout/right-sidebar-main"
 import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
+import { getOwnerProfile } from "@/services/visitor/owner-profile"
 
 export const dynamic = "force-dynamic"
 
 export default async function Home() {
-  const linkedinRecommendationsResponse = await getLinkedinRecommendations()
+  const [linkedinRecommendationsResponse, ownerProfile] = await Promise.all([
+    getLinkedinRecommendations(),
+    getOwnerProfile(),
+  ])
   const recommendations = linkedinRecommendationsResponse?.data || []
 
   return (
     <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
-      <IntroSection />
+      <IntroSection profile={ownerProfile} />
       <AboutSection />
       <SkillSection />
       <CarrerSection />
@@ -34,6 +39,8 @@ export default async function Home() {
         <LinkedinRecommendations recommendations={recommendations} />
         <ContactSection />
       </div>
+
+      <AskResumeLauncher />
     </BaseLayout>
   )
 }

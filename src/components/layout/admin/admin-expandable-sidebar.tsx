@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { ChevronsLeft, ChevronsRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, BarChart3, Sparkles, ChevronUp, type LucideIcon } from "lucide-react"
+import { ChevronsLeft, ChevronsRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, BarChart3, Sparkles, ChevronUp, MessageSquare, type LucideIcon } from "lucide-react"
 import { performAdminLogout } from "@/lib/admin-logout"
 
 interface NavItem {
@@ -41,6 +41,7 @@ const navSections: NavSection[] = [
       { title: "Education", href: "/admin/dashboard/education", icon: GraduationCap },
       { title: "Career", href: "/admin/dashboard/career", icon: School },
       { title: "Blog", href: "/admin/dashboard/blog", icon: NotebookPen },
+      { title: "Feedback", href: "/admin/dashboard/feedback", icon: MessageSquare },
     ],
   },
 ]

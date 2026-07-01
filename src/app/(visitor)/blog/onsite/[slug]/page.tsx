@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, CalendarDays, Clock, PenLine } from "lucide-react"
 import ReadingProgress from "@/app/_components/blog/reading-progress"
+import ClapButton from "@/components/ui/clap-button"
 
 export const revalidate = 60
 
@@ -83,6 +84,7 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
           />
 
           <footer className="mt-12 flex items-center justify-between border-t border-border/60 pt-6">
+            <ClapButton targetType="blog" targetId={slug} />
             <Link
               href="/blog"
               className="group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -90,7 +92,6 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
               All posts
             </Link>
-            <span className="text-xs text-muted-foreground">Thanks for reading ✦</span>
           </footer>
         </article>
       </BlurFade>

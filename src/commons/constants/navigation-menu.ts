@@ -11,6 +11,8 @@ import {
   HomeIcon,
   LogIn,
   User,
+  KanbanSquare,
+  Activity,
 } from "lucide-react";
 
 type Menu = {
@@ -58,6 +60,11 @@ export const publicDashboardMenu = [
         label: "Chat",
         icon: MessageSquare,
       },
+      {
+        href: "/tracker",
+        label: "Tracker",
+        icon: KanbanSquare,
+      },
     ],
   },
   {
@@ -77,6 +84,11 @@ export const publicDashboardMenu = [
         href: "/stats",
         label: "Stats",
         icon: BarChart2,
+      },
+      {
+        href: "/status",
+        label: "Status",
+        icon: Activity,
       },
     ],
   },

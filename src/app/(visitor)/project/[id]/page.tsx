@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { getSupabaseProjectById } from "@/services/visitor/project"
+import ClapButton from "@/components/ui/clap-button"
 import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -59,6 +60,8 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
               </div>
             )}
           </div>
+
+          <ClapButton targetType="project" targetId={id} className="mb-6" />
 
           {/* Project Image */}
           {project.image && (

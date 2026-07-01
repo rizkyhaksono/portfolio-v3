@@ -6,6 +6,7 @@ import Typography from "@/components/ui/typography"
 import { MacWindow } from "@/components/ui/mac-window"
 import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
 import { getLeetCodeStats } from "@/services/visitor/leetcode"
+import LeetCodeSection from "./_components/leetcode-section"
 import { getChessStats } from "@/services/visitor/chess"
 import { getNpmStats } from "@/services/visitor/npm"
 import { getLetterboxdStats, type LetterboxdFilm } from "@/services/visitor/letterboxd"
@@ -98,7 +99,7 @@ export default async function StatsPage() {
 
   return (
     <BaseLayout sidebar={<SidebarMain />} useGridBackground={false}>
-      <div className="flex flex-col gap-6 mt-20 max-w-6xl mx-auto w-full px-4 lg:px-0">
+      <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full px-4 lg:px-0">
         <div className="flex flex-col gap-2">
           <h1 className="font-medium text-3xl sm:text-4xl md:text-5xl tracking-tighter">Stats & Activity</h1>
           <p className="text-muted-foreground text-sm md:text-base">
@@ -121,6 +122,9 @@ export default async function StatsPage() {
                 <StatRow label="Total solved" value={leetcode.totalSolved} />
                 {leetcode.ranking != null && (
                   <StatRow label="Ranking" value={`#${leetcode.ranking.toLocaleString()}`} />
+                )}
+                {leetcode.currentRating != null && (
+                  <StatRow label="Contest rating" value={leetcode.currentRating} />
                 )}
               </div>
             )}
@@ -173,6 +177,8 @@ export default async function StatsPage() {
           </PlatformCard>
 
         </div>
+
+        {leetcode && <LeetCodeSection stats={leetcode} />}
 
         <PlatformCard
           title="Letterboxd"

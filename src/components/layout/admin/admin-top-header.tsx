@@ -7,8 +7,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSidebar } from "./admin-expandable-sidebar"
+import { NotificationBell } from "./notification-bell"
 import { cn } from "@/lib/utils"
-import { Bell, ExternalLink } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 
 const PAGE_TITLES: Record<string, string> = {
   "/admin/dashboard": "Dashboard",
@@ -59,11 +60,7 @@ export function AdminTopHeader() {
           </Link>
         </Button>
 
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

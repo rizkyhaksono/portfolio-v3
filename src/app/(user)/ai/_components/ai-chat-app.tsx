@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import MDXComponent from "@/components/ui/mdx-components"
 import { cn } from "@/lib/utils"
 import { Send, Plus, Bot, User, Loader2, MessageSquare, Sparkles, Clock, Pencil, Trash2 } from "lucide-react"
+import { MicButton, TtsToggle } from "./voice-controls"
+import { useSpeechSynthesis } from "./use-voice"
 
 const RATE_LIMIT = 10
 const RATE_WINDOW = 60 * 1000
@@ -25,6 +27,8 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
   const [loading, setLoading] = useState(false)
   const [timestamps, setTimestamps] = useState<number[]>([])
   const [now, setNow] = useState(() => 0)
+  const [ttsOn, setTtsOn] = useState(false)
+  const tts = useSpeechSynthesis()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -138,6 +142,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       const chatIdMatch = full.match(/<!--chatId:([^>]+)-->/)
       const finalText = full.replace(/<!--chatId:[^>]*-->/, "").trim()
       setMessages((prev) => prev.map((m) => (m.id === aiId ? { ...m, msg: finalText } : m)))
+      if (ttsOn) tts.speak(finalText)
 
       const aiMsg: Message = { id: aiId, msg: finalText, role: "model" }
       const chatId = chatIdMatch?.[1] ?? activeChatId
@@ -170,7 +175,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
   }
 
   return (
-    <div className="mt-6 flex h-[calc(100dvh-10rem)] min-h-[460px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
+    <div className="flex h-[calc(100dvh-16rem)] min-h-[460px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
       {/* mac window title bar */}
       <div className="flex shrink-0 items-center gap-3 border-b bg-muted/40 px-4 py-2.5">
         <div className="flex items-center gap-1.5">
@@ -312,6 +317,10 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
             className="h-11 rounded-full"
             autoComplete="off"
           />
+          <MicButton onTranscript={(t) => setInput((p) => (p ? `${p} ${t}` : t))} disabled={loading || remaining <= 0} />
+          {tts.supported && (
+            <TtsToggle on={ttsOn} onToggle={() => { const n = !ttsOn; setTtsOn(n); if (!n) tts.cancel() }} />
+          )}
           <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" disabled={loading || !input.trim() || remaining <= 0}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>

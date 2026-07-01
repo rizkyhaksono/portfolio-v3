@@ -1,47 +1,40 @@
 import BlurFade from "@/components/magicui/blur-fade"
-import Link from "next/link"
+import { MacWindow } from "@/components/ui/mac-window"
 import { getAIChat } from "@/services/user/ai"
 import { isHaveValidToken } from "@/app/actions/actions"
 import AIChatApp from "./_components/ai-chat-app"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Lock, Sparkles } from "lucide-react"
+import PublicAIChat from "./_components/public-ai-chat"
+import OcrDemo from "./_components/ocr-demo"
+import AIHub from "./_components/ai-hub"
 
 export const dynamic = "force-dynamic"
 
 export default async function AIPage() {
   const valid = await isHaveValidToken()
 
-  if (!valid) {
-    return (
-      <BlurFade delay={0.2} inView>
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center px-6 py-16">
-            <div className="mb-4 rounded-full bg-muted p-4">
-              <Lock className="h-8 w-8 text-muted-foreground" />
-            </div>
-            <h3 className="mb-2 text-lg font-semibold">Authentication Required</h3>
-            <p className="mb-6 max-w-sm text-center text-sm text-muted-foreground">
-              Please log in to access Etan AI and start chatting.
-            </p>
-            <Link href="/auth">
-              <Button className="gap-2">
-                <Sparkles className="h-4 w-4" />
-                Log in to Continue
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </BlurFade>
+  // Chat mode adapts to auth: full Etan AI (with history) when signed in, the functional
+  // public RAG demo when logged out — no redirect, so visitors can try it first.
+  let chat
+  if (valid) {
+    const res = await getAIChat().catch(() => null)
+    chat = <AIChatApp initialSessions={res?.data ?? []} />
+  } else {
+    chat = (
+      <MacWindow title="etan-ai ~ chat" bodyClassName="p-3 sm:p-5">
+        <PublicAIChat />
+      </MacWindow>
     )
   }
 
-  const res = await getAIChat().catch(() => null)
-  const sessions = res?.data ?? []
+  const docTool = (
+    <MacWindow title="etan-ai ~ document" bodyClassName="p-3 sm:p-5">
+      <OcrDemo />
+    </MacWindow>
+  )
 
   return (
     <BlurFade delay={0.2} inView>
-      <AIChatApp initialSessions={sessions} />
+      <AIHub chat={chat} docTool={docTool} loggedIn={valid} />
     </BlurFade>
   )
 }
