@@ -84,34 +84,25 @@ export default function AnalyticsDashboard({ data, range, unit }: { data: FullUm
   const avgTime = s && s.visits > 0 ? Math.round(s.totaltime / s.visits) : 0
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            Analytics
-          </h1>
-          <p className="text-sm text-muted-foreground">Full Umami statistics for your portfolio</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {data.activeVisitors > 0 && (
-            <Badge variant="default" className="animate-pulse gap-1">
-              <span className="h-2 w-2 rounded-full bg-green-400" />
-              {data.activeVisitors} online
-            </Badge>
-          )}
-          <div className="flex rounded-lg border p-0.5">
-            {RANGES.map((r) => (
-              <Link
-                key={r.id}
-                href={`/admin/dashboard/analytics?range=${r.id}`}
-                className={cn("rounded-md px-3 py-1 text-xs font-medium transition-colors", range === r.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
-              >
-                {r.label}
-              </Link>
-            ))}
-          </div>
+    <div className="flex flex-col gap-4">
+      {/* Controls row — the topbar already names the page */}
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {data.activeVisitors > 0 && (
+          <Badge variant="default" className="animate-pulse gap-1">
+            <span className="h-2 w-2 rounded-full bg-green-400" />
+            {data.activeVisitors} online
+          </Badge>
+        )}
+        <div className="flex rounded-lg border p-0.5">
+          {RANGES.map((r) => (
+            <Link
+              key={r.id}
+              href={`/admin/dashboard/analytics?range=${r.id}`}
+              className={cn("rounded-md px-3 py-1 text-xs font-medium transition-colors", range === r.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
+            >
+              {r.label}
+            </Link>
+          ))}
         </div>
       </div>
 

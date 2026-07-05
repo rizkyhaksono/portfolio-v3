@@ -1,9 +1,9 @@
 import RightSidebarWindow from "./right-sidebar-window"
 import VisitorPanel from "./visitor-panel"
 
-const RightSidebarMain = () => {
+const RightSidebarMain = ({ defaultOpen = true }: Readonly<{ defaultOpen?: boolean }>) => {
   return (
-    <RightSidebarWindow>
+    <RightSidebarWindow defaultOpen={defaultOpen}>
       <VisitorPanel />
     </RightSidebarWindow>
   )

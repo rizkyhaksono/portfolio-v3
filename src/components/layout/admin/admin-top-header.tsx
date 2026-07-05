@@ -19,6 +19,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/dashboard/education": "Education",
   "/admin/dashboard/career": "Career",
   "/admin/dashboard/blog": "Blog",
+  "/admin/dashboard/feedback": "Feedback",
   "/admin/dashboard/settings": "Settings",
 }
 
@@ -39,18 +40,16 @@ export function AdminTopHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/70 px-4 backdrop-blur-xl transition-all duration-300 sm:px-6",
-        isExpanded ? "sm:pl-[272px]" : "sm:pl-[80px]"
+        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/70 px-4 backdrop-blur-xl transition-all duration-300 sm:px-5",
+        isExpanded ? "sm:pl-[276px]" : "sm:pl-[84px]"
       )}
     >
-      <div className="flex flex-col pl-12 sm:pl-0">
-        <nav className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>Admin</span>
-          <span className="text-muted-foreground/40">/</span>
-          <span className="font-medium text-foreground">{title}</span>
-        </nav>
-        <h1 className="text-base font-semibold leading-tight sm:text-lg">{title}</h1>
-      </div>
+      {/* Single page identity — pages don't repeat their own title */}
+      <nav className="flex items-center gap-1.5 pl-12 text-xs text-muted-foreground sm:pl-0" aria-label="Breadcrumb">
+        <span>Admin</span>
+        <span className="text-muted-foreground/40">/</span>
+        <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+      </nav>
 
       <div className="flex items-center gap-1.5">
         <Button variant="ghost" size="sm" className="hidden gap-1.5 text-muted-foreground sm:flex" asChild>

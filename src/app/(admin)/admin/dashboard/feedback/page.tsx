@@ -50,11 +50,7 @@ export default function FeedbackAdminPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Feedback</h1>
-        <p className="text-sm text-muted-foreground">Visitor suggestions, bug reports, and feedback.</p>
-      </div>
+    <div className="flex flex-col gap-4">
 
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (

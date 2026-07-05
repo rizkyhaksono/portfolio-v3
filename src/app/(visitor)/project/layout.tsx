@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain defaultOpen={false} />}>
       {children}
     </BaseLayout>
   )

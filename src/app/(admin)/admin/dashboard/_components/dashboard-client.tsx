@@ -538,24 +538,9 @@ export function AdminDashboardClient() {
   ]
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of both Backend API and Supabase databases.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Last updated: {formatDistanceToNow(lastRefresh, { addSuffix: true })}</span>
-          <Button variant="outline" size="sm" onClick={fetchDashboardData} disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            <span className="ml-2 hidden sm:inline">Refresh</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Database Status */}
-      <div className="flex gap-4 flex-wrap">
+    <div className="flex flex-col gap-4">
+      {/* Status row + actions — the topbar already names the page */}
+      <div className="flex flex-wrap items-center gap-2">
         <Badge variant="outline" className="text-sm py-1 px-3">
           <Server className="h-4 w-4 mr-2 text-green-600" />
           Backend API Connected
@@ -564,6 +549,13 @@ export function AdminDashboardClient() {
           <Cloud className="h-4 w-4 mr-2 text-blue-600" />
           Supabase Connected
         </Badge>
+        <div className="ml-auto flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Updated {formatDistanceToNow(lastRefresh, { addSuffix: true })}</span>
+          <Button variant="outline" size="sm" onClick={fetchDashboardData} disabled={isLoading}>
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            <span className="ml-2 hidden sm:inline">Refresh</span>
+          </Button>
+        </div>
       </div>
 
       {/* Backend Stats */}

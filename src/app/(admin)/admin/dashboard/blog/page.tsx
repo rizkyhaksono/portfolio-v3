@@ -309,27 +309,21 @@ export default function AdminBlogPage() {
 
   if (loading && posts.length === 0) {
     return (
-      <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-        <p className="text-lg font-semibold">Admin Blog Page</p>
-        <p className="text-sm text-muted-foreground">Manage on-site articles shown on /blog.</p>
-        <div className="flex justify-between items-center mt-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <div className="flex gap-2">
             <Skeleton className="h-7 w-20" />
             <Skeleton className="h-7 w-20" />
           </div>
         </div>
-        <Skeleton className="h-72 w-full" />
+        <Skeleton className="h-[400px] w-full" />
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col sm:gap-4 sm:py-1 sm:pl-14 m-4">
-      <div>
-        <p className="text-lg font-semibold">Admin Blog Page</p>
-        <p className="text-sm text-muted-foreground">Manage on-site articles shown on /blog (Written here tab).</p>
-      </div>
+    <div className="flex flex-col gap-4">
 
       <Tabs
         value={activeTab}

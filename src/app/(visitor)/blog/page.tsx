@@ -32,7 +32,7 @@ export default async function BlogPage() {
           <Newspaper className="h-6 w-6 text-primary" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Blog</h1>
         </div>
-        <p className="mx-auto max-w-xl text-sm text-muted-foreground">
+        <p className="mx-auto max-w-xl text-xs sm:text-sm text-muted-foreground">
           I write about my experiences, thoughts, and ideas on various topics.
         </p>
       </div>

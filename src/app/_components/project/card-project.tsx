@@ -49,8 +49,8 @@ export default function CardProject({
         )}
         <CardHeader className="p-4 pb-2">
           <div className="space-y-1.5">
-            <CardTitle className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary line-clamp-2">{title}</CardTitle>
-            <div className="prose max-w-full text-pretty font-sans text-sm text-muted-foreground dark:prose-invert line-clamp-2 leading-snug" dangerouslySetInnerHTML={{ __html: description }} />
+            <CardTitle className="text-base sm:text-lg font-bold tracking-tight transition-colors group-hover:text-primary line-clamp-2">{title}</CardTitle>
+            <div className="prose max-w-full text-pretty font-sans text-xs sm:text-sm text-muted-foreground dark:prose-invert line-clamp-2 leading-snug" dangerouslySetInnerHTML={{ __html: description }} />
           </div>
         </CardHeader>
       </Link>

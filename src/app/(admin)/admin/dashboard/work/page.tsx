@@ -219,7 +219,7 @@ export default function AdminWorkPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
@@ -230,16 +230,7 @@ export default function AdminWorkPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Briefcase className="h-6 w-6 sm:h-8 sm:w-8" />
-            Work & Career
-          </h1>
-          <p className="text-muted-foreground">Manage work experience from both databases</p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-4">
 
       {/* Database summary */}
       <div className="flex gap-4 flex-wrap">

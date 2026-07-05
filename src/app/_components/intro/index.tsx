@@ -11,7 +11,7 @@ import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
 const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
 
-export default function IntroSection({ profile }: { profile?: OwnerProfile | null }) {
+export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProfile | null }>) {
   const name = profile?.name || "Muhammad Rizky Haksono"
   // Owner headshot is the bundled asset, not the OAuth/Google avatar stored on the account.
   const avatar = "/rizky.jpg"
@@ -51,13 +51,13 @@ export default function IntroSection({ profile }: { profile?: OwnerProfile | nul
           <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground">I&apos;m a</span>
-              <TypingAnimation words={roles} className="font-semibold text-lg md:text-xl bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
+              <TypingAnimation words={roles} className="font-semibold text-base md:text-lg text-primary" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
             </div>
           </div>
 
           {/* Bio Text */}
           <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-            <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
               Passionate about <span className="font-medium text-foreground">web, mobile, cloud, and DevOps development</span>. I love creating innovative solutions using modern technologies like{" "}
               <span className="font-medium text-foreground">React, Next.js, TypeScript</span>, and more. Currently focused on building high-performance applications and learning CI/CD pipelines.
             </p>
@@ -105,8 +105,8 @@ export default function IntroSection({ profile }: { profile?: OwnerProfile | nul
       {/* Profile Image - Only visible on mobile, hidden on md and above since sidebar shows it */}
       <BlurFade delay={0.1} inView className="md:hidden flex justify-center">
         <div className="relative w-fit">
-          {/* Glow Effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-purple-500/20 to-pink-500/30 blur-2xl opacity-60 dark:opacity-40" />
+          {/* Soft depth behind the portrait — neutral, no rainbow gradient */}
+          <div className="absolute inset-0 rounded-full bg-primary/10 blur-2xl" />
 
           {/* Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}

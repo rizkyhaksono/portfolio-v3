@@ -14,7 +14,7 @@ export default async function ProjectPage() {
           <FolderGit2 className="h-6 w-6 text-primary" />
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Projects</h1>
         </div>
-        <p className="mx-auto max-w-xl text-sm text-muted-foreground">
+        <p className="mx-auto max-w-xl text-xs sm:text-sm text-muted-foreground">
           I have experience working on a wide range of projects, from basic websites to advanced web applications.
         </p>
       </div>

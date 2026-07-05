@@ -53,7 +53,7 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
               {post.title}
             </h1>
             {post.description && (
-              <p className="mt-4 text-pretty text-lg leading-relaxed text-muted-foreground">
+              <p className="mt-4 text-pretty text-sm sm:text-base leading-relaxed text-muted-foreground">
                 {post.description}
               </p>
             )}

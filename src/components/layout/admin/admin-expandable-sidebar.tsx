@@ -136,8 +136,14 @@ function Brand({ isExpanded }: { isExpanded: boolean }) {
   )
 }
 
+export interface AdminUser {
+  name: string
+  email: string
+  avatarUrl?: string
+}
+
 interface UserMenuProps {
-  user?: { name: string; email: string; avatarUrl?: string }
+  user?: AdminUser
   isExpanded: boolean
   onLogout: () => void
 }
@@ -147,14 +153,19 @@ function UserMenu({ user, isExpanded, onLogout }: Readonly<UserMenuProps>) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className={cn("flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-sm transition-all hover:border-border hover:bg-muted", !isExpanded && "justify-center")}>
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
-            <User className="h-4 w-4" />
-          </div>
+          {user?.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatarUrl} alt={user.name} referrerPolicy="no-referrer" className="h-8 w-8 shrink-0 rounded-full object-cover" />
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
+              <User className="h-4 w-4" />
+            </div>
+          )}
           {isExpanded && (
             <>
               <div className="flex min-w-0 flex-col items-start">
-                <span className="w-full truncate text-left font-medium">{user?.name || "Admin"}</span>
-                <span className="w-full truncate text-left text-xs text-muted-foreground">{user?.email || "admin@example.com"}</span>
+                <span className="w-full truncate text-left text-xs font-medium">{user?.name || "Admin"}</span>
+                {user?.email && <span className="w-full truncate text-left text-[11px] text-muted-foreground">{user.email}</span>}
               </div>
               <ChevronUp className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
             </>
@@ -187,11 +198,7 @@ function UserMenu({ user, isExpanded, onLogout }: Readonly<UserMenuProps>) {
 }
 
 interface AdminExpandableSidebarProps {
-  user?: {
-    name: string
-    email: string
-    avatarUrl?: string
-  }
+  user?: AdminUser
 }
 
 export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebarProps>) {

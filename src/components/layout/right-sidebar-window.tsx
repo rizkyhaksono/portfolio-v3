@@ -5,19 +5,28 @@ import { X, PanelRightOpen } from "lucide-react"
 
 const STORAGE_KEY = "rh:right-sidebar-open"
 
-export default function RightSidebarWindow({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [open, setOpen] = useState(true)
+interface RightSidebarWindowProps {
+  children: React.ReactNode
+  /** When false, the panel starts collapsed on every visit (content-first pages like /project)
+   *  and the open/close choice is NOT persisted, so other pages keep their own preference. */
+  defaultOpen?: boolean
+}
+
+export default function RightSidebarWindow({ children, defaultOpen = true }: Readonly<RightSidebarWindowProps>) {
+  const [open, setOpen] = useState(defaultOpen)
 
   useEffect(() => {
+    if (!defaultOpen) return
     try {
       if (localStorage.getItem(STORAGE_KEY) === "false") setOpen(false)
     } catch {
       // localStorage unavailable (private mode / blocked) — keep default open
     }
-  }, [])
+  }, [defaultOpen])
 
   const setOpenPersist = (next: boolean) => {
     setOpen(next)
+    if (!defaultOpen) return
     try {
       localStorage.setItem(STORAGE_KEY, String(next))
     } catch {

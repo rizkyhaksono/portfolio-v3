@@ -43,11 +43,11 @@ export default function StatusPage() {
   return (
     <div className="w-full px-4 lg:px-0">
       <div className="mb-6 flex flex-col gap-2">
-        <h1 className="flex items-center gap-2 text-3xl font-medium tracking-tighter sm:text-4xl">
-          <Activity className="h-7 w-7 text-primary" />
+        <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight">
+          <Activity className="h-6 w-6 text-primary" />
           System Status
         </h1>
-        <p className="text-sm text-muted-foreground">Live health of the portfolio API and its dependencies.</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Live health of the portfolio API and its dependencies.</p>
       </div>
 
       <MacWindow title="~/status" bodyClassName="space-y-4">

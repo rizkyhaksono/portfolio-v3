@@ -250,7 +250,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                 </Badge>
               </div>
               <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white tracking-tight">{metadata.title}</h1>
-              <p className="text-zinc-400 max-w-2xl text-sm md:text-lg">{metadata.description}</p>
+              <p className="text-zinc-400 max-w-2xl text-xs sm:text-sm md:text-base">{metadata.description}</p>
               <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-2 text-zinc-300 text-sm">
                 <div className="flex items-center gap-2">
                   <Layers className="h-4 w-4 md:h-5 md:w-5 text-zinc-500" />

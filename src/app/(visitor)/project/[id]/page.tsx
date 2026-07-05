@@ -6,9 +6,9 @@ import { Separator } from "@/components/ui/separator"
 import { getSupabaseProjectById } from "@/services/visitor/project"
 import ClapButton from "@/components/ui/clap-button"
 import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import ProjectImageViewer from "./_components/project-image-viewer"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -63,12 +63,8 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
           <ClapButton targetType="project" targetId={id} className="mb-6" />
 
-          {/* Project Image */}
-          {project.image && (
-            <div className="relative w-full h-[400px] rounded-lg overflow-hidden mb-6">
-              <Image src={project.image} alt={project.title} fill className="object-cover" priority />
-            </div>
-          )}
+          {/* Project Image — click to view uncropped in a lightbox */}
+          {project.image && <ProjectImageViewer src={project.image} alt={project.title} />}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

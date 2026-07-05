@@ -21,5 +21,12 @@ export default async function AdminDashboardLayout({
     redirect("/")
   }
 
-  return <AdminDashboardLayoutClient>{children}</AdminDashboardLayoutClient>
+  // Real signed-in user for the sidebar footer — never dummy data.
+  const user = {
+    name: profile.data.name ?? "Admin",
+    email: profile.data.email ?? "",
+    avatarUrl: profile.data.avatarUrl ?? profile.data.iconUrl ?? undefined,
+  }
+
+  return <AdminDashboardLayoutClient user={user}>{children}</AdminDashboardLayoutClient>
 }

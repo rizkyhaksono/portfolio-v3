@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
-import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint } from "lucide-react"
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint, Settings } from "lucide-react"
 import {
   getCurrentUserClient,
   getAdminSettingsClient,
@@ -273,12 +273,7 @@ export default function AdminDashboardSettingPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences.</p>
-      </div>
+    <div className="flex flex-col gap-4">
 
       <Separator />
 
@@ -447,15 +442,16 @@ export default function AdminDashboardSettingPage() {
             </CardHeader>
             <CardContent>
               <Form {...notificationForm}>
-                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-6">
-                  <div className="space-y-4">
+                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-4">
+                  {/* Single divided list — lighter than four separate boxes */}
+                  <div className="divide-y rounded-lg border">
                     <FormField
                       control={notificationForm.control}
                       name="emailNotifications"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Feedback &amp; suggestions</FormLabel>
+                            <FormLabel className="text-sm">Feedback &amp; suggestions</FormLabel>
                             <FormDescription>Show new feedback submissions in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
@@ -469,9 +465,9 @@ export default function AdminDashboardSettingPage() {
                       control={notificationForm.control}
                       name="pushNotifications"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">New chat messages</FormLabel>
+                            <FormLabel className="text-sm">New chat messages</FormLabel>
                             <FormDescription>Show new public chat messages in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
@@ -485,9 +481,9 @@ export default function AdminDashboardSettingPage() {
                       control={notificationForm.control}
                       name="projectUpdates"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Tracker activity</FormLabel>
+                            <FormLabel className="text-sm">Tracker activity</FormLabel>
                             <FormDescription>Show new Kanban tracker cards in your notification bell.</FormDescription>
                           </div>
                           <FormControl>
@@ -501,9 +497,9 @@ export default function AdminDashboardSettingPage() {
                       control={notificationForm.control}
                       name="securityAlerts"
                       render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-base">Reactions &amp; claps</FormLabel>
+                            <FormLabel className="text-sm">Reactions &amp; claps</FormLabel>
                             <FormDescription>Show new claps on your blog posts and projects in your notification bell.</FormDescription>
                           </div>
                           <FormControl>

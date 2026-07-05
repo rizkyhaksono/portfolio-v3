@@ -43,9 +43,9 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
         <div className="text-center">
           <div className="mb-2 flex items-center justify-center gap-2">
             <Wrench className="h-6 w-6" />
-            <h1 className="text-2xl sm:text-3xl font-bold">Tools</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Tools</h1>
           </div>
-          <p className="text-muted-foreground">A growing collection of tools — explore, build, and have fun</p>
+          <p className="text-xs sm:text-sm text-muted-foreground">A growing collection of tools — explore, build, and have fun</p>
         </div>
 
         {/* Sidebar nav + active tool content */}
