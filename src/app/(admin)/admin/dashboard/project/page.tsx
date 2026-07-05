@@ -225,7 +225,7 @@ export default function AdminProjectPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-10 w-32" />
@@ -236,16 +236,7 @@ export default function AdminProjectPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <FolderGit2 className="h-6 w-6 sm:h-8 sm:w-8" />
-            Projects
-          </h1>
-          <p className="text-muted-foreground">Manage projects from both databases</p>
-        </div>
-      </div>
+    <div className="flex flex-col gap-4">
 
       {/* Database summary */}
       <div className="flex gap-4 flex-wrap">
@@ -480,7 +471,7 @@ export default function AdminProjectPage() {
                     Add Project
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[500px]">
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>{editingSupabase ? "Edit Project" : "Add Project"}</DialogTitle>
                     <DialogDescription>{editingSupabase ? "Update the project in Supabase." : "Add new project to Supabase."}</DialogDescription>
@@ -507,7 +498,7 @@ export default function AdminProjectPage() {
                           <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
-                              <Textarea placeholder="Project description..." className="min-h-[80px]" {...field} />
+                              <RichTextEditor content={field.value} onChange={field.onChange} placeholder="Project description…" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

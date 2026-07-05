@@ -98,6 +98,22 @@ function getSupabaseHeaders(): HeadersInit {
   }
 }
 
+// Supabase WRITES go through our server-side admin API (service role + admin auth).
+// Calling Supabase directly from the browser with the anon key makes RLS silently
+// match 0 rows on UPDATE/DELETE — a 204 "success" that changes nothing.
+async function adminSupabaseMutation<T>(path: string, method: "POST" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
+  const response = await fetch(`/api/admin/supabase/${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  })
+  const json = await response.json().catch(() => null)
+  if (!response.ok) {
+    throw new Error(json?.error || `Request failed: ${response.status}`)
+  }
+  return json.data as T
+}
+
 // ==================== Backend API Services (Prisma) ====================
 
 // Project Services - Backend
@@ -487,45 +503,15 @@ export async function getSupabaseProjectsClient() {
 }
 
 export async function createSupabaseProjectClient(project: Omit<SupabaseProject, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects`, {
-    method: "POST",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify(project),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to create Supabase project: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseProject
+  return adminSupabaseMutation<SupabaseProject>("projects", "POST", project)
 }
 
 export async function updateSupabaseProjectClient(id: string, project: Partial<SupabaseProject>) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
-    method: "PATCH",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify({ ...project, updated_at: new Date().toISOString() }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to update Supabase project: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseProject
+  return adminSupabaseMutation<SupabaseProject>(`projects/${id}`, "PATCH", project)
 }
 
 export async function deleteSupabaseProjectClient(id: string) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`, {
-    method: "DELETE",
-    headers: getSupabaseHeaders(),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete Supabase project: ${response.status}`)
-  }
-
+  await adminSupabaseMutation<SupabaseProject>(`projects/${id}`, "DELETE")
   return { success: true }
 }
 
@@ -544,45 +530,15 @@ export async function getSupabaseCareersClient() {
 }
 
 export async function createSupabaseCareerClient(career: Omit<SupabaseCareer, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/career`, {
-    method: "POST",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify(career),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to create Supabase career: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseCareer
+  return adminSupabaseMutation<SupabaseCareer>("career", "POST", career)
 }
 
 export async function updateSupabaseCareerClient(id: string, career: Partial<SupabaseCareer>) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/career?id=eq.${id}`, {
-    method: "PATCH",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify({ ...career, updated_at: new Date().toISOString() }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to update Supabase career: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseCareer
+  return adminSupabaseMutation<SupabaseCareer>(`career/${id}`, "PATCH", career)
 }
 
 export async function deleteSupabaseCareerClient(id: string) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/career?id=eq.${id}`, {
-    method: "DELETE",
-    headers: getSupabaseHeaders(),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete Supabase career: ${response.status}`)
-  }
-
+  await adminSupabaseMutation<SupabaseCareer>(`career/${id}`, "DELETE")
   return { success: true }
 }
 
@@ -601,45 +557,15 @@ export async function getSupabaseEducationsClient() {
 }
 
 export async function createSupabaseEducationClient(education: Omit<SupabaseEducation, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/education`, {
-    method: "POST",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify(education),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to create Supabase education: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseEducation
+  return adminSupabaseMutation<SupabaseEducation>("education", "POST", education)
 }
 
 export async function updateSupabaseEducationClient(id: string, education: Partial<SupabaseEducation>) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/education?id=eq.${id}`, {
-    method: "PATCH",
-    headers: { ...getSupabaseHeaders(), Prefer: "return=representation" },
-    body: JSON.stringify({ ...education, updated_at: new Date().toISOString() }),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to update Supabase education: ${response.status}`)
-  }
-
-  const data = await response.json()
-  return data[0] as SupabaseEducation
+  return adminSupabaseMutation<SupabaseEducation>(`education/${id}`, "PATCH", education)
 }
 
 export async function deleteSupabaseEducationClient(id: string) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/education?id=eq.${id}`, {
-    method: "DELETE",
-    headers: getSupabaseHeaders(),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to delete Supabase education: ${response.status}`)
-  }
-
+  await adminSupabaseMutation<SupabaseEducation>(`education/${id}`, "DELETE")
   return { success: true }
 }
 
