@@ -13,7 +13,8 @@ const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", 
 
 export default function IntroSection({ profile }: { profile?: OwnerProfile | null }) {
   const name = profile?.name || "Muhammad Rizky Haksono"
-  const avatar = profile?.avatarUrl || "/rizky.jpg"
+  // Owner headshot is the bundled asset, not the OAuth/Google avatar stored on the account.
+  const avatar = "/rizky.jpg"
   return (
     <div className="flex flex-col-reverse gap-8">
       {/* Text Content - Single BlurFade wrapper with CSS stagger */}

@@ -25,7 +25,8 @@ const SidebarMain = () => {
   }, [])
 
   const name = profile?.name || "Rizky Haksono"
-  const avatar = profile?.avatarUrl || "/rizky.jpg"
+  // Owner headshot is the bundled asset, not the OAuth/Google avatar stored on the account.
+  const avatar = "/rizky.jpg"
 
   return (
     <div className="hidden max-h-[calc(100vh-4rem)] flex-col px-3 overflow-y-auto lg:w-64 md:w-52 top-16 pt-4 pb-6 sticky md:flex">
