@@ -2,6 +2,7 @@
 
 import { LinkedinRecommendation } from "@/commons/types/linkedin"
 import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards"
+import { SectionHeading } from "@/components/ui/section-heading"
 
 interface LinkedinRecommendationsProps {
   recommendations: LinkedinRecommendation[]
@@ -21,13 +22,14 @@ export default function LinkedinRecommendations({ recommendations }: LinkedinRec
 
   return (
     <div className="my-10">
-      <div className="mb-2 flex items-center gap-2">
-        <h2 className="text-xl font-semibold">What People Say About Me</h2>
-      </div>
-      <p className="mb-6 text-sm text-muted-foreground">Testimonials from colleagues and professionals I&apos;ve worked with on LinkedIn.</p>
-      <div className="">
-        <InfiniteMovingCards items={formattedRecommendations} direction="left" speed="normal" pauseOnHover={false} />
-      </div>
+      <SectionHeading
+        eyebrow="Testimonials"
+        title="What people say"
+        accent="about me"
+        description="Testimonials from colleagues and professionals I've worked with on LinkedIn."
+        className="mb-6"
+      />
+      <InfiniteMovingCards items={formattedRecommendations} direction="left" speed="normal" pauseOnHover={false} />
     </div>
   )
 }

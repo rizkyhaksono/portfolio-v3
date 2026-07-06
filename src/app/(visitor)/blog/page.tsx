@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog"
 import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
 import { MacWindow } from "@/components/ui/mac-window"
+import { SectionHeading } from "@/components/ui/section-heading"
 import { Newspaper } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -12,7 +13,7 @@ export const dynamic = "force-dynamic"
 function TabCount({ value }: { value: number }) {
   if (!value) return null
   return (
-    <span className="ml-1.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-primary">
+    <span className="ml-1.5 rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-semibold leading-none tabular-nums text-primary">
       {value}
     </span>
   )
@@ -27,15 +28,19 @@ export default async function BlogPage() {
 
   return (
     <BlurFade delay={0.25} inView>
-      <div className="mb-8 text-center">
-        <div className="mb-2 flex items-center justify-center gap-2">
-          <Newspaper className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Blog</h1>
-        </div>
-        <p className="mx-auto max-w-xl text-xs sm:text-sm text-muted-foreground">
-          I write about my experiences, thoughts, and ideas on various topics.
-        </p>
-      </div>
+      <SectionHeading
+        align="center"
+        className="mb-8"
+        eyebrow={
+          <>
+            <Newspaper className="h-3.5 w-3.5 text-primary" />
+            Writing
+          </>
+        }
+        title="Blog"
+        accent="& notes"
+        description="I write about my experiences, thoughts, and ideas on various topics."
+      />
       <MacWindow title="~/blog">
       <Tabs defaultValue="devto" className="w-full">
         <div className="flex justify-center">

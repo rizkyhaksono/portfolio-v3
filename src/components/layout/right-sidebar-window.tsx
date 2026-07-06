@@ -70,7 +70,7 @@ export default function RightSidebarWindow({ children, defaultOpen = true }: Rea
         </div>
 
         {/* content */}
-        <div className="space-y-4 overflow-y-auto p-3">{children}</div>
+        <div className="min-w-0 space-y-4 overflow-x-hidden overflow-y-auto p-3">{children}</div>
       </div>
     </div>
   )

@@ -2,6 +2,7 @@
 
 import { LinkedinCertification } from "@/commons/types/linkedin"
 import { Card, CardContent } from "@/components/ui/card"
+import { Chip } from "@/components/ui/chip"
 import { ExternalLink, Award } from "lucide-react"
 import Image from "next/image"
 
@@ -32,21 +33,23 @@ export function CertificationCard({ certification, compact = false }: Readonly<C
                 />
               </div>
             ) : (
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded flex items-center justify-center">
-                <Award className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex-shrink-0 w-10 h-10 bg-primary/10 rounded flex items-center justify-center">
+                <Award className="w-5 h-5 text-primary" />
               </div>
             )}
 
             {/* Compact Content */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm mb-0.5 line-clamp-2">{certification.title}</h3>
+              <h3 className="font-display font-semibold text-sm mb-0.5 line-clamp-2">{certification.title}</h3>
               <p className="text-xs text-muted-foreground">{certification.provider}</p>
-              <p className="text-xs text-muted-foreground mt-1">{certification.issuedDisplay}</p>
+              <div className="mt-1.5">
+                <Chip>{certification.issuedDisplay}</Chip>
+              </div>
             </div>
 
             {/* Link Icon */}
             {certification.link && (
-              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300" aria-label="View credential">
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors" aria-label="View credential">
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
@@ -76,18 +79,20 @@ export function CertificationCard({ certification, compact = false }: Readonly<C
               />
             </div>
           ) : (
-            <div className="flex-shrink-0 w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-              <Award className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+            <div className="flex-shrink-0 w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
+              <Award className="w-8 h-8 text-primary" />
             </div>
           )}
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg mb-1 line-clamp-2">{certification.title}</h3>
+            <h3 className="font-display font-semibold text-lg mb-1 line-clamp-2">{certification.title}</h3>
             <p className="text-sm text-muted-foreground mb-3">{certification.provider}</p>
-            <p className="text-xs text-muted-foreground">Issued {certification.issuedDisplay}</p>
+            <div>
+              <Chip>Issued · {certification.issuedDisplay}</Chip>
+            </div>
 
             {certification.link && (
-              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline mt-2">
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline">
                 <span>View Credential</span>
                 <ExternalLink className="w-3 h-3" />
               </a>

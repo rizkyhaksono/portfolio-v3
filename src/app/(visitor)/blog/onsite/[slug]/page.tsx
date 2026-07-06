@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, CalendarDays, Clock, PenLine } from "lucide-react"
 import ReadingProgress from "@/app/_components/blog/reading-progress"
 import ClapButton from "@/components/ui/clap-button"
+import { SectionHeading } from "@/components/ui/section-heading"
 
 export const revalidate = 60
 
@@ -45,19 +46,18 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
           </Link>
 
           <header className="mb-8">
-            <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-              <PenLine className="h-3.5 w-3.5" />
-              Written here
-            </div>
-            <h1 className="text-balance text-2xl sm:text-3xl font-bold leading-tight tracking-tight md:text-4xl">
-              {post.title}
-            </h1>
-            {post.description && (
-              <p className="mt-4 text-pretty text-sm sm:text-base leading-relaxed text-muted-foreground">
-                {post.description}
-              </p>
-            )}
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <SectionHeading
+              as="h1"
+              eyebrow={
+                <>
+                  <PenLine className="h-3.5 w-3.5 text-primary" />
+                  Written here
+                </>
+              }
+              title={post.title}
+              description={post.description || undefined}
+            />
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] tracking-wide text-muted-foreground">
               {publishedDate && (
                 <span className="inline-flex items-center gap-1.5">
                   <CalendarDays className="h-4 w-4" />

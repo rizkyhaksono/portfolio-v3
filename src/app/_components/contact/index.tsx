@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { SectionHeading } from "@/components/ui/section-heading"
 import BlurFade from "@/components/magicui/blur-fade"
 import { checkContactRateLimit, recordContactSubmission, formatRemainingTime } from "@/commons/helpers/rate-limit"
 import { media_socials } from "@/commons/constants/contact"
@@ -146,20 +147,20 @@ export default function ContactSection() {
     <BlurFade delay={0.25} inView>
       <section id="contact-section" className="mt-10 scroll-mt-20">
         {/* Section Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="h-8 w-1 bg-gradient-to-b from-primary to-primary/50 rounded-full" />
-            <h2 className="text-2xl font-bold">Get In Touch</h2>
-          </div>
-          <p className="text-muted-foreground text-sm md:text-base ml-3">Feel free to reach out — I&apos;m always open to discussing new projects, opportunities, or just having a chat!</p>
-        </div>
+        <SectionHeading
+          eyebrow="Contact"
+          title="Get in"
+          accent="touch"
+          description="Feel free to reach out — I'm always open to discussing new projects, opportunities, or just having a chat!"
+          className="mb-8"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
           {/* Left Side - Social Cards (single container, no per-item BlurFade) */}
           <div className="md:col-span-2 flex flex-col gap-4">
-            <Card className="h-full overflow-hidden border-border/50">
+            <Card className="h-full overflow-hidden">
               <CardHeader className="pb-4">
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="font-display text-lg flex items-center gap-2">
                   <MessageSquare className="size-5 text-primary" />
                   Connect With Me
                 </CardTitle>
@@ -173,9 +174,9 @@ export default function ContactSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(
-                      "group flex items-center gap-3 p-3 rounded-xl border border-border/50",
-                      "bg-background/50 hover:bg-accent/50 hover:border-primary/30",
-                      "transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5",
+                      "group flex items-center gap-3 p-3 rounded-xl border border-border",
+                      "bg-secondary hover:bg-accent hover:border-primary/40",
+                      "transition-colors duration-300",
                       "animate-fade-in-up",
                     )}
                     style={{ animationDelay: `${index * 50}ms` }}
@@ -183,21 +184,21 @@ export default function ContactSection() {
                     <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                       <social.icon className="size-4 text-primary" />
                     </div>
-                    <span className="font-medium text-xs">{social.title}</span>
+                    <span className="font-mono text-xs uppercase tracking-wider text-foreground">{social.title}</span>
                   </Link>
                 ))}
               </CardContent>
             </Card>
 
             {/* Quick Info Card */}
-            <Card className="border-border/50">
+            <Card>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-primary/10">
                     <Mail className="size-5 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium text-sm">Prefer email?</p>
+                    <p className="font-display font-medium text-sm">Prefer email?</p>
                     <p className="text-muted-foreground text-xs mt-1">
                       Use the form or reach out at{" "}
                       <a href="mailto:mrizkyhaksono@gmail.com" className="text-primary hover:underline">
@@ -212,9 +213,9 @@ export default function ContactSection() {
 
           {/* Right Side - Contact Form */}
           <div className="md:col-span-3">
-            <Card className="h-full border-border/50">
+            <Card className="h-full">
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
+                <CardTitle className="font-display text-lg flex items-center gap-2">
                   <Send className="size-5 text-primary" />
                   Send a Message
                 </CardTitle>
@@ -232,7 +233,7 @@ export default function ContactSection() {
                 <form onSubmit={sendEmail} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">
+                      <label htmlFor="email" className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
                         Email
                       </label>
                       <Input
@@ -247,7 +248,7 @@ export default function ContactSection() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">
+                      <label htmlFor="name" className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
                         Name
                       </label>
                       <Input id="name" type="text" placeholder="Your name" value={formState.name} onChange={(e) => dispatch({ type: "SET_NAME", payload: e.target.value })} disabled={isFormDisabled} required className="bg-background/50" />
@@ -255,7 +256,7 @@ export default function ContactSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">
+                    <label htmlFor="message" className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
                       Message
                     </label>
                     <Textarea

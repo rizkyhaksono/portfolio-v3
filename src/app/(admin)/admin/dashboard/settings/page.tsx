@@ -15,8 +15,9 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { toast } from "@/hooks/use-toast"
-import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint, Settings } from "lucide-react"
+import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint } from "lucide-react"
 import {
   getCurrentUserClient,
   getAdminSettingsClient,
@@ -301,7 +302,7 @@ export default function AdminDashboardSettingPage() {
         <TabsContent value="profile" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
+              <CardTitle className="font-display">Profile Information</CardTitle>
               <CardDescription>Update your personal information and public profile.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -437,7 +438,7 @@ export default function AdminDashboardSettingPage() {
         <TabsContent value="notifications" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Notification Preferences</CardTitle>
+              <CardTitle className="font-display">Notification Preferences</CardTitle>
               <CardDescription>Choose which events show up in your admin notification bell.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -535,7 +536,7 @@ export default function AdminDashboardSettingPage() {
         <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Appearance Settings</CardTitle>
+              <CardTitle className="font-display">Appearance Settings</CardTitle>
               <CardDescription>Customize the look and feel of your dashboard.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -651,7 +652,7 @@ export default function AdminDashboardSettingPage() {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Account &amp; Security</CardTitle>
+              <CardTitle className="font-display">Account &amp; Security</CardTitle>
               <CardDescription>Your account details and sign-in methods.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -707,8 +708,8 @@ export default function AdminDashboardSettingPage() {
 
               {/* Connected accounts */}
               <div className="space-y-3">
-                <div className="space-y-1">
-                  <h3 className="font-medium">Connected accounts</h3>
+                <div className="space-y-1.5">
+                  <Eyebrow>Connected accounts</Eyebrow>
                   <p className="text-sm text-muted-foreground">Sign-in providers linked to your account.</p>
                 </div>
                 {user?.oauthAccounts && user.oauthAccounts.length > 0 ? (
@@ -742,8 +743,8 @@ export default function AdminDashboardSettingPage() {
 
               {/* Sign out */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <h3 className="font-medium">Sign out</h3>
+                <div className="space-y-1.5">
+                  <Eyebrow>Sign out</Eyebrow>
                   <p className="text-sm text-muted-foreground">End your admin session on this device.</p>
                 </div>
                 <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleLogout} disabled={isLoggingOut}>

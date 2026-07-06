@@ -4,6 +4,9 @@ import { Shield, Eye, Database, Lock, Cookie, ExternalLink, UserCheck, RefreshCw
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { SectionHeading } from "@/components/ui/section-heading"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { Chip } from "@/components/ui/chip"
 import BlurFade from "@/components/magicui/blur-fade"
 
 const sections = [
@@ -126,24 +129,32 @@ export default function PrivacyPolicyPage() {
             <div className="p-3 rounded-xl bg-primary/10 text-primary">
               <Shield className="w-8 h-8" />
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold">Privacy Policy</h1>
-              <p className="text-muted-foreground mt-1">How I collect, use, and protect your information</p>
-              <Badge variant="secondary" className="mt-3">
+            <SectionHeading
+              as="h1"
+              eyebrow="Legal"
+              title="Privacy"
+              accent="Policy"
+              description="How I collect, use, and protect your information"
+              className="flex-1"
+              titleClassName="md:text-4xl"
+            >
+              <Badge variant="secondary" className="mt-1 w-fit">
                 Last updated: December 28, 2025
               </Badge>
-            </div>
+            </SectionHeading>
           </div>
         </div>
 
         {/* Quick Navigation */}
         <Card className="mb-8">
           <CardContent className="p-4">
-            <p className="text-sm font-medium mb-3">Quick Navigation</p>
+            <Eyebrow className="mb-3">Quick Navigation</Eyebrow>
             <div className="flex flex-wrap gap-2">
               {sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`} className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors">
-                  {section.title.replace(/^\d+\.\s/, "")}
+                <a key={section.id} href={`#${section.id}`} className="inline-flex">
+                  <Chip className="transition-colors hover:bg-accent hover:text-foreground">
+                    {section.title.replace(/^\d+\.\s/, "")}
+                  </Chip>
                 </a>
               ))}
             </div>
@@ -152,25 +163,25 @@ export default function PrivacyPolicyPage() {
 
         {/* Sections */}
         <div className="space-y-6">
-          {sections.map((section, index) => {
+          {sections.map((section) => {
             const Icon = section.icon
             return (
               <Card key={section.id} id={section.id}>
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-lg bg-muted flex-shrink-0">
+                    <div className="p-2 rounded-lg bg-secondary flex-shrink-0">
                       <Icon className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 space-y-3">
-                      <h2 className="text-xl font-semibold">{section.title}</h2>
-                      <p className="text-muted-foreground leading-relaxed">{section.content}</p>
+                      <h2 className="font-display text-lg sm:text-xl font-semibold tracking-tight">{section.title}</h2>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{section.content}</p>
 
                       {section.subsections && (
-                        <div className="mt-4 space-y-4 pl-4 border-l-2 border-muted">
+                        <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
                           {section.subsections.map((sub, i) => (
                             <div key={i}>
-                              <h3 className="font-medium mb-1">{sub.title}</h3>
-                              <p className="text-sm text-muted-foreground">{sub.content}</p>
+                              <h3 className="font-display font-medium mb-1">{sub.title}</h3>
+                              <p className="text-xs sm:text-sm text-muted-foreground">{sub.content}</p>
                             </div>
                           ))}
                         </div>
@@ -179,8 +190,8 @@ export default function PrivacyPolicyPage() {
                       {section.list && (
                         <ul className="mt-3 space-y-2">
                           {section.list.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            <li key={i} className="flex items-start gap-2 text-xs sm:text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                               <span className="text-muted-foreground">{item}</span>
                             </li>
                           ))}

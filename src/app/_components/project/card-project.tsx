@@ -27,7 +27,7 @@ export default function CardProject({
   const hasImage = !!image && image !== "/no-image.jpg"
 
   return (
-    <Card className="group flex flex-col overflow-hidden rounded-xl border border-muted/40 hover:border-primary/40 bg-background/50 hover:bg-muted/10 shadow-sm hover:shadow-xl transition-all duration-500 ease-out h-full">
+    <Card className="group flex flex-col overflow-hidden rounded-xl border border-border hover:border-primary/40 bg-card shadow-sm hover:shadow-md transition-all duration-500 ease-out h-full">
       <Link href={`/project/${id}`} className="block overflow-hidden">
         {hasImage ? (
           <div className="relative h-44 w-full overflow-hidden bg-muted">
@@ -49,18 +49,18 @@ export default function CardProject({
         )}
         <CardHeader className="p-4 pb-2">
           <div className="space-y-1.5">
-            <CardTitle className="text-base sm:text-lg font-bold tracking-tight transition-colors group-hover:text-primary line-clamp-2">{title}</CardTitle>
+            <CardTitle className="font-display text-base sm:text-lg font-bold tracking-tight transition-colors group-hover:text-primary line-clamp-2">{title}</CardTitle>
             <div className="prose max-w-full text-pretty font-sans text-xs sm:text-sm text-muted-foreground dark:prose-invert line-clamp-2 leading-snug" dangerouslySetInnerHTML={{ __html: description }} />
           </div>
         </CardHeader>
       </Link>
-      <CardFooter className="p-4 pt-4 mt-auto border-t border-border/10">
+      <CardFooter className="p-4 pt-4 mt-auto border-t border-border">
         <div className="flex flex-row flex-wrap items-center gap-2">
           {href && href.length > 0 && (
             <Link href={href} target="_blank">
               <Button size="sm" variant="secondary" className="h-8 gap-1.5 rounded-md hover:bg-primary hover:text-primary-foreground transition-colors">
                 <Globe className="size-3.5" />
-                <span className="text-xs font-medium">Website</span>
+                <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Website</span>
               </Button>
             </Link>
           )}
@@ -68,7 +68,7 @@ export default function CardProject({
             <Link href={source} target="_blank">
               <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-md hover:bg-primary/10 transition-colors">
                 <GitBranch className="size-3.5" />
-                <span className="text-xs font-medium">Source</span>
+                <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Source</span>
               </Button>
             </Link>
           )}

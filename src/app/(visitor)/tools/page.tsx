@@ -14,6 +14,7 @@ import { PokemonTab } from "./_components/pokemon-tab"
 import { StarWarsTab } from "./_components/starwars-tab"
 import ToolsBrowser from "./_components/tools-browser"
 import { MacWindow } from "@/components/ui/mac-window"
+import { SectionHeading } from "@/components/ui/section-heading"
 import { logNonCriticalError } from "@/lib/logging"
 
 export const dynamic = "force-dynamic"
@@ -40,19 +41,25 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
     <BlurFade delay={0.25} inView>
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <div className="mb-2 flex items-center justify-center gap-2">
-            <Wrench className="h-6 w-6" />
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Tools</h1>
-          </div>
-          <p className="text-xs sm:text-sm text-muted-foreground">A growing collection of tools — explore, build, and have fun</p>
-        </div>
+        <SectionHeading
+          as="h1"
+          align="center"
+          eyebrow={
+            <>
+              <Wrench className="h-3.5 w-3.5" />
+              Toolbox
+            </>
+          }
+          title="Tools"
+          accent="& toys"
+          description="A growing collection of tools — explore, build, and have fun."
+        />
 
         {/* Sidebar nav + active tool content */}
         <MacWindow title="~/tools" bodyClassName="p-3 sm:p-5">
         <div className="flex flex-col gap-6 lg:flex-row">
           <aside className="lg:w-60 lg:shrink-0">
-            <div className="rounded-xl border border-muted/40 bg-card/40 p-3 lg:sticky lg:top-20">
+            <div className="rounded-xl border border-border bg-card/40 p-3 lg:sticky lg:top-20">
               <ToolsBrowser activeTab={activeTab} />
             </div>
           </aside>

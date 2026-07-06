@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Script from "next/script"
-import { Montserrat as FontSans } from "next/font/google"
+import localFont from "next/font/local"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Toaster } from "sonner"
@@ -13,10 +13,37 @@ import JsonLd from "@/components/seo/json-ld"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
-const fontSans = FontSans({
-  subsets: ["latin"],
+// Type system, SELF-HOSTED (next/font/local) so the build never hits the network:
+// Inter (body), Bricolage Grotesque (display headings), Instrument Serif (italic
+// accent words), JetBrains Mono (uppercase labels/chips). Files in ./fonts.
+const fontSans = localFont({
+  src: "./fonts/inter-latin-wght-normal.woff2",
   variable: "--font-sans",
+  display: "swap",
+  weight: "100 900",
 })
+const fontDisplay = localFont({
+  src: "./fonts/bricolage-grotesque-latin-wght-normal.woff2",
+  variable: "--font-display",
+  display: "swap",
+  weight: "200 800",
+})
+const fontSerif = localFont({
+  src: [
+    { path: "./fonts/instrument-serif-latin-400-normal.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/instrument-serif-latin-400-italic.woff2", weight: "400", style: "italic" },
+  ],
+  variable: "--font-serif",
+  display: "swap",
+})
+const fontMono = localFont({
+  src: "./fonts/jetbrains-mono-latin-wght-normal.woff2",
+  variable: "--font-mono",
+  display: "swap",
+  weight: "100 800",
+})
+
+const fontVariables = cn(fontSans.variable, fontDisplay.variable, fontSerif.variable, fontMono.variable)
 
 export const metadata: Metadata = {
   title: "Rizky Haksono | Software Engineer",
@@ -67,7 +94,7 @@ export default function RootLayout({
           strategy="afterInteractive"
         />
       </head>
-      <body className={cn("bg-background font-sans antialiased mx-auto ", fontSans.variable)}>
+      <body className={cn("bg-background font-sans antialiased mx-auto", fontVariables)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
           <CommandPalette />

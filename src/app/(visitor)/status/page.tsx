@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { getHealth, type HealthData, type HealthService, type ServiceStatus } from "@/services/visitor/health"
 import { MacWindow } from "@/components/ui/mac-window"
+import { SectionHeading } from "@/components/ui/section-heading"
 import { cn } from "@/lib/utils"
 import { Activity, RefreshCw, Loader2 } from "lucide-react"
 
@@ -42,13 +43,19 @@ export default function StatusPage() {
 
   return (
     <div className="w-full px-4 lg:px-0">
-      <div className="mb-6 flex flex-col gap-2">
-        <h1 className="flex items-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight">
-          <Activity className="h-6 w-6 text-primary" />
-          System Status
-        </h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">Live health of the portfolio API and its dependencies.</p>
-      </div>
+      <SectionHeading
+        as="h1"
+        className="mb-6"
+        eyebrow={
+          <>
+            <Activity className="h-3.5 w-3.5 text-primary" />
+            Monitoring
+          </>
+        }
+        title="System"
+        accent="status"
+        description="Live health of the portfolio API and its dependencies."
+      />
 
       <MacWindow title="~/status" bodyClassName="space-y-4">
         <div

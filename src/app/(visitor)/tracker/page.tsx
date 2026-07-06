@@ -1,6 +1,7 @@
 import { KanbanSquare } from "lucide-react"
 import { getTrackerTasks } from "@/services/visitor/tracker"
 import { getProfile } from "@/services/user/profile"
+import { SectionHeading } from "@/components/ui/section-heading"
 import TrackerBoard from "./_components/tracker-board"
 
 export const dynamic = "force-dynamic"
@@ -12,15 +13,20 @@ export default async function TrackerPage() {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <h1 className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-bold tracking-tight">
-          <KanbanSquare className="h-6 w-6 text-primary" />
-          Tracker
-        </h1>
-        <p className="mx-auto mt-1 max-w-xl text-sm text-muted-foreground">
-          A public Jira-style board — drag cards across columns. Anyone can view; sign in to add &amp; move.
-        </p>
-      </div>
+      <SectionHeading
+        as="h1"
+        align="center"
+        className="mb-6"
+        eyebrow={
+          <>
+            <KanbanSquare className="h-3.5 w-3.5" />
+            Kanban
+          </>
+        }
+        title="Tracker"
+        accent="board"
+        description="A public Jira-style board — drag cards across columns. Anyone can view; sign in to add & move."
+      />
 
       {/*
         Mac-style window WITHOUT backdrop-filter/transform. @hello-pangea/dnd positions the

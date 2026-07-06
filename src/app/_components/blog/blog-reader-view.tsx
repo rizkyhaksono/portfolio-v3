@@ -47,7 +47,7 @@ const BlogReaderView = ({
         published_at={published_at}
         page_views_count={pageViewCount}
       />
-      <div className="space-y-6 leading-[1.8] dark:text-neutral-300 ">
+      <div className="space-y-6 leading-[1.8] text-foreground/90">
         <div className="overflow-hidden rounded-xl">
           <ImageRender
             src={cover_image}
@@ -74,7 +74,7 @@ const BlogReaderView = ({
         <Typography.H3 className="text-lg font-medium">
           Comment on DEV Community:
         </Typography.H3>
-        <Link href={url} target="_blank" className="text-blue-600">
+        <Link href={url} target="_blank" className="text-primary hover:underline">
           {url}
         </Link>
       </div>

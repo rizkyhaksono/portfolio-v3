@@ -8,6 +8,8 @@ import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { Chip } from "@/components/ui/chip"
 import { Input } from "@/components/ui/input"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
@@ -41,21 +43,18 @@ const LEVELS: RoadmapLevel[] = ["beginner", "intermediate", "advanced"]
 
 const levelConfig: Record<
   RoadmapLevel,
-  { label: string; badgeClass: string; dotClass: string }
+  { label: string; dotClass: string }
 > = {
   beginner: {
     label: "Beginner",
-    badgeClass: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
     dotClass: "bg-green-500",
   },
   intermediate: {
     label: "Intermediate",
-    badgeClass: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800",
     dotClass: "bg-yellow-500",
   },
   advanced: {
     label: "Advanced",
-    badgeClass: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800",
     dotClass: "bg-red-500",
   },
 }
@@ -235,25 +234,21 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
 
         <div className="space-y-6 md:space-y-8">
           {/* Course Header Banner */}
-          <div className="course-header relative overflow-hidden rounded-2xl bg-zinc-950 border">
+          <div className="course-header relative overflow-hidden rounded-2xl border border-border bg-card">
             <div className="absolute inset-0 z-0">
-              <Image src={metadata.illustration} alt={metadata.title} fill sizes="100vw" className="object-cover opacity-20" priority />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
+              <Image src={metadata.illustration} alt={metadata.title} fill sizes="100vw" unoptimized className="object-cover opacity-20" priority />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
             </div>
             <div className="relative z-10 p-6 md:p-12 flex flex-col gap-3 md:gap-4">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 uppercase tracking-wider text-xs">
-                  {metadata.category}
-                </Badge>
-                <Badge variant="outline" className="uppercase tracking-wider text-zinc-300 border-zinc-700 text-xs">
-                  {metadata.totalLessons} Modules
-                </Badge>
+              <div className="flex flex-wrap items-center gap-3">
+                <Eyebrow className="text-primary">{metadata.category}</Eyebrow>
+                <Chip>{metadata.totalLessons} Modules</Chip>
               </div>
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-bold text-white tracking-tight">{metadata.title}</h1>
-              <p className="text-zinc-400 max-w-2xl text-xs sm:text-sm md:text-base">{metadata.description}</p>
-              <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-2 text-zinc-300 text-sm">
+              <h1 className="font-display text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight text-foreground">{metadata.title}</h1>
+              <p className="text-muted-foreground max-w-2xl text-xs sm:text-sm md:text-base">{metadata.description}</p>
+              <div className="flex flex-wrap items-center gap-4 md:gap-6 mt-2 text-muted-foreground text-sm">
                 <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4 md:h-5 md:w-5 text-zinc-500" />
+                  <Layers className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   <span>
                     {LEVELS.filter((l) => metadata.levelCounts[l] > 0)
                       .map((l) => `${metadata.levelCounts[l]} ${levelConfig[l].label}`)
@@ -261,20 +256,20 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 md:h-5 md:w-5 text-zinc-500" />
+                  <Clock className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                   <span>{metadata.estimatedDuration} Total</span>
                 </div>
               </div>
               {/* Progress bar in header (mobile-friendly) */}
               {isLoaded && (
                 <div className="mt-2 max-w-md">
-                  <div className="flex justify-between text-xs text-zinc-400 mb-1">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Overall progress</span>
                     <span>
                       {getCompletedCount(activeCourseId)} / {metadata.totalLessons}
                     </span>
                   </div>
-                  <div className="h-2 w-full bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-primary transition-all duration-700 rounded-full" style={{ width: `${progressPercent}%` }} />
                   </div>
                 </div>
@@ -307,9 +302,9 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className="font-semibold text-base md:text-lg">{config.label}</span>
-                            <Badge variant="outline" className={`text-xs capitalize ${config.badgeClass}`}>
+                            <Chip>
                               {lessons.length} {lessons.length === 1 ? "module" : "modules"}
-                            </Badge>
+                            </Chip>
                             {levelComplete && (
                               <Badge variant="default" className="text-xs gap-1 bg-primary">
                                 <CheckCircle className="h-3 w-3" />
@@ -525,6 +520,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                     alt={meta.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                    unoptimized
                     className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

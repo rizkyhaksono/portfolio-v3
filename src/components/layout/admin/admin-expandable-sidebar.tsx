@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { ChevronsLeft, ChevronsRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, BarChart3, Sparkles, ChevronUp, MessageSquare, type LucideIcon } from "lucide-react"
 import { performAdminLogout } from "@/lib/admin-logout"
 
@@ -90,8 +91,8 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
       className={cn(
         "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
         isActive
-          ? "bg-gradient-to-r from-primary/15 to-primary/5 text-foreground"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          ? "bg-primary/10 text-foreground"
+          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
         !isExpanded && "justify-center px-2"
       )}
     >
@@ -122,13 +123,13 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
 function Brand({ isExpanded }: { isExpanded: boolean }) {
   return (
     <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/60 text-sm font-bold text-primary-foreground shadow-sm">
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground shadow-sm">
         RH
         <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-primary" />
       </div>
       {isExpanded && (
         <div className="flex flex-col leading-none">
-          <span className="text-sm font-semibold">Admin Panel</span>
+          <span className="font-display text-sm font-semibold">Admin Panel</span>
           <span className="mt-0.5 text-[11px] text-muted-foreground">Portfolio v3</span>
         </div>
       )}
@@ -152,12 +153,12 @@ function UserMenu({ user, isExpanded, onLogout }: Readonly<UserMenuProps>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={cn("flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-sm transition-all hover:border-border hover:bg-muted", !isExpanded && "justify-center")}>
+        <button className={cn("flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-sm transition-all hover:border-border hover:bg-secondary", !isExpanded && "justify-center")}>
           {user?.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={user.avatarUrl} alt={user.name} referrerPolicy="no-referrer" className="h-8 w-8 shrink-0 rounded-full object-cover" />
           ) : (
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 text-primary">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <User className="h-4 w-4" />
             </div>
           )}
@@ -245,7 +246,7 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
           <nav className="flex flex-col gap-4 px-2">
             {navSections.map((section) => (
               <div key={section.label} className="flex flex-col gap-1">
-                {isExpanded && <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">{section.label}</p>}
+                {isExpanded && <Eyebrow className="px-3 pb-1 text-[10px]">{section.label}</Eyebrow>}
                 {section.items.map((item) => (
                   <NavLink key={item.href} item={item} isExpanded={isExpanded} />
                 ))}
@@ -282,7 +283,7 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
             <nav className="flex flex-col gap-4 px-2">
               {navSections.map((section) => (
                 <div key={section.label} className="flex flex-col gap-1">
-                  <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">{section.label}</p>
+                  <Eyebrow className="px-3 pb-1 text-[10px]">{section.label}</Eyebrow>
                   {section.items.map((item) => (
                     <NavLink key={item.href} item={item} isExpanded={true} />
                   ))}

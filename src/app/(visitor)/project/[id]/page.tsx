@@ -1,8 +1,9 @@
 import BlurFade from "@/components/magicui/blur-fade"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { SectionHeading } from "@/components/ui/section-heading"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { Chip } from "@/components/ui/chip"
 import { getSupabaseProjectById } from "@/services/visitor/project"
 import ClapButton from "@/components/ui/clap-button"
 import { ArrowLeft, Calendar, Globe, GitBranch, ExternalLink } from "lucide-react"
@@ -33,7 +34,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
         {/* Project Header */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4">{project.title}</h1>
+          <SectionHeading as="h1" eyebrow="Project" title={project.title} className="mb-4" />
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
             <div className="flex items-center gap-2">
               <Calendar className="size-4" />
@@ -72,7 +73,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Project Description</CardTitle>
+                <Eyebrow>Project Description</Eyebrow>
               </CardHeader>
               <CardContent>
                 <div className="prose dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: project.description }} />
@@ -101,8 +102,8 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
             {/* Project Timeline */}
             <Card>
               <CardHeader>
-                <CardTitle>Project Timeline</CardTitle>
-                <CardDescription>Development milestones and updates</CardDescription>
+                <Eyebrow>Project Timeline</Eyebrow>
+                <CardDescription className="text-xs sm:text-sm">Development milestones and updates</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -148,7 +149,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Quick Links</CardTitle>
+                <Eyebrow>Quick Links</Eyebrow>
               </CardHeader>
               <CardContent className="space-y-3">
                 {project.url && (
@@ -174,12 +175,12 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
             <Card>
               <CardHeader>
-                <CardTitle>Project Info</CardTitle>
+                <Eyebrow>Project Info</Eyebrow>
               </CardHeader>
               <CardContent>
                 <div>
-                  <p className="text-sm font-medium mb-1">Status</p>
-                  <Badge variant="default">Active</Badge>
+                  <Eyebrow className="mb-2">Status</Eyebrow>
+                  <Chip className="border-primary/30 bg-primary/10 text-primary">Active</Chip>
                 </div>
               </CardContent>
             </Card>

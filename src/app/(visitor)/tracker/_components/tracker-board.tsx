@@ -7,6 +7,7 @@ import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-p
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -172,8 +173,8 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: P
             return (
               <div key={col.id} className="flex flex-col rounded-xl bg-muted/40 p-2">
                 <div className="flex items-center justify-between px-2 py-1.5">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{col.label}</span>
-                  <span className="text-xs text-muted-foreground">{items.length}</span>
+                  <Eyebrow>{col.label}</Eyebrow>
+                  <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{items.length}</span>
                 </div>
 
                 <Droppable droppableId={col.id} isDropDisabled={!canEdit}>

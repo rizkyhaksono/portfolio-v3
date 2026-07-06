@@ -2,22 +2,21 @@ import BlurFade from "@/components/magicui/blur-fade"
 import CardProject from "@/app/_components/project/card-project"
 import { getAllProject } from "@/services/visitor/project"
 import { MacWindow } from "@/components/ui/mac-window"
-import { FolderGit2 } from "lucide-react"
+import { SectionHeading } from "@/components/ui/section-heading"
 
 export default async function ProjectPage() {
   const projects = await getAllProject()
 
   return (
     <BlurFade delay={0.25} inView>
-      <div className="mb-8 text-center">
-        <div className="mb-2 flex items-center justify-center gap-2">
-          <FolderGit2 className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Projects</h1>
-        </div>
-        <p className="mx-auto max-w-xl text-xs sm:text-sm text-muted-foreground">
-          I have experience working on a wide range of projects, from basic websites to advanced web applications.
-        </p>
-      </div>
+      <SectionHeading
+        as="h1"
+        eyebrow="Work"
+        title="Selected"
+        accent="projects"
+        description="I have experience working on a wide range of projects, from basic websites to advanced web applications."
+        className="mb-8"
+      />
       <MacWindow title="~/projects">
         <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {projects?.map((project) => (

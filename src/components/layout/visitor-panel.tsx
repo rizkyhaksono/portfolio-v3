@@ -80,7 +80,7 @@ export default function VisitorPanel() {
       {/* Visitor Info */}
       <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           <Typography.P className="text-sm font-semibold text-primary/80">Visitor Info</Typography.P>
         </div>
 
@@ -90,8 +90,8 @@ export default function VisitorPanel() {
               <IpIcon size={14} className="text-primary/60" />
               <Typography.P className="text-xs text-primary/70">IP Address</Typography.P>
             </div>
-            <div className="bg-secondary/30 rounded px-2 py-1">
-              <Typography.P className="text-xs font-mono text-primary/90">{ipInfo?.ip ?? "Detecting…"}</Typography.P>
+            <div className="overflow-hidden bg-secondary/30 px-2 py-1">
+              <Typography.P className="break-all text-xs font-mono text-primary/90">{ipInfo?.ip ?? "Detecting…"}</Typography.P>
             </div>
           </div>
 

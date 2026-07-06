@@ -3,13 +3,25 @@ import { fontFamily } from "tailwindcss/defaultTheme"
 
 const config = {
 	darkMode: ["class"],
-	content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+	content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}", "./content/**/*.{md,mdx}"],
 	prefix: "",
 	theme: {
 		fontFamily: {
 			sans: [
 				'var(--font-sans)',
 				...fontFamily.sans
+			],
+			display: [
+				'var(--font-display)',
+				...fontFamily.sans
+			],
+			serif: [
+				'var(--font-serif)',
+				...fontFamily.serif
+			],
+			mono: [
+				'var(--font-mono)',
+				...fontFamily.mono
 			]
 		},
 		container: {
@@ -55,10 +67,18 @@ const config = {
 					foreground: 'hsl(var(--card-foreground))'
 				}
 			},
+			// Square design language: every named radius collapses to 0 so cards,
+			// buttons, inputs, and panels are sharp-cornered. `full` is kept for
+			// circular elements (avatars, status dots, icon bubbles).
 			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				none: '0px',
+				sm: '0px',
+				md: '0px',
+				lg: '0px',
+				xl: '0px',
+				'2xl': '0px',
+				'3xl': '0px',
+				full: '9999px'
 			},
 			keyframes: {
 				marquee: {

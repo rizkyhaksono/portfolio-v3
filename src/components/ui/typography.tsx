@@ -9,7 +9,7 @@ const TypographyH1 = ({ children, className, ...props }: any) => {
   return (
     <h1
       className={cn(
-        "scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl",
+        "scroll-m-20 font-display text-4xl font-bold tracking-tight lg:text-5xl",
         className
       )}
       {...props}
@@ -24,7 +24,7 @@ const TypographyH2 = ({ children, className, ...props }: any) => {
   return (
     <h2
       className={cn(
-        "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 font-display border-b pb-2 text-3xl font-bold tracking-tight first:mt-0",
         className
       )}
       {...props}
@@ -39,7 +39,7 @@ const TypographyH3 = ({ children, className, ...props }: any) => {
   return (
     <h3
       className={cn(
-        "mt-8 scroll-m-20 text-2xl font-semibold tracking-tight",
+        "mt-8 scroll-m-20 font-display text-2xl font-bold tracking-tight",
         className
       )}
       {...props}
@@ -54,7 +54,7 @@ const TypographyH4 = ({ children, className, ...props }: any) => {
   return (
     <h4
       className={cn(
-        "scroll-m-20 text-xl font-semibold tracking-tight",
+        "scroll-m-20 font-display text-xl font-bold tracking-tight",
         className
       )}
       {...props}
@@ -64,6 +64,16 @@ const TypographyH4 = ({ children, className, ...props }: any) => {
   );
 };
 Typography.H4 = TypographyH4;
+
+// Serif-italic accent word rendered in the accent colour (e.g. "built from *your* docs").
+const TypographyEm = ({ children, className, ...props }: any) => {
+  return (
+    <em className={cn("font-serif italic text-primary", className)} {...props}>
+      {children}
+    </em>
+  );
+};
+Typography.Em = TypographyEm;
 
 const TypographyP = ({ children, className, ...props }: any) => {
   return (

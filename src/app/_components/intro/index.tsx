@@ -3,13 +3,22 @@
 import Link from "next/link"
 import BlurFade from "@/components/magicui/blur-fade"
 import { TypingAnimation } from "@/components/ui/typing-animation"
-import AnimatedShinyText from "@/components/ui/animated-shiny-text"
-import { cn } from "@/lib/utils"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { StatStrip } from "@/components/ui/stat-strip"
+import { Button } from "@/components/ui/button"
+import Typography from "@/components/ui/typography"
 import { media_socials } from "@/commons/constants/contact"
-import { Sparkles, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
 const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
+
+const HERO_STATS = [
+  { label: "Focus", value: "Full-Stack" },
+  { label: "Stack", value: "TS · Go" },
+  { label: "Cloud", value: "AWS · Azure" },
+  { label: "Based in", value: "Malang, ID" },
+]
 
 export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProfile | null }>) {
   const name = profile?.name || "Muhammad Rizky Haksono"
@@ -19,37 +28,29 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
     <div className="flex flex-col-reverse gap-8">
       {/* Text Content - Single BlurFade wrapper with CSS stagger */}
       <BlurFade delay={0.1} inView>
-        <div className="text-left space-y-4">
-          {/* Status Badge */}
+        <div className="text-left space-y-5">
+          {/* Eyebrow */}
           <div className="animate-fade-in-up" style={{ animationDelay: "0ms" }}>
-            <button
-              onClick={() => {
-                document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" })
-              }}
-              className="inline-block"
-            >
-              <div
-                className={cn(
-                  "group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
-                )}
-              >
-                <AnimatedShinyText className="inline-flex items-center justify-center h-8 rounded-md px-3 text-xs transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
-                  <Sparkles className="mr-1.5 size-3" />
-                  <span>Open to Work</span>
-                  <ArrowRight className="ml-1.5 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-                </AnimatedShinyText>
-              </div>
-            </button>
+            <Eyebrow>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
+              Open to work · Software Engineer
+            </Eyebrow>
           </div>
 
-          {/* Name - Simple bold text instead of HyperText scramble */}
+          {/* Name — display headline with a serif-italic accent */}
           <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-            <h1 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-2">{`Hi, I'm ${name}`}</h1>
+            <h1 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-balance sm:text-4xl md:text-5xl">
+              Hi, I&apos;m {name}
+              <Typography.Em className="text-3xl sm:text-4xl md:text-5xl">.</Typography.Em>
+            </h1>
           </div>
 
           {/* Typing Animation for Roles */}
           <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm">
               <span className="text-muted-foreground">I&apos;m a</span>
               <TypingAnimation words={roles} className="font-semibold text-base md:text-lg text-primary" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
             </div>
@@ -57,32 +58,31 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
 
           {/* Bio Text */}
           <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-              Passionate about <span className="font-medium text-foreground">web, mobile, cloud, and DevOps development</span>. I love creating innovative solutions using modern technologies like{" "}
-              <span className="font-medium text-foreground">React, Next.js, TypeScript</span>, and more. Currently focused on building high-performance applications and learning CI/CD pipelines.
+            <p className="max-w-xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
+              Passionate about <span className="font-medium text-foreground">web, mobile, cloud, and DevOps development</span>. I build <Typography.Em>innovative</Typography.Em> solutions with{" "}
+              <span className="font-medium text-foreground">React, Next.js, TypeScript</span>, and more — focused on high-performance applications and clean CI/CD pipelines.
             </p>
           </div>
 
           {/* CTA Buttons */}
           <div className="animate-fade-in-up" style={{ animationDelay: "400ms" }}>
             <div className="flex flex-wrap gap-3">
-              <Link href="/project">
-                <div className="h-10 rounded-lg px-4 text-sm border border-border bg-background hover:bg-accent transition-colors flex items-center gap-2">
-                  <span>View Projects</span>
-                </div>
-              </Link>
-              <Link href="/changelog">
-                <div className="h-10 rounded-lg px-4 text-sm border border-border bg-background hover:bg-accent transition-colors flex items-center gap-2">
-                  <span>View Changelog</span>
-                </div>
-              </Link>
+              <Button asChild>
+                <Link href="/project">
+                  View Projects
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/changelog">View Changelog</Link>
+              </Button>
             </div>
           </div>
 
           {/* Social Links */}
           <div className="animate-fade-in-up" style={{ animationDelay: "500ms" }}>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground">Find me on</span>
+              <Eyebrow>Find me on</Eyebrow>
               <div className="flex flex-wrap gap-2 items-center">
                 {media_socials.map((social) => (
                   <Link
@@ -90,7 +90,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-lg border border-border bg-background hover:bg-accent hover:scale-105 transition-all duration-200"
+                    className="p-2.5 rounded-lg border border-border bg-background hover:bg-accent hover:text-primary transition-colors"
                     title={social.title}
                   >
                     <social.icon className="size-4" />
@@ -98,6 +98,11 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* Stat strip */}
+          <div className="animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+            <StatStrip items={HERO_STATS} className="border-x-0" />
           </div>
         </div>
       </BlurFade>

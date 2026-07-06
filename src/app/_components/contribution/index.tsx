@@ -1,4 +1,5 @@
 import BlurFade from "@/components/magicui/blur-fade"
+import { SectionHeading } from "@/components/ui/section-heading"
 import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime"
 import { getDuolingoProfile } from "@/services/visitor/duolingo"
 import { getMonkeyTypeData } from "@/services/visitor/monkeytype"
@@ -27,7 +28,14 @@ export default async function ContributionSection() {
   return (
     <BlurFade delay={0.25} inView>
       <div className="mt-10">
-        <h3 className="text-base font-semibold text-foreground">@rizkyhaksono&apos;s Contributions</h3>
+        <SectionHeading
+          as="h3"
+          eyebrow="Activity"
+          title="@rizkyhaksono's"
+          accent="contributions"
+          description="Coding hours, GitHub streaks, and learning stats pulled live from around the web."
+          className="mb-6"
+        />
         <DuolingoStats duolingo={duolingoProfile} />
         <WakatimeOverview data={wakatime} />
         <WakatimeActive data={wakatime} />

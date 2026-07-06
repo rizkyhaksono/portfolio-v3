@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { PublicChatMessage } from "@/commons/types/public-chat"
@@ -133,7 +134,7 @@ function Bubble({ message, quoted, alignRight, canReply, canManage, onReply, onE
       <div className={cn("flex min-w-0 max-w-[78%] flex-col", alignRight ? "items-end" : "items-start")}>
         <div className={cn("mb-1 flex items-center gap-1.5", alignRight ? "flex-row-reverse" : "")}>
           <span className="text-sm font-semibold text-foreground">{name}</span>
-          {isAdmin && <BadgeCheck size={14} className="text-blue-400" />}
+          {isAdmin && <BadgeCheck size={14} className="text-primary" />}
         </div>
 
         <div className={cn("flex items-center gap-1", alignRight ? "flex-row" : "flex-row-reverse")}>
@@ -309,10 +310,12 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
         {/* Pinned message — fixed above the scroll area so it stays visible */}
         <div className="flex shrink-0 items-start gap-2.5 border-b border-border/60 bg-muted/20 px-4 py-3 sm:px-6">
           <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" />
-          <p className="text-sm leading-relaxed">
-            <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Pinned ·</span>
-            <span className="font-medium text-foreground">@Rizky Haksono</span> Hello welcome to my site, enjoy 👋
-          </p>
+          <div className="min-w-0">
+            <Eyebrow>Pinned</Eyebrow>
+            <p className="mt-1 text-sm leading-relaxed">
+              <span className="font-medium text-foreground">@Rizky Haksono</span> Hello welcome to my site, enjoy 👋
+            </p>
+          </div>
         </div>
 
         {/* Messages */}

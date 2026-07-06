@@ -11,13 +11,16 @@ import { authLogin } from "@/services/visitor/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { storeCookie } from "@/app/actions/actions"
-import Image from "next/image"
 import Link from "next/link"
 import Typography from "@/components/ui/typography"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { FcGoogle } from "react-icons/fc"
-import { FaGithub, FaDiscord, FaFacebook } from "react-icons/fa"
-import { Mail, Lock, Loader2 } from "lucide-react"
+import { Mail, Lock, Loader2, Check } from "lucide-react"
 import { useState } from "react"
+
+const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground"
+
+const PERKS = ["Saved Etan AI chats & history", "Join the realtime public chat", "Personalized experience"]
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -83,46 +86,46 @@ export default function LoginForm() {
     globalThis.window.location.href = `${API_URL}/v3/auth/${provider}`
   }
 
+  // Google-only sign-in (GitHub/Discord/Facebook intentionally disabled).
   const oauthProviders = [
     {
       name: "Google",
       icon: FcGoogle,
       provider: "google",
-      className: "hover:bg-red-50 dark:hover:bg-red-950/20",
+      className: "hover:bg-accent",
       status: "supported",
-    },
-    {
-      name: "GitHub",
-      icon: FaGithub,
-      provider: "github",
-      className: "hover:bg-gray-100 dark:hover:bg-gray-800",
-      status: "not_supported",
-    },
-    {
-      name: "Discord",
-      icon: FaDiscord,
-      provider: "discord",
-      className: "hover:bg-indigo-50 dark:hover:bg-indigo-950/20",
-      status: "not_supported",
-    },
-    {
-      name: "Facebook",
-      icon: FaFacebook,
-      provider: "facebook",
-      className: "hover:bg-blue-50 dark:hover:bg-blue-950/20",
-      status: "not_supported",
     },
   ]
 
   return (
-    <Card className="overflow-hidden border-0 shadow-xl">
+    <Card className="overflow-hidden border border-border shadow-none">
       <CardContent className="grid p-0 md:grid-cols-2 gap-0">
+        {/* Brand panel */}
+        <div className="relative hidden flex-col justify-between border-r border-border bg-secondary/40 p-8 md:flex">
+          <Eyebrow>Rizky Haksono · Portfolio</Eyebrow>
+          <div className="space-y-5">
+            <h2 className="font-display text-3xl font-bold leading-[1.1] tracking-tight text-balance">
+              Everything in <Typography.Em>one</Typography.Em> place.
+            </h2>
+            <ul className="flex flex-col gap-3">
+              {PERKS.map((perk) => (
+                <li key={perk} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <Check className="h-4 w-4 shrink-0 text-primary" />
+                  {perk}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Eyebrow>© 2026 Rizky Haksono</Eyebrow>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleLogin)} className="p-6 md:p-8">
             <div className="flex flex-col gap-5">
-              <div className="flex flex-col items-center text-center space-y-1">
-                <Typography.H4 className="text-2xl font-bold">Welcome back</Typography.H4>
-                <Typography.P className="text-muted-foreground text-sm">Login to access your personalized experience</Typography.P>
+              <div className="flex flex-col gap-1">
+                <Eyebrow>Sign in</Eyebrow>
+                <Typography.H4 className="font-display text-2xl font-bold tracking-tight">Sign in to your account</Typography.H4>
+                <Typography.P className="text-muted-foreground text-sm">Access your saved chats and personalization.</Typography.P>
               </div>
 
               <FormField
@@ -130,7 +133,7 @@ export default function LoginForm() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <FormLabel htmlFor="email" className={MONO_LABEL}>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -148,8 +151,8 @@ export default function LoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel htmlFor="password">Password</FormLabel>
-                      <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
+                      <FormLabel htmlFor="password" className={MONO_LABEL}>Password</FormLabel>
+                      <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground hover:underline">
                         Forgot password?
                       </Link>
                     </div>
@@ -186,7 +189,7 @@ export default function LoginForm() {
               </div>
 
               {/* OAuth Providers */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid gap-2">
                 {oauthProviders.map((provider) => (
                   <Button
                     key={provider.provider}
@@ -197,7 +200,7 @@ export default function LoginForm() {
                     disabled={provider.status === "not_supported"}
                   >
                     <provider.icon className="mr-2 h-4 w-4" />
-                    {provider.name}
+                    Continue with {provider.name}
                   </Button>
                 ))}
               </div>
@@ -205,15 +208,6 @@ export default function LoginForm() {
           </form>
         </Form>
 
-        {/* Image Side */}
-        <div className="relative hidden bg-muted md:block">
-          <Image src="https://i.pinimg.com/736x/a0/f5/cd/a0f5cdfbb60d16bd37ebc10c18e8da89.jpg" width={500} height={500} alt="Login illustration" className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.4]" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 text-white">
-            <p className="text-lg font-semibold">Start your journey</p>
-            <p className="text-sm text-white/80">Access all features with your account</p>
-          </div>
-        </div>
       </CardContent>
     </Card>
   )

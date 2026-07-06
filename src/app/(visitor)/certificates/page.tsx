@@ -3,6 +3,7 @@ import { Award, ChevronLeft, ChevronRight } from "lucide-react"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationCard } from "@/app/_components/certification/certification-card"
 import { Button } from "@/components/ui/button"
+import { SectionHeading } from "@/components/ui/section-heading"
 import Link from "next/link"
 import { logNonCriticalError } from "@/lib/logging"
 
@@ -39,10 +40,13 @@ export default async function CertificatesPage({ searchParams }: CertificatesPag
     <BlurFade delay={0.25} inView>
       <div className="space-y-6">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-base font-bold">Certifications</h1>
-          <p className="text-muted-foreground text-sm">{total} professional certifications and completed courses</p>
-        </div>
+        <SectionHeading
+          as="h1"
+          eyebrow="Credentials"
+          title="Certifications"
+          accent="& courses"
+          description={`${total} professional certifications and completed courses`}
+        />
 
         {/* Certifications Grid - Compact */}
         {certifications.length > 0 ? (

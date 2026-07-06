@@ -4,6 +4,9 @@ import { FileText, Scale, AlertTriangle, ShieldAlert, FileCheck, Link2, RefreshC
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { SectionHeading } from "@/components/ui/section-heading"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { Chip } from "@/components/ui/chip"
 import BlurFade from "@/components/magicui/blur-fade"
 
 const sections = [
@@ -82,24 +85,32 @@ export default function TermsOfServicePage() {
             <div className="p-3 rounded-xl bg-primary/10 text-primary">
               <Scale className="w-8 h-8" />
             </div>
-            <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold">Terms of Service</h1>
-              <p className="text-muted-foreground mt-1">Rules and guidelines for using this website</p>
-              <Badge variant="secondary" className="mt-3">
+            <SectionHeading
+              as="h1"
+              eyebrow="Legal"
+              title="Terms of"
+              accent="Service"
+              description="Rules and guidelines for using this website"
+              className="flex-1"
+              titleClassName="md:text-4xl"
+            >
+              <Badge variant="secondary" className="mt-1 w-fit">
                 Last updated: December 28, 2025
               </Badge>
-            </div>
+            </SectionHeading>
           </div>
         </div>
 
         {/* Quick Navigation */}
         <Card className="mb-8">
           <CardContent className="p-4">
-            <p className="text-sm font-medium mb-3">Quick Navigation</p>
+            <Eyebrow className="mb-3">Quick Navigation</Eyebrow>
             <div className="flex flex-wrap gap-2">
               {sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`} className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors">
-                  {section.title.replace(/^\d+\.\s/, "")}
+                <a key={section.id} href={`#${section.id}`} className="inline-flex">
+                  <Chip className="transition-colors hover:bg-accent hover:text-foreground">
+                    {section.title.replace(/^\d+\.\s/, "")}
+                  </Chip>
                 </a>
               ))}
             </div>
@@ -108,7 +119,7 @@ export default function TermsOfServicePage() {
 
         {/* Sections */}
         <div className="space-y-6">
-          {sections.map((section, index) => {
+          {sections.map((section) => {
             const Icon = section.icon
             const isWarning = section.variant === "warning"
 
@@ -116,18 +127,18 @@ export default function TermsOfServicePage() {
               <Card key={section.id} id={section.id} className={isWarning ? "border-yellow-200 dark:border-yellow-800" : ""}>
                 <CardContent className={`p-6 ${isWarning ? "bg-yellow-50/50 dark:bg-yellow-950/20" : ""}`}>
                   <div className="flex items-start gap-4">
-                    <div className={`p-2 rounded-lg flex-shrink-0 ${isWarning ? "bg-yellow-100 dark:bg-yellow-900/30" : "bg-muted"}`}>
+                    <div className={`p-2 rounded-lg flex-shrink-0 ${isWarning ? "bg-yellow-100 dark:bg-yellow-900/30" : "bg-secondary"}`}>
                       <Icon className={`w-5 h-5 ${isWarning ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`} />
                     </div>
                     <div className="flex-1 space-y-3">
-                      <h2 className="text-xl font-semibold">{section.title}</h2>
-                      <p className="text-muted-foreground leading-relaxed">{section.content}</p>
+                      <h2 className="font-display text-lg sm:text-xl font-semibold tracking-tight">{section.title}</h2>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{section.content}</p>
 
                       {section.list && (
                         <ul className="mt-3 space-y-2">
                           {section.list.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            <li key={i} className="flex items-start gap-2 text-xs sm:text-sm">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
                               <span className="text-muted-foreground">{item}</span>
                             </li>
                           ))}

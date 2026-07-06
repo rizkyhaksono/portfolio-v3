@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Search, Gamepad2, Rocket, Sparkles, Code, Keyboard, Download, Languages, MapPin, TrendingUp } from "lucide-react"
 import type { ToolTab } from "@/commons/types/tools"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { cn } from "@/lib/utils"
 
 interface ToolItem {
@@ -48,7 +49,7 @@ export default function ToolsBrowser({ activeTab }: { activeTab: ToolTab }) {
       <nav className="space-y-4">
         {grouped.map(({ cat, tools }) => (
           <div key={cat}>
-            <p className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/70">{cat}</p>
+            <Eyebrow className="mb-1.5 px-2">{cat}</Eyebrow>
             <div className="grid grid-cols-2 gap-1 lg:grid-cols-1 lg:gap-0.5">
               {tools.map((tool) => {
                 const Icon = tool.icon

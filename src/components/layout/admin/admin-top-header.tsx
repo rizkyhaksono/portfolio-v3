@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useSidebar } from "./admin-expandable-sidebar"
 import { NotificationBell } from "./notification-bell"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { cn } from "@/lib/utils"
 import { ExternalLink } from "lucide-react"
 
@@ -45,10 +46,10 @@ export function AdminTopHeader() {
       )}
     >
       {/* Single page identity — pages don't repeat their own title */}
-      <nav className="flex items-center gap-1.5 pl-12 text-xs text-muted-foreground sm:pl-0" aria-label="Breadcrumb">
-        <span>Admin</span>
-        <span className="text-muted-foreground/40">/</span>
-        <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+      <nav className="flex items-center gap-2 pl-12 sm:pl-0" aria-label="Breadcrumb">
+        <Eyebrow>Admin</Eyebrow>
+        <span className="text-border">/</span>
+        <h1 className="font-display text-sm font-semibold text-foreground">{title}</h1>
       </nav>
 
       <div className="flex items-center gap-1.5">

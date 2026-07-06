@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { FcGoogle } from "react-icons/fc"
-import { FaGithub, FaDiscord, FaFacebook } from "react-icons/fa"
 import { ArrowLeft, LayoutDashboard, Loader2, Lock, Mail, Shield } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -25,30 +25,13 @@ interface OAuthProviderConfig {
   className: string
 }
 
+// Admin sign-in is Google-only by design (smaller OAuth attack surface).
 const oauthProviders: OAuthProviderConfig[] = [
   {
     name: "Google",
     icon: FcGoogle,
     provider: "google",
     className: "hover:bg-muted/80",
-  },
-  {
-    name: "GitHub",
-    icon: FaGithub,
-    provider: "github",
-    className: "hover:bg-muted/80",
-  },
-  {
-    name: "Discord",
-    icon: FaDiscord,
-    provider: "discord",
-    className: "hover:bg-indigo-500/10",
-  },
-  {
-    name: "Facebook",
-    icon: FaFacebook,
-    provider: "facebook",
-    className: "hover:bg-blue-500/10",
   },
 ]
 
@@ -76,9 +59,12 @@ export function AdminLoginForm() {
         throw new Error("Access denied. Admin privileges required.")
       }
 
-      const cookieExpiry = 2592000
-      document.cookie = `NATEE_V3_TOKEN=${data.token}; path=/; max-age=${cookieExpiry}`
-      document.cookie = `ADMIN_SUPABASE_AUTH_COOKIE=true; path=/; max-age=${cookieExpiry}`
+      // 7-day lifetime + SameSite=Lax; Secure whenever served over HTTPS (prod).
+      const cookieExpiry = 60 * 60 * 24 * 7
+      const secure = globalThis.location?.protocol === "https:" ? "; Secure" : ""
+      const attrs = `; path=/; max-age=${cookieExpiry}; SameSite=Lax${secure}`
+      document.cookie = `NATEE_V3_TOKEN=${data.token}${attrs}`
+      document.cookie = `ADMIN_SUPABASE_AUTH_COOKIE=true${attrs}`
 
       toast.success("Login successful!")
       router.push("/admin/dashboard")
@@ -111,14 +97,12 @@ export function AdminLoginForm() {
 
           <div className="flex flex-col gap-1 mb-6">
             <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 <Shield className="h-5 w-5" />
               </span>
-              <span className="text-xs font-medium uppercase tracking-wider text-violet-600/80 dark:text-violet-400/80">
-                Admin
-              </span>
+              <Eyebrow>Admin</Eyebrow>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Sign in</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight">Sign in</h1>
             <p className="text-sm text-muted-foreground">
               Manage projects, blog, and portfolio content.
             </p>
@@ -182,42 +166,42 @@ export function AdminLoginForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid gap-2">
             {oauthProviders.map((provider) => (
               <Button
                 key={provider.provider}
                 variant="outline"
                 type="button"
                 onClick={() => handleOAuthLogin(provider.provider)}
-                className={`h-10 transition-colors ${provider.className}`}
+                className={`h-10 w-full transition-colors ${provider.className}`}
                 disabled={isLoading}
               >
                 <provider.icon className="mr-2 h-4 w-4 shrink-0" />
-                <span className="truncate">{provider.name}</span>
+                <span className="truncate">Continue with {provider.name}</span>
               </Button>
             ))}
           </div>
         </div>
 
         {/* Brand panel */}
-        <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-violet-600 via-violet-700 to-indigo-900 p-8 text-white">
+        <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/85 p-8 text-primary-foreground">
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-white/20 blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-indigo-300/30 blur-2xl" />
+            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary-foreground/20 blur-3xl" />
+            <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-primary-foreground/20 blur-2xl" />
           </div>
 
           <div className="relative z-10">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm border border-white/20 mb-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-foreground/15 backdrop-blur-sm border border-primary-foreground/20 mb-6">
               <LayoutDashboard className="h-6 w-6" />
             </div>
-            <h2 className="text-2xl font-bold leading-tight">Portfolio CMS</h2>
-            <p className="mt-2 text-sm text-white/75 max-w-[240px] leading-relaxed">
+            <h2 className="font-display text-2xl font-bold leading-tight">Portfolio CMS</h2>
+            <p className="mt-2 text-sm text-primary-foreground/75 max-w-[240px] leading-relaxed">
               Secure workspace for editing projects, work history, blog posts, and site settings.
             </p>
           </div>
 
           <div className="relative z-10 space-y-4">
-            <div className="relative aspect-[4/3] w-full max-w-[280px] mx-auto rounded-xl overflow-hidden border border-white/20 shadow-lg">
+            <div className="relative aspect-[4/3] w-full max-w-[280px] mx-auto rounded-xl overflow-hidden border border-primary-foreground/20 shadow-lg">
               <Image
                 src="https://i.pinimg.com/736x/a0/f5/cd/a0f5cdfbb60d16bd37ebc10c18e8da89.jpg"
                 width={400}
@@ -226,9 +210,9 @@ export function AdminLoginForm() {
                 className="object-cover w-full h-full brightness-90"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-violet-950/80 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent" />
             </div>
-            <p className="text-xs text-white/60 text-center">
+            <p className="text-xs text-primary-foreground/60 text-center">
               Admin access only · Role verified on sign-in
             </p>
           </div>

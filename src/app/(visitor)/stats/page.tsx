@@ -4,6 +4,9 @@ import BaseLayout from "@/components/layout/base-layout"
 import SidebarMain from "@/components/layout/sidebar-main"
 import Typography from "@/components/ui/typography"
 import { MacWindow } from "@/components/ui/mac-window"
+import { SectionHeading } from "@/components/ui/section-heading"
+import { StatStrip } from "@/components/ui/stat-strip"
+import { Eyebrow } from "@/components/ui/eyebrow"
 import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
 import { getLeetCodeStats } from "@/services/visitor/leetcode"
 import LeetCodeSection from "./_components/leetcode-section"
@@ -35,9 +38,9 @@ function PlatformCard({
   unavailable?: boolean
 }) {
   return (
-    <div className="bg-secondary/20 rounded-xl p-5 border border-border/30 flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-foreground/20">
       <div className="flex items-center justify-between">
-        <Typography.P className="text-base font-semibold">{title}</Typography.P>
+        <Typography.P className="font-display text-base font-semibold tracking-tight">{title}</Typography.P>
         <Link
           href={href}
           target="_blank"
@@ -97,15 +100,24 @@ export default async function StatsPage() {
   const npm = np.status === "fulfilled" ? np.value : null
   const letterboxd = lb.status === "fulfilled" ? lb.value : null
 
+  const overviewStats: { label: string; value: React.ReactNode }[] = []
+  if (leetcode) overviewStats.push({ label: "Problems Solved", value: leetcode.totalSolved })
+  if (chess?.rapid != null) overviewStats.push({ label: "Chess Rapid", value: chess.rapid })
+  if (npm) overviewStats.push({ label: "npm Downloads", value: formatDownloads(npm.totalDownloadsLastMonth) })
+  if (letterboxd) overviewStats.push({ label: "Films Logged", value: letterboxd.films.length })
+
   return (
     <BaseLayout sidebar={<SidebarMain />} useGridBackground={false}>
       <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full px-4 lg:px-0">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Stats & Activity</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            My public data from various platforms
-          </p>
-        </div>
+        <SectionHeading
+          as="h1"
+          eyebrow="Activity"
+          title="Stats &"
+          accent="Activity"
+          description="My public data from various platforms."
+        />
+
+        {overviewStats.length > 0 && <StatStrip items={overviewStats} className="border-x-0" />}
 
         <MacWindow title="~/stats" bodyClassName="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -162,8 +174,8 @@ export default async function StatsPage() {
                   value={formatDownloads(npm.totalDownloadsLastMonth)}
                 />
                 {npm.topPackages.length > 0 && (
-                  <div className="pt-2 border-t border-border/30 space-y-1">
-                    <p className="text-xs text-muted-foreground">Top packages</p>
+                  <div className="pt-2 border-t border-border space-y-1">
+                    <Eyebrow>Top packages</Eyebrow>
                     {npm.topPackages.map((pkg) => (
                       <div key={pkg.name} className="flex justify-between text-xs">
                         <span className="truncate text-primary/80 max-w-[60%]">{pkg.name}</span>
@@ -195,12 +207,12 @@ export default async function StatsPage() {
             return (
               <div className="space-y-6">
                 <div>
-                  <p className="mb-3 text-sm font-medium text-muted-foreground">Latest Activity</p>
+                  <Eyebrow className="mb-3">Latest Activity</Eyebrow>
                   <FilmGrid films={latest} />
                 </div>
                 {topRated.length > 0 && (
                   <div>
-                    <p className="mb-3 text-sm font-medium text-muted-foreground">Highest Rated</p>
+                    <Eyebrow className="mb-3">Highest Rated</Eyebrow>
                     <FilmGrid films={topRated} />
                   </div>
                 )}
