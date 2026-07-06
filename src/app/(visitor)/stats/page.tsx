@@ -73,7 +73,7 @@ function FilmGrid({ films }: { films: LetterboxdFilm[] }) {
             )}
           </div>
           <p className="text-xs font-medium line-clamp-2">{film.title}</p>
-          {film.rating != null && <p className="text-xs text-yellow-600 dark:text-yellow-400">★ {film.rating}</p>}
+          {film.rating != null && <p className="font-mono text-xs text-muted-foreground">★ {film.rating}</p>}
           {film.watchedDate && <p className="text-xs text-muted-foreground">{film.watchedDate}</p>}
         </div>
       ))}
@@ -195,9 +195,9 @@ export default async function StatsPage() {
         <PlatformCard
           title="Letterboxd"
           href={STATS_PROFILE_URLS.letterboxd(STATS_PROFILES.letterboxd)}
-          unavailable={!letterboxd || letterboxd.films.length === 0}
+          unavailable={!letterboxd || (letterboxd.films.length === 0 && letterboxd.favorites.length === 0)}
         >
-          {letterboxd && letterboxd.films.length > 0 && (() => {
+          {letterboxd && (letterboxd.films.length > 0 || letterboxd.favorites.length > 0) && (() => {
             const latest = letterboxd.films.slice(0, 8)
             const topRated = [...letterboxd.films]
               .filter((f) => f.rating != null)
@@ -206,10 +206,18 @@ export default async function StatsPage() {
 
             return (
               <div className="space-y-6">
-                <div>
-                  <Eyebrow className="mb-3">Latest Activity</Eyebrow>
-                  <FilmGrid films={latest} />
-                </div>
+                {letterboxd.favorites.length > 0 && (
+                  <div>
+                    <Eyebrow className="mb-3">Favorite Films</Eyebrow>
+                    <FilmGrid films={letterboxd.favorites} />
+                  </div>
+                )}
+                {latest.length > 0 && (
+                  <div>
+                    <Eyebrow className="mb-3">Latest Activity</Eyebrow>
+                    <FilmGrid films={latest} />
+                  </div>
+                )}
                 {topRated.length > 0 && (
                   <div>
                     <Eyebrow className="mb-3">Highest Rated</Eyebrow>

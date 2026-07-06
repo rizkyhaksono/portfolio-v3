@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
-import { Search, Gamepad2, Rocket, Sparkles, Code, Keyboard, Download, Languages, MapPin, TrendingUp } from "lucide-react"
+import { Search, Gamepad2, Rocket, Sparkles, Code, Keyboard, Download, Languages, MapPin, TrendingUp, GraduationCap } from "lucide-react"
 import type { ToolTab } from "@/commons/types/tools"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { cn } from "@/lib/utils"
@@ -23,6 +23,7 @@ const TOOLS: ToolItem[] = [
   { id: "wpm", name: "WPM Test", icon: Keyboard, category: "Developer" },
   { id: "downloader", name: "Downloader", icon: Download, category: "Media" },
   { id: "japanese-quiz", name: "Japanese Quiz", icon: Languages, category: "Learning" },
+  { id: "ielts", name: "IELTS Flashcards", icon: GraduationCap, category: "Learning" },
   { id: "postal-code", name: "Postal Code", icon: MapPin, category: "Utilities" },
   { id: "web3-crypto", name: "Web3 Crypto", icon: TrendingUp, category: "Utilities" },
 ]

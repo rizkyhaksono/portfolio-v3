@@ -4,6 +4,7 @@ import { Wrench } from "lucide-react"
 import { getJLPTLevels } from "@/services/visitor/japanese"
 import type { ToolTab, JLPTLevel } from "@/commons/types/tools"
 import { JapaneseQuizTab } from "./_components/japanese-quiz-tab"
+import { IeltsTab } from "./_components/ielts-tab"
 import { AnimeGeneratorTab } from "./_components/anime-generator-tab"
 import { DownloaderTab } from "./_components/downloader-tab"
 import { WpmTab } from "./_components/wpm-tab"
@@ -69,6 +70,7 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
               <TabsContent value="pokemon" className="mt-0"><PokemonTab /></TabsContent>
               <TabsContent value="starwars" className="mt-0"><StarWarsTab /></TabsContent>
               <TabsContent value="japanese-quiz" className="mt-0"><JapaneseQuizTab initialLevels={jlptLevels} /></TabsContent>
+              <TabsContent value="ielts" className="mt-0"><IeltsTab /></TabsContent>
               <TabsContent value="anime-generator" className="mt-0"><AnimeGeneratorTab /></TabsContent>
               <TabsContent value="downloader" className="mt-0"><DownloaderTab /></TabsContent>
               <TabsContent value="wpm" className="mt-0"><WpmTab /></TabsContent>

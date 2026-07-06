@@ -313,6 +313,7 @@ export interface GasPriceResponse {
 // Tools Tab Types
 export type ToolTab =
   | "japanese-quiz"
+  | "ielts"
   | "anime-generator"
   | "downloader"
   | "wpm"
