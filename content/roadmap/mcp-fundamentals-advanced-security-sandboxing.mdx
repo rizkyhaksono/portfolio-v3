@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "advanced"
 level: "advanced"
-duration: "20 min"
+duration: "28 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -14,25 +14,235 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## MCP Security
+## Why Security Is the Hard Part of MCP
 
-<LearningObjectives objectives={["Validate all tool inputs", "Limit filesystem and network access", "Audit tool invocations", "Run servers with minimal OS permissions"]} />
+An MCP server turns a language model into an actor: it can read files, hit databases, and call external APIs. That is the whole point — and it is also the whole risk. The arguments your tools receive are ultimately shaped by model output, and model output can be steered by **untrusted content** the model just read (a web page, an email, a PR description). This is *indirect prompt injection*, and it means you must treat every tool call as if it originated from a hostile client.
+
+The good news: MCP servers are ordinary programs, so the defenses are the ones you already know — strict input validation, least privilege, sandboxing, and auditing — applied with discipline at the tool boundary. This lesson wires those defenses into a real TypeScript server.
+
+<LearningObjectives objectives={["Validate every tool input with a strict Zod schema", "Prevent path traversal and enforce filesystem boundaries", "Apply least privilege using scopes and tool annotations", "Sandbox the runtime with a hardened container", "Audit tool calls and gate destructive actions behind confirmation"]} />
+
+## The MCP Threat Model
+
+Before writing code, name what you are defending against. In a typical MCP deployment the server trusts neither the tool arguments nor the data those tools return.
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Where attacks enter</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul>
+      <li><strong>Injected arguments</strong> — the model, influenced by malicious content, calls <code>delete_record</code> or reads <code>/etc/passwd</code>.</li>
+      <li><strong>Path & command traversal</strong> — <code>../../</code> sequences or shell metacharacters escape their intended sandbox.</li>
+      <li><strong>Confused deputy</strong> — the server holds broad credentials and executes actions the end user never authorized.</li>
+      <li><strong>Data exfiltration</strong> — a tool returns secrets that get echoed back into the model context.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+<Warning>Tool descriptions and annotations are hints to the model, not security controls. Never rely on "the description says read-only" — enforce every constraint in code, server-side.</Warning>
+
+## Validate Every Input with Zod
+
+The single most effective control is a schema that rejects anything unexpected *before* your handler runs. Constrain type, length, format, and range — an allowlist beats a denylist every time. The official SDK integrates Zod directly, so a rejected input never reaches your logic.
 
 ```typescript
-const schema = z.object({ path: z.string().max(256).regex(/^[a-zA-Z0-9_/.-]+$/) })
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
 
-server.tool("read_file", schema, async ({ path }) => {
-  if (!path.startsWith(ALLOWED_ROOT)) throw new Error("Path not allowed")
-  return { content: [{ type: "text", text: await fs.readFile(path, "utf8") }] }
+const server = new McpServer({ name: "files", version: "1.0.0" })
+
+server.registerTool(
+  "read_file",
+  {
+    title: "Read File",
+    description: "Read a UTF-8 text file inside the workspace.",
+    inputSchema: {
+      // Allowlist the exact shape: relative path, bounded length, safe charset.
+      path: z
+        .string()
+        .max(256)
+        .regex(/^[a-zA-Z0-9_./-]+$/, "Illegal characters in path"),
+      // Cap how much can be exfiltrated in one call.
+      maxBytes: z.number().int().min(1).max(1_000_000).default(65_536),
+    },
+    annotations: { readOnlyHint: true, destructiveHint: false },
+  },
+  async ({ path, maxBytes }) => {
+    const abs = safeResolve(path) // see next section
+    const data = await fs.readFile(abs, "utf8")
+    return { content: [{ type: "text", text: data.slice(0, maxBytes) }] }
+  },
+)
+```
+
+<Tip>Give each numeric and string field explicit bounds. An unbounded `limit` field is how a benign "list rows" tool becomes an accidental full-table dump.</Tip>
+
+## Enforce Filesystem Boundaries
+
+Prefix checks like `path.startsWith(ROOT)` are a classic footgun: `../` sequences and sibling directories that share a prefix (`/srv/data-evil` starts with `/srv/data`) both slip through. Always **resolve to an absolute path first**, then confirm it sits under the root plus a separator.
+
+```typescript
+import path from "node:path"
+import fs from "node:fs/promises"
+
+const ALLOWED_ROOT = path.resolve("/srv/workspace")
+
+export function safeResolve(userPath: string): string {
+  const resolved = path.resolve(ALLOWED_ROOT, userPath)
+  const isInside =
+    resolved === ALLOWED_ROOT || resolved.startsWith(ALLOWED_ROOT + path.sep)
+  if (!isInside) throw new Error("Path escapes the allowed root")
+  return resolved
+}
+```
+
+<Warning>Resolving alone is not enough if symlinks live inside the root. For untrusted trees, call <code>fs.realpath()</code> on the result and re-check that the *real* path is still under <code>ALLOWED_ROOT</code> to defeat symlink escapes.</Warning>
+
+The same principle applies to any tool that shells out. Never interpolate model input into a command string — pass arguments as an array and keep an explicit allowlist of executables.
+
+```typescript
+import { execFile } from "node:child_process"
+import { promisify } from "node:util"
+
+const run = promisify(execFile)
+const ALLOWED = new Set(["git", "ls", "cat"])
+
+async function safeExec(cmd: string, args: string[]) {
+  if (!ALLOWED.has(cmd)) throw new Error(`Command not permitted: ${cmd}`)
+  // execFile does NOT spawn a shell, so metacharacters can't chain commands.
+  return run(cmd, args, { timeout: 5_000, cwd: ALLOWED_ROOT })
+}
+```
+
+## Least Privilege and Authentication
+
+A tool should hold the *narrowest* permission that lets it do its job. Scope credentials per tool, prefer read-only database roles, and separate authentication (who is calling) from authorization (what they may do). How you authenticate depends on the transport.
+
+<Tabs defaultValue="stdio">
+  <TabsList>
+    <TabsTrigger value="stdio">stdio (local)</TabsTrigger>
+    <TabsTrigger value="http">HTTP (remote)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="stdio">
+
+For local servers launched by a client such as Claude Desktop, secrets travel through the process environment, never in the code or arguments. The client config injects them at spawn time:
+
+```json
+{
+  "mcpServers": {
+    "files": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": { "DB_URL": "postgres://readonly@localhost/app" }
+    }
+  }
+}
+```
+
+  </TabsContent>
+  <TabsContent value="http">
+
+Remote servers over Streamable HTTP or SSE must authenticate callers. The MCP authorization spec builds on **OAuth 2.1**: the server acts as a resource server, validates the bearer token on every request, and rejects missing or expired tokens with `401`.
+
+```typescript
+app.use("/mcp", (req, res, next) => {
+  const token = req.headers.authorization?.replace(/^Bearer /, "")
+  if (!token || !verifyAccessToken(token)) {
+    return res.status(401).json({ error: "invalid_token" })
+  }
+  req.scopes = decodeScopes(token) // enforce per-tool scopes downstream
+  next()
 })
 ```
 
-<Warning>Never execute arbitrary shell commands from LLM-provided strings without strict allowlists.</Warning>
+  </TabsContent>
+</Tabs>
+
+<Tip>Tag each tool with the OAuth scope it requires (e.g. <code>files:read</code>) and check <code>req.scopes</code> inside the handler. A read token should never be able to invoke a write tool, even if the model asks.</Tip>
+
+## Sandbox the Runtime
+
+Validation stops bad inputs; sandboxing contains the blast radius when something still goes wrong. Run the server as a non-root user in a container with a read-only root filesystem, all Linux capabilities dropped, and no ability to gain new privileges.
+
+```yaml
+# docker-compose.yml — a hardened MCP service
+services:
+  mcp:
+    image: my-mcp-server:1.0.0
+    user: "10001:10001"          # never root
+    read_only: true               # immutable root filesystem
+    cap_drop: ["ALL"]             # drop every Linux capability
+    security_opt:
+      - no-new-privileges:true    # block setuid escalation
+    pids_limit: 128
+    mem_limit: 256m
+    tmpfs:
+      - /tmp:size=16m             # writable scratch, capped
+    networks:
+      - restricted                # egress allowlist, not open internet
+```
+
+<InfoCard>Match the OS sandbox to the tool surface. A server that only reads a local directory can run with <code>network_mode: none</code>; one that calls a single upstream API should reach only that host through an egress proxy.</InfoCard>
+
+## Audit Logging and Human Confirmation
+
+You cannot investigate what you did not record. Log every tool invocation with enough context to reconstruct it, and gate irreversible actions behind an explicit confirmation step rather than executing them silently.
+
+```typescript
+server.registerTool(
+  "delete_record",
+  {
+    title: "Delete Record",
+    description: "Permanently delete a record by id.",
+    inputSchema: { id: z.string().uuid(), confirm: z.literal(true) },
+    annotations: { destructiveHint: true, idempotentHint: false },
+  },
+  async ({ id }, { requestId }) => {
+    logger.warn("tool.invoke", { tool: "delete_record", id, requestId, ts: Date.now() })
+    await db.records.delete(id)
+    return { content: [{ type: "text", text: `Deleted ${id}` }] }
+  },
+)
+```
+
+By requiring `confirm: z.literal(true)`, the model must deliberately pass `confirm: true` — a stray or injected call missing that field is rejected by the schema before any row is touched. Pair this with client-side approval prompts for anything destructive.
+
+<Warning>Never write raw request arguments straight into logs — a path or query may contain a token or PII. Log identifiers and redact free-text fields so your audit trail does not become the next leak.</Warning>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="p1">
+    <AccordionTrigger>Trusting tool annotations as enforcement</AccordionTrigger>
+    <AccordionContent>
+      <code>readOnlyHint</code> and <code>destructiveHint</code> guide the model's behavior but change nothing on the server. A read-only tool must be read-only in code, backed by a read-only credential.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p2">
+    <AccordionTrigger>Building command strings from model output</AccordionTrigger>
+    <AccordionContent>
+      Passing a model-supplied string to <code>exec()</code> or a template literal invites command injection. Use <code>execFile</code> with an argument array and an executable allowlist.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p3">
+    <AccordionTrigger>Naive prefix checks for paths</AccordionTrigger>
+    <AccordionContent>
+      <code>startsWith(ROOT)</code> is defeated by <code>../</code> traversal, sibling prefixes, and symlinks. Resolve to absolute, verify against <code>ROOT + sep</code>, and use <code>realpath</code> for untrusted trees.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p4">
+    <AccordionTrigger>Running the server as root with broad tokens</AccordionTrigger>
+    <AccordionContent>
+      A single over-scoped credential is a confused-deputy waiting to happen. Scope per tool, drop container capabilities, and run as an unprivileged user.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
 
 ---
 
 ## Next Steps
 
-<NextLesson title="Custom Transports" description="stdio, SSE, WebSocket." href="/roadmap/mcp-fundamentals-advanced-custom-transports" />
+<NextLesson title="Custom Transports" description="stdio, SSE, and WebSocket — choosing and building the right transport for your MCP server." href="/roadmap/mcp-fundamentals-advanced-custom-transports" />
 
-<Resources resources={[{"title":"MCP Security","href":"https://modelcontextprotocol.io/"}]} />
+<Resources resources={[{"title":"MCP Authorization Specification","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization"},{"title":"MCP Security Best Practices","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/security_best_practices"},{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"OWASP Command Injection Prevention","href":"https://owasp.org/www-community/attacks/Command_Injection"}]} />

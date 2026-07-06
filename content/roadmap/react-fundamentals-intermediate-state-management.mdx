@@ -5,7 +5,7 @@ course: "react-fundamentals"
 category: "frontend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "20 min"
+duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,26 +16,201 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## State Management in React
 
-<LearningObjectives objectives={["Use Context + useReducer for shared state", "Avoid unnecessary re-renders with split contexts", "Know when to adopt Zustand or Redux", "Lift state only as high as needed"]} />
+Every non-trivial React app eventually faces the same question: *where should this piece of state live, and how do components far apart in the tree read and update it?* Get it wrong and you end up prop-drilling values through ten layers, or wrapping the whole app in one giant provider that re-renders on every keystroke. React ships with everything you need for most cases — `useState`, `useReducer`, and the Context API — and only a subset of apps genuinely need an external library. This lesson gives you a decision framework: start local, colocate state, reach for Context + `useReducer` for shared logic, and escalate to Zustand or Redux only when the problem demands it.
+
+<LearningObjectives objectives={["Decide where state should live: local, lifted, or shared via Context", "Model complex state transitions with useReducer instead of tangled useState calls", "Combine Context + useReducer to share state without prop drilling", "Prevent unnecessary re-renders by splitting state and dispatch into separate contexts", "Know the concrete signals that justify adopting Zustand, Redux, or Jotai"]} />
+
+## Where Should State Live?
+
+The cheapest state is the state you never share. Before reaching for any global tool, apply this order of preference:
+
+1. **Local state** (`useState`) — owned by a single component. Default choice.
+2. **Lifted state** — move it to the closest common ancestor of the components that need it, and pass it down via props.
+3. **Shared state** (Context) — only when the same value is needed by many components across distant branches of the tree.
+
+<Tip title="Colocation first">Keep state as close as possible to where it is used. Lifting state higher than necessary makes more of the tree re-render on every change and couples unrelated components together.</Tip>
 
 ```tsx
-const CartContext = createContext(null)
-
-function cartReducer(state, action) {
-  switch (action.type) {
-    case "ADD": return { items: [...state.items, action.item] }
-    case "CLEAR": return { items: [] }
-    default: return state
-  }
-}
-
-export function CartProvider({ children }) {
-  const [state, dispatch] = useReducer(cartReducer, { items: [] })
-  return <CartContext.Provider value={{ state, dispatch }}>{children}</CartContext.Provider>
+// Local: this counter is nobody else's business.
+function LikeButton() {
+  const [likes, setLikes] = useState(0)
+  return <button onClick={() => setLikes((n) => n + 1)}>{likes} likes</button>
 }
 ```
 
-<Tabs defaultValue="context"><TabsList><TabsTrigger value="context">Context</TabsTrigger><TabsTrigger value="when">When to escalate</TabsTrigger></TabsList><TabsContent value="context">Split **state** and **dispatch** into separate contexts so consumers that only dispatch don't re-render on state changes.</TabsContent><TabsContent value="when">Reach for Zustand/Redux when you have cross-route global state, middleware, or devtools time-travel needs.</TabsContent></Tabs>
+Prop drilling — passing a value through intermediate components that don't use it — is the smell that tells you a value has outgrown lifting and belongs in Context.
+
+## Modeling State with useReducer
+
+When state updates involve multiple sub-values or follow rules (add, remove, toggle, reset), a pile of `useState` calls becomes hard to keep consistent. `useReducer` centralizes every transition in one pure function, so the *how* of updating lives in one place and components only describe *what* happened by dispatching actions.
+
+```tsx
+type CartItem = { id: string; name: string; price: number; qty: number }
+type CartState = { items: CartItem[] }
+
+type CartAction =
+  | { type: "ADD"; item: CartItem }
+  | { type: "REMOVE"; id: string }
+  | { type: "CLEAR" }
+
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case "ADD": {
+      const existing = state.items.find((i) => i.id === action.item.id)
+      if (existing) {
+        return {
+          items: state.items.map((i) =>
+            i.id === action.item.id ? { ...i, qty: i.qty + action.item.qty } : i
+          ),
+        }
+      }
+      return { items: [...state.items, action.item] }
+    }
+    case "REMOVE":
+      return { items: state.items.filter((i) => i.id !== action.id) }
+    case "CLEAR":
+      return { items: [] }
+    default:
+      return state
+  }
+}
+```
+
+<Warning>Reducers must be **pure**: no mutation, no side effects, no fetching. Always return a new object (`{ ...state }`) instead of mutating `state` directly, or React will not detect the change and components won't re-render.</Warning>
+
+## Sharing State with the Context API
+
+Context lets any descendant read a value without it being threaded through props. Pairing Context with `useReducer` gives you a mini store: the provider holds the state, and consumers dispatch actions to change it.
+
+```tsx
+const CartContext = createContext<{
+  state: CartState
+  dispatch: React.Dispatch<CartAction>
+} | null>(null)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(cartReducer, { items: [] })
+  const value = useMemo(() => ({ state, dispatch }), [state])
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>
+}
+```
+
+Wrap the reads in a custom hook so consumers get a friendly error instead of a cryptic `null` crash when they forget the provider:
+
+```tsx
+export function useCart() {
+  const ctx = useContext(CartContext)
+  if (!ctx) {
+    throw new Error("useCart must be used within a <CartProvider>")
+  }
+  return ctx
+}
+```
+
+Now any component can call `const { state, dispatch } = useCart()` — no prop drilling, and TypeScript knows the shape.
+
+## Avoiding Re-render Storms with Split Contexts
+
+A subtle Context pitfall: **every consumer re-renders whenever the context value changes**, even consumers that only need `dispatch` (which never changes). If your provider's value is `{ state, dispatch }`, a component that only dispatches will still re-render on every state update. The fix is to split state and dispatch into two separate contexts.
+
+```tsx
+const CartStateContext = createContext<CartState | null>(null)
+const CartDispatchContext =
+  createContext<React.Dispatch<CartAction> | null>(null)
+
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(cartReducer, { items: [] })
+  return (
+    <CartStateContext.Provider value={state}>
+      <CartDispatchContext.Provider value={dispatch}>
+        {children}
+      </CartDispatchContext.Provider>
+    </CartStateContext.Provider>
+  )
+}
+```
+
+Because `dispatch` is guaranteed stable across renders, a `<AddToCartButton>` that only consumes `CartDispatchContext` never re-renders when items change — only components reading `CartStateContext` do.
+
+<InfoCard title="Why this works">React bails out of re-rendering a Context consumer only when the specific context value it reads is referentially unchanged. Splitting isolates the frequently-changing `state` from the never-changing `dispatch`.</InfoCard>
+
+## When to Escalate to an External Library
+
+Context is a dependency-injection mechanism, not a performance-optimized store. When a single context holds fast-changing state read by hundreds of components, you'll fight re-renders. That is the signal to adopt a purpose-built library.
+
+<Tabs defaultValue="context">
+  <TabsList>
+    <TabsTrigger value="context">Context + useReducer</TabsTrigger>
+    <TabsTrigger value="zustand">Zustand</TabsTrigger>
+    <TabsTrigger value="redux">Redux Toolkit</TabsTrigger>
+  </TabsList>
+  <TabsContent value="context">
+    Built in, zero dependencies. Best for low-frequency shared state: theme, current user, locale, a shopping cart. Split contexts to control re-renders.
+  </TabsContent>
+  <TabsContent value="zustand">
+    Tiny (~1KB) store with selector-based subscriptions, so components re-render only when the slice they select changes. Great default when Context re-renders become a problem.
+  </TabsContent>
+  <TabsContent value="redux">
+    Redux Toolkit adds structure, middleware, and time-travel devtools. Worth it for large teams, complex async flows, and audit-heavy apps where predictable, traceable updates matter.
+  </TabsContent>
+</Tabs>
+
+A Zustand store needs no provider and subscribes by selector:
+
+```ts
+import { create } from "zustand"
+
+type CartStore = {
+  items: CartItem[]
+  add: (item: CartItem) => void
+  clear: () => void
+}
+
+export const useCartStore = create<CartStore>((set) => ({
+  items: [],
+  add: (item) => set((s) => ({ items: [...s.items, item] })),
+  clear: () => set({ items: [] }),
+}))
+
+// Re-renders ONLY when items.length changes, not on unrelated updates.
+function CartBadge() {
+  const count = useCartStore((s) => s.items.length)
+  return <span>{count}</span>
+}
+```
+
+<Tip title="Server state is different">Data fetched from an API (loading, caching, revalidation) is *server state*, not client state. Reach for TanStack Query or SWR for that — don't hand-roll it into Context or Redux.</Tip>
+
+## Best Practices & Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="one">
+    <AccordionTrigger>Don't put everything in one global context</AccordionTrigger>
+    <AccordionContent>
+      A single "AppContext" holding theme, auth, cart, and modal state re-renders the whole app on any change. Create focused providers per concern instead.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="two">
+    <AccordionTrigger>Always memoize the context value</AccordionTrigger>
+    <AccordionContent>
+      Passing a fresh object literal like <code>value=&#123;&#123; state, dispatch &#125;&#125;</code> creates a new reference every render, forcing all consumers to re-render. Wrap it in <code>useMemo</code>, or split into separate contexts.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="three">
+    <AccordionTrigger>Keep reducers pure and serializable</AccordionTrigger>
+    <AccordionContent>
+      No mutation, no <code>Date.now()</code>, no fetch calls inside a reducer. Compute non-deterministic values before dispatching and pass them in the action payload.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="four">
+    <AccordionTrigger>Don't overwrite state — merge intentionally</AccordionTrigger>
+    <AccordionContent>
+      When updating nested state, spread the previous value: <code>set((s) =&gt; (&#123; ...s, items: [...s.items, item] &#125;))</code>. Returning a partial object without spreading drops the rest of your state.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Warning>Don't reach for Redux "just in case." Adding a heavy store to an app that only shares a theme and a logged-in user adds boilerplate with no payoff. Start with the built-in tools and escalate only when you feel real pain.</Warning>
 
 ---
 
@@ -43,4 +218,4 @@ export function CartProvider({ children }) {
 
 <NextLesson title="Hooks Deep Dive" description="Master useEffect, useMemo, and custom hooks." href="/roadmap/react-fundamentals-intermediate-hooks-deep-dive" />
 
-<Resources resources={[{"title":"React useReducer","href":"https://react.dev/reference/react/useReducer"}]} />
+<Resources resources={[{"title":"React useReducer","href":"https://react.dev/reference/react/useReducer"},{"title":"Scaling Up with Reducer and Context","href":"https://react.dev/learn/scaling-up-with-reducer-and-context"},{"title":"Passing Data Deeply with Context","href":"https://react.dev/learn/passing-data-deeply-with-context"},{"title":"Zustand Documentation","href":"https://zustand.docs.pmnd.rs/"}]} />

@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "22 min"
+duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
@@ -18,64 +18,194 @@ import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react
 
 ## JWT Authentication in Express
 
-JSON Web Tokens let stateless APIs authenticate users without server-side sessions.
+Most REST APIs are **stateless**: the server keeps no session in memory between requests. A JSON Web Token (JWT) solves the "who is this user?" problem by handing the client a signed, self-contained credential after login. On every subsequent request the client sends that token, and the server verifies the signature to trust the claims inside it — no database lookup and no shared session store required. This makes JWTs a natural fit for horizontally scaled Express services, mobile back ends, and any API consumed by a SPA. In this lesson you'll build the full flow: hashing passwords, issuing tokens on login, guarding routes with middleware, and layering role-based access on top.
 
-<LearningObjectives objectives={["Sign and verify JWTs with jsonwebtoken", "Build auth middleware for protected routes", "Hash passwords with bcrypt", "Return access tokens on login"]} />
+<LearningObjectives objectives={["Explain the three parts of a JWT and how signatures prevent tampering", "Hash and verify passwords with bcrypt", "Sign and verify tokens with the jsonwebtoken library", "Protect routes with reusable auth and role middleware", "Apply access + refresh token patterns and avoid common security mistakes"]} />
 
-### Login & Token Generation
+### Anatomy of a Token
+
+A JWT is three Base64URL-encoded segments joined by dots: `header.payload.signature`. The header names the algorithm, the payload holds **claims** (arbitrary JSON like the user id), and the signature is an HMAC (with `HS256`) or asymmetric signature (with `RS256`) over the first two parts.
+
+```text
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9   <- header  { "alg": "HS256", "typ": "JWT" }
+.eyJzdWIiOiIxMjMiLCJyb2xlIjoiYWRtaW4ifQ <- payload { "sub": "123", "role": "admin" }
+.dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk <- signature
+```
+
+<Warning>The payload is only **encoded**, not encrypted. Anyone can decode and read it. Never put passwords, secrets, or sensitive personal data in a JWT.</Warning>
+
+### Registration: Hashing Passwords
+
+Never store raw passwords. Use bcrypt, which is deliberately slow and salts each hash automatically, so identical passwords produce different digests. A cost factor of 10–12 is a sensible default for 2020s hardware.
+
+```javascript
+import bcrypt from "bcryptjs"
+
+app.post("/api/auth/register", async (req, res, next) => {
+  try {
+    const { email, password } = req.body
+    if (!email || !password || password.length < 8) {
+      return res.status(400).json({ error: "Email and 8+ char password required" })
+    }
+    const passwordHash = await bcrypt.hash(password, 12)
+    const user = await prisma.user.create({
+      data: { email, passwordHash, role: "user" },
+    })
+    res.status(201).json({ id: user.id, email: user.email })
+  } catch (err) {
+    next(err) // e.g. unique-constraint violation on email
+  }
+})
+```
+
+### Login: Issuing a Token
+
+On login, verify the password with `bcrypt.compare`, then sign a token. Keep the payload small — just the identifiers you need for authorization. Use `sub` (subject) for the user id, per the JWT spec, and always set `expiresIn`.
 
 ```javascript
 import jwt from "jsonwebtoken"
-import bcrypt from "bcryptjs"
 
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+
+  // Compare even when user is missing to avoid leaking which emails exist.
+  const ok = user && (await bcrypt.compare(password, user.passwordHash))
+  if (!ok) {
     return res.status(401).json({ error: "Invalid credentials" })
   }
-  const token = jwt.sign({ sub: user.id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
-  })
+
+  const token = jwt.sign(
+    { sub: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m", issuer: "portfolio-api" }
+  )
   res.json({ token, user: { id: user.id, email: user.email } })
 })
 ```
 
-### Auth Middleware
+<Tip title="Pick a strong secret">Generate `JWT_SECRET` with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` and store it in `.env`. A weak secret makes HS256 signatures forgeable.</Tip>
+
+### Protecting Routes with Middleware
+
+Verification belongs in a single reusable middleware. It pulls the token from the `Authorization: Bearer <token>` header, verifies it, and attaches the decoded claims to `req.user` so downstream handlers can read them.
 
 ```javascript
 function requireAuth(req, res, next) {
   const header = req.headers.authorization
   if (!header?.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Missing token" })
+    return res.status(401).json({ error: "Missing or malformed token" })
   }
   try {
     req.user = jwt.verify(header.slice(7), process.env.JWT_SECRET)
     next()
-  } catch {
-    res.status(401).json({ error: "Invalid or expired token" })
+  } catch (err) {
+    // jwt.verify throws TokenExpiredError or JsonWebTokenError
+    const expired = err.name === "TokenExpiredError"
+    res.status(401).json({ error: expired ? "Token expired" : "Invalid token" })
   }
 }
 
-app.get("/api/me", requireAuth, (req, res) => res.json({ user: req.user }))
+app.get("/api/me", requireAuth, (req, res) => {
+  res.json({ id: req.user.sub, role: req.user.role })
+})
 ```
 
+### Role-Based Authorization
+
+Authentication answers *who you are*; authorization answers *what you may do*. Because the role is baked into the token, a small higher-order middleware can gate routes by role without another database round trip.
+
+```javascript
+function requireRole(...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ error: "Insufficient permissions" })
+    }
+    next()
+  }
+}
+
+// Chain guards: must be authenticated AND an admin.
+app.delete("/api/users/:id", requireAuth, requireRole("admin"), handler)
+```
+
+<Warning>Use `401 Unauthorized` when the token is missing or invalid, and `403 Forbidden` when the token is valid but the role is not allowed. Mixing them up confuses clients.</Warning>
+
+### Access + Refresh Tokens
+
+Short-lived access tokens limit the damage of a leak, but forcing a re-login every 15 minutes is poor UX. The standard fix is a long-lived **refresh token** stored in an httpOnly cookie, exchanged for a fresh access token when the old one expires.
+
+<Tabs defaultValue="issue" className="my-6">
+  <TabsList>
+    <TabsTrigger value="issue">Issue Both</TabsTrigger>
+    <TabsTrigger value="refresh">Refresh Endpoint</TabsTrigger>
+  </TabsList>
+  <TabsContent value="issue">
+
+<CodeSnippet language="javascript">{`const accessToken = jwt.sign({ sub: user.id, role: user.role },
+  process.env.JWT_SECRET, { expiresIn: "15m" })
+
+const refreshToken = jwt.sign({ sub: user.id },
+  process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" })
+
+res
+  .cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: true,       // HTTPS only
+    sameSite: "strict",
+    path: "/api/auth/refresh",
+  })
+  .json({ accessToken })`}</CodeSnippet>
+  </TabsContent>
+  <TabsContent value="refresh">
+
+<CodeSnippet language="javascript">{`app.post("/api/auth/refresh", (req, res) => {
+  const token = req.cookies.refreshToken
+  if (!token) return res.status(401).json({ error: "No refresh token" })
+  try {
+    const { sub } = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+    const accessToken = jwt.sign({ sub }, process.env.JWT_SECRET,
+      { expiresIn: "15m" })
+    res.json({ accessToken })
+  } catch {
+    res.status(401).json({ error: "Invalid refresh token" })
+  }
+})`}</CodeSnippet>
+  </TabsContent>
+</Tabs>
+
+<InfoCard title="Why two secrets?">Signing access and refresh tokens with separate secrets means leaking one does not compromise the other, and lets you rotate them independently. Cookie parsing requires the `cookie-parser` middleware (`app.use(cookieParser())`).</InfoCard>
+
+### Common Pitfalls
+
 <Accordion type="single" collapsible className="not-prose">
-  <AccordionItem value="security">
-    <AccordionTrigger>Security checklist</AccordionTrigger>
+  <AccordionItem value="storage">
+    <AccordionTrigger>Storing tokens in localStorage</AccordionTrigger>
     <AccordionContent>
-      <ul className="list-disc pl-4 space-y-1">
-        <li>Store JWT_SECRET in environment variables</li>
-        <li>Use HTTPS in production</li>
-        <li>Prefer short-lived access tokens + refresh tokens for sensitive apps</li>
-        <li>Never store JWT in localStorage if XSS is a concern — use httpOnly cookies</li>
-      </ul>
+      localStorage is readable by any JavaScript on the page, so an XSS bug leaks the token. Prefer httpOnly cookies for refresh tokens; if you must keep the access token in memory, hold it in a JS variable, not persistent storage.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="expiry">
+    <AccordionTrigger>Forgetting expiresIn</AccordionTrigger>
+    <AccordionContent>
+      Without `expiresIn`, a token is valid forever. A single leaked token then never stops working. Always set a short lifetime on access tokens.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="algnone">
+    <AccordionTrigger>The alg: none attack</AccordionTrigger>
+    <AccordionContent>
+      Some libraries once accepted unsigned tokens (`alg: none`). Pin the algorithm explicitly on verify: `jwt.verify(token, secret, {"{"} algorithms: ["HS256"] {"}"})` so a forged header cannot bypass the signature check.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="revoke">
+    <AccordionTrigger>Assuming you can "log out" a JWT</AccordionTrigger>
+    <AccordionContent>
+      A signed JWT is valid until it expires — the server cannot revoke it on its own. For instant logout or ban, keep a short access-token lifetime plus a server-side denylist of refresh-token ids (jti).
     </AccordionContent>
   </AccordionItem>
 </Accordion>
 
-<Warning>Never commit JWT_SECRET to git. Rotate secrets if leaked.</Warning>
-
+<Tip title="Verify the algorithm explicitly">Always pass `{ algorithms: ["HS256"] }` to `jwt.verify` in production so an attacker cannot downgrade the signature check.</Tip>
 
 ---
 
@@ -83,4 +213,4 @@ app.get("/api/me", requireAuth, (req, res) => res.json({ user: req.user }))
 
 <NextLesson title="Database Integration" description="Connect Express to PostgreSQL with Prisma." href="/roadmap/express-fundamentals-intermediate-database-integration" />
 
-<Resources resources={[{"title":"jsonwebtoken","href":"https://www.npmjs.com/package/jsonwebtoken"},{"title":"OWASP JWT Cheat Sheet","href":"https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"}]} />
+<Resources resources={[{"title":"jsonwebtoken (npm)","href":"https://www.npmjs.com/package/jsonwebtoken"},{"title":"bcryptjs (npm)","href":"https://www.npmjs.com/package/bcryptjs"},{"title":"RFC 7519 — JSON Web Token","href":"https://datatracker.ietf.org/doc/html/rfc7519"},{"title":"OWASP JWT Cheat Sheet","href":"https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"}]} />

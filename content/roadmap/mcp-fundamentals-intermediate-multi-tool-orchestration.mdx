@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "24 min"
+duration: "32 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -14,23 +14,224 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Tool Orchestration
+## Multi-Tool Orchestration
 
-<LearningObjectives objectives={["Design single-purpose tools", "Compose workflows across tools", "Propagate errors with context", "Validate tool inputs with Zod"]} />
+A single tool answers one question. Real agents solve problems by chaining several tools together: search a codebase, read the matching file, run a linter, then open a pull request. On the MCP side you never write that control flow yourself — the LLM decides the sequence. Your job is to expose tools that are small, predictable, well-described, and safe to combine in any order the model chooses. This lesson shows how to design a tool surface that an agent can compose reliably, validate inputs, return chainable output, and surface errors the model can actually recover from.
+
+<LearningObjectives objectives={["Design single-purpose, composable tools", "Validate every tool input with Zod", "Return structured output that downstream tools can consume", "Report errors as tool results instead of protocol crashes", "Keep tools idempotent so retries stay safe"]} />
+
+## Design Single-Purpose Tools
+
+The model picks tools by reading their `name` and `description`. Vague, do-everything tools confuse selection; narrow tools with sharp descriptions get called correctly. Give each tool one job, a verb-based name, and a description that states what it does *and* what it returns.
 
 ```typescript
-server.tool("search_repo", { query: z.string() }, async ({ query }) => {
-  const files = await search(query)
-  return { content: [{ type: "text", text: JSON.stringify(files) }] }
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { z } from "zod"
+
+const server = new McpServer({ name: "repo-tools", version: "1.0.0" })
+
+// Good: one responsibility, describes its output shape
+server.tool(
+  "search_repo",
+  "Search the repository for files whose contents match a query. Returns a JSON array of file paths.",
+  { query: z.string().min(1), limit: z.number().int().min(1).max(50).default(10) },
+  async ({ query, limit }) => {
+    const files = await search(query, limit)
+    return { content: [{ type: "text", text: JSON.stringify(files) }] }
+  },
+)
+```
+
+<Tip>Name tools after the action they perform (`search_repo`, `read_file`, `open_pr`) rather than the data they touch. The model reasons about verbs when planning a sequence of calls.</Tip>
+
+## Validate Inputs with Zod
+
+Never trust arguments the model generates. Passing a raw Zod shape to `server.tool` makes the SDK build the JSON Schema advertised to the client *and* validate the arguments on every call. Invalid input is rejected before your handler runs, so your logic only ever sees well-typed data.
+
+```typescript
+server.tool(
+  "read_file",
+  "Read a UTF-8 text file inside the repo. Returns the file contents.",
+  {
+    path: z
+      .string()
+      .regex(/^[\w./-]+$/, "path may only contain letters, numbers, . / _ -")
+      .refine((p) => !p.includes(".."), "path traversal is not allowed"),
+    maxBytes: z.number().int().positive().max(1_000_000).default(64_000),
+  },
+  async ({ path, maxBytes }) => {
+    const text = await readWithinRepo(path, maxBytes)
+    return { content: [{ type: "text", text }] }
+  },
+)
+```
+
+<Warning>Schema validation checks *shape*, not *safety*. A well-formed `path` can still point outside your repo, so combine Zod refinements with a server-side boundary check (resolve the real path and confirm it stays inside the allowed root) before touching the filesystem.</Warning>
+
+## Return Structured, Chainable Output
+
+When one tool's output feeds the next tool's input, plain prose is fragile. Emit machine-readable JSON so the model can lift a value out and pass it along. Newer SDK versions let you declare an `outputSchema` and return `structuredContent`, which the client validates and can hand to a typed consumer.
+
+```typescript
+server.registerTool(
+  "list_open_prs",
+  {
+    title: "List open pull requests",
+    description: "Return open PRs for a repo as structured data.",
+    inputSchema: { repo: z.string() },
+    outputSchema: {
+      pullRequests: z.array(
+        z.object({ number: z.number(), title: z.string(), author: z.string() }),
+      ),
+    },
+  },
+  async ({ repo }) => {
+    const pullRequests = await fetchOpenPrs(repo)
+    return {
+      // Keep a text block for models that ignore structuredContent
+      content: [{ type: "text", text: JSON.stringify({ pullRequests }) }],
+      structuredContent: { pullRequests },
+    }
+  },
+)
+```
+
+<Tip>Always include a `text` content block alongside `structuredContent`. Not every client consumes structured output yet, and the text block keeps your tool backward-compatible.</Tip>
+
+## Handle Errors the Model Can Recover From
+
+There are two distinct failure channels in MCP, and mixing them up is the most common orchestration bug. A thrown exception becomes a JSON-RPC protocol error — the right signal for "this request was malformed." But a *tool that ran and failed* (file not found, API returned 404) should return a normal result with `isError: true`. That keeps the failure inside the model's context so it can read the message and try a different tool or argument.
+
+<Tabs defaultValue="result">
+  <TabsList>
+    <TabsTrigger value="result">Recoverable (isError)</TabsTrigger>
+    <TabsTrigger value="throw">Protocol error (throw)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="result">
+
+```typescript
+server.tool("read_file", "Read a text file.", { path: z.string() }, async ({ path }) => {
+  try {
+    const text = await readWithinRepo(path)
+    return { content: [{ type: "text", text }] }
+  } catch (err) {
+    // The model sees this and can retry with a corrected path
+    return {
+      isError: true,
+      content: [{ type: "text", text: `Could not read ${path}: ${(err as Error).message}` }],
+    }
+  }
 })
 ```
 
-<Tip>Keep tools idempotent where possible so retries are safe.</Tip>
+  </TabsContent>
+  <TabsContent value="throw">
 
----
+```typescript
+// Throwing is correct only for protocol-level faults the model can't fix,
+// e.g. a required dependency is misconfigured on the server itself.
+server.tool("open_pr", "Open a pull request.", { branch: z.string() }, async ({ branch }) => {
+  if (!process.env.GITHUB_TOKEN) {
+    throw new Error("Server misconfigured: GITHUB_TOKEN is not set")
+  }
+  const pr = await createPr(branch)
+  return { content: [{ type: "text", text: JSON.stringify(pr) }] }
+})
+```
+
+  </TabsContent>
+</Tabs>
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Rule of thumb</CardTitle>
+  </CardHeader>
+  <CardContent>
+    If a retry with different arguments could succeed, return <code>isError: true</code> so the model
+    can adapt. If nothing the model does could fix it, throw — the client surfaces a protocol error
+    and the run halts cleanly.
+  </CardContent>
+</Card>
+
+## Compose Workflows Across Tools
+
+You do not orchestrate tools with `if/else` inside the server. The LLM plans the sequence and calls tools one after another, feeding each result into the next request. Your leverage is in the *interfaces*: consistent identifiers, self-describing output, and stateless handlers make chains reliable. A typical agent-driven flow over the tools above looks like this:
+
+```text
+1. search_repo({ query: "parseConfig" })      -> ["src/config.ts", "src/loader.ts"]
+2. read_file({ path: "src/config.ts" })       -> file contents
+3. list_open_prs({ repo: "acme/app" })        -> [{ number: 42, ... }]
+4. open_pr({ branch: "fix/config-parsing" })  -> { number: 43, url: "..." }
+```
+
+Because tools return stable identifiers (file paths, PR numbers), the model can carry a value from step 1 into step 2 without guessing. Keep every handler **stateless** — no reliance on a previous call having set some in-memory variable — so calls can safely run in any order or in parallel.
+
+<InfoCard>
+Clients may issue several tool calls concurrently when the model requests them in one turn. Design each handler to be independent and thread-safe; never store per-conversation state in a module-level variable shared across requests.
+</InfoCard>
+
+## Keep Tools Idempotent and Retryable
+
+Networks drop, and both clients and models retry. A tool is *idempotent* when calling it twice with the same arguments leaves the world in the same state as calling it once. Read tools are naturally idempotent; write tools need help — usually an idempotency key or an existence check before the mutation.
+
+```typescript
+server.tool(
+  "open_pr",
+  "Open a pull request for a branch, or return the existing one if it is already open.",
+  { repo: z.string(), branch: z.string() },
+  async ({ repo, branch }) => {
+    // Check first so a retry does not create a duplicate PR
+    const existing = await findOpenPr(repo, branch)
+    const pr = existing ?? (await createPr(repo, branch))
+    return { content: [{ type: "text", text: JSON.stringify({ number: pr.number, url: pr.url }) }] }
+  },
+)
+```
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="one">
+    <AccordionTrigger>Throwing on user-recoverable errors</AccordionTrigger>
+    <AccordionContent>
+      Throwing on a missing file ends the run instead of letting the model retry. Reserve exceptions
+      for protocol faults; return <code>isError: true</code> for anything the model could work around.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="two">
+    <AccordionTrigger>Overloaded mega-tools</AccordionTrigger>
+    <AccordionContent>
+      A single <code>manage_repo</code> tool with a <code>mode</code> argument forces the model to
+      guess enum values and hides intent. Split it into <code>search_repo</code>,
+      <code>read_file</code>, and <code>open_pr</code> so tool selection stays accurate.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="three">
+    <AccordionTrigger>Unbounded output</AccordionTrigger>
+    <AccordionContent>
+      Returning a 5 MB file blows the model's context window and slows the whole chain. Cap sizes with
+      a <code>limit</code> or <code>maxBytes</code> parameter and paginate large result sets.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="four">
+    <AccordionTrigger>Non-idempotent writes</AccordionTrigger>
+    <AccordionContent>
+      Without an existence check or idempotency key, a retried <code>open_pr</code> or
+      <code>send_email</code> fires twice. Make writes safe to repeat before you expose them.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+- Advertise clear, verb-based names and descriptions that state the return shape — the model plans from them.
+- Validate every argument with Zod, then add a server-side safety boundary for anything touching files, networks, or shells.
+- Return both a `text` block and `structuredContent` so output is readable and chainable.
+- Distinguish recoverable failures (`isError: true`) from protocol faults (thrown) deliberately.
+- Keep handlers stateless and idempotent so concurrent and retried calls stay correct.
 
 ## Next Steps
 
 <NextLesson title="Production Deployment" description="Docker and health checks." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
 
-<Resources resources={[{"title":"MCP Tools","href":"https://modelcontextprotocol.io/docs/concepts/tools"}]} />
+<Resources resources={[{"title":"MCP Tools Concept","href":"https://modelcontextprotocol.io/docs/concepts/tools"},{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Specification","href":"https://modelcontextprotocol.io/specification"},{"title":"Zod Documentation","href":"https://zod.dev"}]} />

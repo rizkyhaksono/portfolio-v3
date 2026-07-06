@@ -5,7 +5,7 @@ course: "react-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "22 min"
+duration: "28 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,26 +14,226 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Testing React Apps
+## Testing React with Confidence
 
-<LearningObjectives objectives={["Query by role with Testing Library", "Mock API calls with MSW", "Test user flows not implementation details", "Run tests in CI with Vitest"]} />
+A test suite is only valuable if it fails when your users would be hurt and stays green when you refactor. That is the core idea behind modern React testing: assert on what the user sees and does, not on component internals like state variables or class names. In this lesson you will wire up **Vitest** as a fast, Vite-native test runner, drive components through **React Testing Library** the way a real person would, and intercept network traffic with **Mock Service Worker (MSW)** so integration tests exercise your real data-fetching code without hitting a live API. These are the same tools shipped by the Vite and Next.js starter templates, so the patterns transfer directly to production apps.
+
+<LearningObjectives objectives={["Configure Vitest with jsdom and a Testing Library setup file", "Query the DOM by accessible role and label instead of test IDs", "Simulate realistic interaction with the user-event API", "Intercept and stub HTTP requests using MSW handlers", "Test custom hooks and run the suite with coverage in CI"]} />
+
+## Setting Up Vitest and Testing Library
+
+Vitest reuses your Vite config and transform pipeline, so it understands TypeScript, JSX, and path aliases with zero extra setup. Point it at the `jsdom` environment (a browser-like DOM in Node), enable `globals` so `describe`/`test`/`expect` are available without imports, and register a setup file that runs before every test.
+
+```ts
+// vitest.config.ts
+import { defineConfig } from "vitest/config"
+import react from "@vitejs/plugin-react"
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/setupTests.ts",
+    css: true,
+  },
+})
+```
+
+The setup file extends `expect` with the jest-dom matchers (`toBeInTheDocument`, `toHaveTextContent`, and friends) and unmounts components after each test so they never leak into one another.
+
+```ts
+// src/setupTests.ts
+import "@testing-library/jest-dom/vitest"
+import { afterEach } from "vitest"
+import { cleanup } from "@testing-library/react"
+
+afterEach(() => {
+  cleanup()
+})
+```
+
+## Query by Role, Not by Implementation
+
+Testing Library exposes a **priority order** for finding elements. Reach for the query that mirrors how a person (or a screen reader) locates the element: role first, then label, then visible text. `getByTestId` is a last resort for things with no accessible handle. Querying this way means your tests double as accessibility checks.
+
+```tsx
+// Prefer this — accessible and refactor-proof
+screen.getByRole("button", { name: /add to cart/i })
+screen.getByLabelText(/email address/i)
+screen.getByText(/order confirmed/i)
+
+// Avoid this — brittle and invisible to assistive tech
+screen.getByTestId("submit-btn")
+container.querySelector(".btn-primary")
+```
+
+Each query family has three variants. Choosing the right one prevents flaky async failures and produces clear error messages.
+
+<Tabs defaultValue="get">
+  <TabsList>
+    <TabsTrigger value="get">getBy</TabsTrigger>
+    <TabsTrigger value="query">queryBy</TabsTrigger>
+    <TabsTrigger value="find">findBy</TabsTrigger>
+  </TabsList>
+  <TabsContent value="get">Use `getBy*` when the element should already be in the DOM. It throws immediately with a helpful DOM dump if nothing matches.</TabsContent>
+  <TabsContent value="query">Use `queryBy*` only to assert **absence**. It returns `null` instead of throwing, so it pairs with `expect(...).not.toBeInTheDocument()`.</TabsContent>
+  <TabsContent value="find">Use `findBy*` for elements that appear after an async update. It returns a Promise and retries until the element shows up or the timeout is hit.</TabsContent>
+</Tabs>
+
+## Simulating Real User Interaction
+
+The `@testing-library/user-event` package fires the full sequence of DOM events a real interaction produces — `pointerdown`, `focus`, `keydown`, `input`, `change` — instead of the single synthetic event that `fireEvent` dispatches. Always call `userEvent.setup()` once per test and `await` every interaction, because v14 actions are asynchronous.
 
 ```tsx
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { LoginForm } from "./LoginForm"
 
-test("submits form", async () => {
+test("logs the user in after a valid submission", async () => {
+  const user = userEvent.setup()
   render(<LoginForm />)
-  await userEvent.type(screen.getByLabelText(/email/i), "a@b.com")
-  await userEvent.click(screen.getByRole("button", { name: /sign in/i }))
-  expect(await screen.findByText(/welcome/i)).toBeInTheDocument()
+
+  await user.type(screen.getByLabelText(/email/i), "ada@example.com")
+  await user.type(screen.getByLabelText(/password/i), "hunter2")
+  await user.click(screen.getByRole("button", { name: /sign in/i }))
+
+  expect(await screen.findByText(/welcome back/i)).toBeInTheDocument()
 })
 ```
+
+<Tip title="Forgetting await">If an interaction seems to have no effect, you probably forgot to `await` it. Every `user.*` call and every `findBy*` query returns a Promise.</Tip>
+
+## Mocking the Network with MSW
+
+Integration tests should exercise your real fetch/axios/React Query code. MSW intercepts requests at the network layer, so components stay untouched and you assert on the same loading, success, and error branches your users hit in production. Define handlers once, then start a server in the setup file.
+
+```ts
+// src/mocks/handlers.ts
+import { http, HttpResponse } from "msw"
+
+export const handlers = [
+  http.get("/api/users", () => {
+    return HttpResponse.json([
+      { id: 1, name: "Ada Lovelace" },
+      { id: 2, name: "Alan Turing" },
+    ])
+  }),
+]
+```
+
+```ts
+// src/mocks/server.ts
+import { setupServer } from "msw/node"
+import { handlers } from "./handlers"
+
+export const server = setupServer(...handlers)
+```
+
+Wire the server lifecycle into your setup file. `onUnhandledRequest: "error"` catches typos and forgotten mocks by failing loudly, and `resetHandlers()` discards any per-test overrides so tests stay isolated.
+
+```ts
+// add to src/setupTests.ts
+import { server } from "./mocks/server"
+import { afterAll, afterEach, beforeAll } from "vitest"
+
+beforeAll(() => server.listen({ onUnhandledRequest: "error" }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+```
+
+To test a failure path, override the handler for a single test with `server.use()`.
+
+```tsx
+import { http, HttpResponse } from "msw"
+import { render, screen } from "@testing-library/react"
+import { server } from "./mocks/server"
+import { UserList } from "./UserList"
+
+test("shows an error banner when the request fails", async () => {
+  server.use(
+    http.get("/api/users", () => new HttpResponse(null, { status: 500 })),
+  )
+
+  render(<UserList />)
+
+  expect(await screen.findByRole("alert")).toHaveTextContent(/failed to load/i)
+})
+```
+
+<Warning>Assert on the error boundary the user actually sees (`getByRole("alert")`), not on a rejected promise. If your component swallows the error, the test should fail — that is the bug.</Warning>
+
+## Testing Custom Hooks
+
+Reusable logic often lives in custom hooks. `renderHook` from `@testing-library/react` mounts a hook in isolation and returns a `result` ref plus a `rerender` function for feeding it new props. Wrap any state update that happens outside an interaction in `act()`, and pair time-based hooks with Vitest fake timers.
+
+```tsx
+import { renderHook, act } from "@testing-library/react"
+import { useDebounce } from "./useDebounce"
+
+test("debounces the value until the delay elapses", () => {
+  vi.useFakeTimers()
+  const { result, rerender } = renderHook(
+    ({ value }) => useDebounce(value, 500),
+    { initialProps: { value: "a" } },
+  )
+
+  rerender({ value: "ab" })
+  expect(result.current).toBe("a") // not updated yet
+
+  act(() => vi.advanceTimersByTime(500))
+  expect(result.current).toBe("ab") // updated after the delay
+
+  vi.useRealTimers()
+})
+```
+
+<InfoCard>Prefer testing hooks *through a component* when they drive UI. Reach for `renderHook` only for pure, framework-agnostic logic like `useDebounce`, `usePagination`, or `useLocalStorage`.</InfoCard>
+
+## Running Tests in CI
+
+Add scripts for local watch mode and a single deterministic CI run with coverage. Vitest's `--run` flag disables watch, and `--coverage` uses the built-in V8 provider.
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage"
+  }
+}
+```
+
+```yaml
+# .github/workflows/test.yml
+name: test
+on: [push, pull_request]
+jobs:
+  vitest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run test:ci
+```
+
+## Common Pitfalls
+
+- **Testing implementation details.** Asserting on `useState` values, internal method calls, or CSS class names makes every refactor break your tests. Assert on rendered output and behavior instead.
+- **Not awaiting async work.** Missing `await` on a `user.*` action or a `findBy*` query causes "act" warnings and false passes. If jsdom logs an act warning, an update happened after your assertion.
+- **Overusing `waitFor`.** Prefer a single `findBy*` query over wrapping a `getBy*` in `waitFor`. Never put side effects (renders, clicks) inside `waitFor` — it can run its callback many times.
+- **Leaning on `getByTestId`.** Test IDs skip the accessibility tree. Add a proper `label`, `aria-label`, or heading and query by role first.
+- **Leaking state between tests.** Without `cleanup()` and `server.resetHandlers()`, one test's mounted DOM or handler override bleeds into the next, producing order-dependent flakiness.
 
 ---
 
 ## Next Steps
 
+You have completed the React Fundamentals track. The natural next move is the backend: learn to build and secure the APIs your tested components consume.
 
+<NextLesson title="Express Setup & Environment" description="Start the backend track and build the APIs your React app talks to." href="/roadmap/express-fundamentals-setup-environment" />
 
-<Resources resources={[{"title":"Testing Library","href":"https://testing-library.com/docs/react-testing-library/intro/"},{"title":"MSW","href":"https://mswjs.io/"}]} />
+<Resources resources={[{"title":"Vitest Documentation","href":"https://vitest.dev/guide/"},{"title":"React Testing Library","href":"https://testing-library.com/docs/react-testing-library/intro/"},{"title":"Mock Service Worker","href":"https://mswjs.io/docs/"},{"title":"Testing — react.dev","href":"https://react.dev/learn/testing"}]} />

@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "20 min"
+duration: "28 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,9 +14,120 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Vue Performance
+## Vue Performance Optimization
 
-<LearningObjectives objectives={["Use v-memo for expensive lists", "Lazy-load heavy components", "Cache views with keep-alive", "Analyze bundle with rollup-plugin-visualizer"]} />
+Vue's reactivity system and virtual DOM are fast by default, but as an application grows the difference between a smooth 60 fps interface and a janky one comes down to how much work Vue is asked to repeat. Large lists that re-render on every keystroke, heavy components loaded eagerly on the first paint, and a bundle that ships every route to every visitor are the three problems you will hit most often in production. This lesson covers the concrete tools Vue 3 gives you to fix each one: `v-memo` to skip re-rendering unchanged subtrees, `defineAsyncComponent` and route-level lazy loading to split code, `<KeepAlive>` to cache expensive component instances, and bundle analysis to find what is actually making your app slow.
+
+<LearningObjectives objectives={["Skip unnecessary re-renders of large lists with v-memo", "Code-split heavy components using defineAsyncComponent and lazy route imports", "Cache stateful views with KeepAlive and its include/max limits", "Measure and shrink your bundle with rollup-plugin-visualizer", "Apply shallowRef and v-once to avoid tracking data that never changes"]} />
+
+## Skipping Re-renders with v-memo
+
+`v-memo` caches a rendered subtree and only re-renders it when one of the values in its dependency array changes. It behaves like `React.memo` but is applied at the template level. It is a scalpel, not a default: reach for it only when profiling shows a genuinely expensive list, because the memoization comparison itself has a cost.
+
+The classic use case is a long list where each row is expensive to render and only a few rows change at a time — for example, a virtualized table where a `selected` flag flips on one item.
+
+```vue
+<template>
+  <div
+    v-for="item in list"
+    :key="item.id"
+    v-memo="[item.id === selectedId]"
+  >
+    <!-- Re-renders only when this row's selected state changes -->
+    <ExpensiveRow :item="item" :selected="item.id === selectedId" />
+  </div>
+</template>
+```
+
+The array `[item.id === selectedId]` is compared against its previous value for each row. If it is unchanged, Vue reuses the last render of that row and skips it entirely, even when the parent re-renders. With a 1,000-row list, moving the selection updates two rows instead of a thousand.
+
+<Warning>An empty `v-memo="[]"` renders once and never updates — it is equivalent to `v-once`. Always include every reactive value the subtree depends on in the array, or you will ship stale UI that silently fails to update.</Warning>
+
+For content that is truly static after first render, `v-once` is simpler and cheaper than `v-memo` because it stores no dependency array to compare.
+
+```vue
+<template>
+  <!-- Rendered a single time, then treated as static -->
+  <footer v-once>
+    <p>&copy; {{ new Date().getFullYear() }} Acme Inc.</p>
+  </footer>
+</template>
+```
+
+## Code-Splitting with Async Components
+
+Shipping every component in the initial bundle delays the first paint. `defineAsyncComponent` wraps a dynamic `import()` so a component is fetched only when it is actually rendered. This is ideal for modals, tabs, charts, and anything below the fold.
+
+```ts
+import { defineAsyncComponent } from 'vue'
+
+const AnalyticsChart = defineAsyncComponent(() =>
+  import('./components/AnalyticsChart.vue')
+)
+```
+
+For a production-grade experience you should also handle the loading and error states rather than showing a blank gap while the chunk downloads.
+
+```ts
+import { defineAsyncComponent } from 'vue'
+import LoadingSpinner from './components/LoadingSpinner.vue'
+import ErrorBox from './components/ErrorBox.vue'
+
+const AnalyticsChart = defineAsyncComponent({
+  loader: () => import('./components/AnalyticsChart.vue'),
+  loadingComponent: LoadingSpinner,
+  errorComponent: ErrorBox,
+  delay: 200,      // wait 200ms before showing the spinner (avoids flicker)
+  timeout: 10000,  // show errorComponent if the chunk fails to load in 10s
+})
+```
+
+The most impactful place to split is the router. Passing a dynamic `import()` as the `component` makes Vue Router create a separate chunk per route, so a visitor only downloads the code for the page they open.
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="lazy">Lazy (per-route chunk)</TabsTrigger>
+    <TabsTrigger value="eager">Eager (single bundle)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="lazy">
+
+```ts
+import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: () => import('./views/Home.vue') },
+    { path: '/dashboard', component: () => import('./views/Dashboard.vue') },
+    { path: '/settings', component: () => import('./views/Settings.vue') },
+  ],
+})
+```
+
+  </TabsContent>
+  <TabsContent value="eager">
+
+```ts
+import Home from './views/Home.vue'
+import Dashboard from './views/Dashboard.vue'
+import Settings from './views/Settings.vue'
+
+// Every view is bundled into the initial download — avoid for large apps.
+const routes = [
+  { path: '/', component: Home },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/settings', component: Settings },
+]
+```
+
+  </TabsContent>
+</Tabs>
+
+<Tip>Vite/Rollup uses the `import()` call to name chunks automatically. To group related routes into one chunk, add a magic comment: `import(/* webpackChunkName: "admin" */ './views/Admin.vue')` — Vite honors the same syntax for backwards compatibility.</Tip>
+
+## Caching Instances with KeepAlive
+
+When you switch between components with a dynamic `<component :is>` or `<router-view>`, Vue destroys the old instance and creates a new one. That throws away scroll position, form input, and any fetched data, forcing a re-fetch and re-render on every switch. Wrapping the switch in `<KeepAlive>` keeps inactive instances in memory instead of destroying them.
 
 ```vue
 <template>
@@ -26,7 +137,137 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 </template>
 ```
 
-<Tip>Use defineAsyncComponent for code-splitting route-level chunks.</Tip>
+Keeping everything alive forever is a memory leak waiting to happen, so scope it. `include`/`exclude` restrict which components are cached by name, and `max` caps how many instances are retained using an LRU (least-recently-used) policy.
+
+```vue
+<template>
+  <!-- Cache only these two components, keep at most 5 instances -->
+  <KeepAlive :include="['UserProfile', 'OrderHistory']" :max="5">
+    <component :is="activeTab" />
+  </KeepAlive>
+</template>
+```
+
+Cached components are not unmounted, so `onMounted` does not run again when you return to them. Use the KeepAlive-specific lifecycle hooks to refresh data or restart timers when a component becomes visible again.
+
+```vue
+<script setup>
+import { onActivated, onDeactivated } from 'vue'
+
+onActivated(() => {
+  // Runs each time the cached component is shown again
+  refreshLiveData()
+})
+
+onDeactivated(() => {
+  // Runs when it is hidden but kept in memory — pause work here
+  pausePolling()
+})
+</script>
+```
+
+## Analyzing and Shrinking the Bundle
+
+You cannot optimize what you have not measured. `rollup-plugin-visualizer` generates an interactive treemap of your production build so you can see which dependencies dominate the bundle — the usual culprits are moment.js, lodash imported wholesale, and duplicated copies of a library.
+
+```bash
+npm install -D rollup-plugin-visualizer
+```
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { visualizer } from 'rollup-plugin-visualizer'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    visualizer({
+      open: true,        // open the report in the browser after build
+      gzipSize: true,    // show gzipped sizes, closer to what users download
+      brotliSize: true,
+      filename: 'dist/stats.html',
+    }),
+  ],
+})
+```
+
+Run the build and the report opens automatically:
+
+```bash
+npm run build
+```
+
+Once you can see the offenders, two Vite settings give you quick wins. Manual chunking splits large, rarely-changing vendor code into its own file so it stays cached across deploys, and raising the warning limit only after you have deliberately reviewed chunk sizes keeps the signal meaningful.
+
+```ts
+// vite.config.ts (build section)
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vue: ['vue', 'vue-router', 'pinia'],
+          charts: ['echarts'],
+        },
+      },
+    },
+  },
+})
+```
+
+<InfoCard>Prefer libraries with per-function entry points and tree-shakable ESM builds. Import `import { debounce } from 'lodash-es'` instead of `import _ from 'lodash'`, and replace moment.js with `date-fns` or the native `Intl` API to drop tens of kilobytes.</InfoCard>
+
+## Avoiding Unnecessary Reactivity
+
+Vue makes every property of a `ref` or `reactive` object deeply reactive, which costs memory and CPU for large, immutable data such as a parsed 10,000-row dataset you only read. `shallowRef` and `shallowReactive` track only the top-level reference, skipping the deep conversion entirely.
+
+```ts
+import { shallowRef, triggerRef } from 'vue'
+
+// Only reassignment of .value triggers updates, not mutation of nested fields
+const dataset = shallowRef(await fetchLargeDataset())
+
+function reload(next) {
+  dataset.value = next        // triggers a re-render
+  // dataset.value.rows.push() would NOT trigger — call triggerRef if needed:
+  triggerRef(dataset)
+}
+```
+
+<Warning>`shallowRef` will not react to nested mutations. If your code updates a property deep inside the object and expects the view to change, either reassign the whole `.value` or call `triggerRef` explicitly. Silent non-updates are the most common bug when adopting shallow reactivity.</Warning>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="index-key">
+    <AccordionTrigger>Using the array index as a `:key`</AccordionTrigger>
+    <AccordionContent>
+      `:key="index"` breaks Vue's DOM-reuse heuristics when the list reorders, inserts, or deletes, causing wrong elements to be patched and component state to leak between rows. Always key by a stable unique id, and remember `v-memo` relies on correct keys to work at all.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="vif-vfor">
+    <AccordionTrigger>Combining `v-if` and `v-for` on the same element</AccordionTrigger>
+    <AccordionContent>
+      In Vue 3 `v-if` has higher priority, so the condition runs before the loop variable exists — a runtime error or unintended filtering on every render. Filter the list in a `computed` property instead, which also memoizes the result.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="premature">
+    <AccordionTrigger>Reaching for `v-memo` everywhere</AccordionTrigger>
+    <AccordionContent>
+      `v-memo` adds a comparison on every render. On small or cheap lists it is slower than plain rendering. Profile with the Vue DevTools flame graph first, apply it only to the proven hotspot, and measure again to confirm the win.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+- Profile before optimizing — use the **Vue DevTools** performance tab and the browser's Performance panel to find the real bottleneck instead of guessing.
+- Lazy-load at the route level first; it is the single highest-leverage change for initial load time.
+- Reserve `v-memo` for large lists with expensive rows, and always list every dependency it reads.
+- Scope `<KeepAlive>` with `include` and `max` so caching does not turn into an unbounded memory leak.
+- Re-run `rollup-plugin-visualizer` after adding any new dependency to catch bundle regressions early.
 
 ---
 
@@ -34,4 +275,4 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 <NextLesson title="SSR with Nuxt" description="Nuxt 3 rendering." href="/roadmap/vue-fundamentals-advanced-ssr-nuxt" />
 
-<Resources resources={[{"title":"Vue Performance","href":"https://vuejs.org/guide/best-practices/performance.html"}]} />
+<Resources resources={[{"title":"Vue Performance Guide","href":"https://vuejs.org/guide/best-practices/performance.html"},{"title":"KeepAlive API","href":"https://vuejs.org/guide/built-ins/keep-alive.html"},{"title":"Async Components","href":"https://vuejs.org/guide/components/async.html"},{"title":"Vite Build Options","href":"https://vitejs.dev/config/build-options.html"}]} />

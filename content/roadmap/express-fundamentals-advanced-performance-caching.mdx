@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "advanced"
 level: "advanced"
-duration: "20 min"
+duration: "26 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
@@ -18,36 +18,187 @@ import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react
 
 ## Performance & Caching
 
-Caching reduces database load and improves response times for read-heavy endpoints.
+Once an Express API is correct, the next job is making it fast under load. Most read-heavy endpoints repeat the same expensive work — a database query, an aggregation, a third-party call — for thousands of identical requests. Caching stores the computed result close to the app so repeat requests skip that work entirely, cutting p95 latency from hundreds of milliseconds to single digits and taking pressure off your database. In this lesson you will add a Redis cache, compress responses, protect the API with rate limiting, and lean on HTTP caching headers — the same layered approach production APIs use.
 
-<LearningObjectives objectives={["Set up Redis with ioredis", "Build cache-aside middleware", "Add compression and rate limiting", "Measure latency improvements"]} />
+<LearningObjectives objectives={["Measure baseline latency and throughput before optimizing", "Implement a cache-aside layer with Redis and ioredis", "Invalidate cache keys safely on writes", "Add response compression and distributed rate limiting", "Use HTTP caching headers to offload the client and CDN"]} />
+
+### Measure Before You Optimize
+
+Never guess where the time goes. Establish a baseline with a load-testing tool so every change is backed by numbers. `autocannon` fires concurrent requests and reports latency percentiles and requests per second.
+
+```bash
+# 50 concurrent connections for 10 seconds
+npx autocannon -c 50 -d 10 http://localhost:3000/api/products
+```
+
+<Tip title="Focus on the tail">Track p95 and p99 latency, not the average. Averages hide the slow requests that real users actually notice.</Tip>
+
+## Caching with Redis
+
+Redis is an in-memory key-value store that reads and writes in microseconds, which makes it the standard backing store for API caches. The `ioredis` client gives you promises, connection pooling, and cluster support. Configure it to fail loudly and cap retries so a Redis outage never hangs a request.
 
 ```javascript
 import Redis from "ioredis"
-import compression from "compression"
-import rateLimit from "express-rate-limit"
 
-const redis = new Redis(process.env.REDIS_URL)
-app.use(compression())
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }))
+const redis = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: true,
+})
 
-async function cacheMiddleware(ttl = 60) {
+redis.on("error", (err) => console.error("Redis connection error:", err))
+```
+
+### The Cache-Aside Pattern
+
+Cache-aside (lazy loading) is the most common strategy: the app checks the cache first, and only on a miss does it hit the database and populate the cache. The middleware below intercepts `res.json`, stores the serialized body with a TTL, and short-circuits future requests. Crucially, it **fails open** — if Redis is unreachable, the request still reaches your handler instead of erroring.
+
+```javascript
+function cache(ttlSeconds = 60) {
   return async (req, res, next) => {
+    if (req.method !== "GET") return next()
+
     const key = `cache:${req.originalUrl}`
-    const cached = await redis.get(key)
-    if (cached) return res.json(JSON.parse(cached))
-    const originalJson = res.json.bind(res)
+
+    try {
+      const hit = await redis.get(key)
+      if (hit) {
+        res.setHeader("X-Cache", "HIT")
+        return res.type("application/json").send(hit)
+      }
+    } catch {
+      return next() // Redis down → skip cache, serve normally
+    }
+
+    res.setHeader("X-Cache", "MISS")
+    const sendJson = res.json.bind(res)
     res.json = (body) => {
-      redis.setex(key, ttl, JSON.stringify(body))
-      return originalJson(body)
+      if (res.statusCode === 200) {
+        redis.set(key, JSON.stringify(body), "EX", ttlSeconds).catch(() => {})
+      }
+      return sendJson(body)
     }
     next()
   }
 }
+
+app.get("/api/products", cache(120), async (req, res) => {
+  const products = await prisma.product.findMany()
+  res.json(products)
+})
 ```
 
-<Tip title="Cache invalidation">Invalidate keys on POST/PATCH/DELETE, or use short TTLs for eventually consistent data.</Tip>
+<Tabs defaultValue="aside" className="not-prose">
+  <TabsList>
+    <TabsTrigger value="aside">Cache-Aside</TabsTrigger>
+    <TabsTrigger value="through">Write-Through</TabsTrigger>
+    <TabsTrigger value="ttl">TTL-Only</TabsTrigger>
+  </TabsList>
+  <TabsContent value="aside">App reads cache first, loads from DB on a miss, then populates the cache. Simple and resilient; the first request after expiry is slow (a "cold" miss).</TabsContent>
+  <TabsContent value="through">Every write updates the DB and the cache together, so reads are always warm. Adds write latency and complexity — use it for hot keys that are read far more than written.</TabsContent>
+  <TabsContent value="ttl">No explicit invalidation — just a short TTL (e.g. 30s). Perfect for data that can be slightly stale, like dashboards or public listings.</TabsContent>
+</Tabs>
 
+## Cache Invalidation
+
+Stale data is the classic caching bug. When the underlying data changes, evict the affected keys. Use `SCAN` (never `KEYS`, which blocks the entire Redis server) to remove keys by pattern, and pipeline the deletes for efficiency.
+
+```javascript
+async function invalidate(pattern) {
+  const stream = redis.scanStream({ match: pattern, count: 100 })
+  const pipeline = redis.pipeline()
+  for await (const keys of stream) {
+    for (const key of keys) pipeline.del(key)
+  }
+  await pipeline.exec()
+}
+
+app.post("/api/products", requireAuth, async (req, res) => {
+  const product = await prisma.product.create({ data: req.body })
+  await invalidate("cache:/api/products*")
+  res.status(201).json(product)
+})
+```
+
+<Warning>`KEYS *` scans the whole keyspace and blocks Redis until it finishes — it can freeze production. Always use `SCAN` / `scanStream` for pattern matching against a live server.</Warning>
+
+## Compression
+
+Compressing response bodies with gzip or Brotli shrinks JSON and HTML payloads by 60-80%, which is often the single biggest win for perceived speed. Add the `compression` middleware early in the stack and set a threshold so tiny responses aren't compressed (the CPU cost isn't worth it below ~1 KB).
+
+```javascript
+import compression from "compression"
+
+app.use(
+  compression({
+    threshold: 1024, // only compress responses larger than 1 KB
+    filter: (req, res) => {
+      if (req.headers["x-no-compression"]) return false
+      return compression.filter(req, res)
+    },
+  })
+)
+```
+
+<InfoCard title="Offload it to the edge">If you run behind Nginx, a CDN, or a platform like Fly.io or Render, compression is often handled at the proxy layer. Compress in one place only — double compression wastes CPU for no gain.</InfoCard>
+
+## Rate Limiting
+
+Rate limiting protects your API from abuse, scrapers, and accidental request storms. `express-rate-limit` counts requests per client, but its default in-memory store breaks across multiple instances — each process keeps its own counter. Back it with Redis via `rate-limit-redis` so the limit is shared cluster-wide.
+
+```javascript
+import rateLimit from "express-rate-limit"
+import { RedisStore } from "rate-limit-redis"
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,                 // 100 requests per window per IP
+  standardHeaders: true,    // send RateLimit-* headers
+  legacyHeaders: false,
+  store: new RedisStore({
+    sendCommand: (...args) => redis.call(...args),
+  }),
+})
+
+app.use("/api/", apiLimiter)
+```
+
+<Tip title="Tighter limits on sensitive routes">Apply a stricter limiter (e.g. `max: 5` per 15 min) to `/api/auth/login` and password-reset endpoints to slow down credential-stuffing attacks.</Tip>
+
+## HTTP Caching Headers
+
+The fastest request is the one your server never handles. `Cache-Control` and `ETag` headers let browsers and CDNs cache responses themselves. Express computes weak ETags automatically and answers with `304 Not Modified` when the client's cached copy is still valid. For public, rarely-changing data, add an explicit `Cache-Control`.
+
+```javascript
+app.get("/api/config", (req, res) => {
+  res.set("Cache-Control", "public, max-age=300, stale-while-revalidate=60")
+  res.json({ features: { darkMode: true }, version: "3.1.0" })
+})
+```
+
+`stale-while-revalidate` lets the CDN serve a slightly stale response instantly while it refreshes in the background — no user ever waits on the origin. Use `private, no-store` for anything user-specific so it is never cached by a shared proxy.
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible className="not-prose">
+  <AccordionItem value="user-data">
+    <AccordionTrigger>Caching user-specific responses under a shared key</AccordionTrigger>
+    <AccordionContent>Keying only on the URL means user A can receive user B's cached data. Include the user or tenant id in the key (`cache:${userId}:${req.originalUrl}`) or skip the cache for authenticated, personalized routes.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="fail-closed">
+    <AccordionTrigger>Letting a Redis outage take down the API</AccordionTrigger>
+    <AccordionContent>If cache reads throw and aren't caught, every request fails. Always fail open: wrap cache calls in try/catch and fall through to the origin when Redis is unavailable.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="ttl">
+    <AccordionTrigger>Infinite TTLs with no invalidation</AccordionTrigger>
+    <AccordionContent>Data cached forever with no eviction path drifts out of sync. Pair every long-lived key with explicit invalidation on writes, or use a short TTL as a safety net.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="stampede">
+    <AccordionTrigger>Cache stampede on expiry</AccordionTrigger>
+    <AccordionContent>When a hot key expires, hundreds of concurrent requests all miss and hit the database at once. Add jitter to TTLs, or use a short lock so only one request repopulates the key.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Warning>Only cache idempotent, safe methods (`GET`, `HEAD`). Never cache responses to `POST`, `PATCH`, or `DELETE` — they mutate state and their responses are request-specific.</Warning>
 
 ---
 
@@ -55,4 +206,4 @@ async function cacheMiddleware(ttl = 60) {
 
 <NextLesson title="Microservices Architecture" description="Split services and communicate via HTTP." href="/roadmap/express-fundamentals-advanced-microservices" />
 
-<Resources resources={[{"title":"Redis","href":"https://redis.io/docs/"}]} />
+<Resources resources={[{"title":"Redis Documentation","href":"https://redis.io/docs/"},{"title":"ioredis","href":"https://github.com/redis/ioredis"},{"title":"express-rate-limit","href":"https://express-rate-limit.mintlify.app/"},{"title":"MDN: Cache-Control","href":"https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control"}]} />

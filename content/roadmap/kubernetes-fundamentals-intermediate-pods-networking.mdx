@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "22 min"
+duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,7 +16,83 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Pods & Networking
 
-<LearningObjectives objectives={["Write Pod and Deployment manifests", "Expose apps with ClusterIP and LoadBalancer Services", "Understand cluster DNS", "Restrict traffic with NetworkPolicy"]} />
+A **Pod** is the smallest deployable unit in Kubernetes — one or more containers that share a network namespace, storage volumes, and a lifecycle. Once you have Pods running across many nodes, the hard question becomes: how do they find and talk to each other when Pod IPs change on every restart? This lesson covers the Kubernetes networking model end to end: how Pods get IPs, how **Services** give you a stable address, how **cluster DNS** turns names into IPs, and how **NetworkPolicies** lock down who can talk to whom. Getting this right is the difference between a cluster that "works on my machine" and one that survives a node failure at 3 a.m.
+
+<LearningObjectives objectives={["Explain the Pod lifecycle and configure liveness, readiness, and startup probes", "Describe the flat Pod networking model and how containers in a Pod share a namespace", "Expose workloads with ClusterIP, NodePort, LoadBalancer, and headless Services", "Resolve workloads using CoreDNS FQDNs and SRV records", "Restrict east-west traffic with a default-deny NetworkPolicy"]} />
+
+## The Pod Lifecycle
+
+Every Pod moves through a `phase` — a coarse status you see in `kubectl get pods`. Understanding these phases is essential for debugging why traffic never reaches your container.
+
+- **Pending** — the Pod is accepted but not yet scheduled, or images are still pulling.
+- **Running** — the Pod is bound to a node and at least one container is live.
+- **Succeeded** — all containers exited with status `0` and will not restart.
+- **Failed** — all containers terminated and at least one exited non-zero.
+- **Unknown** — the node hosting the Pod is unreachable.
+
+Within a Running Pod, each container reports its own state (`Waiting`, `Running`, or `Terminated`). Kubernetes decides whether a container is healthy using **probes**:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  containers:
+    - name: api
+      image: ghcr.io/acme/api:1.4.0
+      ports:
+        - containerPort: 3000
+      startupProbe: # Gives slow-booting apps time before other probes run
+        httpGet:
+          path: /healthz
+          port: 3000
+        failureThreshold: 30
+        periodSeconds: 2
+      readinessProbe: # Controls whether the Pod receives Service traffic
+        httpGet:
+          path: /ready
+          port: 3000
+        periodSeconds: 5
+      livenessProbe: # Restarts the container if it hangs
+        httpGet:
+          path: /healthz
+          port: 3000
+        initialDelaySeconds: 10
+        periodSeconds: 10
+```
+
+<Warning>
+A failing **liveness** probe restarts the container; a failing **readiness** probe only pulls the Pod out of Service rotation. Wiring a slow dependency (like a database check) into your liveness probe is a classic mistake — a brief DB blip triggers a restart storm. Use readiness for dependencies, liveness only for "is this process wedged?".
+</Warning>
+
+## The Kubernetes Networking Model
+
+Kubernetes enforces a deliberately simple, flat network model implemented by a **CNI plugin** (Calico, Cilium, Flannel, and others). Three rules always hold:
+
+1. Every Pod gets its **own unique, cluster-wide IP address**.
+2. Every Pod can reach every other Pod **without NAT**, across nodes.
+3. All containers **inside a single Pod** share one network namespace — they reach each other over `localhost` and must not collide on ports.
+
+Because containers in a Pod share `localhost`, a sidecar (say, a metrics exporter) can scrape the main container at `127.0.0.1:3000` with zero service discovery. You can confirm the model directly:
+
+```bash
+# Each Pod has its own IP on the cluster network
+kubectl get pods -o wide
+
+# From inside a Pod, curl another Pod's IP directly — no NAT, no proxy
+kubectl exec -it api -- curl http://10.244.1.7:3000/healthz
+```
+
+<InfoCard>
+Pod IPs are **ephemeral**. When a Deployment replaces a crashed Pod, the new one gets a fresh IP. Never hardcode a Pod IP in application config — that is exactly the problem Services solve.
+</InfoCard>
+
+## Services: A Stable Address for Ephemeral Pods
+
+A **Service** gives a set of Pods a single, permanent virtual IP (the ClusterIP) and DNS name. It selects Pods by label and load-balances across the healthy ones. `kube-proxy` programs the underlying `iptables` or IPVS rules so traffic to the virtual IP is transparently distributed.
 
 ```yaml
 apiVersion: v1
@@ -25,19 +101,154 @@ metadata:
   name: api-service
 spec:
   selector:
-    app: api
+    app: api # Matches the Pod label — this is the glue
   ports:
-    - port: 80
-      targetPort: 3000
+    - name: http
+      port: 80 # Port the Service exposes
+      targetPort: 3000 # Port the container listens on
   type: ClusterIP
 ```
 
-<Tabs defaultValue="dns"><TabsList><TabsTrigger value="dns">DNS</TabsTrigger><TabsTrigger value="policy">NetworkPolicy</TabsTrigger></TabsList><TabsContent value="dns">Pods reach services at http://api-service.default.svc.cluster.local.</TabsContent><TabsContent value="policy">NetworkPolicy uses label selectors to allow/deny ingress and egress.</TabsContent></Tabs>
+The Service tracks which Pods are ready via an **EndpointSlice** object. Only Pods passing their readiness probe are added, so a rolling update never routes traffic to a booting Pod.
 
+```bash
+# See which Pod IPs currently back the Service
+kubectl get endpointslices -l kubernetes.io/service-name=api-service
+```
+
+### Choosing a Service Type
+
+<Tabs defaultValue="clusterip">
+  <TabsList>
+    <TabsTrigger value="clusterip">ClusterIP</TabsTrigger>
+    <TabsTrigger value="nodeport">NodePort</TabsTrigger>
+    <TabsTrigger value="lb">LoadBalancer</TabsTrigger>
+    <TabsTrigger value="headless">Headless</TabsTrigger>
+  </TabsList>
+  <TabsContent value="clusterip">
+    The default. Exposes the Service on an internal virtual IP reachable **only from inside the cluster**. Use it for internal APIs, databases, and anything fronted by an Ingress.
+  </TabsContent>
+  <TabsContent value="nodeport">
+    Opens a static port (default range **30000–32767**) on every node. Reach it at `<NodeIP>:<NodePort>`. Handy for bare-metal or local testing, but you manage IPs and ports yourself.
+  </TabsContent>
+  <TabsContent value="lb">
+    Provisions a real cloud load balancer (AWS ELB, GCP LB, Azure LB) with an external IP. This is the standard way to expose a single service to the public internet on managed Kubernetes.
+  </TabsContent>
+  <TabsContent value="headless">
+    Set `clusterIP: None`. No virtual IP or proxying — DNS returns the **A records of the individual Pods**. Essential for StatefulSets where clients need to address specific replicas (e.g. a database primary).
+  </TabsContent>
+</Tabs>
+
+## Cluster DNS with CoreDNS
+
+Every cluster runs **CoreDNS** as an internal DNS server. When you create a Service, it automatically gets a DNS name, so applications resolve names instead of chasing IPs. The fully qualified domain name follows a fixed pattern:
+
+```text
+<service-name>.<namespace>.svc.cluster.local
+```
+
+Resolution is namespace-aware, so you can use progressively shorter names:
+
+```bash
+# Same namespace — bare service name works
+curl http://api-service/healthz
+
+# Cross-namespace — include the namespace
+curl http://api-service.production/healthz
+
+# Fully qualified — always works from anywhere
+curl http://api-service.production.svc.cluster.local/healthz
+```
+
+For **named ports**, CoreDNS also publishes SRV records, letting clients discover the port without hardcoding it:
+
+```text
+_http._tcp.api-service.production.svc.cluster.local
+```
+
+A **headless** Service resolves differently: instead of one virtual IP, a DNS query returns one A record per backing Pod — the mechanism StatefulSet clients use to reach a specific replica like `web-0.web.production.svc.cluster.local`.
+
+<Tip>
+Debug DNS from inside the cluster instead of guessing. Run a throwaway Pod and query CoreDNS directly: `kubectl run tmp --rm -it --image=busybox:1.36 -- nslookup api-service.production`. If it fails, check that the `kube-dns` Service in `kube-system` has endpoints.
+</Tip>
+
+## Restricting Traffic with NetworkPolicy
+
+By default the Kubernetes model is **allow-all**: any Pod can open a connection to any other Pod. In production that is rarely acceptable. A **NetworkPolicy** is a namespaced object that whitelists allowed ingress and egress using label selectors.
+
+The critical rule: a Pod is unaffected until it is selected by at least one policy. The moment any policy selects it for a given direction, that Pod switches to **default-deny** for that direction, and only explicitly listed traffic is permitted. A common baseline is to deny all ingress in a namespace, then layer on specific allowances:
+
+```yaml
+# 1. Baseline: deny all ingress to every Pod in the namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: production
+spec:
+  podSelector: {} # Empty selector = every Pod in the namespace
+  policyTypes:
+    - Ingress
 ---
+# 2. Allow only the frontend to reach the API on port 3000
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-to-api
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+      ports:
+        - protocol: TCP
+          port: 3000
+```
+
+<Warning>
+NetworkPolicy is enforced by the **CNI plugin**, not the Kubernetes API server. Calico and Cilium enforce it; plain Flannel does **not**. If you apply the policy above on a cluster whose CNI ignores it, the API accepts the object but traffic is never actually blocked. Always confirm your CNI supports NetworkPolicy.
+</Warning>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="selector">
+    <AccordionTrigger>Service has no endpoints</AccordionTrigger>
+    <AccordionContent>
+      Almost always a label mismatch. The Service `selector` must exactly match the Pod labels, and the Pods must be passing readiness. Run `kubectl describe service api-service` and check the `Endpoints` field — if it is empty, fix the labels or the readiness probe.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="port">
+    <AccordionTrigger>Confusing port vs targetPort</AccordionTrigger>
+    <AccordionContent>
+      `port` is what clients hit on the Service; `targetPort` is the port your container actually listens on. Setting `targetPort` to the wrong value yields connection-refused errors even though the Service and Pods look healthy.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="egress">
+    <AccordionTrigger>Egress policy breaks DNS</AccordionTrigger>
+    <AccordionContent>
+      A default-deny **egress** policy also blocks the Pod's DNS lookups to CoreDNS, so every hostname resolution fails. Remember to explicitly allow egress on UDP/TCP port 53 to the `kube-system` namespace when locking down egress.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+- **Always front Pods with a Service.** Never depend on a Pod IP; it changes on every reschedule.
+- **Separate readiness from liveness.** Readiness gates traffic, liveness gates restarts — never put dependency checks in liveness.
+- **Adopt default-deny early.** Start each production namespace with a deny-all ingress policy and open only the paths you need.
+- **Prefer ClusterIP + Ingress over many LoadBalancers.** One cloud load balancer per service gets expensive fast; route HTTP through a single Ingress instead.
+- **Name your ports.** Named ports enable SRV records and make manifests self-documenting.
 
 ## Next Steps
 
-<NextLesson title="Helm Charts" description="Package apps with Helm." href="/roadmap/kubernetes-fundamentals-intermediate-helm-charts" />
+<NextLesson title="Helm Charts" description="Package, template, and version your Kubernetes manifests with Helm so you can deploy the same app across environments." href="/roadmap/kubernetes-fundamentals-intermediate-helm-charts" />
 
-<Resources resources={[{"title":"Kubernetes Services","href":"https://kubernetes.io/docs/concepts/services-networking/service/"}]} />
+<Resources resources={[{"title":"Kubernetes Services","href":"https://kubernetes.io/docs/concepts/services-networking/service/"},{"title":"DNS for Services and Pods","href":"https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/"},{"title":"Network Policies","href":"https://kubernetes.io/docs/concepts/services-networking/network-policies/"},{"title":"Configure Liveness, Readiness and Startup Probes","href":"https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"}]} />

@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "28 min"
+duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,17 +14,263 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Nuxt 3 SSR
+Server-side rendering (SSR) runs your Vue components on the server, sends fully-formed HTML to the browser, and then "hydrates" that HTML into a live, interactive app. The payoff is real: faster first paint, meaningful content for search-engine crawlers and social-preview scrapers, and less blank-screen time on slow devices. Nuxt is the framework that makes SSR practical in Vue 3 — it wires up a server engine (Nitro), a file-based router, auto-imported composables, and deployment presets so you can ship an SSR app without hand-rolling a Node server. This lesson covers how rendering and hydration actually work, how to fetch data correctly on both server and client, how to keep secrets on the server, and how to deploy.
 
-<LearningObjectives objectives={["Fetch data with useFetch/useAsyncData", "Understand SSR vs CSR trade-offs", "Deploy to Vercel or Node server", "Use server routes for secrets"]} />
+<LearningObjectives objectives={["Explain SSR, hydration, and how they differ from client-only rendering", "Fetch data safely with useFetch and useAsyncData", "Keep secrets server-side with runtimeConfig and server routes", "Configure hybrid rendering with routeRules", "Build and deploy a Nuxt app with Nitro presets"]} />
+
+## How SSR and hydration work
+
+In a plain SPA, the browser downloads an empty `<div id="app">`, then JavaScript builds the entire page client-side. With SSR, Nuxt runs your components on the server first, produces the final HTML, and ships it in the initial response. The browser paints that HTML immediately. Then the same components run again in the browser and attach event listeners to the existing DOM — this is **hydration**. After hydration, the page behaves like a normal SPA.
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="ssr">SSR</TabsTrigger>
+    <TabsTrigger value="csr">CSR (SPA)</TabsTrigger>
+    <TabsTrigger value="ssg">SSG</TabsTrigger>
+  </TabsList>
+  <TabsContent value="ssr">
+    HTML is rendered per request on the server. Best for dynamic, personalized, or frequently-changing content. Requires a running server (or serverless functions).
+  </TabsContent>
+  <TabsContent value="csr">
+    Server sends an empty shell; the browser renders everything. Simplest to host (static files) but slow first paint and weak SEO without extra tooling.
+  </TabsContent>
+  <TabsContent value="ssg">
+    HTML is rendered once at build time (`nuxi generate`). Ideal for content that rarely changes — blogs, docs, marketing pages. Deploys as static files to any CDN.
+  </TabsContent>
+</Tabs>
+
+<InfoCard>
+The single most important SSR rule: code in `<script setup>` runs on **both** the server and the client. Anything that only exists in the browser — `window`, `document`, `localStorage`, `IntersectionObserver` — must be guarded with `import.meta.client` or moved into `onMounted`, which only fires after hydration in the browser.
+</InfoCard>
+
+## Fetching data with useFetch and useAsyncData
+
+The naive approach — calling `$fetch` directly in setup — fetches the data on the server, then fetches it *again* on the client after hydration, doubling your API load. Nuxt solves this with `useFetch` and `useAsyncData`, which fetch once on the server and serialize the result into the HTML payload so the client reuses it instead of refetching.
 
 ```vue
-<script setup>
-const { data: posts } = await useFetch('/api/posts')
+<script setup lang="ts">
+// useFetch is the high-level wrapper: URL in, reactive state out.
+const { data: posts, pending, error, refresh } = await useFetch('/api/posts', {
+  key: 'posts-list',      // stable cache key across server/client
+  lazy: false,            // block navigation until data resolves (default)
+  default: () => [],      // value used before the request resolves
+})
 </script>
+
+<template>
+  <p v-if="pending">Loading…</p>
+  <p v-else-if="error">Failed to load: {{ error.message }}</p>
+  <ul v-else>
+    <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
+  </ul>
+</template>
 ```
 
-<Card><CardHeader><CardTitle>Server routes</CardTitle></CardHeader><CardContent>Place API keys in server/api/` — never expose them to the client bundle.</CardContent></Card>
+Reach for `useAsyncData` when the logic is more than a single URL — combining calls, running an SDK, or transforming a response before it hits the payload:
+
+```ts
+const { data: dashboard } = await useAsyncData('dashboard', async () => {
+  const [stats, activity] = await Promise.all([
+    $fetch('/api/stats'),
+    $fetch('/api/activity'),
+  ])
+  return { stats, activity }
+}, {
+  transform: (d) => ({ ...d, total: d.stats.a + d.stats.b }),
+  watch: [], // re-run when reactive deps change
+})
+```
+
+<Tip>
+Use the `pick` and `transform` options to trim the payload. If a component only needs `id` and `title`, `pick: ['id', 'title']` keeps the megabytes of unused API fields out of the HTML that ships to every visitor.
+</Tip>
+
+## Keeping secrets on the server
+
+A bundle sent to the browser is public — anyone can read it in DevTools. API keys, database URLs, and tokens must never appear in client code. Nuxt gives you two tools: **`runtimeConfig`** for values, and **server routes** for logic.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    // Private — server-only. Never exposed to the client bundle.
+    stripeSecret: '',            // set via NUXT_STRIPE_SECRET
+    apiBase: 'https://api.internal',
+    public: {
+      // Exposed to the client. Safe values only.
+      siteUrl: 'https://example.com', // set via NUXT_PUBLIC_SITE_URL
+    },
+  },
+})
+```
+
+Values default from `nuxt.config.ts` but are **overridden at runtime** by environment variables: private keys use the `NUXT_` prefix and public keys use `NUXT_PUBLIC_`, both converted from camelCase to SCREAMING_SNAKE_CASE (so `stripeSecret` ← `NUXT_STRIPE_SECRET`). Read them with `useRuntimeConfig()`:
+
+```ts
+// server/api/checkout.post.ts
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig(event)      // full config on the server
+  const body = await readBody(event)
+  const session = await createStripeSession(config.stripeSecret, body.items)
+  return { url: session.url }
+})
+```
+
+<Warning>
+On the **client**, `useRuntimeConfig()` returns only the `public` block. If you read `config.stripeSecret` in a component, you get an empty string — and if you had hardcoded the secret instead of using `runtimeConfig`, it would ship to every browser. Always route privileged calls through `server/api`.
+</Warning>
+
+Server routes live in `server/api/` and use Nitro's `defineEventHandler`. The filename encodes the HTTP method (`checkout.post.ts` → `POST /api/checkout`) and brackets create params (`server/api/users/[id].ts` → `GET /api/users/:id`).
+
+```ts
+// server/api/posts.get.ts
+export default defineEventHandler(async (event) => {
+  const { page = '1' } = getQuery(event)
+  const config = useRuntimeConfig(event)
+  return await $fetch(`${config.apiBase}/posts`, {
+    query: { page },
+    headers: { authorization: `Bearer ${config.apiToken}` },
+  })
+})
+```
+
+## Hybrid rendering with routeRules
+
+You rarely want one rendering mode for the whole app. Nuxt's `routeRules` lets you pick a strategy per route — prerender the landing page, cache the blog with stale-while-revalidate, and ship the admin dashboard as a client-only SPA — all in one build.
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  routeRules: {
+    '/': { prerender: true },                       // static at build time
+    '/blog/**': { swr: 3600 },                      // cache 1h, revalidate in background
+    '/products/**': { isr: true },                  // incremental static regeneration
+    '/admin/**': { ssr: false },                    // client-only SPA (no server render)
+    '/api/legacy/**': { proxy: 'https://old.example.com/**' },
+    '/docs': { redirect: '/documentation' },
+  },
+})
+```
+
+<InfoCard>
+`swr` and `isr` cache rendered HTML at the edge or CDN so most visitors get a static-fast response while content stays fresh. `ssr: false` disables server rendering for that route only — useful for heavily interactive, auth-gated screens where SEO does not matter and hydration cost would be wasted.
+</InfoCard>
+
+## Avoiding hydration mismatches
+
+Hydration expects the server-rendered HTML and the client's first render to be **identical**. When they differ, Vue logs a "Hydration node mismatch" warning and discards the server markup for that subtree — losing the SSR benefit and sometimes flashing wrong content. The usual causes are non-deterministic values (`Date.now()`, `Math.random()`) and browser-only APIs read during render.
+
+```vue
+<script setup lang="ts">
+// BAD: the server timestamp and client timestamp never match.
+// const now = new Date().toLocaleTimeString()
+
+// GOOD: compute browser-only values after hydration.
+const now = ref('')
+onMounted(() => { now.value = new Date().toLocaleTimeString() })
+</script>
+
+<template>
+  <!-- Wrap genuinely client-only widgets so they skip SSR entirely. -->
+  <ClientOnly>
+    <LiveChart />
+    <template #fallback><span>Loading chart…</span></template>
+  </ClientOnly>
+</template>
+```
+
+For state that must be shared across components *and* survive the server-to-client transfer, use `useState` rather than a module-level `ref` — `useState` is serialized into the payload and is not shared between concurrent requests on the server.
+
+```ts
+// Safe SSR state: unique per request, hydrated on the client.
+const counter = useState('counter', () => 0)
+```
+
+## Building and deploying
+
+Nuxt's server engine, **Nitro**, compiles your app for a target platform using a "preset." Many hosts are auto-detected, so the same codebase deploys to serverless, edge, or a long-running Node process without code changes.
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="node">Node server</TabsTrigger>
+    <TabsTrigger value="vercel">Vercel</TabsTrigger>
+    <TabsTrigger value="static">Static (SSG)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="node">
+
+```bash
+# Build the SSR app into .output/
+npm run build
+
+# Run the standalone Node server (no extra deps needed)
+node .output/server/index.mjs
+# Listens on http://localhost:3000 (set PORT / HOST to override)
+```
+
+  </TabsContent>
+  <TabsContent value="vercel">
+
+```ts
+// nuxt.config.ts — usually auto-detected on Vercel, but explicit is fine
+export default defineNuxtConfig({
+  nitro: { preset: 'vercel' },
+})
+```
+
+```bash
+# Vercel runs `npm run build`; output goes to .vercel/output
+git push   # connect the repo in the Vercel dashboard and it deploys on push
+```
+
+  </TabsContent>
+  <TabsContent value="static">
+
+```bash
+# Prerender every route to plain HTML for CDN hosting
+npm run generate      # runs `nuxi generate`
+npx nuxi preview      # serve .output/public locally to verify
+```
+
+  </TabsContent>
+</Tabs>
+
+<Warning>
+`nuxi generate` (SSG) crawls links from your entry pages. Routes that are not reachable by a link — or that depend on request-time data — will not be prerendered. For those, keep SSR/ISR or list them explicitly under `nitro.prerender.routes`.
+</Warning>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="double-fetch">
+    <AccordionTrigger>Calling $fetch directly in setup</AccordionTrigger>
+    <AccordionContent>
+      Bare `$fetch` in `<script setup>` runs on the server and again after hydration, doubling requests. Wrap it in `useFetch` or `useAsyncData` so the result is transferred through the payload. Use raw `$fetch` only inside event handlers, `onMounted`, or server routes.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="missing-key">
+    <AccordionTrigger>Omitting a stable key</AccordionTrigger>
+    <AccordionContent>
+      Without an explicit `key`, `useAsyncData` derives one from the call site, which can collide or refetch unexpectedly. Give data-fetching composables a stable, unique key so server and client agree on the cached value.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="window">
+    <AccordionTrigger>Touching window/document during render</AccordionTrigger>
+    <AccordionContent>
+      `window is not defined` crashes the server render. Guard browser APIs with `if (import.meta.client)` or move them into `onMounted`. Wrap browser-only components in `&lt;ClientOnly&gt;`.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="global-state">
+    <AccordionTrigger>Module-level mutable state on the server</AccordionTrigger>
+    <AccordionContent>
+      A `ref` declared at module scope is shared across all requests on the server, leaking one user's data into another's response. Use `useState` for request-scoped, SSR-safe shared state.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Card>
+  <CardHeader><CardTitle>Server routes keep secrets safe</CardTitle></CardHeader>
+  <CardContent>Place API keys in <code>runtimeConfig</code> (no <code>public</code>) and call third-party services from <code>server/api/</code> handlers — never from a component, so credentials stay out of the client bundle.</CardContent>
+</Card>
 
 ---
 
@@ -32,4 +278,4 @@ const { data: posts } = await useFetch('/api/posts')
 
 <NextLesson title="Testing Vue Applications" description="Vitest + Vue Test Utils." href="/roadmap/vue-fundamentals-advanced-testing-vue" />
 
-<Resources resources={[{"title":"Nuxt","href":"https://nuxt.com/docs"}]} />
+<Resources resources={[{"title":"Nuxt Docs","href":"https://nuxt.com/docs"},{"title":"Data Fetching Guide","href":"https://nuxt.com/docs/getting-started/data-fetching"},{"title":"Nitro Deployment Presets","href":"https://nitro.build/deploy"},{"title":"runtimeConfig Reference","href":"https://nuxt.com/docs/guide/going-further/runtime-config"}]} />

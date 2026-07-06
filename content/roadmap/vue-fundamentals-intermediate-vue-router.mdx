@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "18 min"
+duration: "24 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,22 +16,305 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Vue Router
 
-<LearningObjectives objectives={["Configure dynamic routes", "Add navigation guards", "Lazy-load route components", "Use route meta for permissions"]} />
+Vue Router is the official client-side routing library for Vue. It maps URLs to components so a single-page application can render different views, keep the browser address bar in sync, support the back/forward buttons, and let users deep-link or bookmark any screen — all without a full page reload. Once your app grows past a couple of screens, hand-rolling this with `v-if` becomes unmanageable, and Vue Router gives you dynamic segments, nested layouts, code-splitting, and route-level access control out of the box.
 
-```js
-const routes = [
-  { path: '/users/:id', component: () => import('./UserView.vue'), meta: { requiresAuth: true } },
-]
+<LearningObjectives objectives={["Create a router with createRouter and wire it into your app", "Define dynamic and nested routes and read their params", "Navigate declaratively and programmatically with RouterLink and useRouter", "Lazy-load route components to shrink the initial bundle", "Protect routes with navigation guards and route meta fields"]} />
 
+## Setting Up the Router
+
+Vue Router 4 pairs with Vue 3. Install it, create a router instance with a history mode, register your route table, and install it as a plugin.
+
+```bash
+npm install vue-router@4
+```
+
+```ts
+// src/router/index.ts
+import { createRouter, createWebHistory } from "vue-router"
+import HomeView from "@/views/HomeView.vue"
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    { path: "/", name: "home", component: HomeView },
+    { path: "/about", name: "about", component: () => import("@/views/AboutView.vue") },
+  ],
+})
+
+export default router
+```
+
+```ts
+// src/main.ts
+import { createApp } from "vue"
+import App from "./App.vue"
+import router from "./router"
+
+createApp(App).use(router).mount("#app")
+```
+
+In your root component you render the matched view with `<RouterView>` and link to routes with `<RouterLink>` — both are registered globally once the plugin is installed.
+
+```vue
+<template>
+  <nav>
+    <RouterLink to="/">Home</RouterLink>
+    <RouterLink :to="{ name: 'about' }">About</RouterLink>
+  </nav>
+  <RouterView />
+</template>
+```
+
+<Tip title="Prefer named routes">Reference routes by `name` (`:to="{ name: 'about' }"`) instead of hard-coding path strings. If a URL ever changes you update it in one place — the route table — and every link keeps working.</Tip>
+
+### History modes
+
+<Tabs defaultValue="html5" className="my-6">
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="html5">HTML5 (recommended)</TabsTrigger>
+    <TabsTrigger value="hash">Hash</TabsTrigger>
+  </TabsList>
+  <TabsContent value="html5">
+```ts
+import { createWebHistory } from "vue-router"
+// Clean URLs: /about
+// Requires a server fallback that serves index.html for unknown paths.
+const history = createWebHistory()
+```
+  </TabsContent>
+  <TabsContent value="hash">
+```ts
+import { createWebHashHistory } from "vue-router"
+// URLs look like /#/about — everything after # is never sent to the server,
+// so it works on any static host with zero server config.
+const history = createWebHashHistory()
+```
+  </TabsContent>
+</Tabs>
+
+## Dynamic Routes and Params
+
+A colon marks a dynamic segment. `/users/:id` matches `/users/42`, and the value is exposed on `route.params`. Inside `<script setup>` you read the current route with `useRoute()`.
+
+```vue
+<script setup lang="ts">
+import { useRoute } from "vue-router"
+
+const route = useRoute()
+// route.params.id is a string: "42"
+</script>
+
+<template>
+  <h1>User #{{ route.params.id }}</h1>
+</template>
+```
+
+Passing `props: true` decouples the component from the router by turning params into component props — much easier to test and reuse.
+
+```ts
+{
+  path: "/users/:id",
+  name: "user",
+  component: () => import("@/views/UserView.vue"),
+  props: true,
+}
+```
+
+```vue
+<script setup lang="ts">
+const props = defineProps<{ id: string }>()
+</script>
+```
+
+<Warning>When you navigate from `/users/1` to `/users/2`, Vue Router **reuses** the same component instance instead of recreating it, so `onMounted` does not fire again. Refetch data by watching the param, or add `:key="route.params.id"` to `<RouterView>` to force a remount.</Warning>
+
+```ts
+import { watch } from "vue"
+import { useRoute } from "vue-router"
+
+const route = useRoute()
+watch(() => route.params.id, (id) => fetchUser(id), { immediate: true })
+```
+
+## Nested Routes
+
+Real apps have layouts inside layouts — a settings page with profile, security, and billing tabs. `children` builds that hierarchy, and each parent needs its own `<RouterView>` where children render.
+
+```ts
+{
+  path: "/settings",
+  component: () => import("@/views/SettingsLayout.vue"),
+  children: [
+    { path: "", name: "settings", redirect: { name: "profile" } },
+    { path: "profile", name: "profile", component: () => import("@/views/ProfileTab.vue") },
+    { path: "security", name: "security", component: () => import("@/views/SecurityTab.vue") },
+  ],
+}
+```
+
+Note that child `path` values are relative and must **not** start with a slash — `profile` resolves to `/settings/profile`.
+
+## Programmatic Navigation
+
+`useRouter()` returns the router instance for navigating in response to logic — after a form submit, a login, or a timeout. Use `push` to add a history entry and `replace` when you do not want the current page in the back stack.
+
+```vue
+<script setup lang="ts">
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+
+async function onLogin() {
+  await authStore.login(form)
+  // Object form supports name, params, and query
+  router.push({ name: "user", params: { id: authStore.userId } })
+}
+
+function goBack() {
+  router.back()
+}
+
+function redirectToDashboard() {
+  // No back-button entry for the login page
+  router.replace({ path: "/dashboard", query: { welcome: "true" } })
+}
+</script>
+```
+
+## Lazy-Loaded Views and Route Meta
+
+Passing a dynamic `import()` as `component` tells your bundler to split that view into its own chunk, fetched only when the route is visited. This keeps the initial JavaScript payload small — critical as an app grows. The `meta` field attaches arbitrary data to a route, most commonly access rules.
+
+```ts
+{
+  path: "/admin",
+  name: "admin",
+  // Separate chunk, loaded on demand
+  component: () => import("@/views/AdminView.vue"),
+  meta: { requiresAuth: true, roles: ["admin"] },
+}
+```
+
+For full type safety, augment the `RouteMeta` interface so `meta.requiresAuth` is checked at compile time.
+
+```ts
+// src/router/meta.d.ts
+import "vue-router"
+
+declare module "vue-router" {
+  interface RouteMeta {
+    requiresAuth?: boolean
+    roles?: string[]
+  }
+}
+```
+
+<InfoCard title="Add a catch-all for 404s">A route with `path: "/:pathMatch(.*)*"` matches anything no other route claimed. Put it last and point it at a `NotFound` view so unknown URLs render a proper page instead of an empty `<RouterView>`.</InfoCard>
+
+## Navigation Guards
+
+Guards run before a navigation is confirmed, letting you cancel it, redirect, or wait on async work. A global `beforeEach` guard is the standard place to enforce authentication. In Vue Router 4 you **return** the result — `false` to abort, a route location to redirect, or nothing/`true` to allow.
+
+```ts
 router.beforeEach((to) => {
-  if (to.meta.requiresAuth && !useUserStore().isLoggedIn) return '/login'
+  const auth = useAuthStore()
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    // Redirect to login and remember where the user wanted to go
+    return { name: "login", query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.roles && !to.meta.roles.some((r) => auth.roles.includes(r))) {
+    return { name: "forbidden" }
+  }
 })
 ```
 
----
+Guards come in three scopes. Reach for the narrowest one that fits.
+
+<Tabs defaultValue="global" className="my-6">
+  <TabsList className="grid w-full grid-cols-3">
+    <TabsTrigger value="global">Global</TabsTrigger>
+    <TabsTrigger value="route">Per-route</TabsTrigger>
+    <TabsTrigger value="component">In-component</TabsTrigger>
+  </TabsList>
+  <TabsContent value="global">
+```ts
+// Runs for every navigation — auth, analytics, page titles.
+router.afterEach((to) => {
+  document.title = to.meta.title ?? "My App"
+})
+```
+  </TabsContent>
+  <TabsContent value="route">
+```ts
+// Runs only when entering this specific route.
+{
+  path: "/checkout",
+  component: CheckoutView,
+  beforeEnter: (to, from) => {
+    if (cart.isEmpty) return { name: "cart" }
+  },
+}
+```
+  </TabsContent>
+  <TabsContent value="component">
+```vue
+<script setup lang="ts">
+import { onBeforeRouteLeave } from "vue-router"
+
+// Warn before abandoning an unsaved form.
+onBeforeRouteLeave(() => {
+  if (form.isDirty && !confirm("Discard your changes?")) {
+    return false
+  }
+})
+</script>
+```
+  </TabsContent>
+</Tabs>
+
+## Scroll Behavior
+
+For a native-feeling app, control the scroll position on navigation. `scrollBehavior` restores the saved position on back/forward and scrolls to the top (or to an anchor) otherwise.
+
+```ts
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) return savedPosition
+    if (to.hash) return { el: to.hash, behavior: "smooth" }
+    return { top: 0 }
+  },
+})
+```
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="p1">
+    <AccordionTrigger>Params are always strings</AccordionTrigger>
+    <AccordionContent>`route.params.id` is `"42"`, never the number `42`. Convert with `Number(route.params.id)` before comparing to numeric IDs, or a strict `===` check will silently fail.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p2">
+    <AccordionTrigger>Blank page after deploy (HTML5 mode)</AccordionTrigger>
+    <AccordionContent>`createWebHistory` needs the server to fall back to `index.html` for unknown paths. Without a rewrite rule, refreshing `/about` returns a real 404 from your host. Configure the fallback (Netlify `_redirects`, Nginx `try_files`, etc.) or use hash history on static hosts.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p3">
+    <AccordionTrigger>Calling next() and returning together</AccordionTrigger>
+    <AccordionContent>In Vue Router 4 the modern guard signature returns a value. Do not both call the legacy `next()` and `return` a location in the same guard — that double-triggers the navigation and throws. Pick one style; returning is preferred.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p4">
+    <AccordionTrigger>useRoute is not reactive if you destructure it</AccordionTrigger>
+    <AccordionContent>`const { params } = useRoute()` breaks reactivity — `params` becomes a snapshot. Keep the `route` object intact and access `route.params.id` so it updates as you navigate.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Warning>Never use a plain `<a href="/about">` for internal links — it forces a full page reload and discards your app state. Always use `<RouterLink>` so navigation stays client-side.</Warning>
 
 ## Next Steps
 
 <NextLesson title="Vue Performance Optimization" description="Optimize renders." href="/roadmap/vue-fundamentals-advanced-performance-optimization" />
 
-<Resources resources={[{"title":"Vue Router","href":"https://router.vuejs.org/"}]} />
+<Resources resources={[{"title":"Vue Router Docs","href":"https://router.vuejs.org/"},{"title":"Navigation Guards","href":"https://router.vuejs.org/guide/advanced/navigation-guards.html"},{"title":"Dynamic Route Matching","href":"https://router.vuejs.org/guide/essentials/dynamic-matching.html"},{"title":"Lazy Loading Routes","href":"https://router.vuejs.org/guide/advanced/lazy-loading.html"}]} />

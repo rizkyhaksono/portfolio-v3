@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "22 min"
+duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,38 +16,316 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Vue Composition API
 
-<LearningObjectives objectives={["Use ref and reactive correctly", "Derive state with computed", "React to changes with watch/watchEffect", "Extract composables for reuse"]} />
+The Composition API is a set of function-based APIs (`ref`, `reactive`, `computed`, `watch`, lifecycle hooks) that let you organize component logic by *feature* instead of by *option type*. Where the Options API forces related code apart into `data`, `methods`, `computed`, and `watch` blocks, the Composition API keeps everything about a single concern together — and, crucially, lets you extract that concern into a reusable **composable**. In real projects this is what makes large Vue components maintainable and lets teams share data-fetching, form, and browser-API logic across dozens of components without mixins or wrapper hell.
 
-```vue
-<script setup>
-import { ref, computed, watch } from 'vue'
+<LearningObjectives objectives={["Choose correctly between ref and reactive for state", "Derive read-only state with computed and two-way computed setters", "React to state changes with watch and watchEffect", "Run setup, mount, and cleanup logic with lifecycle hooks", "Extract and reuse stateful logic as composables"]} />
 
-const count = ref(0)
-const doubled = computed(() => count.value * 2)
+## `<script setup>` and reactive state
 
-watch(count, (n) => console.log('count:', n))
+`<script setup>` is the recommended compile-time syntax for the Composition API. Top-level bindings — imports, variables, and functions — are exposed directly to the template, and macros like `defineProps` and `defineEmits` are available without importing them.
 
-function increment() { count.value++ }
-</script>
+The two primitives for declarative state are `ref()` and `reactive()`. A `ref` wraps a single value (of any type) in a reactive object; you read and write it through `.value` in JavaScript, but Vue **auto-unwraps** it in templates. `reactive()` makes an entire object deeply reactive, with no `.value`.
+
+<Tabs defaultValue="ref" className="my-6">
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="ref">ref</TabsTrigger>
+    <TabsTrigger value="reactive">reactive</TabsTrigger>
+  </TabsList>
+  <TabsContent value="ref">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup lang="ts">
+        import { ref } from "vue"
+
+        const count = ref(0)          // Ref<number>
+        const user = ref({ name: "Ada" })
+
+        function increment() {
+          count.value++                // .value in JS
+          user.value.name = "Grace"    // nested access is reactive too
+        }
+        </script>
+
+        <template>
+          <!-- auto-unwrapped: no .value in templates -->
+          <button @click="increment">{{ count }} — {{ user.name }}</button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  <TabsContent value="reactive">
+    <Card>
+      <CardContent className="pt-6">
+        ```vue
+        <script setup lang="ts">
+        import { reactive } from "vue"
+
+        const state = reactive({
+          count: 0,
+          items: [] as string[],
+        })
+
+        function add(item: string) {
+          state.count++          // no .value
+          state.items.push(item) // arrays/objects are deeply reactive
+        }
+        </script>
+
+        <template>
+          <button @click="add('x')">{{ state.count }}</button>
+        </template>
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+<Tip>
+Default to `ref` for almost everything. It works with primitives, objects, and arrays, survives reassignment (`data.value = newArray`), and has one consistent access rule (`.value`). Reach for `reactive` only when you want an object-shaped store with no `.value` noise.
+</Tip>
+
+### Keeping reactivity when you destructure
+
+A `reactive` object loses its reactive connection the moment you destructure it, because you copy the plain value out of the proxy. Use `toRefs` to convert each property back into a linked `ref`.
+
+```ts
+import { reactive, toRefs } from "vue"
+
+const state = reactive({ x: 0, y: 0 })
+
+// ❌ x and y are plain numbers now — updates to state won't reflect
+const { x, y } = state
+
+// ✅ each stays connected to state
+const { x: rx, y: ry } = toRefs(state)
+rx.value++ // also updates state.x
 ```
 
-```js
-// composables/useFetch.js
-export function useFetch(url) {
-  const data = ref(null)
-  const error = ref(null)
-  watchEffect(async () => {
-    try { data.value = await (await fetch(url)).json() }
-    catch (e) { error.value = e }
+## Computed properties
+
+`computed()` creates a cached, read-only reactive value derived from other reactive sources. It only re-evaluates when one of its dependencies changes — unlike a method, which re-runs on every render. Pass a getter for read-only values, or an object with `get` and `set` for a writable computed.
+
+```ts
+import { ref, computed } from "vue"
+
+const firstName = ref("Ada")
+const lastName = ref("Lovelace")
+
+// read-only computed (cached)
+const fullName = computed(() => `${firstName.value} ${lastName.value}`)
+
+// writable computed
+const fullNameEditable = computed({
+  get: () => `${firstName.value} ${lastName.value}`,
+  set: (value: string) => {
+    [firstName.value, lastName.value] = value.split(" ")
+  },
+})
+
+fullNameEditable.value = "Grace Hopper" // updates both refs
+```
+
+<Warning>
+Never mutate state inside a computed getter or perform async work there. A getter must be a pure function of its dependencies — side effects belong in `watch`, `watchEffect`, or event handlers. A computed that mutates other state leads to unpredictable, hard-to-trace updates.
+</Warning>
+
+## Watchers: `watch` vs `watchEffect`
+
+Watchers run side effects — logging, fetching, saving to `localStorage` — in response to reactive changes. `watch` is explicit about its source and gives you both old and new values. `watchEffect` runs immediately and automatically tracks whatever reactive values it reads.
+
+<Tabs defaultValue="watch" className="my-6">
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="watch">watch</TabsTrigger>
+    <TabsTrigger value="watcheffect">watchEffect</TabsTrigger>
+  </TabsList>
+  <TabsContent value="watch">
+    <Card>
+      <CardContent className="pt-6">
+        ```ts
+        import { ref, watch } from "vue"
+
+        const query = ref("")
+        const results = ref<string[]>([])
+
+        // watch a ref: get new and old values
+        watch(query, async (newVal, oldVal) => {
+          if (newVal.trim() === "") return
+          const res = await fetch(`/api/search?q=${newVal}`)
+          results.value = await res.json()
+        })
+
+        // watch a getter, run once on setup, deep-compare nested objects
+        watch(
+          () => filters.value.category,
+          (cat) => console.log("category changed:", cat),
+          { immediate: true, deep: true }
+        )
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+  <TabsContent value="watcheffect">
+    <Card>
+      <CardContent className="pt-6">
+        ```ts
+        import { ref, watchEffect } from "vue"
+
+        const userId = ref(1)
+        const user = ref(null)
+
+        // runs immediately; re-runs whenever userId.value changes
+        watchEffect(async (onCleanup) => {
+          const controller = new AbortController()
+          onCleanup(() => controller.abort()) // cancel stale request
+
+          const res = await fetch(`/api/users/${userId.value}`, {
+            signal: controller.signal,
+          })
+          user.value = await res.json()
+        })
+        ```
+      </CardContent>
+    </Card>
+  </TabsContent>
+</Tabs>
+
+<InfoCard>
+Use `watchEffect` when the effect depends on several sources and you want it to run right away. Use `watch` when you need the previous value, want it lazy by default, or must watch a source you don't read inside the callback. The `onCleanup` callback lets you cancel in-flight work before the next run to avoid race conditions.
+</InfoCard>
+
+## Lifecycle hooks
+
+Composition-API lifecycle hooks are registered by calling functions like `onMounted` during setup. They run at the same points as their Options-API equivalents, and you can register several of the same hook. Use `onMounted` for DOM access or subscriptions, and `onUnmounted` to clean them up.
+
+```ts
+import { ref, onMounted, onUnmounted } from "vue"
+
+const width = ref(window.innerWidth)
+
+function onResize() {
+  width.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener("resize", onResize)
+})
+
+onUnmounted(() => {
+  // always remove listeners you add, or you leak memory
+  window.removeEventListener("resize", onResize)
+})
+```
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="hooks">
+    <AccordionTrigger>Common lifecycle hooks at a glance</AccordionTrigger>
+    <AccordionContent>
+      <ul className="list-disc list-inside space-y-1">
+        <li><code>onBeforeMount</code> / <code>onMounted</code> — before and after first DOM render</li>
+        <li><code>onBeforeUpdate</code> / <code>onUpdated</code> — around reactive-driven re-renders</li>
+        <li><code>onBeforeUnmount</code> / <code>onUnmounted</code> — teardown and cleanup</li>
+        <li><code>onErrorCaptured</code> — catch errors from descendant components</li>
+        <li><code>onActivated</code> / <code>onDeactivated</code> — for components inside <code>&lt;KeepAlive&gt;</code></li>
+      </ul>
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Composables: reusable stateful logic
+
+A **composable** is a plain function, conventionally named `useSomething`, that uses Composition-API functions to encapsulate and reuse stateful logic. Each call creates its own isolated reactive state, so unlike mixins there are no naming collisions or unclear data sources.
+
+```ts
+// composables/useFetch.ts
+import { ref, watchEffect, toValue, type Ref } from "vue"
+
+export function useFetch<T>(url: Ref<string> | (() => string)) {
+  const data = ref<T | null>(null)
+  const error = ref<Error | null>(null)
+  const loading = ref(false)
+
+  watchEffect(async (onCleanup) => {
+    const controller = new AbortController()
+    onCleanup(() => controller.abort())
+
+    loading.value = true
+    error.value = null
+    try {
+      // toValue() unwraps a ref OR calls a getter → always a string
+      const res = await fetch(toValue(url), { signal: controller.signal })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      data.value = (await res.json()) as T
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") error.value = e as Error
+    } finally {
+      loading.value = false
+    }
   })
-  return { data, error }
+
+  return { data, error, loading }
 }
 ```
 
----
+Consuming it in a component stays tiny and declarative:
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from "vue"
+import { useFetch } from "@/composables/useFetch"
+
+const id = ref(1)
+const url = computed(() => `/api/posts/${id.value}`)
+const { data, error, loading } = useFetch<{ title: string }>(url)
+</script>
+
+<template>
+  <p v-if="loading">Loading…</p>
+  <p v-else-if="error">Failed: {{ error.message }}</p>
+  <h1 v-else>{{ data?.title }}</h1>
+  <button @click="id++">Next post</button>
+</template>
+```
+
+<Tip>
+Accept refs or getters as arguments and unwrap them with <code>toValue()</code>. This makes composables "reactive by default" — the caller can pass a computed URL and the composable automatically re-runs when it changes, without any extra wiring.
+</Tip>
+
+## Common Pitfalls
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Mistakes to avoid</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2 text-sm">
+      <li><strong>Forgetting <code>.value</code></strong> — in <em>JavaScript</em> a ref is always accessed via <code>.value</code>. <code>count + 1</code> concatenates the ref object; you meant <code>count.value + 1</code>. (Templates auto-unwrap, JS does not.)</li>
+      <li><strong>Destructuring a <code>reactive</code> object</strong> breaks reactivity. Use <code>toRefs</code> / <code>toRef</code>, or just use <code>ref</code> instead.</li>
+      <li><strong>Reassigning a <code>reactive</code> value</strong> (<code>state = reactive(...)</code>) drops the original proxy. Mutate its properties, or use a <code>ref</code> if you need whole-value replacement.</li>
+      <li><strong>Registering lifecycle hooks asynchronously</strong> — <code>onMounted</code> must be called synchronously during setup, not inside a <code>setTimeout</code> or after an <code>await</code>.</li>
+      <li><strong>Side effects in <code>computed</code></strong> — getters must be pure. Fetch and mutate in watchers or handlers instead.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+## Best Practices
+
+- **Prefer `ref`** as your default and reserve `reactive` for cohesive object stores.
+- **Keep computeds pure and lean**; move async and side-effecting logic into `watch`/`watchEffect`.
+- **Always clean up** timers, listeners, and subscriptions in `onUnmounted` (or via `onCleanup`).
+- **Extract composables** the moment logic is reused or a component's `<script>` grows past one concern — name them `useX` and return refs so callers keep reactivity.
+- **Type your refs** with generics (`ref<User[]>([])`, `useFetch<Post>()`) so the compiler catches shape mistakes early.
 
 ## Next Steps
 
 <NextLesson title="Pinia State Management" description="Global stores with Pinia." href="/roadmap/vue-fundamentals-intermediate-pinia-state" />
 
-<Resources resources={[{"title":"Composition API","href":"https://vuejs.org/guide/extras/composition-api-faq.html"}]} />
+<Resources
+  resources={[
+    { title: "Composition API FAQ", href: "https://vuejs.org/guide/extras/composition-api-faq.html" },
+    { title: "Reactivity Fundamentals", href: "https://vuejs.org/guide/essentials/reactivity-fundamentals.html" },
+    { title: "Composables", href: "https://vuejs.org/guide/reusability/composables.html" },
+    { title: "Lifecycle Hooks", href: "https://vuejs.org/guide/essentials/lifecycle.html" },
+  ]}
+/>

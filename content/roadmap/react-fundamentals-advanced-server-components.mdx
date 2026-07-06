@@ -5,7 +5,7 @@ course: "react-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "26 min"
+duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,17 +16,231 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## React Server Components
 
-<LearningObjectives objectives={["Distinguish Server vs Client Components", "Fetch data on the server without useEffect", "Stream UI with Suspense boundaries", "Choose 'use client' only when needed"]} />
+React Server Components (RSC) let you render components entirely on the server, sending finished HTML and a compact serialized payload to the browser instead of shipping the component's JavaScript. This is a genuine architectural shift: data fetching happens where your data lives, secrets never reach the client, and your bundle shrinks because server-only code stays on the server. In the Next.js App Router every component under `app/` is a Server Component by default, and you opt into the client only where interactivity demands it. Getting this boundary right is the single most impactful skill for building fast, modern React apps.
+
+<LearningObjectives objectives={["Distinguish Server Components from Client Components and what each can do", "Fetch data directly in async Server Components without useEffect", "Place the 'use client' boundary deliberately to minimize bundle size", "Stream UI progressively with Suspense and loading.tsx", "Mutate data safely with Server Actions"]} />
+
+## The Two-Component Model
+
+Every component in the App Router is one of two kinds. Server Components run only during rendering on the server (or at build time) and never re-run in the browser — so they can be `async`, read from a database, and use secrets, but they cannot use state, effects, or event handlers. Client Components run in the browser after hydration and can do all the interactive things, but they cannot be `async` and their code ships to the user.
+
+<Tabs defaultValue="server">
+  <TabsList>
+    <TabsTrigger value="server">Server Component</TabsTrigger>
+    <TabsTrigger value="client">Client Component</TabsTrigger>
+  </TabsList>
+  <TabsContent value="server">
 
 ```tsx
-// app/posts/page.tsx — Server Component (default in App Router)
+// app/posts/page.tsx — Server Component (default, no directive needed)
+import { db } from "@/lib/db"
+
 export default async function PostsPage() {
-  const posts = await db.post.findMany()
-  return <PostList posts={posts} />
+  const posts = await db.post.findMany({ orderBy: { createdAt: "desc" } })
+  return (
+    <ul>
+      {posts.map((post) => (
+        <li key={post.id}>{post.title}</li>
+      ))}
+    </ul>
+  )
 }
 ```
 
-<Card><CardHeader><CardTitle>When to use 'use client'</CardTitle></CardHeader><CardContent>Event handlers, hooks, browser APIs, and local state require Client Components.</CardContent></Card>
+  </TabsContent>
+  <TabsContent value="client">
+
+```tsx
+// components/like-button.tsx — Client Component
+"use client"
+import { useState } from "react"
+
+export function LikeButton({ initial }: { initial: number }) {
+  const [likes, setLikes] = useState(initial)
+  return <button onClick={() => setLikes((n) => n + 1)}>♥ {likes}</button>
+}
+```
+
+  </TabsContent>
+</Tabs>
+
+<InfoCard title="Quick decision rule">Reach for a Client Component only when you need `useState`/`useReducer`, `useEffect`, an event handler like `onClick`, or a browser API such as `localStorage`, `window`, or `IntersectionObserver`. Everything else should stay a Server Component.</InfoCard>
+
+## Fetching Data on the Server
+
+Because Server Components can be `async`, you `await` your data directly in the component body — no `useEffect`, no loading flags, no client-side waterfall. Next.js extends the native `fetch` API with caching and revalidation controls, so you can turn a request into cached, static, or revalidating data with a single option.
+
+```tsx
+// app/products/[id]/page.tsx
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const res = await fetch(`https://api.shop.com/products/${id}`, {
+    // Re-fetch at most once every 60 seconds (incremental static regeneration)
+    next: { revalidate: 60 },
+  })
+  if (!res.ok) throw new Error("Failed to load product")
+  const product = await res.json()
+
+  return (
+    <article>
+      <h1>{product.name}</h1>
+      <p>${product.price}</p>
+    </article>
+  )
+}
+```
+
+<Tip title="Caching options">Use `cache: "force-cache"` for data that rarely changes, `next: { revalidate: N }` for time-based refresh, and `cache: "no-store"` for per-request data. Pair `next: { tags: ["products"] }` with `revalidateTag("products")` in a Server Action for precise on-demand invalidation.</Tip>
+
+## The `use client` Boundary
+
+The `"use client"` directive does not just mark one file — it marks the **entry point** into the client bundle. Every module imported (directly or transitively) by a Client Component is bundled and shipped to the browser. The goal is therefore to push the directive **down the tree**: keep large, data-heavy layouts on the server and make only the small interactive leaves client-side.
+
+```tsx
+// app/dashboard/page.tsx — stays on the server
+import { Chart } from "@/components/chart"        // Client Component (interactive)
+import { getMetrics } from "@/lib/metrics"
+
+export default async function Dashboard() {
+  const metrics = await getMetrics() // heavy query, runs on server only
+  // Only <Chart> and its deps ship to the browser — not this page or getMetrics
+  return <Chart data={metrics} />
+}
+```
+
+<Warning>Once a component is a Client Component, all of its children rendered inside it are client-rendered too. Don't slap `"use client"` at the top of a layout or page — you accidentally opt the entire subtree out of server rendering and bloat the bundle.</Warning>
+
+## Composing Server and Client Components
+
+A Client Component cannot `import` a Server Component (the server code would have no way to run in the browser). The escape hatch is composition: pass Server Components into a Client Component through the `children` prop or any other prop that holds JSX. React renders the server content on the server and hands the Client Component a ready-made element.
+
+```tsx
+// components/collapsible.tsx
+"use client"
+import { useState, type ReactNode } from "react"
+
+export function Collapsible({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <section>
+      <button onClick={() => setOpen((o) => !o)}>Toggle</button>
+      {open && children}
+    </section>
+  )
+}
+```
+
+```tsx
+// app/page.tsx — Server Component composes the two
+import { Collapsible } from "@/components/collapsible"
+import { ServerReport } from "@/components/server-report" // async Server Component
+
+export default function Page() {
+  return (
+    <Collapsible>
+      <ServerReport /> {/* rendered on the server, slotted in as children */}
+    </Collapsible>
+  )
+}
+```
+
+<InfoCard title="Props must be serializable">Data passed from a Server to a Client Component crosses the network, so it must serialize: plain objects, arrays, strings, numbers, `Date`, `Map`, and `Set` work; functions (other than Server Actions) and class instances do not.</InfoCard>
+
+## Streaming with Suspense
+
+Server rendering does not have to be all-or-nothing. Wrap a slow async Server Component in `<Suspense>` and Next.js streams the rest of the page immediately, then flushes the slow part in when its data resolves. This keeps time-to-first-byte low and lets fast content paint without waiting on the slowest query.
+
+```tsx
+// app/feed/page.tsx
+import { Suspense } from "react"
+import { Timeline } from "@/components/timeline"      // slow async component
+import { Sidebar } from "@/components/sidebar"          // fast
+
+export default function FeedPage() {
+  return (
+    <div className="grid grid-cols-[1fr_320px]">
+      <Suspense fallback={<TimelineSkeleton />}>
+        <Timeline /> {/* streams in when ready */}
+      </Suspense>
+      <Sidebar /> {/* renders instantly */}
+    </div>
+  )
+}
+```
+
+A `loading.tsx` file in any route segment is a shortcut: Next.js automatically wraps that segment's `page.tsx` in a Suspense boundary and shows `loading.tsx` as the fallback during navigation and initial load.
+
+```tsx
+// app/feed/loading.tsx
+export default function Loading() {
+  return <p role="status">Loading your feed…</p>
+}
+```
+
+## Mutating Data with Server Actions
+
+To change data you use **Server Actions**: async functions marked `"use server"` that run on the server but can be called directly from a form or an event handler. They replace hand-written API routes for most mutations and integrate with cache revalidation.
+
+```tsx
+// app/todos/actions.ts
+"use server"
+import { revalidatePath } from "next/cache"
+import { db } from "@/lib/db"
+
+export async function addTodo(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim()
+  if (!title) return
+  await db.todo.create({ data: { title } })
+  revalidatePath("/todos") // refresh the Server Component's data
+}
+```
+
+```tsx
+// app/todos/page.tsx
+import { addTodo } from "./actions"
+
+export default function TodosPage() {
+  return (
+    <form action={addTodo}>
+      <input name="title" placeholder="New todo" />
+      <button type="submit">Add</button>
+    </form>
+  )
+}
+```
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="hooks">
+    <AccordionTrigger>Using hooks or onClick in a Server Component</AccordionTrigger>
+    <AccordionContent>You will hit an error like "useState is not a function" or "Event handlers cannot be passed to Client Component props." Move the interactive piece into its own file with `"use client"` at the top.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="env">
+    <AccordionTrigger>Leaking secrets into the client bundle</AccordionTrigger>
+    <AccordionContent>Reading `process.env.DATABASE_URL` inside a Client Component either fails or exposes the value. Keep secret access in Server Components and Server Actions; only `NEXT_PUBLIC_`-prefixed vars are safe on the client.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="top-level">
+    <AccordionTrigger>Marking a whole page "use client"</AccordionTrigger>
+    <AccordionContent>This opts the entire subtree out of server rendering and ships more JavaScript. Push the directive to the smallest interactive leaf and pass server-rendered content down via `children`.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="serialize">
+    <AccordionTrigger>Passing non-serializable props across the boundary</AccordionTrigger>
+    <AccordionContent>Passing a function, a class instance, or a Prisma model with methods will throw a serialization error. Map to a plain object first, or hand the data down as `children`.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+- **Default to Server Components.** Start every component on the server and only add `"use client"` when a feature forces it.
+- **Fetch where you render.** Co-locate data fetching with the component that needs it and let Next.js dedupe and cache identical `fetch` calls automatically.
+- **Stream the slow parts.** Wrap expensive sections in `<Suspense>` (or use `loading.tsx`) so the shell paints instantly.
+- **Keep the boundary thin.** A small `LikeButton` or `Collapsible` client leaf is far cheaper than a client-rendered page.
+- **Prefer Server Actions over ad-hoc API routes** for mutations, and revalidate with `revalidatePath` or `revalidateTag` to keep the UI in sync.
 
 ---
 
@@ -34,4 +248,4 @@ export default async function PostsPage() {
 
 <NextLesson title="Testing Patterns" description="Vitest and Testing Library." href="/roadmap/react-fundamentals-advanced-testing-patterns" />
 
-<Resources resources={[{"title":"Server Components","href":"https://react.dev/reference/rsc/server-components"}]} />
+<Resources resources={[{"title":"React — Server Components","href":"https://react.dev/reference/rsc/server-components"},{"title":"Next.js — Server & Client Components","href":"https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns"},{"title":"Next.js — Data Fetching & Caching","href":"https://nextjs.org/docs/app/building-your-application/data-fetching/fetching"},{"title":"Next.js — Server Actions and Mutations","href":"https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations"}]} />

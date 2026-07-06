@@ -5,7 +5,7 @@ course: "react-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "24 min"
+duration: "32 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,23 +14,285 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## React Performance
+## Why Performance Matters
 
-<LearningObjectives objectives={["Profile with React DevTools Profiler", "Split bundles with React.lazy and Suspense", "Prevent wasted renders with memo", "Virtualize long lists"]} />
+React is fast by default, but as an app grows a few patterns quietly erode that speed: a top-level state change that re-renders a whole page, a 500 KB chart library shipped on first paint, or a list of 10,000 rows all mounted at once. These problems rarely show up on your dev machine — they show up on a mid-range phone over a slow network, which is where most real users live.
+
+Optimization in React is a loop, not a checklist: **measure, find the actual bottleneck, apply the smallest fix, then measure again.** This lesson walks through the tools and techniques that matter most in production apps — profiling, memoization, code splitting, list virtualization, and the concurrent rendering APIs — and, just as importantly, when *not* to use them.
+
+<LearningObjectives objectives={["Profile renders and commits with the React DevTools Profiler", "Prevent wasted re-renders with React.memo, useMemo, and useCallback", "Split bundles with React.lazy and Suspense", "Keep the UI responsive with useTransition and useDeferredValue", "Virtualize long lists to render only what is visible"]} />
+
+## Measure First
+
+Never optimize by intuition. The **React DevTools Profiler** records every commit and shows exactly which components rendered, why, and how long they took.
+
+<Tip title="Turn on render reasons">In the Profiler's gear icon, enable "Record why each component rendered." Each bar then tells you whether a component updated because of props, state, hooks, or a parent render.</Tip>
+
+You can also measure in code with the `<Profiler>` component, which fires a callback on every commit:
 
 ```tsx
+import { Profiler } from "react"
+
+function onRender(id, phase, actualDuration) {
+  // phase is "mount" or "update"; actualDuration is ms spent rendering this commit
+  console.log(`${id} [${phase}] took ${actualDuration.toFixed(1)}ms`)
+}
+
+export function Dashboard() {
+  return (
+    <Profiler id="Dashboard" onRender={onRender}>
+      <Widgets />
+    </Profiler>
+  )
+}
+```
+
+<Warning>Profile a **production build** (`npm run build`). Development builds include extra checks and are significantly slower, so dev timings are not representative of what users experience.</Warning>
+
+## Stop Wasted Renders with Memoization
+
+When a component re-renders, React re-runs the function and re-renders its children by default — even if their props did not change. `React.memo` skips the child render when its props are shallowly equal to the previous ones.
+
+```tsx
+import { memo } from "react"
+
+const ProductRow = memo(function ProductRow({ product, onSelect }) {
+  return (
+    <li onClick={() => onSelect(product.id)}>
+      {product.name} — ${product.price}
+    </li>
+  )
+})
+```
+
+`memo` only helps if the props are actually stable. Inline objects and functions create a **new reference every render**, defeating the shallow comparison. That is where `useMemo` and `useCallback` come in:
+
+```tsx
+function ProductList({ products }) {
+  const [selectedId, setSelectedId] = useState(null)
+
+  // Stable function identity across renders -> ProductRow can skip re-rendering
+  const handleSelect = useCallback((id) => setSelectedId(id), [])
+
+  // Recompute the sorted array only when `products` changes
+  const sorted = useMemo(
+    () => [...products].sort((a, b) => a.price - b.price),
+    [products],
+  )
+
+  return (
+    <ul>
+      {sorted.map((p) => (
+        <ProductRow key={p.id} product={p} onSelect={handleSelect} />
+      ))}
+    </ul>
+  )
+}
+```
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="memo">React.memo</TabsTrigger>
+    <TabsTrigger value="usememo">useMemo</TabsTrigger>
+    <TabsTrigger value="usecallback">useCallback</TabsTrigger>
+  </TabsList>
+  <TabsContent value="memo">
+    Wraps a **component**. Skips its render when props are shallowly equal. Use it on components that render often with the same props.
+  </TabsContent>
+  <TabsContent value="usememo">
+    Caches a **computed value** (the result of a function call). Use it for genuinely expensive calculations or to keep object/array props referentially stable.
+  </TabsContent>
+  <TabsContent value="usecallback">
+    Caches a **function reference**. `useCallback(fn, deps)` is shorthand for `useMemo(() => fn, deps)`. Use it when passing callbacks to memoized children.
+  </TabsContent>
+</Tabs>
+
+<Warning>Memoization is not free — it costs memory and a dependency comparison on every render. Wrapping a cheap component or a trivial calculation can be slower than just re-rendering. Reach for it only after the Profiler shows a real cost.</Warning>
+
+## Code Splitting with React.lazy and Suspense
+
+Every import that reaches your entry file ships in the initial bundle. Route-level and heavy-component splitting defers that code until it is actually needed, cutting time-to-interactive.
+
+```tsx
+import { lazy, Suspense } from "react"
+
 const HeavyChart = lazy(() => import("./HeavyChart"))
 
-function Page() {
+function AnalyticsPage({ data }) {
   return (
-    <Suspense fallback={<Skeleton />}>
+    <Suspense fallback={<Skeleton className="h-64 w-full" />}>
       <HeavyChart data={data} />
     </Suspense>
   )
 }
 ```
 
-<Warning>Don't memo everything — measure first. Premature memoization adds complexity.</Warning>
+The dynamic `import()` tells your bundler (Vite, webpack, etc.) to emit a separate chunk. `Suspense` renders the `fallback` until that chunk downloads and the component is ready. The most impactful place to split is at the **router**:
+
+```tsx
+import { lazy, Suspense } from "react"
+import { createBrowserRouter } from "react-router-dom"
+
+const Settings = lazy(() => import("./routes/Settings"))
+const Reports = lazy(() => import("./routes/Reports"))
+
+export const router = createBrowserRouter([
+  {
+    path: "/settings",
+    element: (
+      <Suspense fallback={<PageSpinner />}>
+        <Settings />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/reports",
+    element: (
+      <Suspense fallback={<PageSpinner />}>
+        <Reports />
+      </Suspense>
+    ),
+  },
+])
+```
+
+<InfoCard title="Prefetch on intent">You can warm a lazy chunk before it is needed by calling the same import on hover or focus — e.g. `onMouseEnter={() => import("./routes/Reports")}`. The browser caches the module, so navigation feels instant.</InfoCard>
+
+## Keep the UI Responsive with Concurrent Features
+
+React 18 added APIs that let you mark some updates as low priority so urgent ones (like typing) never get blocked. `useTransition` wraps a state update that can be interrupted; `useDeferredValue` lets an expensive subtree lag behind a fast-changing value.
+
+```tsx
+import { useState, useTransition, useDeferredValue, useMemo } from "react"
+
+function Search({ items }) {
+  const [query, setQuery] = useState("")
+  const [isPending, startTransition] = useTransition()
+
+  function onChange(e) {
+    // The input value updates immediately (urgent)...
+    const value = e.target.value
+    // ...but filtering the big list is deferred (non-urgent)
+    startTransition(() => setQuery(value))
+  }
+
+  const results = useMemo(
+    () => items.filter((i) => i.name.includes(query)),
+    [items, query],
+  )
+
+  return (
+    <>
+      <input onChange={onChange} />
+      {isPending && <span>Updating…</span>}
+      <ResultsList results={results} />
+    </>
+  )
+}
+```
+
+`useDeferredValue` achieves a similar effect without splitting the handler — pass it the fast value and read the deferred copy in the expensive part:
+
+```tsx
+const deferredQuery = useDeferredValue(query)
+const results = useMemo(
+  () => items.filter((i) => i.name.includes(deferredQuery)),
+  [items, deferredQuery],
+)
+```
+
+## Virtualize Long Lists
+
+Rendering thousands of DOM nodes is slow to mount and slow to scroll. **Windowing** renders only the rows currently visible plus a small buffer. `@tanstack/react-virtual` is the modern, framework-agnostic choice:
+
+```bash
+npm install @tanstack/react-virtual
+```
+
+```tsx
+import { useRef } from "react"
+import { useVirtualizer } from "@tanstack/react-virtual"
+
+function BigList({ rows }) {
+  const parentRef = useRef(null)
+
+  const virtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 40, // estimated row height in px
+    overscan: 5,
+  })
+
+  return (
+    <div ref={parentRef} style={{ height: 400, overflow: "auto" }}>
+      <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        {virtualizer.getVirtualItems().map((item) => (
+          <div
+            key={item.key}
+            style={{
+              position: "absolute",
+              top: 0,
+              transform: `translateY(${item.start}px)`,
+              width: "100%",
+            }}
+          >
+            {rows[item.index].name}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+Now the DOM holds ~15 rows regardless of whether the data has 100 or 100,000 items.
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="index-key">
+    <AccordionTrigger>Using array index as a list key</AccordionTrigger>
+    <AccordionContent>
+      `key={index}` breaks reconciliation when items are inserted, removed, or reordered — React reuses the wrong DOM nodes and component state, causing subtle bugs and extra renders. Use a stable unique id (`key={item.id}`).
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="inline-object">
+    <AccordionTrigger>Passing new objects/functions to memoized children</AccordionTrigger>
+    <AccordionContent>
+      `<Row style={{ margin: 8 }} onClick={() => x()} />` creates fresh references every render, so `React.memo` never skips. Hoist the object or wrap the callback in `useCallback`.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="context">
+    <AccordionTrigger>Putting everything in one big Context</AccordionTrigger>
+    <AccordionContent>
+      Every consumer re-renders when any part of the context value changes. Split contexts by concern, or memoize the provider value with `useMemo` so it does not create a new object each render.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="premature">
+    <AccordionTrigger>Optimizing before measuring</AccordionTrigger>
+    <AccordionContent>
+      Sprinkling `memo`/`useMemo` everywhere adds complexity and can slow things down. Let the Profiler point you at the real hot path first.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+<Card>
+  <CardHeader>
+    <CardTitle>A pragmatic optimization checklist</CardTitle>
+  </CardHeader>
+  <CardContent>
+    - **Measure a production build** with the Profiler before changing anything.
+    - **Lift state down**, not up — keep frequently-changing state close to where it is used so fewer components re-render.
+    - **Code-split at route boundaries** first; that is usually the biggest bundle win.
+    - **Memoize deliberately**, guided by profiling — not by habit.
+    - **Virtualize** any list that can grow past a few hundred rows.
+    - **Defer non-urgent updates** with `useTransition` / `useDeferredValue` to keep input responsive.
+  </CardContent>
+</Card>
+
+<Warning>Don't memo everything — measure first. Premature memoization adds complexity and rarely pays for itself outside real bottlenecks.</Warning>
 
 ---
 
@@ -38,4 +300,4 @@ function Page() {
 
 <NextLesson title="Server Components" description="RSC and streaming." href="/roadmap/react-fundamentals-advanced-server-components" />
 
-<Resources resources={[{"title":"React Performance","href":"https://react.dev/learn/render-and-commit"}]} />
+<Resources resources={[{"title":"Render and Commit (react.dev)","href":"https://react.dev/learn/render-and-commit"},{"title":"React DevTools Profiler","href":"https://react.dev/reference/react/Profiler"},{"title":"lazy — React reference","href":"https://react.dev/reference/react/lazy"},{"title":"TanStack Virtual","href":"https://tanstack.com/virtual/latest"}]} />

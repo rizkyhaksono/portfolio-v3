@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "22 min"
+duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -16,17 +16,277 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Resources and Prompts
 
-<LearningObjectives objectives={["Register static and dynamic resources", "Define prompt templates with arguments", "Return structured content to clients", "Version resource URIs"]} />
+Tools let a model *do* things, but a capable MCP server also needs to *offer context* and *guide interactions*. That is what the other two primitives are for. **Resources** expose read-only data — files, database rows, API responses — that a client can pull into the model's context. **Prompts** are reusable, parameterised message templates that surface in the client UI (often as slash commands) so users trigger well-crafted interactions without retyping them. Getting these right is what turns a toy server into something a team actually integrates into Claude Desktop, an IDE, or a custom agent.
+
+<LearningObjectives objectives={["Distinguish tools, resources, and prompts by who controls them", "Register static resources and read their contents", "Build dynamic resources with URI templates", "Notify clients when resource data changes", "Define prompt templates with typed arguments"]} />
+
+## Three Primitives, Three Controllers
+
+MCP defines three server primitives. The key mental model is *who decides when each one is used*:
+
+| Primitive | Controlled by | Analogous to | Side effects |
+| --- | --- | --- | --- |
+| **Tools** | The model | `POST` endpoints | Yes — actions |
+| **Resources** | The application | `GET` endpoints | No — read-only |
+| **Prompts** | The user | Slash commands / macros | No — templates |
+
+<Warning>
+Resources must be **side-effect free**. A client may read a resource eagerly, cache it, or fetch it repeatedly to refresh context. If reading a resource mutates state, model that operation as a **tool** instead.
+</Warning>
+
+Before a client will request any of these, declare the capabilities during construction. `listChanged` tells the client you will emit list-update notifications; `subscribe` enables per-resource change subscriptions.
 
 ```typescript
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+
+const server = new Server(
+  { name: "docs-server", version: "1.0.0" },
+  {
+    capabilities: {
+      resources: { subscribe: true, listChanged: true },
+      prompts: { listChanged: true },
+    },
+  },
+)
+```
+
+## Exposing Static Resources
+
+A resource is identified by a **URI** and described with a `name`, optional `description`, and a `mimeType`. Listing resources advertises what exists; reading one returns its contents. The high-level `McpServer` API wires both handlers for you, while the low-level `Server` gives you full control over each JSON-RPC method.
+
+<Tabs defaultValue="high">
+  <TabsList>
+    <TabsTrigger value="high">High-level (McpServer)</TabsTrigger>
+    <TabsTrigger value="low">Low-level (Server)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="high">
+
+```typescript
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { readFile } from "node:fs/promises"
+
+const server = new McpServer({ name: "docs-server", version: "1.0.0" })
+
+server.registerResource(
+  "api-docs",                       // internal id
+  "file:///docs/api.md",            // stable URI
+  { title: "API Reference", description: "REST endpoint docs", mimeType: "text/markdown" },
+  async (uri) => ({
+    contents: [
+      { uri: uri.href, mimeType: "text/markdown", text: await readFile("docs/api.md", "utf8") },
+    ],
+  }),
+)
+```
+
+  </TabsContent>
+  <TabsContent value="low">
+
+```typescript
+import { ListResourcesRequestSchema, ReadResourceRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+import { readFile } from "node:fs/promises"
+import { fileURLToPath } from "node:url"
+
 server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-  resources: [{ uri: "file:///docs/api.md", name: "API Docs", mimeType: "text/markdown" }],
+  resources: [
+    { uri: "file:///docs/api.md", name: "API Reference", description: "REST endpoint docs", mimeType: "text/markdown" },
+  ],
 }))
 
-server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
-  messages: [{ role: "user", content: { type: "text", text: "Review: " + (req.params.arguments?.code ?? "") } }],
+server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
+  const { uri } = req.params
+  const text = await readFile(fileURLToPath(uri), "utf8")
+  return { contents: [{ uri, mimeType: "text/markdown", text }] }
+})
+```
+
+  </TabsContent>
+</Tabs>
+
+The `contents` array can hold either **text** or **binary** entries. For binary payloads, drop `text` and send a base64 `blob` alongside its `mimeType`:
+
+```typescript
+return {
+  contents: [
+    { uri: "file:///logo.png", mimeType: "image/png", blob: pngBuffer.toString("base64") },
+  ],
+}
+```
+
+### Dynamic Resources with URI Templates
+
+Enumerating every possible resource is impractical when data is keyed by an id or date. **Resource templates** advertise a parameterised URI using [RFC 6570](https://datatracker.ietf.org/doc/html/rfc6570) syntax, and the SDK extracts the parameters for you on read.
+
+```typescript
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js"
+
+server.registerResource(
+  "user-profile",
+  new ResourceTemplate("users://{userId}/profile", { list: undefined }),
+  { title: "User Profile", description: "Public profile as JSON" },
+  async (uri, { userId }) => ({
+    contents: [
+      { uri: uri.href, mimeType: "application/json", text: JSON.stringify(await getUser(userId)) },
+    ],
+  }),
+)
+```
+
+With the low-level API you expose the template through its own list handler so clients can discover the pattern:
+
+```typescript
+import { ListResourceTemplatesRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+
+server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
+  resourceTemplates: [
+    { uriTemplate: "users://{userId}/profile", name: "User profile", mimeType: "application/json" },
+  ],
 }))
 ```
+
+<Tip>
+Pick a URI **scheme** that communicates the source: `file://` for disk, `https://` for remote docs, or a custom scheme like `db://orders/{id}` or `users://{userId}/profile`. Keep URIs stable — clients cache and reference them, so a changed URI reads as a different resource.
+</Tip>
+
+### Notifying Clients When Data Changes
+
+Static context goes stale. When the underlying data updates, emit a notification so clients can re-read. There are two levels: `notifications/resources/list_changed` (the *set* of resources changed) and `notifications/resources/updated` (one resource's *contents* changed). The latter requires `subscribe` capability and a subscribe handler.
+
+```typescript
+import { SubscribeRequestSchema, UnsubscribeRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+
+const subscribed = new Set<string>()
+
+server.setRequestHandler(SubscribeRequestSchema, async (req) => {
+  subscribed.add(req.params.uri)
+  return {}
+})
+server.setRequestHandler(UnsubscribeRequestSchema, async (req) => {
+  subscribed.delete(req.params.uri)
+  return {}
+})
+
+// Later, when a watched file changes on disk:
+async function onFileChanged(uri: string) {
+  if (!subscribed.has(uri)) return
+  await server.notification({ method: "notifications/resources/updated", params: { uri } })
+}
+```
+
+## Defining Prompt Templates
+
+Prompts are user-invoked templates. Each has a `name`, an optional `description`, and typed `arguments`. `prompts/list` advertises them; `prompts/get` fills in the arguments and returns concrete `messages` the client sends to the model.
+
+<Tabs defaultValue="high">
+  <TabsList>
+    <TabsTrigger value="high">High-level (McpServer)</TabsTrigger>
+    <TabsTrigger value="low">Low-level (Server)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="high">
+
+```typescript
+import { z } from "zod"
+
+server.registerPrompt(
+  "code-review",
+  {
+    title: "Code Review",
+    description: "Review a snippet for bugs and style",
+    argsSchema: { code: z.string(), language: z.string().optional() },
+  },
+  ({ code, language }) => ({
+    messages: [
+      {
+        role: "user",
+        content: { type: "text", text: `Review this ${language ?? "code"} for bugs and style:\n\n${code}` },
+      },
+    ],
+  }),
+)
+```
+
+  </TabsContent>
+  <TabsContent value="low">
+
+```typescript
+import { ListPromptsRequestSchema, GetPromptRequestSchema } from "@modelcontextprotocol/sdk/types.js"
+
+server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+  prompts: [
+    {
+      name: "code-review",
+      description: "Review a snippet for bugs and style",
+      arguments: [
+        { name: "code", description: "Source code to review", required: true },
+        { name: "language", description: "Programming language", required: false },
+      ],
+    },
+  ],
+}))
+
+server.setRequestHandler(GetPromptRequestSchema, async (req) => {
+  const code = req.params.arguments?.code ?? ""
+  const language = req.params.arguments?.language ?? "code"
+  return {
+    description: "Code review prompt",
+    messages: [
+      { role: "user", content: { type: "text", text: `Review this ${language} for bugs and style:\n\n${code}` } },
+    ],
+  }
+})
+```
+
+  </TabsContent>
+</Tabs>
+
+### Embedding Resources in Prompts
+
+A prompt message is not limited to plain text. It can embed a resource, letting one template pull live data into the conversation. Use content type `resource` with the same `contents` shape returned by `resources/read`.
+
+```typescript
+server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
+  messages: [
+    { role: "user", content: { type: "text", text: "Summarise the current API docs." } },
+    {
+      role: "user",
+      content: {
+        type: "resource",
+        resource: { uri: "file:///docs/api.md", mimeType: "text/markdown", text: await readFile("docs/api.md", "utf8") },
+      },
+    },
+  ],
+}))
+```
+
+<Accordion type="single" collapsible className="not-prose">
+  <AccordionItem value="completions">
+    <AccordionTrigger>How do argument autocompletions work?</AccordionTrigger>
+    <AccordionContent>
+      Declare a <code>completions</code> capability and handle <code>completion/complete</code>. When a user starts typing a prompt or template argument, the client requests suggestions and your server returns up to 100 candidate <code>values</code> plus an optional <code>total</code> and <code>hasMore</code> flag — for example suggesting valid language names for the <code>code-review</code> prompt.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices & Common Pitfalls
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Ship-ready checklist</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc pl-5 space-y-1">
+      <li><strong>Keep resources read-only.</strong> If it writes, it is a tool, not a resource.</li>
+      <li><strong>Always set an accurate <code>mimeType</code>.</strong> Clients rely on it to render or parse contents; use <code>application/json</code>, <code>text/markdown</code>, etc.</li>
+      <li><strong>Validate template parameters.</strong> A <code>{"users://{userId}"}</code> read is untrusted input — reject unknown ids instead of leaking errors.</li>
+      <li><strong>Only advertise capabilities you implement.</strong> Declaring <code>subscribe: true</code> without a subscribe handler makes clients wait for updates that never arrive.</li>
+      <li><strong>Mark required prompt arguments.</strong> Omitting <code>required</code> lets clients call <code>prompts/get</code> with missing data, forcing defensive fallbacks.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+<Warning>
+Never interpolate a resource URI straight into a filesystem path. `fileURLToPath` plus an allow-list of served directories prevents `file:///../../etc/passwd` style path traversal. Treat every incoming URI as hostile input.
+</Warning>
 
 ---
 
@@ -34,4 +294,4 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
 
 <NextLesson title="Multi-Tool Orchestration" description="Chain tools safely." href="/roadmap/mcp-fundamentals-intermediate-multi-tool-orchestration" />
 
-<Resources resources={[{"title":"MCP Resources","href":"https://modelcontextprotocol.io/docs/concepts/resources"}]} />
+<Resources resources={[{"title":"MCP Resources","href":"https://modelcontextprotocol.io/docs/concepts/resources"},{"title":"MCP Prompts","href":"https://modelcontextprotocol.io/docs/concepts/prompts"},{"title":"TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Specification","href":"https://spec.modelcontextprotocol.io/"}]} />

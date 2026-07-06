@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "advanced"
 level: "advanced"
-duration: "28 min"
+duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -18,27 +18,246 @@ import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react
 
 ## Microservices with Express
 
-Break large apps into independently deployable services with clear boundaries.
+A microservices architecture breaks a single large application into a set of small, independently deployable services, each owning one business capability and its own data. Instead of one Express app that handles users, orders, payments, and notifications, you run separate services that talk over the network. This buys you independent scaling, isolated failures, and team autonomy — but it also introduces network latency, partial failures, and operational overhead. In real projects the goal is not "microservices everywhere" but drawing the right boundaries and communicating between them reliably. This lesson shows how to do both with Express.
 
-<LearningObjectives objectives={["Identify service boundaries by domain", "Call services via HTTP with timeouts", "Introduce an API gateway", "Handle partial failures gracefully"]} />
+<LearningObjectives objectives={["Decide when a monolith or microservices fit the problem", "Identify service boundaries by business domain", "Call services over HTTP with timeouts and retries", "Route traffic through an API gateway", "Add resilience with circuit breakers and async messaging"]} />
 
-### Service Communication
+## Monolith vs Microservices
+
+Do not start with microservices by default. A well-structured monolith is faster to build, deploy, and debug. Reach for services when scaling needs, team size, or deployment cadence diverge across parts of the system.
+
+<Tabs defaultValue="monolith" className="not-prose">
+  <TabsList>
+    <TabsTrigger value="monolith">Monolith</TabsTrigger>
+    <TabsTrigger value="micro">Microservices</TabsTrigger>
+  </TabsList>
+  <TabsContent value="monolith">
+    One codebase, one deploy, one database. Simple local development, easy transactions, and low latency between modules. Downsides: the whole app scales as a unit and one team's change can block another's release.
+  </TabsContent>
+  <TabsContent value="micro">
+    Many services, each with its own deploy and datastore. Independent scaling and fault isolation at the cost of network calls, distributed data, and heavier observability and CI/CD.
+  </TabsContent>
+</Tabs>
+
+<Tip title="Start with a modular monolith">Keep clean module boundaries inside a single app first. When a module genuinely needs its own scaling or release cadence, extract it into a service. Boundaries you already trust make extraction cheap.</Tip>
+
+## Defining Service Boundaries
+
+Split by business domain (a "bounded context"), not by technical layer. A service should own its data and expose it only through its API — no other service reaches into its database. A common mistake is creating a "user-service", "auth-service", and "profile-service" that all read the same users table; that is a distributed monolith with all the pain and none of the benefits.
+
+```text
+E-commerce boundaries (each owns its data):
+
+  User Service      -> users, addresses
+  Catalog Service   -> products, categories, inventory
+  Order Service     -> orders, order_items
+  Payment Service   -> transactions, refunds
+  Notification Svc  -> emails, push tokens
+```
+
+Each service is its own Express app with its own `package.json`, port, and database connection:
 
 ```javascript
-// user-service calls order-service
-const res = await fetch(`${ORDER_SERVICE_URL}/orders?userId=${userId}`, {
-  signal: AbortSignal.timeout(5000),
-  headers: { "x-internal-key": process.env.INTERNAL_KEY },
+// order-service/src/index.js
+import express from "express"
+
+const app = express()
+app.use(express.json())
+
+app.get("/orders", async (req, res) => {
+  const orders = await db.order.findMany({ where: { userId: req.query.userId } })
+  res.json(orders)
 })
-if (!res.ok) throw new Error("Order service unavailable")
-const orders = await res.json()
+
+app.get("/health", (_req, res) => res.json({ status: "ok", service: "order" }))
+
+app.listen(process.env.PORT || 4002, () => {
+  console.log("order-service listening")
+})
+```
+
+<Warning>Never let two services share a database schema. Shared tables couple deploys and migrations, so you lose the independence that justified splitting in the first place.</Warning>
+
+## Inter-Service Communication
+
+Synchronous request/response over HTTP is the simplest way for services to talk. The critical detail beginners miss: a network call can hang forever. Always set a timeout so a slow dependency cannot exhaust your service's connections.
+
+```javascript
+// order-service calls user-service to enrich an order
+const ORDER_TIMEOUT_MS = 3000
+
+async function getUser(userId) {
+  const res = await fetch(`${process.env.USER_SERVICE_URL}/users/${userId}`, {
+    signal: AbortSignal.timeout(ORDER_TIMEOUT_MS),
+    headers: { "x-internal-key": process.env.INTERNAL_KEY },
+  })
+  if (!res.ok) throw new Error(`user-service responded ${res.status}`)
+  return res.json()
+}
+```
+
+Transient failures (a brief network blip, a service restart) are normal at scale, so retry idempotent reads with backoff. Do not blindly retry non-idempotent writes like "create payment" — you may charge twice.
+
+```javascript
+async function withRetry(fn, { retries = 2, baseMs = 200 } = {}) {
+  let lastErr
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await fn()
+    } catch (err) {
+      lastErr = err
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, baseMs * 2 ** attempt))
+      }
+    }
+  }
+  throw lastErr
+}
+
+const user = await withRetry(() => getUser(userId))
+```
+
+## The API Gateway
+
+Clients should not know the address of every service. An API gateway is a single public entry point that routes requests to the right service and centralizes cross-cutting concerns: authentication, rate limiting, CORS, and TLS termination. Internal services then trust the gateway and stay off the public internet.
+
+```javascript
+// gateway/src/index.js
+import express from "express"
+import { createProxyMiddleware } from "http-proxy-middleware"
+import rateLimit from "express-rate-limit"
+
+const app = express()
+app.use(rateLimit({ windowMs: 60_000, max: 120 }))
+
+// Verify the caller once, at the edge
+app.use(authenticate)
+
+app.use(
+  "/api/users",
+  createProxyMiddleware({ target: process.env.USER_SERVICE_URL, changeOrigin: true })
+)
+app.use(
+  "/api/orders",
+  createProxyMiddleware({ target: process.env.ORDER_SERVICE_URL, changeOrigin: true })
+)
+
+app.listen(8080, () => console.log("gateway on :8080"))
 ```
 
 <Accordion type="multiple" className="not-prose">
-  <AccordionItem value="gateway"><AccordionTrigger>API Gateway</AccordionTrigger><AccordionContent>Single entry point that routes `/users/*` to User Service and `/orders/*` to Order Service. Handles auth, rate limits, and SSL termination.</AccordionContent></AccordionItem>
-  <AccordionItem value="tradeoffs"><AccordionTrigger>Trade-offs</AccordionTrigger><AccordionContent>More operational complexity (deployments, observability) vs better team autonomy and scaling per service.</AccordionContent></AccordionItem>
+  <AccordionItem value="discovery">
+    <AccordionTrigger>How do services find each other?</AccordionTrigger>
+    <AccordionContent>
+      In small setups, pass URLs via environment variables (`USER_SERVICE_URL`). In container platforms like Kubernetes or Docker Compose, use DNS service names (`http://user-service:4001`) so addresses resolve automatically without hard-coded IPs.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="tradeoffs">
+    <AccordionTrigger>What does the gateway cost?</AccordionTrigger>
+    <AccordionContent>
+      It is another component to deploy and monitor, and a potential single point of failure — run at least two replicas behind a load balancer. In return you get one place for auth, throttling, and routing instead of duplicating it in every service.
+    </AccordionContent>
+  </AccordionItem>
 </Accordion>
 
+## Resilience: Circuit Breakers
+
+Retries and timeouts help, but if a downstream service is completely down, hammering it wastes resources and slows every request. A circuit breaker trips after repeated failures, fails fast for a cooldown window, then tests recovery. The `opossum` library wraps any async call:
+
+```javascript
+import CircuitBreaker from "opossum"
+
+const breaker = new CircuitBreaker(getUser, {
+  timeout: 3000, // fail if the call takes longer than 3s
+  errorThresholdPercentage: 50, // open once 50% of calls fail
+  resetTimeout: 10_000, // try again after 10s
+})
+
+// Serve a graceful fallback instead of crashing the request
+breaker.fallback(() => ({ id: null, name: "Unknown", degraded: true }))
+
+const user = await breaker.fire(userId)
+```
+
+<InfoCard title="Design for partial failure">In a monolith a function call either returns or throws. Across a network, a dependency can be slow, unreachable, or return garbage. Decide up front what each endpoint does when a dependency is down — return cached data, a partial response, or a clear 503 — rather than letting requests pile up.</InfoCard>
+
+## Asynchronous Communication with Events
+
+Not every interaction should be a blocking HTTP call. When an order is placed, the Order Service should not wait on the Notification and Analytics services to finish. Publish an event to a message broker (RabbitMQ, NATS, or Kafka) and let interested services consume it. This decouples producers from consumers and survives temporary consumer downtime.
+
+```javascript
+// order-service: publish an event after committing the order
+import amqp from "amqplib"
+
+const conn = await amqp.connect(process.env.RABBITMQ_URL)
+const channel = await conn.createChannel()
+await channel.assertExchange("orders", "topic", { durable: true })
+
+function publishOrderCreated(order) {
+  channel.publish(
+    "orders",
+    "order.created",
+    Buffer.from(JSON.stringify(order)),
+    { persistent: true }
+  )
+}
+```
+
+```javascript
+// notification-service: consume and react
+const channel = await conn.createChannel()
+await channel.assertExchange("orders", "topic", { durable: true })
+const q = await channel.assertQueue("notify-on-order", { durable: true })
+await channel.bindQueue(q.queue, "orders", "order.created")
+
+channel.consume(q.queue, async (msg) => {
+  const order = JSON.parse(msg.content.toString())
+  await sendOrderConfirmation(order)
+  channel.ack(msg) // ack only after the work succeeds
+})
+```
+
+<Tabs defaultValue="sync" className="not-prose">
+  <TabsList>
+    <TabsTrigger value="sync">Synchronous (HTTP)</TabsTrigger>
+    <TabsTrigger value="async">Asynchronous (Events)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="sync">
+    Use when the caller needs an immediate answer — reading a user's profile, checking inventory before checkout. Simple to reason about, but the caller is coupled to the callee's availability and latency.
+  </TabsContent>
+  <TabsContent value="async">
+    Use for side effects that can happen slightly later — sending email, updating analytics, syncing search indexes. Resilient to consumer downtime, but harder to trace and eventually consistent.
+  </TabsContent>
+</Tabs>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible className="not-prose">
+  <AccordionItem value="shared-db">
+    <AccordionTrigger>Sharing a database between services</AccordionTrigger>
+    <AccordionContent>The most common anti-pattern. It couples migrations and deploys and turns your fleet into a distributed monolith. Each service owns its data; expose it only through the API.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="no-timeout">
+    <AccordionTrigger>Calling services without timeouts</AccordionTrigger>
+    <AccordionContent>One slow dependency can exhaust every worker as requests block waiting. Always set a timeout and a fallback behavior.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="chatty">
+    <AccordionTrigger>Chatty calls (N+1 over the network)</AccordionTrigger>
+    <AccordionContent>Fetching 100 users one HTTP request at a time is disastrous over a network. Add batch endpoints (`/users?ids=1,2,3`) and cache hot reads.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="dist-tx">
+    <AccordionTrigger>Expecting distributed transactions</AccordionTrigger>
+    <AccordionContent>You cannot wrap calls to three services in a single ACID transaction. Use the saga pattern with compensating actions, and design operations to be idempotent so retries are safe.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+- Give every service a `/health` endpoint and structured logging with a shared correlation ID so you can trace a request across the fleet.
+- Version your APIs (`/api/v1/...`) so services can evolve without breaking callers.
+- Keep internal traffic off the public internet; authenticate service-to-service calls with a shared secret or mTLS.
+- Make writes idempotent (accept an idempotency key) so retries and at-least-once message delivery never double-charge or double-create.
+- Add distributed tracing (OpenTelemetry) early — debugging across services is impossible without it.
 
 ---
 
@@ -46,4 +265,4 @@ const orders = await res.json()
 
 <NextLesson title="Testing & Deployment" description="Supertest, Docker, and CI/CD." href="/roadmap/express-fundamentals-advanced-testing-deployment" />
 
-<Resources resources={[{"title":"Microservices patterns","href":"https://microservices.io/patterns/index.html"}]} />
+<Resources resources={[{"title":"Microservices patterns","href":"https://microservices.io/patterns/index.html"},{"title":"http-proxy-middleware","href":"https://github.com/chimurai/http-proxy-middleware"},{"title":"opossum circuit breaker","href":"https://nodeshift.dev/opossum/"},{"title":"RabbitMQ tutorials","href":"https://www.rabbitmq.com/tutorials"}]} />

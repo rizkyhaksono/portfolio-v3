@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "advanced"
 level: "advanced"
-duration: "22 min"
+duration: "28 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -14,25 +14,281 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Production MCP Servers
+## Shipping MCP to Production
 
-<LearningObjectives objectives={["Containerize stdio/SSE servers", "Add health and readiness endpoints", "Configure env-based secrets", "Run behind reverse proxy for SSE"]} />
+A local MCP server that talks to Claude Desktop over stdio is one thing; a server that dozens of clients hit over the network, all day, is another. Production deployment is where you decide on a transport, containerize the process, expose health probes so your orchestrator can restart it when it wedges, inject secrets safely, and put a TLS-terminating proxy in front of the streaming endpoint. Get these right and your MCP server behaves like any other well-run microservice — observable, restartable, and horizontally scalable.
+
+<LearningObjectives objectives={["Choose between stdio and Streamable HTTP transports for production", "Build a lean multi-stage Docker image and run it as a non-root user", "Expose liveness and readiness endpoints and wire them to Docker and Kubernetes probes", "Inject configuration and secrets through environment variables", "Run behind an Nginx reverse proxy with TLS and correct streaming settings", "Scale sessions horizontally without dropping stateful connections"]} />
+
+## Pick the Right Transport
+
+The transport decides everything downstream — how you scale, whether you need a proxy, and how clients authenticate. Local integrations keep using **stdio**; remote deployments should use the **Streamable HTTP** transport (the successor to the deprecated HTTP+SSE transport from the 2024 spec).
+
+<Tabs defaultValue="http">
+  <TabsList>
+    <TabsTrigger value="http">Streamable HTTP</TabsTrigger>
+    <TabsTrigger value="stdio">stdio</TabsTrigger>
+  </TabsList>
+  <TabsContent value="http">
+    A single HTTP endpoint (typically <code>/mcp</code>) that handles POST for client-to-server messages and streams server-to-client events over the same connection. This is the transport to deploy remotely: it works behind proxies, supports auth headers, and can scale to many clients.
+  </TabsContent>
+  <TabsContent value="stdio">
+    The server is launched as a child process and speaks JSON-RPC over standard input/output. There is no port and no network surface, which is exactly why it is ideal for local IDE and desktop integrations — but it cannot be reached remotely.
+  </TabsContent>
+</Tabs>
+
+Here is a minimal but production-shaped Streamable HTTP server using Express and the official SDK. Note the session map — Streamable HTTP is stateful by default, and each session gets its own transport.
+
+```ts
+import express from "express"
+import { randomUUID } from "node:crypto"
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js"
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
+import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js"
+
+const app = express()
+app.use(express.json())
+
+const transports: Record<string, StreamableHTTPServerTransport> = {}
+
+app.post("/mcp", async (req, res) => {
+  const sessionId = req.headers["mcp-session-id"] as string | undefined
+  let transport: StreamableHTTPServerTransport
+
+  if (sessionId && transports[sessionId]) {
+    transport = transports[sessionId]
+  } else if (!sessionId && isInitializeRequest(req.body)) {
+    transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: () => randomUUID(),
+      onsessioninitialized: (id) => { transports[id] = transport },
+    })
+    transport.onclose = () => {
+      if (transport.sessionId) delete transports[transport.sessionId]
+    }
+    const server = new McpServer({ name: "weather-mcp", version: "1.0.0" })
+    // ...register tools/resources here...
+    await server.connect(transport)
+  } else {
+    res.status(400).json({
+      jsonrpc: "2.0",
+      error: { code: -32000, message: "Bad Request: No valid session ID" },
+      id: null,
+    })
+    return
+  }
+
+  await transport.handleRequest(req, res, req.body)
+})
+```
+
+## Build a Production Docker Image
+
+A multi-stage build keeps your final image small: compile TypeScript in a `builder` stage, then copy only the compiled `dist/` and production dependencies into a slim runtime stage. Always run as a non-root user.
 
 ```dockerfile
-FROM node:20-alpine
+# syntax=docker/dockerfile:1
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --omit=dev
-COPY dist ./dist
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=builder /app/dist ./dist
+USER node
+EXPOSE 3000
 CMD ["node", "dist/index.js"]
 ```
 
-<Card><CardHeader><CardTitle>SSE transport</CardTitle></CardHeader><CardContent>Expose HTTP endpoint with TLS; stdio remains best for local IDE integrations.</CardContent></Card>
+<Tip>Pin the base image to a digest (for example `node:20-alpine@sha256:...`) in real deployments so a silent upstream retag can never change what you ship. Combine it with a `.dockerignore` that excludes `node_modules`, `.git`, and `.env` to keep the build context tiny.</Tip>
 
----
+## Add Health and Readiness Endpoints
+
+Orchestrators need two distinct signals. **Liveness** answers "is the process alive?" — if it fails, the container is restarted. **Readiness** answers "can it serve traffic right now?" — if it fails, traffic is withheld but the container is left running (useful during warm-up or a downstream outage). Serve both outside the MCP auth layer so probes never carry credentials.
+
+```ts
+let ready = false
+
+app.get("/healthz", (_req, res) => {
+  res.status(200).json({ status: "ok" })
+})
+
+app.get("/readyz", (_req, res) => {
+  res.status(ready ? 200 : 503).json({ ready })
+})
+
+app.listen(Number(process.env.PORT ?? 3000), () => {
+  ready = true // flip to true once downstreams (DB, upstream APIs) are reachable
+})
+```
+
+Wire the same endpoint into a Docker `HEALTHCHECK` and, in Kubernetes, into probes:
+
+<Tabs defaultValue="docker">
+  <TabsList>
+    <TabsTrigger value="docker">Dockerfile</TabsTrigger>
+    <TabsTrigger value="k8s">Kubernetes</TabsTrigger>
+  </TabsList>
+  <TabsContent value="docker">
+
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD node -e "fetch('http://localhost:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+```
+
+  </TabsContent>
+  <TabsContent value="k8s">
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 30
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 3000
+  periodSeconds: 10
+  failureThreshold: 3
+```
+
+  </TabsContent>
+</Tabs>
+
+## Configuration and Secrets
+
+Never bake API keys into the image. Read everything from the environment, validate at startup, and fail fast if a required value is missing — a container that crashes immediately is far easier to debug than one that runs with a silently-undefined secret.
+
+```ts
+const config = {
+  port: Number(process.env.PORT ?? 3000),
+  apiKey: process.env.MCP_API_KEY,
+  upstreamUrl: process.env.WEATHER_API_URL ?? "https://api.open-meteo.com",
+  logLevel: process.env.LOG_LEVEL ?? "info",
+}
+
+if (!config.apiKey) {
+  throw new Error("MCP_API_KEY is required but was not provided")
+}
+```
+
+A `docker-compose.yml` injects those values and reads secrets from the host environment (or an `.env` file that stays out of version control):
+
+```yaml
+services:
+  mcp:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      MCP_API_KEY: ${MCP_API_KEY}
+      LOG_LEVEL: info
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+```
+
+<Warning>In managed environments prefer a real secret manager — Kubernetes Secrets, AWS Secrets Manager, or Docker secrets — over plain environment variables, which can leak through crash dumps, `/proc`, and child-process inheritance.</Warning>
+
+## Reverse Proxy and TLS
+
+Terminate TLS at a reverse proxy and forward plain HTTP to the MCP process on localhost. The one non-obvious detail: the Streamable HTTP transport keeps a long-lived streaming response open, so you **must disable response buffering** or clients will see events arrive in delayed bursts instead of in real time.
+
+```nginx
+server {
+  listen 443 ssl;
+  server_name mcp.example.com;
+
+  ssl_certificate     /etc/letsencrypt/live/mcp.example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/mcp.example.com/privkey.pem;
+
+  location /mcp {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # Streaming: flush events immediately instead of buffering
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_read_timeout 3600s;
+  }
+}
+```
+
+## Scaling Strategies
+
+Because Streamable HTTP sessions are held in server memory, a request carrying an `Mcp-Session-Id` must land on the instance that created it. You have two production-grade options:
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Session affinity vs. stateless mode</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <strong>Sticky sessions:</strong> configure your load balancer to route by the <code>Mcp-Session-Id</code> header so follow-up requests reach the right replica. Simple, but a lost pod drops its sessions.
+    <br /><br />
+    <strong>Stateless mode:</strong> construct the transport with <code>sessionIdGenerator: undefined</code>. Every request is self-contained, so any replica can serve any request and you scale like a normal stateless service — at the cost of per-connection server state.
+  </CardContent>
+</Card>
+
+```ts
+// Stateless: no session map, safe for round-robin load balancing
+const transport = new StreamableHTTPServerTransport({
+  sessionIdGenerator: undefined,
+})
+const server = new McpServer({ name: "weather-mcp", version: "1.0.0" })
+await server.connect(transport)
+await transport.handleRequest(req, res, req.body)
+```
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="stdout">
+    <AccordionTrigger>Logging to stdout on a stdio server</AccordionTrigger>
+    <AccordionContent>
+      With the stdio transport, stdout is the JSON-RPC channel. A stray <code>console.log</code> injects garbage into the protocol stream and breaks the client. Always log to <code>stderr</code> (<code>console.error</code>) or a file, never stdout.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="buffering">
+    <AccordionTrigger>Proxy buffering swallows streamed events</AccordionTrigger>
+    <AccordionContent>
+      If responses seem to hang and then arrive all at once, your proxy is buffering. Set <code>proxy_buffering off</code> (Nginx) or the equivalent, and make sure read timeouts are long enough for slow tool calls.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="affinity">
+    <AccordionTrigger>Round-robin balancing across stateful sessions</AccordionTrigger>
+    <AccordionContent>
+      Sending session requests to a random replica yields "No valid session ID" 400s. Use sticky routing by <code>Mcp-Session-Id</code>, or switch the transport to stateless mode.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="root">
+    <AccordionTrigger>Running the container as root</AccordionTrigger>
+    <AccordionContent>
+      Add a <code>USER node</code> line so a compromised tool cannot act as root inside the container. Combine with a read-only root filesystem where possible.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+<InfoCard>
+Pin base images by digest and scan them in CI. Validate all config at startup and fail fast. Emit structured JSON logs and a request ID per MCP session so you can trace a tool call end to end. Set sensible timeouts on every upstream call your tools make — a hung dependency should surface as a tool error, not a stuck stream. Finally, run a smoke test after each deploy that opens a session, lists tools, and calls one, so a broken build never reaches real clients.
+</InfoCard>
 
 ## Next Steps
 
 <NextLesson title="Security & Sandboxing" description="Scopes and validation." href="/roadmap/mcp-fundamentals-advanced-security-sandboxing" />
 
-<Resources resources={[{"title":"MCP SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"}]} />
+<Resources resources={[{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Transports Specification","href":"https://modelcontextprotocol.io/docs/concepts/transports"},{"title":"Docker: Multi-stage builds","href":"https://docs.docker.com/build/building/multi-stage/"},{"title":"Kubernetes: Liveness & Readiness Probes","href":"https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"}]} />

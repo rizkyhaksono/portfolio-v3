@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "24 min"
+duration: "30 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,30 +14,229 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Observability Stack
+## Observability in Kubernetes
 
-<LearningObjectives objectives={["Scrape metrics with Prometheus", "Create Grafana dashboards", "Ship logs to Loki", "Define alerts for SLOs"]} />
+When a request slows down at 3 AM, `kubectl get pods` will not tell you why. Pods are ephemeral, replicas come and go, and a single user request may cross a dozen services. **Observability** is the practice of instrumenting a cluster so you can ask arbitrary questions about its behavior after the fact — without shipping new code. In Kubernetes this is built on three pillars: **metrics** (numeric time series like request rate and memory usage), **logs** (discrete events emitted by your apps), and **traces** (the path of a single request across services). This lesson focuses on the two you will stand up first: metrics with Prometheus and Grafana, and logs with Loki.
+
+<LearningObjectives objectives={["Deploy the Prometheus + Grafana stack with kube-prometheus-stack", "Scrape application metrics using ServiceMonitor CRDs", "Instrument a service to expose a /metrics endpoint", "Ship and query container logs with Loki and Promtail", "Define alerting rules around the four golden signals"]} />
+
+## The Four Golden Signals
+
+Before wiring up tools, decide *what* to measure. Google's SRE book recommends four signals that cover most user-facing failures:
+
+- **Latency** — how long requests take (track successful and failed latency separately).
+- **Traffic** — demand on the system, e.g. requests per second.
+- **Errors** — the rate of failed requests (5xx responses, dropped connections).
+- **Saturation** — how full your resources are (CPU, memory, queue depth).
+
+<Tip>Alert on **symptoms** (rising latency, error spikes) rather than **causes** (high CPU). CPU at 90% is only a problem if users feel it — symptom-based alerts have far fewer false positives.</Tip>
+
+## Deploying the Prometheus Stack
+
+The standard way to install Prometheus, Grafana, Alertmanager, and the node/kube-state exporters together is the community `kube-prometheus-stack` Helm chart. It also installs the Custom Resource Definitions (`ServiceMonitor`, `PodMonitor`, `PrometheusRule`) that let you configure scraping declaratively instead of editing a giant `prometheus.yml`.
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install monitoring prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace \
+  --set grafana.adminPassword='change-me'
+```
+
+Once the pods are running, port-forward Grafana to log in locally:
+
+```bash
+kubectl -n monitoring port-forward svc/monitoring-grafana 3000:80
+# open http://localhost:3000  (user: admin)
+```
+
+<Warning>Never expose Grafana or Prometheus with a default password or a public LoadBalancer. Put them behind an Ingress with authentication, or keep them internal and access via `port-forward` / a VPN.</Warning>
+
+## Scraping Metrics with ServiceMonitor
+
+The Prometheus Operator watches for `ServiceMonitor` objects and reconfigures Prometheus automatically. A `ServiceMonitor` selects Kubernetes `Service` objects by label, then tells Prometheus which port and path to scrape. Your `Service` must expose a **named** port that matches the `port` field below.
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: api-metrics
+  namespace: monitoring
+  labels:
+    release: monitoring   # must match the Prometheus serviceMonitorSelector
 spec:
   selector:
     matchLabels:
-      app: api
+      app: api            # matches the Service's labels
+  namespaceSelector:
+    matchNames:
+      - default
   endpoints:
-    - port: metrics
+    - port: metrics       # the Service's named port, not the number
+      path: /metrics
       interval: 30s
 ```
 
-<Card><CardHeader><CardTitle>Golden signals</CardTitle></CardHeader><CardContent>Latency, traffic, errors, saturation — monitor these per service.</CardContent></Card>
+<Warning>A ServiceMonitor is ignored unless its labels match Prometheus's `serviceMonitorSelector`. The kube-prometheus-stack chart defaults to selecting `release: <helm-release-name>`, so add that label (here `release: monitoring`) or Prometheus will silently never scrape your target.</Warning>
+
+## Instrumenting Your Application
+
+Prometheus is pull-based: your app exposes an HTTP `/metrics` endpoint in the text exposition format, and Prometheus scrapes it. Use an official client library rather than hand-writing the format. Here is a minimal Node.js example with `prom-client`:
+
+```ts
+import express from "express"
+import client from "prom-client"
+
+const app = express()
+const register = new client.Registry()
+client.collectDefaultMetrics({ register }) // CPU, memory, event loop
+
+const httpDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "Request latency in seconds",
+  labelNames: ["method", "route", "status"],
+  buckets: [0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+})
+register.registerMetric(httpDuration)
+
+app.use((req, res, next) => {
+  const end = httpDuration.startTimer()
+  res.on("finish", () =>
+    end({ method: req.method, route: req.path, status: res.statusCode })
+  )
+  next()
+})
+
+app.get("/metrics", async (_req, res) => {
+  res.set("Content-Type", register.contentType)
+  res.end(await register.metrics())
+})
+
+app.listen(8080)
+```
+
+<Tip>Keep metric **cardinality** low. Never put unbounded values (user IDs, request IDs, raw URLs with path params) into label values — each unique combination creates a new time series and can overwhelm Prometheus. Use route templates like `/users/:id`, not `/users/12345`.</Tip>
+
+## Querying with PromQL and Grafana
+
+Prometheus stores everything as time series you query with **PromQL**. Because histograms are cumulative, you almost always wrap counters in `rate()` over a time window. These expressions map directly to the golden signals:
+
+```promql
+# Traffic: requests per second per route
+sum(rate(http_request_duration_seconds_count[5m])) by (route)
+
+# Errors: fraction of 5xx responses
+sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m]))
+  / sum(rate(http_request_duration_seconds_count[5m]))
+
+# Latency: 95th percentile from histogram buckets
+histogram_quantile(
+  0.95,
+  sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route)
+)
+```
+
+In Grafana, add Prometheus as a data source (the chart pre-configures it), then build panels from these queries or import a community dashboard by ID from grafana.com — for example **1860** (Node Exporter Full) or **315** (Kubernetes cluster monitoring). Store your own dashboards as JSON in Git so they are versioned and reproducible.
+
+## Centralized Logging with Loki
+
+Metrics tell you *that* something is wrong; logs tell you *what*. Loki is a log aggregation system designed to pair with Grafana. Unlike Elasticsearch, it does **not** index the full text of every log line — it only indexes a small set of labels and stores the rest compressed, which makes it cheap to run. An agent such as **Promtail** (or Grafana Alloy) runs as a DaemonSet, tails every container's stdout/stderr, attaches Kubernetes labels, and pushes to Loki.
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="install">Install</TabsTrigger>
+    <TabsTrigger value="query">Query (LogQL)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="install">
+
+```bash
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install loki grafana/loki-stack \
+  --namespace monitoring \
+  --set promtail.enabled=true \
+  --set loki.persistence.enabled=true \
+  --set loki.persistence.size=10Gi
+```
+
+  </TabsContent>
+  <TabsContent value="query">
+
+```logql
+# All error-level lines from the api app in the last hour
+{app="api", namespace="default"} |= "level=error"
+
+# Count errors per pod over 5m windows
+sum by (pod) (
+  count_over_time({app="api"} |= "error" [5m])
+)
+```
+
+  </TabsContent>
+</Tabs>
+
+Because Loki and Prometheus share the same label vocabulary, you can jump straight from a spike on a Grafana metric panel to the exact logs for that pod and time range.
+
+<InfoCard>Emit application logs as **structured JSON** to stdout (never to files inside the container). Kubernetes captures stdout automatically, and structured fields let LogQL filter on `level`, `trace_id`, or `route` instead of fragile substring matches.</InfoCard>
+
+## Alerting on SLOs
+
+Dashboards only help when someone is looking. `PrometheusRule` objects define alerting rules that Prometheus evaluates continuously and forwards to Alertmanager for routing to Slack, PagerDuty, or email. Use `for:` to require a condition to persist before firing, which suppresses transient blips.
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: api-slo-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: api.rules
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            sum(rate(http_request_duration_seconds_count{status=~"5.."}[5m]))
+              / sum(rate(http_request_duration_seconds_count[5m])) > 0.05
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "API 5xx error rate above 5%"
+            description: "Error ratio is {{ $value | humanizePercentage }} for 10m."
+```
+
+## Best Practices & Common Pitfalls
+
+- **Match your selectors.** The number-one cause of "no data" is a `ServiceMonitor` whose `release` label does not match Prometheus's `serviceMonitorSelector`, or a `Service` port that has no `name`.
+- **Set resource requests and retention.** Prometheus is memory-hungry. Give it a `retention` window (e.g. 15d) and back it with a PersistentVolume, or you will lose history on every restart.
+- **Avoid high-cardinality labels.** They are the leading cause of Prometheus running out of memory. Audit new metrics before rolling them out.
+- **Alert on symptoms, page on the actionable.** Route only `severity: critical`, user-impacting alerts to a pager; send warnings to a channel for review.
+- **Version your config.** Keep dashboards, alerting rules, and Helm `values.yaml` in Git so your observability stack is as reproducible as your application.
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="q1">
+    <AccordionTrigger>ServiceMonitor vs PodMonitor — which do I use?</AccordionTrigger>
+    <AccordionContent>
+      Use a `ServiceMonitor` when your workload is fronted by a `Service` (the common case) — it scrapes the endpoints behind that Service. Use a `PodMonitor` to scrape pods directly by label when there is no Service, such as batch jobs or sidecars that do not receive traffic.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="q2">
+    <AccordionTrigger>Why is Loki cheaper than Elasticsearch?</AccordionTrigger>
+    <AccordionContent>
+      Loki indexes only labels, not the full log body, and stores compressed chunks in object storage (S3, GCS). You trade rich full-text search for far lower storage and compute cost, which is a good fit for high-volume Kubernetes logs.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
 
 ---
 
 ## Next Steps
 
-<NextLesson title="Cluster Autoscaling" description="HPA and VPA." href="/roadmap/kubernetes-fundamentals-advanced-cluster-autoscaling" />
+You now have metrics, dashboards, logs, and alerts. Next you will use those metrics to scale the cluster automatically in response to real load.
 
-<Resources resources={[{"title":"Prometheus","href":"https://prometheus.io/docs/"}]} />
+<NextLesson title="Cluster Autoscaling" description="Scale pods and nodes automatically with HPA, VPA, and the Cluster Autoscaler." href="/roadmap/kubernetes-fundamentals-advanced-cluster-autoscaling" />
+
+<Resources resources={[{"title":"Prometheus Documentation","href":"https://prometheus.io/docs/"},{"title":"Prometheus Operator (CRDs)","href":"https://prometheus-operator.dev/docs/"},{"title":"Grafana Loki Documentation","href":"https://grafana.com/docs/loki/latest/"},{"title":"Google SRE Book — Monitoring Distributed Systems","href":"https://sre.google/sre-book/monitoring-distributed-systems/"}]} />

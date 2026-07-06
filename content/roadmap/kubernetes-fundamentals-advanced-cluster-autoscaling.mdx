@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "advanced"
 level: "advanced"
-duration: "22 min"
+duration: "28 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,9 +14,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Autoscaling
+Autoscaling is how a Kubernetes cluster matches capacity to demand without a human editing replica counts at 3 a.m. It operates on two independent axes: scaling *pods* (running more or fewer copies of your workload) and scaling *nodes* (adding or removing machines so those pods have somewhere to run). Get this right and you absorb traffic spikes gracefully while paying only for what you use; get it wrong and you either drop requests under load or burn money on idle capacity. This lesson covers the three controllers that make it work — the Horizontal Pod Autoscaler, the Vertical Pod Autoscaler, and the Cluster Autoscaler — plus the resource governance that keeps them honest.
 
-<LearningObjectives objectives={["Configure HorizontalPodAutoscaler", "Set CPU/memory requests and limits", "Use VPA for right-sizing", "Scale nodes with cluster autoscaler"]} />
+<LearningObjectives objectives={["Configure a HorizontalPodAutoscaler with CPU, memory, and custom metrics", "Set correct resource requests and limits so autoscaling has a baseline", "Right-size workloads with the Vertical Pod Autoscaler", "Scale node pools automatically with the Cluster Autoscaler", "Enforce fair usage with ResourceQuota and LimitRange"]} />
+
+## Requests and Limits: the Foundation
+
+Autoscaling is meaningless without resource **requests**. The scheduler uses requests to place pods, and the HPA computes utilization as *current usage ÷ requested amount*. A pod with no CPU request has undefined utilization, so the HPA cannot scale it.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: registry.example.com/api:1.4.0
+          resources:
+            requests:
+              cpu: "250m"      # baseline the scheduler reserves
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"     # hard ceiling before CPU throttling
+              memory: "512Mi"  # exceed this and the container is OOMKilled
+```
+
+<Tip>Set CPU limits generously (or omit them) but always set memory limits. CPU over-limit only throttles the container; memory over-limit gets it OOMKilled. Requests should reflect the *typical* steady-state usage, not the peak.</Tip>
+
+## Horizontal Pod Autoscaler (HPA)
+
+The HPA adds and removes pod replicas based on observed metrics. It requires the **metrics-server** to be installed for CPU and memory, and a custom-metrics adapter (such as Prometheus Adapter) for anything else. Always use the `autoscaling/v2` API — `v1` only supports a single CPU target and is effectively deprecated.
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -37,7 +74,217 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300  # wait 5 min of low load before shrinking
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0    # react to spikes immediately
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 30
 ```
+
+When multiple metrics are listed, the HPA calculates a desired replica count for each and picks the **highest** — so the busiest dimension wins. The `behavior` block (available since v2) is what stops "flapping": a long `scaleDown` stabilization window keeps replicas up through short traffic dips, while an aggressive `scaleUp` policy lets you double capacity in seconds.
+
+### Scaling on custom and external metrics
+
+CPU is a poor proxy for many workloads. A queue consumer should scale on queue depth; an HTTP service on requests per second. With a metrics adapter installed you can target those directly.
+
+<Tabs defaultValue="pods">
+  <TabsList>
+    <TabsTrigger value="pods">Pods metric (RPS)</TabsTrigger>
+    <TabsTrigger value="external">External metric (queue)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="pods">
+
+```yaml
+metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "500"   # scale so each pod handles ~500 rps
+```
+
+  </TabsContent>
+  <TabsContent value="external">
+
+```yaml
+metrics:
+  - type: External
+    external:
+      metric:
+        name: sqs_messages_visible
+        selector:
+          matchLabels:
+            queue: orders
+      target:
+        type: AverageValue
+        averageValue: "30"    # one pod per ~30 pending messages
+```
+
+  </TabsContent>
+</Tabs>
+
+<InfoCard>For event-driven scaling — Kafka, RabbitMQ, SQS, cron, or scale-to-zero — reach for **KEDA**. It ships 60+ scalers and generates a managed HPA under the hood, so you keep the same controller but get far richer triggers.</InfoCard>
+
+## Vertical Pod Autoscaler (VPA)
+
+Where the HPA changes *how many* pods run, the VPA changes *how big* each pod is by adjusting CPU and memory requests. It is ideal for workloads that cannot scale horizontally — a single-writer database, a leader-elected controller — or for discovering correct request values in the first place.
+
+```yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: worker-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: worker
+  updatePolicy:
+    updateMode: "Auto"   # Off | Initial | Recreate | Auto
+  resourcePolicy:
+    containerPolicies:
+      - containerName: "*"
+        minAllowed:
+          cpu: "100m"
+          memory: "128Mi"
+        maxAllowed:
+          cpu: "2"
+          memory: "2Gi"
+        controlledResources: ["cpu", "memory"]
+```
+
+The `updateMode` values matter:
+
+- **Off** — only produces recommendations; apply them yourself. Safest starting point.
+- **Initial** — sets requests when a pod is *created*, never touches running pods.
+- **Recreate** / **Auto** — evicts and recreates pods to apply new requests live.
+
+<Warning>Do not point an HPA and a VPA at the same CPU or memory metric — they fight, since one changes replica count while the other changes the request the HPA measures against. It is safe to combine them only when the HPA scales on a *custom* metric (e.g. RPS) and the VPA manages CPU/memory. Also note that in `Auto` mode the VPA evicts pods, so protect availability with a PodDisruptionBudget.</Warning>
+
+## Cluster Autoscaler: scaling the nodes
+
+Pods that cannot be scheduled because every node is full get stuck in `Pending`. The **Cluster Autoscaler (CA)** watches for exactly this and provisions new nodes from your cloud provider's node groups (an EKS managed node group, a GKE node pool, an AKS agent pool). When nodes sit underutilized and their pods can fit elsewhere, it drains and removes them.
+
+```yaml
+# Node-group discovery via tags on AWS EKS
+command:
+  - ./cluster-autoscaler
+  - --cloud-provider=aws
+  - --namespace=kube-system
+  - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/my-cluster
+  - --balance-similar-node-groups
+  - --expander=least-waste          # pick the group that leaves the least idle capacity
+  - --scale-down-utilization-threshold=0.5
+  - --scale-down-unneeded-time=10m  # node must be idle this long before removal
+```
+
+The CA reasons purely about resource **requests**, not live usage — a node whose pods request 100% of CPU but idle at 5% is considered full. This is another reason accurate requests matter. To keep the autoscaler from evicting a critical pod during scale-down, annotate it:
+
+```bash
+kubectl annotate pod payments-processor \
+  cluster-autoscaler.kubernetes.io/safe-to-evict=false
+```
+
+<Tabs defaultValue="ca">
+  <TabsList>
+    <TabsTrigger value="ca">Cluster Autoscaler</TabsTrigger>
+    <TabsTrigger value="karpenter">Karpenter</TabsTrigger>
+  </TabsList>
+  <TabsContent value="ca">
+
+Works against fixed node groups you define up front. Mature, cloud-agnostic, and predictable — you choose the instance types, it changes the count.
+
+  </TabsContent>
+  <TabsContent value="karpenter">
+
+A newer alternative (AWS-first) that provisions right-sized nodes just-in-time from a broad instance pool, skipping node groups entirely. Often faster to schedule and cheaper, at the cost of less deterministic instance selection.
+
+  </TabsContent>
+</Tabs>
+
+## Governing Capacity: ResourceQuota and LimitRange
+
+Autoscaling amplifies mistakes — a single misconfigured deployment can scale to hundreds of pods and exhaust a shared cluster. Namespace-level guardrails contain the blast radius.
+
+```yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+  namespace: team-a
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    pods: "100"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: team-a
+spec:
+  limits:
+    - type: Container
+      default:            # applied as limits if none specified
+        cpu: "500m"
+        memory: 256Mi
+      defaultRequest:     # applied as requests if none specified
+        cpu: "100m"
+        memory: 128Mi
+```
+
+<Warning>Once a `ResourceQuota` sets `requests.cpu` or `limits.memory`, every pod in that namespace **must** declare the corresponding value or the API server rejects it. Pair the quota with a `LimitRange` so bare pods still get sensible defaults instead of failing admission.</Warning>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="p1">
+    <AccordionTrigger>HPA shows "unknown" for the target metric</AccordionTrigger>
+    <AccordionContent>The metrics-server is not installed, or the pods have no resource requests. Run `kubectl top pods` to confirm metrics flow, and verify every container defines a CPU request.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p2">
+    <AccordionTrigger>Replicas oscillate up and down (flapping)</AccordionTrigger>
+    <AccordionContent>Add a `behavior.scaleDown.stabilizationWindowSeconds` of 180–300s so brief dips don't trigger immediate scale-in, and widen the gap between your target utilization and typical load.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p3">
+    <AccordionTrigger>Nodes never scale down</AccordionTrigger>
+    <AccordionContent>Common causes: pods without a controller (bare pods), pods using local storage (emptyDir), restrictive PodDisruptionBudgets, or `safe-to-evict=false` annotations. kube-system pods without a PDB also block drains.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p4">
+    <AccordionTrigger>HPA and VPA both configured, pods thrash</AccordionTrigger>
+    <AccordionContent>They are competing on the same resource. Use the VPA only in `Off` (recommendation) mode alongside a CPU-based HPA, or split responsibilities: HPA on a custom metric, VPA on CPU/memory.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+<Card>
+  <CardHeader>
+    <CardTitle>Production autoscaling checklist</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Set requests from real profiling data, not guesses. Keep `minReplicas` at 2+ for HA. Scale up fast, scale down slow. Add a PodDisruptionBudget to every scalable workload. Reserve headroom on nodes for the kubelet and system daemons. Load-test the whole path — pod *and* node scaling — before you trust it in production.
+  </CardContent>
+</Card>
 
 ---
 
@@ -45,4 +292,4 @@ spec:
 
 <NextLesson title="Security & RBAC" description="Roles and Pod Security." href="/roadmap/kubernetes-fundamentals-advanced-security-rbac" />
 
-<Resources resources={[{"title":"HPA","href":"https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"}]} />
+<Resources resources={[{"title":"Horizontal Pod Autoscaler","href":"https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"},{"title":"Vertical Pod Autoscaler","href":"https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler"},{"title":"Cluster Autoscaler FAQ","href":"https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md"},{"title":"Resource Quotas","href":"https://kubernetes.io/docs/concepts/policy/resource-quotas/"}]} />

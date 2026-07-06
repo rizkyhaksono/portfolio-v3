@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "18 min"
+duration: "24 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
@@ -16,51 +16,225 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
 
-## Centralized Error Handling
+## Centralized Error Handling in Express
 
-Production APIs need predictable error responses. Express error middleware must be registered **last**.
+Every route in a real API can fail: a database connection drops, a user sends malformed JSON, a record is missing, or a token has expired. If each handler invents its own way to respond to failure, clients receive inconsistent shapes, stack traces leak into production, and debugging becomes guesswork. The fix is a **single, centralized error pipeline**: route handlers throw or forward errors, and one dedicated middleware decides the HTTP status, the response body, and what gets logged. This lesson shows how to build that pipeline with custom error classes, an async wrapper, and an environment-aware error handler.
 
-<LearningObjectives objectives={["Create custom AppError classes with status codes", "Wrap async route handlers to catch rejected promises", "Build centralized error middleware", "Return consistent JSON error shapes"]} />
+<LearningObjectives objectives={["Design a custom AppError class hierarchy with status codes and error codes", "Forward async errors to Express without try/catch in every route", "Build a centralized error-handling middleware and a 404 catch-all", "Map framework errors (validation, Prisma, JWT) to clean client responses", "Return consistent JSON error shapes and avoid leaking stack traces"]} />
 
-### Custom Error Classes
+## How Express Routes Errors
+
+Express recognizes a middleware function as an *error handler* purely by its **arity**: it must take exactly four arguments `(err, req, res, next)`. Whenever you call `next(err)` with a non-null argument, Express skips all remaining normal middleware and jumps straight to the first error handler. Because of this, error middleware must be registered **after** all routes and normal middleware.
+
+```javascript
+import express from "express"
+
+const app = express()
+app.use(express.json())
+
+// ...all your routes go here...
+
+// 404 handler — reached only if no route matched
+app.use((req, res, next) => {
+  next(new AppError("Route not found", 404, "NOT_FOUND"))
+})
+
+// Error handler — MUST be last and MUST have 4 params
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    success: false,
+    error: { code: err.code || "INTERNAL_ERROR", message: err.message },
+  })
+})
+```
+
+<Warning>If your error handler declares only three parameters, Express treats it as a normal middleware and your `next(err)` calls will fall through to Express's default HTML error page instead.</Warning>
+
+## Custom Error Classes
+
+Throwing plain `Error` objects loses information — there is no clean way to know whether a failure should return `400`, `404`, or `500`. A small class hierarchy carries the HTTP status and a machine-readable code alongside the message. The `isOperational` flag distinguishes *expected* failures (bad input, missing record) from *programmer bugs* you may want to crash on.
 
 ```javascript
 class AppError extends Error {
   constructor(message, statusCode = 500, code = "INTERNAL_ERROR") {
     super(message)
+    this.name = this.constructor.name
     this.statusCode = statusCode
     this.code = code
     this.isOperational = true
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource = "Resource") {
+    super(`${resource} not found`, 404, "NOT_FOUND")
+  }
+}
+
+class ValidationError extends AppError {
+  constructor(message, details) {
+    super(message, 422, "VALIDATION_ERROR")
+    this.details = details
+  }
+}
+
+class UnauthorizedError extends AppError {
+  constructor(message = "Authentication required") {
+    super(message, 401, "UNAUTHORIZED")
   }
 }
 ```
 
-### Async Handler Wrapper
+Now a route can express intent directly, and the central handler already knows exactly what to send back:
+
+```javascript
+app.get("/api/users/:id", asyncHandler(async (req, res) => {
+  const user = await db.users.findById(req.params.id)
+  if (!user) throw new NotFoundError("User")
+  res.json({ success: true, data: user })
+}))
+```
+
+<Tip title="Keep codes stable">The `code` string (`NOT_FOUND`, `VALIDATION_ERROR`) is a contract your frontend and mobile clients branch on. Human-readable `message` text can change freely; the machine code should not.</Tip>
+
+## Catching Async Errors
+
+This is the most common source of hung requests. In **Express 4**, if an `async` route handler rejects, Express does **not** catch it automatically — the promise rejection is unhandled and the client waits forever. Wrapping every route in `try/catch` works but is noisy. A tiny higher-order function centralizes it:
 
 ```javascript
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next)
 ```
 
-<Tabs defaultValue="err" className="my-6">
-  <TabsList><TabsTrigger value="err">Error Middleware</TabsTrigger><TabsTrigger value="404">404</TabsTrigger></TabsList>
-  <TabsContent value="err">
+Any thrown or rejected error is passed to `next`, which routes it to your error middleware.
 
-<CodeSnippet language="javascript">{`app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).json({
-    success: false,
-    error: { code: err.code, message: err.message },
-  })
-})`}</CodeSnippet>
+<Tabs defaultValue="v4" className="my-6">
+  <TabsList>
+    <TabsTrigger value="v4">Express 4 (wrapper needed)</TabsTrigger>
+    <TabsTrigger value="v5">Express 5 (automatic)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="v4">
+
+<CodeSnippet language="javascript">{`// Express 4: rejected promises are NOT auto-forwarded.
+// Wrap the handler so .catch(next) fires the error pipeline.
+app.post("/api/orders", asyncHandler(async (req, res) => {
+  const order = await orders.create(req.body) // may reject
+  res.status(201).json({ success: true, data: order })
+}))`}</CodeSnippet>
   </TabsContent>
-  <TabsContent value="404">
+  <TabsContent value="v5">
 
-<CodeSnippet language="javascript">{`app.use((req, res, next) => next(new AppError("Not found", 404, "NOT_FOUND")))`}</CodeSnippet>
+<CodeSnippet language="javascript">{`// Express 5: a rejected promise from an async handler
+// is forwarded to the error middleware automatically.
+app.post("/api/orders", async (req, res) => {
+  const order = await orders.create(req.body)
+  res.status(201).json({ success: true, data: order })
+})`}</CodeSnippet>
   </TabsContent>
 </Tabs>
 
-<Tip title="Order matters">Routes → 404 handler → error handler (4-arg middleware).</Tip>
+<Warning>Even in Express 5, only errors from the handler's own promise chain are caught. Errors thrown inside `setTimeout`, event emitters, or a detached `.then()` still need manual handling with `try/catch` and `next(err)`.</Warning>
 
+## An Environment-Aware Error Handler
+
+The production handler should do four things: normalize unknown errors to `500`, log the real error server-side, hide stack traces from clients in production, and always return the same JSON envelope. Adding a `requestId` makes support tickets traceable back to a specific log line.
+
+```javascript
+function errorHandler(err, req, res, next) {
+  const statusCode = err.statusCode || 500
+  const isProd = process.env.NODE_ENV === "production"
+
+  // Log full detail server-side (swap console for pino/winston in real apps)
+  if (statusCode >= 500) {
+    console.error(`[${req.id}] ${req.method} ${req.originalUrl}`, err)
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    error: {
+      code: err.code || "INTERNAL_ERROR",
+      message: err.isOperational ? err.message : "Something went wrong",
+      ...(err.details ? { details: err.details } : {}),
+      ...(isProd ? {} : { stack: err.stack }),
+    },
+  })
+}
+
+app.use(errorHandler)
+```
+
+<InfoCard title="Why hide non-operational messages">A `500` usually means a bug — a null dereference, a bad query. Its raw message can expose table names, file paths, or library internals. Returning a generic `"Something went wrong"` for non-operational errors keeps that detail in your logs, not in the response body.</InfoCard>
+
+## Mapping Framework Errors
+
+Third-party libraries throw their own error types. Translate them at the boundary so clients never see raw ORM or validation internals. A short lookup keeps the handler readable:
+
+```javascript
+function normalizeError(err) {
+  // Zod / express-validator style validation failures
+  if (err.name === "ZodError") {
+    return new ValidationError("Invalid request body", err.issues)
+  }
+  // Prisma unique-constraint violation
+  if (err.code === "P2002") {
+    return new AppError("Resource already exists", 409, "CONFLICT")
+  }
+  // Prisma record-not-found
+  if (err.code === "P2025") {
+    return new NotFoundError("Record")
+  }
+  // jsonwebtoken failures
+  if (err.name === "TokenExpiredError") {
+    return new UnauthorizedError("Token expired")
+  }
+  return err
+}
+```
+
+Call `normalizeError` at the top of your error handler so everything downstream deals only with `AppError` instances:
+
+```javascript
+function errorHandler(err, req, res, next) {
+  const error = normalizeError(err)
+  const statusCode = error.statusCode || 500
+  res.status(statusCode).json({
+    success: false,
+    error: { code: error.code || "INTERNAL_ERROR", message: error.message },
+  })
+}
+```
+
+## Best Practices & Common Pitfalls
+
+<Accordion type="single" collapsible className="not-prose">
+  <AccordionItem value="order">
+    <AccordionTrigger>Register handlers in the right order</AccordionTrigger>
+    <AccordionContent>
+      The pipeline is strictly ordered: normal routes first, then the 404 catch-all, then the 4-argument error handler last. Registering the error handler early means later routes never reach it.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="return">
+    <AccordionTrigger>Return after sending a response</AccordionTrigger>
+    <AccordionContent>
+      Calling `res.json()` and then continuing execution can trigger the `ERR_HTTP_HEADERS_SENT` error. Always `return res.status(...).json(...)` or guard with `if (res.headersSent) return next(err)` inside the error handler.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="crash">
+    <AccordionTrigger>Let programmer errors crash</AccordionTrigger>
+    <AccordionContent>
+      Operational errors (bad input, missing record) are handled and returned. Non-operational errors — a corrupted state, an out-of-memory condition — are bugs. Log them, add a top-level `process.on("uncaughtException")` handler that flushes logs and exits, and let a process manager (PM2, Kubernetes) restart the instance cleanly.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="shape">
+    <AccordionTrigger>Keep one response envelope</AccordionTrigger>
+    <AccordionContent>
+      Success and error responses should share a predictable shape (`{ success, data }` vs `{ success, error }`). Clients can then branch on `success` without special-casing each endpoint.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Tip title="Log, don't swallow">A `catch` block that only returns a friendly message without logging the original error destroys your ability to debug production. Always log the real error server-side before responding.</Tip>
 
 ---
 
@@ -68,4 +242,4 @@ const asyncHandler = (fn) => (req, res, next) =>
 
 <NextLesson title="JWT Authentication" description="Add token-based auth to your Express API." href="/roadmap/express-fundamentals-intermediate-jwt-auth" />
 
-<Resources resources={[{"title":"Express Error Handling","href":"https://expressjs.com/en/guide/error-handling.html"}]} />
+<Resources resources={[{"title":"Express Error Handling Guide","href":"https://expressjs.com/en/guide/error-handling.html"},{"title":"Migrating to Express 5","href":"https://expressjs.com/en/guide/migrating-5.html"},{"title":"Node.js Error Handling Best Practices","href":"https://nodejs.org/en/learn/asynchronous-work/handling-errors"},{"title":"MDN: HTTP Response Status Codes","href":"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status"}]} />

@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "advanced"
 level: "advanced"
-duration: "25 min"
+duration: "32 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,9 +14,87 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## GitOps with ArgoCD
+## GitOps & Continuous Delivery
 
-<LearningObjectives objectives={["Define ArgoCD Application manifests", "Sync cluster state from Git", "Promote across environments", "Rollback with Git revert"]} />
+GitOps flips the traditional deployment model on its head. Instead of a CI job pushing changes *into* the cluster with `kubectl apply`, a controller running *inside* the cluster continuously pulls the desired state from Git and reconciles the live cluster to match it. Git becomes the single source of truth: every change is a commit, every rollback is a `git revert`, and the cluster is guaranteed to converge on whatever the repository declares. This is how teams safely operate dozens of clusters and hundreds of services without handing production credentials to their CI system.
+
+<LearningObjectives objectives={["Explain the four core GitOps principles", "Define ArgoCD Application and ApplicationSet manifests", "Structure environments with Kustomize overlays and the App-of-Apps pattern", "Wire a CI pipeline that updates manifests for automated delivery", "Roll back safely using Git history"]} />
+
+## The Four GitOps Principles
+
+The OpenGitOps working group defines GitOps with four principles. A system is only "GitOps" if it satisfies all of them:
+
+- **Declarative** — the entire desired state is described declaratively (Kubernetes manifests, Helm values, Kustomize overlays), never as imperative scripts.
+- **Versioned & immutable** — that state is stored in Git, giving you a complete, immutable, auditable history.
+- **Pulled automatically** — software agents automatically pull the declared state from the source.
+- **Continuously reconciled** — agents continuously observe live state and reconcile any drift back to the declared state.
+
+<InfoCard>The key security benefit: your CI pipeline never needs cluster credentials. The in-cluster controller pulls from Git, so the attack surface shrinks to a read-only repository token.</InfoCard>
+
+## Defining an ArgoCD Application
+
+ArgoCD models each deployable unit as an `Application` custom resource that points at a repo path and a destination cluster/namespace. The `syncPolicy` decides whether ArgoCD merely reports drift or actively corrects it.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/org/k8s-manifests
+    path: apps/myapp/overlays/production
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true      # delete resources removed from Git
+      selfHeal: true   # revert manual kubectl changes
+    syncOptions:
+      - CreateNamespace=true
+```
+
+<Warning>`prune: true` deletes any live resource that no longer exists in Git. Combined with `selfHeal: true`, a manual `kubectl edit` on production will be silently reverted within minutes — which is the point, but it surprises people the first time.</Warning>
+
+### Sync waves and hooks
+
+Ordering matters when a database migration must run before the app rolls out. ArgoCD uses annotations to control ordering (`sync-wave`, lower runs first) and lifecycle hooks (`PreSync`, `Sync`, `PostSync`).
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: ghcr.io/org/myapp:1.4.2
+          command: ["npm", "run", "migrate"]
+```
+
+## ArgoCD vs Flux
+
+Both are CNCF-graduated GitOps controllers. ArgoCD ships a rich web UI and models apps as CRDs; Flux is a set of composable controllers driven entirely by manifests and integrates tightly with Kustomize and Helm.
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="argocd">ArgoCD</TabsTrigger>
+    <TabsTrigger value="flux">Flux</TabsTrigger>
+  </TabsList>
+  <TabsContent value="argocd">
 
 ```yaml
 apiVersion: argoproj.io/v1alpha1
@@ -25,7 +103,6 @@ metadata:
   name: myapp
   namespace: argocd
 spec:
-  project: default
   source:
     repoURL: https://github.com/org/k8s-manifests
     path: apps/myapp
@@ -34,15 +111,189 @@ spec:
     server: https://kubernetes.default.svc
     namespace: production
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated: { prune: true, selfHeal: true }
 ```
+
+  </TabsContent>
+  <TabsContent value="flux">
+
+```yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: myapp
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/org/k8s-manifests
+  ref:
+    branch: main
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: myapp
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./apps/myapp
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: myapp
+```
+
+  </TabsContent>
+</Tabs>
+
+<Tip>Choose ArgoCD when teams want a visual dashboard and a clear application-centric model. Choose Flux when you prefer a fully GitOps-managed control plane with no UI to secure and native multi-tenancy via Kustomizations.</Tip>
+
+## Structuring Environments
+
+Keep one base and per-environment overlays with Kustomize. The overlay only expresses the *difference* from the base (replica count, image tag, resource limits), which keeps promotions to a tiny, reviewable diff.
+
+```bash
+apps/myapp/
+├── base/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── kustomization.yaml
+└── overlays/
+    ├── staging/
+    │   └── kustomization.yaml
+    └── production/
+        └── kustomization.yaml
+```
+
+```yaml
+# overlays/production/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+images:
+  - name: ghcr.io/org/myapp
+    newTag: 1.4.2
+replicas:
+  - name: myapp
+    count: 5
+```
+
+### The App-of-Apps pattern
+
+Rather than registering every Application by hand, use `ApplicationSet` to generate one Application per environment from a Git directory. Add a new folder, and a new Application appears automatically.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: myapp-envs
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/org/k8s-manifests
+        revision: main
+        directories:
+          - path: apps/myapp/overlays/*
+  template:
+    metadata:
+      name: 'myapp-{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/org/k8s-manifests
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+```
+
+## Wiring CI to GitOps CD
+
+The pipeline splits cleanly in two. **CI** builds and pushes an immutable image, then bumps the image tag in the manifest repo. **CD** (ArgoCD/Flux) notices the commit and deploys. CI never touches the cluster.
+
+```yaml
+name: build-and-promote
+on:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & push image
+        run: |
+          IMAGE=ghcr.io/org/myapp:${GITHUB_SHA::7}
+          docker build -t "$IMAGE" .
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker push "$IMAGE"
+      - name: Bump tag in manifests repo
+        run: |
+          git clone https://x:${{ secrets.MANIFESTS_TOKEN }}@github.com/org/k8s-manifests.git
+          cd k8s-manifests/apps/myapp/overlays/staging
+          kustomize edit set image ghcr.io/org/myapp=ghcr.io/org/myapp:${GITHUB_SHA::7}
+          git -C ../../../.. commit -am "deploy myapp ${GITHUB_SHA::7} to staging"
+          git -C ../../../.. push
+```
+
+<InfoCard>To avoid a separate commit step, run the **ArgoCD Image Updater** in-cluster. It watches your registry and writes the new tag back to Git, keeping CI focused purely on building.</InfoCard>
+
+## Promotion and Rollback
+
+Promote from staging to production by copying the tested tag into the production overlay — usually a pull request that a reviewer approves. Because the whole state lives in Git, rolling back is just reverting the commit that caused the incident:
+
+```bash
+# Roll production back to the previous known-good state
+git revert <bad-commit-sha>
+git push
+# ArgoCD detects the new HEAD and re-syncs production automatically.
+```
+
+<Tip>For zero-downtime, risk-controlled rollouts, layer <strong>Argo Rollouts</strong> on top. It replaces the standard Deployment with canary or blue-green strategies and can auto-abort based on Prometheus metrics — all still driven from Git.</Tip>
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="one">
+    <AccordionTrigger>Using mutable tags like `latest`</AccordionTrigger>
+    <AccordionContent>
+      GitOps relies on the manifest fully describing state. A `latest` tag makes the deployed version invisible to Git and defeats reproducibility. Always deploy immutable tags (a commit SHA or semantic version) and let CI write the exact tag into the manifest.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="two">
+    <AccordionTrigger>Config drift from manual `kubectl` edits</AccordionTrigger>
+    <AccordionContent>
+      Any change not made through Git will be reverted by `selfHeal`, or worse, silently persist if self-heal is off. Treat the cluster as read-only; make every change a commit.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="three">
+    <AccordionTrigger>Storing secrets in plain text</AccordionTrigger>
+    <AccordionContent>
+      Never commit raw Secret manifests. Encrypt them with Sealed Secrets or SOPS, or reference an external store via the External Secrets Operator, so Git holds only ciphertext.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="four">
+    <AccordionTrigger>CI committing to the same branch it deploys</AccordionTrigger>
+    <AccordionContent>
+      An automated tag-bump commit can retrigger the same workflow, causing loops. Scope path filters and image-updater write-back carefully, or route production promotions exclusively through reviewed pull requests.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Warning>Give ArgoCD/Flux a dedicated, least-privilege repository token with read access to manifests only. The image-updater write-back token should be scoped to the manifests repo, never your application source or organization-wide.</Warning>
 
 ---
 
-## Next Steps
+## Wrapping Up
 
+You have now taken the Kubernetes fundamentals course from a single pod all the way to fully automated, Git-driven delivery. With declarative manifests, an in-cluster reconciler, environment overlays, and CI that only ever touches Git, you have a production-grade deployment platform where every change is reviewed, audited, and instantly reversible.
 
-
-<Resources resources={[{"title":"ArgoCD","href":"https://argo-cd.readthedocs.io/"}]} />
+<Resources resources={[{"title":"OpenGitOps Principles","href":"https://opengitops.dev/"},{"title":"Argo CD Documentation","href":"https://argo-cd.readthedocs.io/"},{"title":"Flux Documentation","href":"https://fluxcd.io/flux/"},{"title":"Argo Rollouts","href":"https://argoproj.github.io/argo-rollouts/"}]} />

@@ -5,7 +5,7 @@ course: "react-fundamentals"
 category: "frontend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "22 min"
+duration: "28 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,37 +14,340 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## React Router v6+
+## Routing in Single-Page Apps
 
-<LearningObjectives objectives={["Define routes with createBrowserRouter", "Use nested layouts and Outlet", "Load data with loaders", "Protect routes with auth checks"]} />
+A React app renders a single HTML document, so navigation between "pages" happens entirely in the browser. **React Router** is the de-facto library for mapping URLs to components, keeping the address bar in sync with what the user sees, and fetching the data each screen needs. From v6.4 onward it ships a **data router** API (`createBrowserRouter`) that co-locates routing, data loading, mutations, and error handling — the same foundation that powers React Router v7. Getting this layer right is what separates a jarring, flicker-prone app from one that feels instant and predictable.
+
+<LearningObjectives objectives={["Configure a data router with createBrowserRouter and RouterProvider", "Compose nested layouts using Outlet and index routes", "Read URL params and query strings with useParams and useSearchParams", "Fetch and mutate data with loaders and actions", "Guard private routes with loader redirects and a fallback component"]} />
+
+## Setting Up the Router
+
+Install the package and create a router from an array of route objects. Each object maps a `path` to an `element`. `RouterProvider` wires the router into React.
+
+```bash
+npm install react-router-dom
+```
 
 ```tsx
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+
+const router = createBrowserRouter([
+  { path: "/", element: <Home /> },
+  { path: "/about", element: <About /> },
+  { path: "*", element: <NotFound /> },
+])
+
+export default function App() {
+  return <RouterProvider router={router} />
+}
+```
+
+<Tip title="The catch-all route">A route with `path: "*"` matches anything no other route claimed. Always include one so unknown URLs render a proper 404 page instead of a blank screen.</Tip>
+
+## Navigating Between Routes
+
+Never use a plain `<a href>` for internal links — it triggers a full-page reload and throws away your app's state. Use `Link` for standard navigation and `NavLink` when you need to style the currently active link.
+
+<Tabs defaultValue="link">
+  <TabsList>
+    <TabsTrigger value="link">Link</TabsTrigger>
+    <TabsTrigger value="navlink">NavLink</TabsTrigger>
+    <TabsTrigger value="programmatic">useNavigate</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="link">
+    Basic client-side navigation with no reload:
+
+    ```tsx
+    import { Link } from "react-router-dom"
+
+    <Link to="/about">About us</Link>
+    <Link to="/products/42">View product</Link>
+    ```
+  </TabsContent>
+
+  <TabsContent value="navlink">
+    `NavLink` passes an `isActive` flag to its `className` and `style` callbacks:
+
+    ```tsx
+    import { NavLink } from "react-router-dom"
+
+    <NavLink
+      to="/dashboard"
+      className={({ isActive }) => (isActive ? "font-bold text-blue-600" : "text-gray-600")}
+    >
+      Dashboard
+    </NavLink>
+    ```
+  </TabsContent>
+
+  <TabsContent value="programmatic">
+    Navigate imperatively after an event, such as a successful form submit:
+
+    ```tsx
+    import { useNavigate } from "react-router-dom"
+
+    function LoginForm() {
+      const navigate = useNavigate()
+
+      async function onSubmit() {
+        await login()
+        navigate("/dashboard", { replace: true })
+      }
+      // ...
+    }
+    ```
+  </TabsContent>
+</Tabs>
+
+## Nested Routes and Layouts
+
+Real apps share chrome — a header, sidebar, or footer — across many pages. Nest routes under a parent and render the parent's `<Outlet />` where children should appear. An `index: true` route is what shows at the parent's exact path.
+
+```tsx
+import { Outlet } from "react-router-dom"
+
+function RootLayout() {
+  return (
+    <div>
+      <NavBar />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  )
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "dashboard", element: <Protected><Dashboard /></Protected>, loader: dashboardLoader },
+      { path: "products", element: <ProductList /> },
+      { path: "products/:productId", element: <ProductDetail /> },
     ],
   },
 ])
 ```
 
-### Protected Routes
+Here `/`, `/products`, and `/products/123` all render inside `RootLayout`, so the nav bar never unmounts or flickers between navigations.
+
+### Reading URL Parameters
+
+The `:productId` segment is a **dynamic param**. Read path params with `useParams` and query string values with `useSearchParams`.
 
 ```tsx
-function Protected({ children }) {
-  const { user } = useAuth()
-  if (!user) return <Navigate to="/login" replace />
-  return children
+import { useParams, useSearchParams } from "react-router-dom"
+
+function ProductDetail() {
+  const { productId } = useParams()          // "/products/123" -> "123"
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab = searchParams.get("tab") ?? "overview"  // "?tab=reviews" -> "reviews"
+
+  return (
+    <button onClick={() => setSearchParams({ tab: "reviews" })}>
+      Show reviews for {productId}
+    </button>
+  )
 }
 ```
 
----
+## Loading Data with Loaders
+
+The data router lets each route declare a `loader` that runs **before** the component renders. React Router waits for the loader, so components never render in a half-loaded state — no `useEffect` fetch waterfalls and no manual loading flags for the initial render. Read the result with `useLoaderData`.
+
+```tsx
+import { useLoaderData } from "react-router-dom"
+
+async function productLoader({ params }) {
+  const res = await fetch(`/api/products/${params.productId}`)
+  if (!res.ok) {
+    throw new Response("Product not found", { status: 404 })
+  }
+  return res.json()
+}
+
+const router = createBrowserRouter([
+  {
+    path: "products/:productId",
+    element: <ProductDetail />,
+    loader: productLoader,
+  },
+])
+
+function ProductDetail() {
+  const product = useLoaderData() as { id: string; name: string }
+  return <h1>{product.name}</h1>
+}
+```
+
+<Warning title="Throw, don't return, for errors">A loader that `throw`s a `Response` (or any error) hands control to the nearest `errorElement`. Returning an error object instead means your component has to defensively check for it on every render.</Warning>
+
+### Mutations with Actions
+
+The mirror image of a loader is an **action**: it runs when a route's `<Form>` is submitted, performs the write, and can `redirect` afterward. React Router automatically re-runs the page's loaders on success so the UI reflects fresh data.
+
+```tsx
+import { Form, redirect } from "react-router-dom"
+
+async function createProductAction({ request }) {
+  const formData = await request.formData()
+  await fetch("/api/products", {
+    method: "POST",
+    body: JSON.stringify({ name: formData.get("name") }),
+  })
+  return redirect("/products")
+}
+
+function NewProduct() {
+  return (
+    <Form method="post">
+      <input name="name" />
+      <button type="submit">Create</button>
+    </Form>
+  )
+}
+```
+
+## Protecting Routes
+
+Two patterns coexist, and they solve slightly different problems.
+
+<Tabs defaultValue="loader">
+  <TabsList>
+    <TabsTrigger value="loader">Loader redirect</TabsTrigger>
+    <TabsTrigger value="component">Wrapper component</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="loader">
+    The idiomatic data-router approach: check auth inside the loader and `redirect` before the component ever mounts. This blocks unauthorized data from being fetched at all.
+
+    ```tsx
+    import { redirect } from "react-router-dom"
+
+    async function protectedLoader({ request }) {
+      const user = await getCurrentUser()
+      if (!user) {
+        const from = new URL(request.url).pathname
+        return redirect(`/login?from=${encodeURIComponent(from)}`)
+      }
+      return user
+    }
+
+    const router = createBrowserRouter([
+      { path: "dashboard", element: <Dashboard />, loader: protectedLoader },
+    ])
+    ```
+  </TabsContent>
+
+  <TabsContent value="component">
+    A wrapper component reads auth from context and renders `<Navigate>` when the user is missing. Handy when auth state lives in a client-side provider rather than on the server.
+
+    ```tsx
+    import { Navigate, useLocation } from "react-router-dom"
+
+    function RequireAuth({ children }: { children: React.ReactNode }) {
+      const { user } = useAuth()
+      const location = useLocation()
+
+      if (!user) {
+        return <Navigate to="/login" state={{ from: location }} replace />
+      }
+      return <>{children}</>
+    }
+    ```
+  </TabsContent>
+</Tabs>
+
+<Tip title="Preserve where they came from">Capturing the attempted URL (via `from` query param or router `state`) lets you send users back to their intended page after they sign in, instead of dumping everyone on the home page.</Tip>
+
+## Handling Errors
+
+Attach an `errorElement` to a route (usually the root) to catch anything thrown by that route's element, loader, or action. Inside it, `useRouteError` gives you the thrown value.
+
+```tsx
+import { useRouteError, isRouteErrorResponse } from "react-router-dom"
+
+function ErrorBoundary() {
+  const error = useRouteError()
+
+  if (isRouteErrorResponse(error)) {
+    return <h1>{error.status} — {error.statusText}</h1>
+  }
+  return <h1>Something went wrong.</h1>
+}
+
+const router = createBrowserRouter([
+  { path: "/", element: <RootLayout />, errorElement: <ErrorBoundary /> },
+])
+```
+
+## Code Splitting Routes
+
+Ship less JavaScript up front by lazily loading a route's component and data logic. The `lazy` property imports a module that exports `Component`, `loader`, and/or `action` only when the route is first visited.
+
+```tsx
+const router = createBrowserRouter([
+  {
+    path: "reports",
+    lazy: () => import("./routes/reports"), // exports Component + loader
+  },
+])
+```
+
+## Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="anchor">
+    <AccordionTrigger>Using &lt;a&gt; tags for internal links</AccordionTrigger>
+    <AccordionContent>
+      A raw anchor reloads the entire document, destroying in-memory state and re-downloading your bundle. Always use `Link` or `NavLink` for routes your app owns; reserve `<a>` for external URLs.
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="effect-fetch">
+    <AccordionTrigger>Fetching in useEffect when a loader would do</AccordionTrigger>
+    <AccordionContent>
+      Loaders start fetching as navigation begins, run in parallel across nested routes, and eliminate the loading-flag boilerplate. Reach for `useEffect` fetching only for data that must refresh independently of navigation.
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="missing-outlet">
+    <AccordionTrigger>Forgetting the &lt;Outlet /&gt; in a layout</AccordionTrigger>
+    <AccordionContent>
+      If a parent route has `children` but its element never renders `<Outlet />`, the child routes simply vanish. The layout renders, but there is nowhere for the matched child to appear.
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="replace">
+    <AccordionTrigger>Not using replace after auth redirects</AccordionTrigger>
+    <AccordionContent>
+      After login or logout, navigate with `{ replace: true }`. Otherwise the protected/login page stays in history and the browser Back button bounces the user right back into a redirect loop.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices
+
+<Card className="mt-6">
+  <CardHeader>
+    <CardTitle>✅ Routing checklist</CardTitle>
+  </CardHeader>
+  <CardContent>
+    1. **One root layout** with shared chrome and a single `errorElement`. 2. **Load data in loaders**, mutate in actions — keep components focused on rendering. 3. **Throw `Response` objects** for expected failures like 404s. 4. **Guard on the server side** with loader redirects for anything truly private. 5. **Lazy-load heavy routes** to shrink the initial bundle. 6. **Give every dynamic screen a `*` fallback** and a real 404.
+  </CardContent>
+</Card>
 
 ## Next Steps
 
 <NextLesson title="Performance Optimization" description="Memoization and code splitting." href="/roadmap/react-fundamentals-advanced-performance-optimization" />
 
-<Resources resources={[{"title":"React Router","href":"https://reactrouter.com/"}]} />
+<Resources
+  resources={[
+    { title: "React Router — Official Docs", href: "https://reactrouter.com/" },
+    { title: "createBrowserRouter API", href: "https://reactrouter.com/en/main/routers/create-browser-router" },
+    { title: "Loaders & Data Loading", href: "https://reactrouter.com/en/main/route/loader" },
+    { title: "Tutorial: A Full-Featured App", href: "https://reactrouter.com/en/main/start/tutorial" },
+  ]}
+/>

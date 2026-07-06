@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "20 min"
+duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,31 +16,277 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Helm Charts
 
-<LearningObjectives objectives={["Understand chart directory structure", "Parameterize with values.yaml", "Template manifests with Go templates", "Install and upgrade releases"]} />
+Once your application grows past a single manifest, copy-pasting near-identical YAML for `dev`, `staging`, and `prod` becomes a maintenance nightmare. **Helm** is the de-facto package manager for Kubernetes: it bundles all the manifests an application needs into a versioned, templated, shareable unit called a **chart**. Instead of applying a dozen raw files with `kubectl`, you install one chart, override a handful of values per environment, and get atomic upgrades and rollbacks for free.
+
+Helm 3 (the current major version) is client-only — there is no server-side "Tiller" component anymore. The Helm CLI talks directly to the Kubernetes API server using your existing `kubeconfig`, and it stores the state of each installation as a Secret in the release's namespace. This lesson covers how charts are structured, how templating works, and how to manage the full lifecycle of a release.
+
+<LearningObjectives objectives={["Understand the chart directory structure and Chart.yaml metadata", "Parameterize manifests with values.yaml and per-environment overrides", "Template resources with Go templates, named helpers, and pipelines", "Install, upgrade, roll back, and inspect releases", "Manage subchart dependencies and remote chart repositories"]} />
+
+## Why Helm Instead of Raw kubectl?
+
+A realistic web app needs a Deployment, a Service, an Ingress, a ConfigMap, an HPA, and maybe a ServiceAccount — six or more manifests that share the same labels, image tag, and replica count. Helm solves three problems at once:
+
+- **Templating** — write the manifest once, inject values like the image tag or replica count from a single source.
+- **Packaging** — ship all resources plus their default configuration as one versioned artifact you can publish to a registry.
+- **Lifecycle** — `install`, `upgrade`, `rollback`, and `uninstall` are tracked as revisions, so you can undo a bad deploy with one command.
+
+<Tip>Scaffold a fully-working starter chart with `helm create myapp`. It generates a Deployment, Service, Ingress, ServiceAccount, HPA, and a test hook — an excellent reference for idiomatic templating.</Tip>
+
+## Anatomy of a Chart
+
+A chart is just a directory with a required layout. Running `helm create myapp` produces this structure:
+
+```bash
+myapp/
+├── Chart.yaml          # Chart metadata: name, version, appVersion, dependencies
+├── values.yaml         # Default configuration values
+├── .helmignore         # Files to exclude when packaging
+├── charts/             # Vendored subchart dependencies (.tgz archives)
+└── templates/          # Manifest templates rendered with Go templating
+    ├── _helpers.tpl    # Reusable named template definitions
+    ├── deployment.yaml
+    ├── service.yaml
+    ├── ingress.yaml
+    └── NOTES.txt       # Usage notes printed after install
+```
+
+The `Chart.yaml` file is the manifest of the package itself. Note that `version` is the chart's own SemVer, while `appVersion` is the version of the application it deploys — they change independently.
 
 ```yaml
-# values.yaml
-replicaCount: 2
-image:
-  repository: myapp
-  tag: "1.0.0"
+# Chart.yaml
+apiVersion: v2
+name: myapp
+description: A Helm chart for the myapp web service
+type: application
+version: 0.2.0        # Version of THIS chart (SemVer)
+appVersion: "1.4.0"   # Version of the app being deployed
 ```
+
+<Warning>`apiVersion: v2` is required for Helm 3 charts — it enables the `dependencies` field directly in `Chart.yaml`. Charts still using `apiVersion: v1` are Helm 2 charts and behave differently.</Warning>
+
+## Values: One Source of Configuration
+
+`values.yaml` holds the default configuration. Every value is exposed to templates under the `.Values` object. You keep environment-specific differences in separate files that override only what changes.
+
+```yaml
+# values.yaml (defaults)
+replicaCount: 2
+
+image:
+  repository: registry.example.com/myapp
+  tag: ""              # Empty → fall back to Chart.appVersion
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+```
+
+```yaml
+# values.prod.yaml (overrides only)
+replicaCount: 6
+image:
+  tag: "1.4.0"
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+```
+
+## Templating with Go Templates
+
+Templates live in `templates/` and use Go's templating engine, wrapping directives in `{{ }}`. Helm exposes several built-in objects: `.Values` (your config), `.Release` (name, namespace, revision), `.Chart` (metadata from `Chart.yaml`), and `.Capabilities` (cluster/API info).
 
 ```yaml
 # templates/deployment.yaml
-replicas: {{ .Values.replicaCount }}
-image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp.fullname" . }}
+  labels:
+    {{- include "myapp.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "myapp.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "myapp.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+```
+
+Two patterns above are worth understanding. `{{ .Values.image.tag | default .Chart.AppVersion }}` is a **pipeline** — it feeds the tag into the `default` function so an empty value falls back to the chart's `appVersion`. And `{{- toYaml .Values.resources | nindent 12 }}` renders the whole `resources` map as YAML indented 12 spaces; the leading `{{-` trims the preceding whitespace so the output lines up cleanly.
+
+### Named Templates and Helpers
+
+Repeated snippets — like the standard label set — go in `_helpers.tpl` as named templates you reuse with `include`. Files whose names start with `_` are treated as partials and never rendered into manifests on their own.
+
+```yaml
+# templates/_helpers.tpl
+{{- define "myapp.fullname" -}}
+{{- printf "%s-%s" .Release.Name .Chart.Name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "myapp.selectorLabels" -}}
+app.kubernetes.io/name: {{ .Chart.Name }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "myapp.labels" -}}
+{{ include "myapp.selectorLabels" . }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+```
+
+<Tip>Prefer `include` over the built-in `template` action. Only `include` returns a string you can pipe into functions like `nindent` — `template` writes directly to output and cannot be indented, which frequently breaks YAML alignment.</Tip>
+
+### Guarding Against Missing Values
+
+Use conditionals and the `required` function to fail fast when a mandatory value is absent, rather than shipping a broken manifest.
+
+```yaml
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "myapp.fullname" . }}
+spec:
+  rules:
+    - host: {{ required "ingress.host is required when ingress is enabled" .Values.ingress.host }}
+{{- end }}
+```
+
+## Managing Releases
+
+An installed instance of a chart is a **release**. Helm tracks every change as a numbered revision, which is what makes rollbacks trivial.
+
+<Tabs defaultValue="install">
+  <TabsList>
+    <TabsTrigger value="install">Install</TabsTrigger>
+    <TabsTrigger value="upgrade">Upgrade</TabsTrigger>
+    <TabsTrigger value="rollback">Rollback</TabsTrigger>
+    <TabsTrigger value="inspect">Inspect</TabsTrigger>
+  </TabsList>
+  <TabsContent value="install">Install a new release into a namespace, creating it if needed: <code>helm install myapp ./myapp -n prod --create-namespace -f values.prod.yaml</code></TabsContent>
+  <TabsContent value="upgrade">Use <code>--install</code> to make it idempotent (install if absent, upgrade if present): <code>helm upgrade --install myapp ./myapp -n prod -f values.prod.yaml</code></TabsContent>
+  <TabsContent value="rollback">Revert to any previous revision number: <code>helm rollback myapp 3 -n prod</code></TabsContent>
+  <TabsContent value="inspect">List releases, view history, and read the values that were applied: <code>helm list -n prod</code>, <code>helm history myapp -n prod</code>, <code>helm get values myapp -n prod</code></TabsContent>
+</Tabs>
+
+The everyday CI/CD command is the idempotent upgrade — it works whether or not the release already exists, and `--atomic` automatically rolls back if the upgrade fails to become healthy within the timeout:
+
+```bash
+helm upgrade --install myapp ./myapp \
+  --namespace prod \
+  --create-namespace \
+  -f values.prod.yaml \
+  --set image.tag=1.4.1 \
+  --atomic \
+  --timeout 5m
+```
+
+### Values Precedence
+
+When the same key is set in multiple places, later sources win. The order is: chart `values.yaml` → each `-f file` in the order given → each `--set` flag. So `--set` always overrides files, which override the chart defaults.
+
+<Warning>`--set` parses dots as nesting and commas as separators, so values containing them (like image digests or comma-lists) get mangled. Use `--set-string` for values that must stay literal strings, or put them in a `-f` values file instead.</Warning>
+
+## Dependencies and Repositories
+
+Charts can depend on other charts (subcharts) — for example, pulling in a database instead of maintaining your own. Declare dependencies in `Chart.yaml`, then run `helm dependency update` to fetch them into `charts/` and write a `Chart.lock`.
+
+```yaml
+# Chart.yaml
+dependencies:
+  - name: postgresql
+    version: "15.5.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled   # Toggle the subchart via values
 ```
 
 ```bash
-helm install myapp ./chart -f values.prod.yaml
-helm upgrade myapp ./chart --set replicaCount=3
+# Add a repo, refresh its index, and search it
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm search repo bitnami/postgresql
+
+# Vendor the declared dependencies into charts/
+helm dependency update ./myapp
 ```
+
+You configure a subchart by nesting its values under a key matching its name (`postgresql:` in the parent `values.yaml`). The `condition` field lets consumers disable it entirely with `postgresql.enabled: false`.
+
+## Debugging and Validation
+
+Never push a chart without rendering it first. `helm template` prints the final manifests without touching the cluster, and `helm lint` catches structural problems.
+
+```bash
+# Render manifests locally with prod values — no cluster changes
+helm template myapp ./myapp -f values.prod.yaml
+
+# Static analysis of chart structure and required fields
+helm lint ./myapp
+
+# Dry-run against the API server (validates but does not apply)
+helm upgrade --install myapp ./myapp --dry-run=server
+```
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="q1">
+    <AccordionTrigger>Where does Helm 3 store release state?</AccordionTrigger>
+    <AccordionContent>As Secrets in the release's namespace, one per revision, named like <code>sh.helm.release.v1.myapp.v3</code>. Delete the namespace and you lose the release history — so back up important values files in version control.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="q2">
+    <AccordionTrigger>Why did my rendered YAML lose its indentation?</AccordionTrigger>
+    <AccordionContent>You likely used <code>indent</code> where the source already had a newline, or used the <code>template</code> action instead of <code>include</code>. Reach for <code>nindent</code>, which prepends a newline and then indents, when injecting a multi-line block into a nested field.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Best Practices and Common Pitfalls
+
+<Card className="my-6">
+  <CardHeader>
+    <CardTitle>Ship Reliable Charts</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="list-disc list-inside space-y-2">
+      <li><strong>Version discipline</strong> — bump <code>version</code> on every chart change and <code>appVersion</code> when the app image changes; they are independent.</li>
+      <li><strong>Document every value</strong> — keep <code>values.yaml</code> complete with sane defaults and comments so consumers know what is configurable.</li>
+      <li><strong>Prefer idempotent deploys</strong> — always use <code>helm upgrade --install</code> in automation, never a bare <code>helm install</code> that fails on the second run.</li>
+      <li><strong>Fail fast</strong> — wrap mandatory values in <code>required</code> so a missing setting errors at render time, not at runtime in the cluster.</li>
+      <li><strong>Pin dependencies</strong> — commit <code>Chart.lock</code> so builds are reproducible instead of pulling a new subchart patch silently.</li>
+    </ul>
+  </CardContent>
+</Card>
+
+<Warning>Avoid `--force` on upgrades unless you understand it deletes and recreates resources, which causes downtime and can drop data on stateful workloads. Prefer `--atomic` for safe, self-reverting rollouts.</Warning>
 
 ---
 
 ## Next Steps
 
-<NextLesson title="Monitoring & Logging" description="Prometheus and Grafana." href="/roadmap/kubernetes-fundamentals-intermediate-monitoring-logging" />
+You can now package, template, and safely roll out applications with Helm. The next step is knowing whether those releases are actually healthy — the domain of observability.
 
-<Resources resources={[{"title":"Helm","href":"https://helm.sh/docs/"}]} />
+<NextLesson title="Monitoring & Logging" description="Instrument your workloads and cluster with Prometheus and Grafana for metrics, dashboards, and alerts." href="/roadmap/kubernetes-fundamentals-intermediate-monitoring-logging" />
+
+<Resources resources={[{"title":"Helm Documentation","href":"https://helm.sh/docs/"},{"title":"Chart Template Guide","href":"https://helm.sh/docs/chart_template_guide/"},{"title":"Best Practices for Charts","href":"https://helm.sh/docs/chart_best_practices/"},{"title":"Chart.yaml Reference","href":"https://helm.sh/docs/topics/charts/"}]} />

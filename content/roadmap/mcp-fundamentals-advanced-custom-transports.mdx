@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "advanced"
 level: "advanced"
-duration: "26 min"
+duration: "30 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -16,20 +16,233 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Custom Transports
 
-<LearningObjectives objectives={["Implement stdio transport for CLI tools", "Build SSE server for remote clients", "Compare WebSocket vs SSE trade-offs", "Handle reconnection and heartbeats"]} />
+A **transport** is the layer that moves JSON-RPC 2.0 messages between an MCP client and server. The protocol logic — tools, resources, prompts, capability negotiation — is identical regardless of how bytes travel. That separation is deliberate: the same server can talk to Claude Desktop over `stdio`, to a browser agent over HTTP, or to a real-time dashboard over WebSocket, just by swapping the transport you pass to `server.connect()`. Understanding transports is what lets you take a local prototype and expose it to remote, authenticated, multi-client deployments without rewriting your tool handlers.
 
-<Tabs defaultValue="stdio" className="my-6"><TabsList><TabsTrigger value="stdio">stdio</TabsTrigger><TabsTrigger value="sse">SSE</TabsTrigger></TabsList><TabsContent value="stdio">Best for Cursor/Claude Desktop — process spawned with stdin/stdout JSON-RPC lines.</TabsContent><TabsContent value="sse">HTTP long-lived stream for browser or remote agents; requires auth at edge.</TabsContent></Tabs>
+<LearningObjectives objectives={["Explain the MCP Transport interface and how it decouples protocol from wire format", "Wire up stdio transport for local clients like Claude Desktop and Cursor", "Compare the legacy SSE and modern Streamable HTTP transports for remote servers", "Implement a custom WebSocket transport from the Transport interface", "Handle reconnection, heartbeats, and session lifecycle safely"]} />
+
+## The Transport Interface
+
+Every transport in the TypeScript SDK implements a single small interface from `@modelcontextprotocol/sdk/shared/transport.js`. Once you understand these five members, building your own transport is mostly plumbing.
 
 ```typescript
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
-const transport = new StdioServerTransport()
-await server.connect(transport)
+import type { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js"
+
+export interface Transport {
+  start(): Promise<void>            // begin listening / connecting
+  send(message: JSONRPCMessage): Promise<void>  // client <-> server
+  close(): Promise<void>            // tear down cleanly
+  onmessage?: (message: JSONRPCMessage) => void // inbound messages
+  onerror?: (error: Error) => void
+  onclose?: () => void
+  sessionId?: string               // set for stateful remote sessions
+}
 ```
+
+The SDK calls `start()` when you invoke `server.connect(transport)`, calls `send()` to emit responses and notifications, and expects you to invoke `onmessage` for every inbound JSON-RPC frame you decode. That contract is all a custom transport must honor.
+
+<Tip>Never call `transport.start()` yourself. `server.connect(transport)` (or `client.connect(transport)`) starts it for you — calling it twice throws "already started".</Tip>
+
+## stdio Transport
+
+`stdio` is the default for locally-spawned servers. The host launches your process and exchanges newline-delimited JSON-RPC messages over `stdin`/`stdout`. It is zero-config, has no network surface, and is what Claude Desktop and Cursor use.
+
+```typescript
+import { Server } from "@modelcontextprotocol/sdk/server/index.js"
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+
+const server = new Server(
+  { name: "my-server", version: "1.0.0" },
+  { capabilities: { tools: {} } }
+)
+
+const transport = new StdioServerTransport()
+await server.connect(transport)   // starts reading stdin, writing stdout
+```
+
+The host registers the server by command in its config file:
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "command": "node",
+      "args": ["/absolute/path/to/build/server.js"]
+    }
+  }
+}
+```
+
+<Warning>Under stdio, `stdout` is reserved exclusively for protocol messages. A stray `console.log` writes garbage into the JSON-RPC stream and the client will disconnect with a parse error. Send all diagnostics to `stderr` via `console.error(...)`, which the host surfaces in its logs.</Warning>
+
+## Remote Transports: SSE vs Streamable HTTP
+
+For servers that outlive a single spawned process — shared internal tools, hosted APIs, browser agents — you need an HTTP-based transport. The spec offers two, and it matters which you choose for a new build.
+
+<Tabs defaultValue="streamable" className="my-6">
+  <TabsList>
+    <TabsTrigger value="streamable">Streamable HTTP</TabsTrigger>
+    <TabsTrigger value="sse">SSE (legacy)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="streamable">
+    Introduced in protocol version <code>2025-03-26</code> and the recommended transport for all new remote servers. A single <code>/mcp</code> endpoint handles POST (client to server) and optionally upgrades to an SSE stream for server-initiated messages. Sessions are tracked with the <code>Mcp-Session-Id</code> header, so it survives reconnects and load balancers.
+  </TabsContent>
+  <TabsContent value="sse">
+    The original HTTP+SSE transport (protocol <code>2024-11-05</code>), now deprecated. It uses two endpoints — a long-lived <code>GET /sse</code> event stream plus a <code>POST /messages</code> for inbound calls. Keep it only for backward compatibility with older clients.
+  </TabsContent>
+</Tabs>
+
+The modern Streamable HTTP server, mounted on Express, generates a session id per connection:
+
+```typescript
+import express from "express"
+import { randomUUID } from "node:crypto"
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
+
+const app = express()
+app.use(express.json())
+
+const transport = new StreamableHTTPServerTransport({
+  sessionIdGenerator: () => randomUUID(),
+  enableDnsRebindingProtection: true,
+  allowedHosts: ["127.0.0.1", "api.example.com"],
+})
+await server.connect(transport)
+
+app.post("/mcp", async (req, res) => {
+  await transport.handleRequest(req, res, req.body)
+})
+app.listen(3000)
+```
+
+The legacy SSE transport pairs one event stream per client with a message-post endpoint, keyed by `sessionId`:
+
+```typescript
+import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js"
+
+const transports: Record<string, SSEServerTransport> = {}
+
+app.get("/sse", async (req, res) => {
+  const transport = new SSEServerTransport("/messages", res)
+  transports[transport.sessionId] = transport
+  res.on("close", () => { delete transports[transport.sessionId] })
+  await server.connect(transport)
+})
+
+app.post("/messages", async (req, res) => {
+  const transport = transports[req.query.sessionId as string]
+  if (!transport) return res.status(400).send("Unknown sessionId")
+  await transport.handlePostMessage(req, res)
+})
+```
+
+<InfoCard>Remote transports expose a network surface, so authentication and origin checks are your responsibility. Validate the `Origin` header, bind to `127.0.0.1` for local-only servers, and enable DNS-rebinding protection so a malicious web page cannot reach a server running on the user's machine.</InfoCard>
+
+## Building a Custom WebSocket Transport
+
+The SDK ships a WebSocket *client* transport but no server one, which makes it the perfect exercise for the Transport interface. WebSocket gives you full-duplex, low-latency messaging — ideal for streaming agents and live dashboards. You implement `start`, `send`, and `close`, and forward parsed frames to `onmessage`.
+
+```typescript
+import type { WebSocket } from "ws"
+import type { Transport } from "@modelcontextprotocol/sdk/shared/transport.js"
+import { type JSONRPCMessage, JSONRPCMessageSchema } from "@modelcontextprotocol/sdk/types.js"
+
+export class WebSocketServerTransport implements Transport {
+  onmessage?: (message: JSONRPCMessage) => void
+  onerror?: (error: Error) => void
+  onclose?: () => void
+
+  constructor(private ws: WebSocket) {}
+
+  async start(): Promise<void> {
+    this.ws.on("message", (data) => {
+      try {
+        // Validate against the schema before handing off to the protocol layer
+        const message = JSONRPCMessageSchema.parse(JSON.parse(data.toString()))
+        this.onmessage?.(message)
+      } catch (error) {
+        this.onerror?.(error as Error)
+      }
+    })
+    this.ws.on("close", () => this.onclose?.())
+    this.ws.on("error", (err) => this.onerror?.(err))
+  }
+
+  async send(message: JSONRPCMessage): Promise<void> {
+    this.ws.send(JSON.stringify(message))
+  }
+
+  async close(): Promise<void> {
+    this.ws.close()
+  }
+}
+```
+
+Wiring it into a `ws` server is then a two-liner per connection:
+
+```typescript
+import { WebSocketServer } from "ws"
+
+const wss = new WebSocketServer({ port: 8080 })
+wss.on("connection", async (ws) => {
+  const transport = new WebSocketServerTransport(ws)
+  await server.connect(transport)   // calls start() for you
+})
+```
+
+## Reconnection & Heartbeats
+
+Long-lived transports must detect dead connections. TCP alone will happily keep a half-open socket for minutes, so you need application-level liveness checks and a client that knows how to come back.
+
+- **WebSocket heartbeats** use the protocol's built-in ping/pong frames. Ping on an interval and terminate any socket that fails to pong.
+- **SSE reconnection** is handled for you client-side: the SDK's `SSEClientTransport` follows the EventSource reconnect semantics and resumes automatically after a drop.
+- **Streamable HTTP resumption** relies on the `Mcp-Session-Id` header — the client replays it so the server can rebind to existing session state.
+
+```typescript
+const HEARTBEAT_MS = 30_000
+
+wss.on("connection", (ws) => {
+  let alive = true
+  ws.on("pong", () => { alive = true })
+
+  const timer = setInterval(() => {
+    if (!alive) return ws.terminate()  // no pong since last tick -> dead
+    alive = false
+    ws.ping()
+  }, HEARTBEAT_MS)
+
+  ws.on("close", () => clearInterval(timer))
+})
+```
+
+<Warning>Always `clearInterval` (or clear timeouts) inside the `close` handler. A heartbeat timer that outlives its socket is a classic memory leak that slowly eats a long-running server.</Warning>
+
+## Common Pitfalls & Best Practices
+
+<Accordion type="single" collapsible className="not-prose">
+  <AccordionItem value="stdout">
+    <AccordionTrigger>Logging to stdout under stdio</AccordionTrigger>
+    <AccordionContent>Corrupts the JSON-RPC stream and disconnects the client. Route every log line to <code>stderr</code> with <code>console.error</code>, or use a logger configured to write to fd 2.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="session">
+    <AccordionTrigger>Leaking sessions on remote transports</AccordionTrigger>
+    <AccordionContent>Delete the transport from your session map on the response <code>close</code> event. Otherwise disconnected clients accumulate and leak memory. Key everything by <code>sessionId</code>.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="validate">
+    <AccordionTrigger>Trusting raw inbound frames</AccordionTrigger>
+    <AccordionContent>Always parse inbound data with <code>JSONRPCMessageSchema</code> before calling <code>onmessage</code>. Passing malformed JSON into the protocol layer produces confusing downstream errors.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="origin">
+    <AccordionTrigger>Skipping origin and host validation</AccordionTrigger>
+    <AccordionContent>For any HTTP or WebSocket transport, validate <code>Origin</code>, enable DNS-rebinding protection, and prefer binding to <code>127.0.0.1</code> unless the server is genuinely meant to be public.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Tip>Choose the smallest transport that fits: stdio for local tools, Streamable HTTP for hosted multi-client servers, and a custom WebSocket transport only when you need true full-duplex streaming. Because they all satisfy the same interface, you can start with stdio and graduate to remote without touching a single tool handler.</Tip>
 
 ---
 
 ## Next Steps
 
+<NextLesson title="Production Deployment" description="Package your transport-ready server with Docker, health checks, and scaling." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
 
-
-<Resources resources={[{"title":"MCP Transports","href":"https://modelcontextprotocol.io/docs/concepts/transports"}]} />
+<Resources resources={[{"title":"MCP Transports Concept","href":"https://modelcontextprotocol.io/docs/concepts/transports"},{"title":"MCP Spec — Transports (2025-06-18)","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/transports"},{"title":"TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"ws — Node.js WebSocket library","href":"https://github.com/websockets/ws"}]} />

@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "advanced"
 level: "advanced"
-duration: "22 min"
+duration: "26 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -16,23 +16,272 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 ## Testing Vue
 
-<LearningObjectives objectives={["Mount components with Vue Test Utils", "Test emitted events and slots", "Mock Pinia stores", "Write E2E flows with Playwright"]} />
+A Vue app that ships without tests is a liability: every refactor becomes a gamble and every bug fix risks reopening two older ones. A healthy Vue test suite is layered. **Unit and component tests** run in milliseconds against a simulated DOM and cover the vast majority of your logic and rendering. A thin layer of **end-to-end (E2E) tests** drives a real browser to prove that critical user journeys — logging in, checking out, submitting a form — actually work when everything is wired together. In the Vue ecosystem the standard tools are **Vitest** (a Vite-native test runner), **Vue Test Utils** (the official component-mounting library), and **Playwright** for E2E. This lesson shows how they fit together.
 
-```js
-import { mount } from '@vue/test-utils'
-import Counter from './Counter.vue'
+<LearningObjectives objectives={["Configure Vitest with the Vue plugin and a jsdom environment", "Mount components and assert on rendered output with Vue Test Utils", "Test props, emitted events, and slots", "Mock Pinia stores and async data fetching", "Write end-to-end user flows with Playwright"]} />
 
-test('increments', async () => {
-  const wrapper = mount(Counter)
-  await wrapper.find('button').trigger('click')
-  expect(wrapper.text()).toContain('1')
+## Setting Up Vitest
+
+Vitest reuses your existing `vite.config` transforms, so a Vue project needs almost no extra wiring. Install the runner plus the Vue integration and a DOM implementation.
+
+```bash
+npm install -D vitest @vue/test-utils jsdom @vitejs/plugin-vue @pinia/testing
+```
+
+Create a `vitest.config.ts` that registers the Vue plugin and sets a browser-like environment. Enabling `globals` lets you call `describe`, `it`, `expect`, and `vi` without importing them.
+
+```ts
+import { defineConfig } from 'vitest/config'
+import vue from '@vitejs/plugin-vue'
+import { fileURLToPath } from 'node:url'
+
+export default defineConfig({
+  plugins: [vue()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
 })
 ```
+
+Wire up the scripts so the suite runs in watch mode locally and once in CI.
+
+```json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "coverage": "vitest run --coverage"
+  }
+}
+```
+
+<Tip>Vitest reads the same `resolve.alias` config as Vite, so the `@/...` import paths you use in components resolve identically inside tests. Keep them in sync to avoid "cannot find module" errors.</Tip>
+
+## Component Testing with Vue Test Utils
+
+`mount` renders a component (and its children) into a jsdom document and returns a `wrapper` with helpers to query the DOM, trigger events, and read state. Consider this simple component:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const count = ref(0)
+const increment = () => count.value++
+</script>
+
+<template>
+  <button @click="increment">Count: {{ count }}</button>
+</template>
+```
+
+The test mounts it, asserts the initial render, clicks the button, then asserts the update. Note the `await` on `trigger` — DOM mutations from Vue's reactivity are asynchronous, and awaiting flushes the pending update before the next assertion.
+
+```ts
+import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
+import Counter from './Counter.vue'
+
+describe('Counter', () => {
+  it('increments on click', async () => {
+    const wrapper = mount(Counter)
+    expect(wrapper.text()).toContain('Count: 0')
+
+    await wrapper.find('button').trigger('click')
+    expect(wrapper.text()).toContain('Count: 1')
+  })
+})
+```
+
+<Warning>If you forget `await` before `trigger`, `setValue`, or `setProps`, your assertions run against the pre-update DOM and fail intermittently. Treat every interaction as async.</Warning>
+
+### Testing Props and Emitted Events
+
+Pass `props` at mount time and update them with `setProps`. To verify a component talks to its parent, inspect `wrapper.emitted()`, which records every event name and its payload arrays.
+
+```ts
+import { mount } from '@vue/test-utils'
+import { it, expect } from 'vitest'
+import LoginForm from './LoginForm.vue'
+
+it('emits submit with the form payload', async () => {
+  const wrapper = mount(LoginForm)
+
+  await wrapper.get('input[name="email"]').setValue('ada@vue.dev')
+  await wrapper.get('form').trigger('submit.prevent')
+
+  const submitted = wrapper.emitted('submit')
+  expect(submitted).toHaveLength(1)
+  expect(submitted?.[0]).toEqual([{ email: 'ada@vue.dev' }])
+})
+```
+
+<InfoCard>`get()` throws if the element is missing, while `find()` returns an empty wrapper. Prefer `get()` for elements you expect to exist so failures point straight at the missing selector.</InfoCard>
+
+### Testing Slots
+
+Slots are passed through the `slots` mount option. You can supply plain markup or a render function, then assert the projected content appears in the output.
+
+```ts
+import { mount } from '@vue/test-utils'
+import BaseCard from './BaseCard.vue'
+
+it('renders header and default slots', () => {
+  const wrapper = mount(BaseCard, {
+    slots: {
+      header: '<h2>Billing</h2>',
+      default: '<p>Your plan renews on the 1st.</p>',
+    },
+  })
+
+  expect(wrapper.html()).toContain('<h2>Billing</h2>')
+  expect(wrapper.text()).toContain('Your plan renews')
+})
+```
+
+## Mocking Pinia Stores
+
+Components that read from a Pinia store need a store instance at mount time. `@pinia/testing` provides `createTestingPinia`, which seeds `initialState` and — by default — replaces every action with a spy so you can assert it was called without running its real logic.
+
+```ts
+import { mount } from '@vue/test-utils'
+import { createTestingPinia } from '@pinia/testing'
+import { vi, it, expect } from 'vitest'
+import { useUserStore } from '@/stores/user'
+import Profile from './Profile.vue'
+
+it('shows the user and logs out on click', async () => {
+  const wrapper = mount(Profile, {
+    global: {
+      plugins: [
+        createTestingPinia({
+          initialState: {
+            user: { user: { name: 'Ada' }, token: 'abc123' },
+          },
+          createSpy: vi.fn,
+        }),
+      ],
+    },
+  })
+
+  const store = useUserStore()
+  expect(wrapper.text()).toContain('Ada')
+
+  await wrapper.get('button.logout').trigger('click')
+  expect(store.logout).toHaveBeenCalledOnce()
+})
+```
+
+<Tip>Pass `stubActions: false` to `createTestingPinia` when you want actions to run for real — useful when the action only mutates local state and you want to test the resulting render.</Tip>
+
+## Testing Async Data
+
+Components that fetch on mount need their network calls stubbed and their pending promises flushed. `flushPromises` from Vue Test Utils resolves the microtask queue so the resolved data renders before you assert.
+
+```ts
+import { flushPromises, mount } from '@vue/test-utils'
+import { vi, it, expect } from 'vitest'
+import PostList from './PostList.vue'
+
+it('renders posts after the fetch resolves', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response(JSON.stringify([{ id: 1, title: 'Hello Vue' }])),
+  )
+
+  const wrapper = mount(PostList)
+  await flushPromises()
+
+  expect(wrapper.findAll('li')).toHaveLength(1)
+  expect(wrapper.text()).toContain('Hello Vue')
+})
+```
+
+## End-to-End Testing with Playwright
+
+Unit tests prove pieces work in isolation; E2E tests prove the whole app works in a real browser. Scaffold Playwright and let it install browsers.
+
+```bash
+npm init playwright@latest
+```
+
+Point the config at your dev server so Playwright boots the app automatically before the run.
+
+```ts
+import { defineConfig } from '@playwright/test'
+
+export default defineConfig({
+  testDir: './e2e',
+  use: { baseURL: 'http://localhost:5173' },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI,
+  },
+})
+```
+
+Write flows the way a user experiences them, querying by visible roles and labels rather than CSS internals. Playwright's `expect` auto-waits, so there is no need for manual sleeps.
+
+```ts
+import { test, expect } from '@playwright/test'
+
+test('user can log in and reach the dashboard', async ({ page }) => {
+  await page.goto('/login')
+
+  await page.getByLabel('Email').fill('ada@vue.dev')
+  await page.getByLabel('Password').fill('secret123')
+  await page.getByRole('button', { name: 'Sign in' }).click()
+
+  await expect(page).toHaveURL('/dashboard')
+  await expect(
+    page.getByRole('heading', { name: 'Welcome, Ada' }),
+  ).toBeVisible()
+})
+```
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="unit">Component (Vitest)</TabsTrigger>
+    <TabsTrigger value="e2e">End-to-End (Playwright)</TabsTrigger>
+  </TabsList>
+  <TabsContent value="unit">
+    Runs in jsdom in milliseconds. Ideal for props, events, slots, computed logic, and edge cases. Fast enough to run on every save and to cover many branches.
+  </TabsContent>
+  <TabsContent value="e2e">
+    Runs in a real browser against the running app. Slower, so reserve it for a handful of critical journeys — auth, checkout, core CRUD — where integration risk is highest.
+  </TabsContent>
+</Tabs>
+
+## Best Practices and Common Pitfalls
+
+<Card>
+  <CardHeader>
+    <CardTitle>Write tests that survive refactors</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Assert on what the user sees and does, not on private component internals — implementation-coupled tests break on harmless refactors and stop catching real bugs.
+  </CardContent>
+</Card>
+
+- **Query by intent.** Prefer `data-test` attributes, roles, and labels over brittle CSS class selectors that change when you restyle.
+- **Await every interaction.** `trigger`, `setValue`, and `setProps` return promises; skipping the `await` produces flaky, order-dependent failures.
+- **Reach for `mount`, not `shallowMount`.** Stubbing children with `shallowMount` hides integration bugs; only stub a child when it is genuinely expensive or does I/O.
+- **Reset spies between tests.** Set `test.clearMocks: true` in `vitest.config.ts` (or call `vi.restoreAllMocks()` in `afterEach`) so a stubbed `fetch` in one test never leaks into the next.
+- **Test behavior, not coverage numbers.** A single meaningful assertion on emitted output beats ten that re-check framework mechanics.
+
+<Warning>Do not import `.vue` files without the `@vitejs/plugin-vue` transform registered — Vitest will fail to parse the single-file component and throw a cryptic syntax error on the `<template>` block.</Warning>
 
 ---
 
 ## Next Steps
 
+You have now covered the full Vue fundamentals path — from reactivity and the Composition API through Pinia, routing, performance, SSR with Nuxt, and a layered testing strategy. Revisit the roadmap to pick your next course or reinforce an earlier lesson.
 
+<NextLesson title="Back to the Roadmap" description="Explore other courses and continue building your engineering path." href="/roadmap" />
 
-<Resources resources={[{"title":"Vue Test Utils","href":"https://test-utils.vuejs.org/"}]} />
+<Resources resources={[{"title":"Vue Test Utils","href":"https://test-utils.vuejs.org/"},{"title":"Vitest","href":"https://vitest.dev/"},{"title":"Testing Pinia Stores","href":"https://pinia.vuejs.org/cookbook/testing.html"},{"title":"Playwright","href":"https://playwright.dev/docs/intro"}]} />

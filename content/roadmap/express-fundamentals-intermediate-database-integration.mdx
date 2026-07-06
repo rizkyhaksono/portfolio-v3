@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "25 min"
+duration: "30 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -18,54 +18,301 @@ import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react
 
 ## Database Integration with Prisma
 
-Prisma provides type-safe database access and migrations for Node.js backends.
+Most Express APIs are only as useful as the data they persist. Talking to PostgreSQL with raw
+`pg` queries works, but you end up hand-writing SQL, tracking schema changes in scattered `.sql`
+files, and losing all type information the moment a row leaves the database. **Prisma** solves this
+by generating a fully typed client from a single schema file and managing your migration history for
+you. In this lesson you will wire Prisma into an Express app, model a `Post` resource, run
+migrations against PostgreSQL, and expose clean CRUD routes backed by a testable repository layer.
 
-<LearningObjectives objectives={["Initialize Prisma with PostgreSQL", "Define models and run migrations", "Implement CRUD routes with Prisma Client", "Structure repositories for testability"]} />
+<LearningObjectives objectives={["Install and initialize Prisma against a PostgreSQL database", "Model resources and relations in the Prisma schema", "Create and apply migrations safely in dev and production", "Instantiate a single shared Prisma Client and build CRUD routes", "Isolate data access behind a repository for testability and cleaner routes"]} />
 
-### Schema & Client
+## Installing and Initializing Prisma
+
+Install the Prisma CLI as a dev dependency and the runtime client, then scaffold the project. The
+`init` command creates a `prisma/schema.prisma` file and a `.env` with a `DATABASE_URL` placeholder.
+
+```bash
+npm install prisma --save-dev
+npm install @prisma/client
+npx prisma init --datasource-provider postgresql
+```
+
+Point `DATABASE_URL` at your Postgres instance. The format is standard libpq connection URI:
+
+```bash
+# .env
+DATABASE_URL="postgresql://user:password@localhost:5432/blog?schema=public"
+```
+
+<Warning>Never commit `.env`. Add it to `.gitignore` and inject `DATABASE_URL` through your host's secret manager in production. A leaked connection string is full database access.</Warning>
+
+## Defining the Schema
+
+The schema is the single source of truth. It declares the datasource, the client generator, and
+your models. Below, a `Post` belongs to a `User`, showing how relations are expressed.
 
 ```prisma
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String?
+  posts Post[]
+}
+
 model Post {
   id        String   @id @default(cuid())
   title     String
   slug      String   @unique
   content   String
   published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, createdAt])
+}
+```
+
+<Tip title="Index what you filter on">The `@@index([published, createdAt])` matches the "published posts, newest first" query below. Add composite indexes for the exact `where` + `orderBy` combinations your API runs most.</Tip>
+
+## Running Migrations
+
+`prisma migrate dev` diffs your schema against the database, generates a timestamped SQL migration
+in `prisma/migrations/`, applies it, and regenerates the typed client — all in one command. Use a
+different command in each environment.
+
+<Tabs defaultValue="dev" className="my-6">
+  <TabsList>
+    <TabsTrigger value="dev">Development</TabsTrigger>
+    <TabsTrigger value="prod">Production</TabsTrigger>
+  </TabsList>
+  <TabsContent value="dev">
+
+```bash
+# Create + apply a new migration and regenerate the client
+npx prisma migrate dev --name add_post_model
+
+# Open a GUI to inspect data
+npx prisma studio
+```
+
+  </TabsContent>
+  <TabsContent value="prod">
+
+```bash
+# Apply already-committed migrations, never generate new ones
+npx prisma migrate deploy
+
+# Regenerate the client during your build step
+npx prisma generate
+```
+
+  </TabsContent>
+</Tabs>
+
+<Warning>Never run `prisma migrate dev` against production — it can prompt to reset data. Commit migration files to git and run `prisma migrate deploy` in CI/CD so every environment applies the same reviewed SQL.</Warning>
+
+## A Single Shared Prisma Client
+
+`PrismaClient` manages a connection pool. Creating a new instance per request exhausts database
+connections. Export one instance from a module and import it everywhere. Guarding against hot-reload
+duplicates keeps the pool stable when tools like `nodemon` or `ts-node-dev` re-evaluate modules.
+
+```javascript
+// src/lib/prisma.js
+import { PrismaClient } from "@prisma/client"
+
+const globalForPrisma = globalThis
+
+export const prisma =
+  globalForPrisma.prisma ?? new PrismaClient({ log: ["warn", "error"] })
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma
+}
+```
+
+## Building CRUD Routes
+
+With the shared client imported, routes stay small. Note the pagination on the list endpoint —
+returning an unbounded `findMany` is a common way to melt an API under real traffic.
+
+```javascript
+// src/routes/posts.js
+import { Router } from "express"
+import { prisma } from "../lib/prisma.js"
+
+const router = Router()
+
+// List published posts, newest first, paginated
+router.get("/", async (req, res) => {
+  const take = Math.min(Number(req.query.limit) || 20, 100)
+  const skip = Number(req.query.offset) || 0
+
+  const [data, total] = await Promise.all([
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take,
+      skip,
+    }),
+    prisma.post.count({ where: { published: true } }),
+  ])
+
+  res.json({ data, meta: { total, take, skip } })
+})
+
+// Fetch one by slug
+router.get("/:slug", async (req, res) => {
+  const post = await prisma.post.findUnique({
+    where: { slug: req.params.slug },
+  })
+  if (!post) return res.status(404).json({ error: "Post not found" })
+  res.json({ data: post })
+})
+
+export default router
+```
+
+For writes, select the exact fields you accept instead of spreading `req.body` straight into
+`create` — that prevents clients from setting `published: true` or a foreign `authorId` they should
+not control.
+
+```javascript
+router.post("/", async (req, res) => {
+  const { title, slug, content } = req.body
+  const post = await prisma.post.create({
+    data: { title, slug, content, authorId: req.user.id },
+  })
+  res.status(201).json({ data: post })
+})
+
+router.patch("/:id", async (req, res) => {
+  const { title, content, published } = req.body
+  const post = await prisma.post.update({
+    where: { id: req.params.id },
+    data: { title, content, published },
+  })
+  res.json({ data: post })
+})
+
+router.delete("/:id", async (req, res) => {
+  await prisma.post.delete({ where: { id: req.params.id } })
+  res.status(204).end()
+})
+```
+
+## The Repository Pattern
+
+Sprinkling Prisma calls across every route ties your HTTP layer to a specific ORM and makes handlers
+hard to unit-test. A **repository** collects all data access for one resource behind plain functions.
+Routes then depend on intent (`findPublished`, `create`) rather than query syntax.
+
+```javascript
+// src/repositories/postRepository.js
+import { prisma } from "../lib/prisma.js"
+
+export const postRepository = {
+  findPublished: ({ take, skip }) =>
+    prisma.post.findMany({
+      where: { published: true },
+      orderBy: { createdAt: "desc" },
+      take,
+      skip,
+    }),
+
+  findBySlug: (slug) => prisma.post.findUnique({ where: { slug } }),
+
+  create: (data) => prisma.post.create({ data }),
+
+  update: (id, data) => prisma.post.update({ where: { id }, data }),
 }
 ```
 
 ```javascript
-import { PrismaClient } from "@prisma/client"
-const prisma = new PrismaClient()
-
-app.get("/api/posts", async (req, res) => {
-  const posts = await prisma.post.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-  })
-  res.json({ data: posts })
-})
-```
-
-### Create & Update Routes
-
-```javascript
-app.post("/api/posts", async (req, res) => {
-  const post = await prisma.post.create({ data: req.body })
-  res.status(201).json({ data: post })
-})
-
-app.patch("/api/posts/:id", async (req, res) => {
-  const post = await prisma.post.update({
-    where: { id: req.params.id },
-    data: req.body,
-  })
+// route becomes thin and intention-revealing
+router.get("/:slug", async (req, res) => {
+  const post = await postRepository.findBySlug(req.params.slug)
+  if (!post) return res.status(404).json({ error: "Post not found" })
   res.json({ data: post })
 })
 ```
 
-<Card><CardHeader><CardTitle>Repository pattern</CardTitle></CardHeader><CardContent>Extract Prisma calls into postRepository.js so routes stay thin and you can mock data in tests.</CardContent></Card>
+<InfoCard title="Why this pays off">In tests you can swap `postRepository` for an in-memory fake, so route tests run in milliseconds without a live database. The pattern also gives you one place to add caching, logging, or a query change later.</InfoCard>
+
+## Handling Prisma Errors
+
+Prisma throws typed errors with stable codes. Catch `PrismaClientKnownRequestError` and map codes to
+proper HTTP statuses instead of leaking a 500 for every failure. The two you will hit most are
+`P2002` (unique constraint violation) and `P2025` (record not found).
+
+```javascript
+import { Prisma } from "@prisma/client"
+
+router.post("/", async (req, res, next) => {
+  try {
+    const post = await postRepository.create(req.body)
+    res.status(201).json({ data: post })
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return res.status(409).json({ error: "Slug already exists" })
+      }
+      if (err.code === "P2025") {
+        return res.status(404).json({ error: "Related record not found" })
+      }
+    }
+    next(err)
+  }
+})
+```
+
+## Best Practices and Common Pitfalls
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="pool">
+    <AccordionTrigger>Instantiating PrismaClient per request</AccordionTrigger>
+    <AccordionContent>
+      Each `new PrismaClient()` opens its own pool. Under load you will hit "too many connections".
+      Always import the single shared instance from `src/lib/prisma.js`.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="nplus1">
+    <AccordionTrigger>N+1 queries on relations</AccordionTrigger>
+    <AccordionContent>
+      Looping over posts and querying each author separately floods the database. Use `include` or
+      `select` to load relations in one round trip: `prisma.post.findMany({ include: { author: true } })`.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="body">
+    <AccordionTrigger>Passing req.body straight into create/update</AccordionTrigger>
+    <AccordionContent>
+      Whitelist fields explicitly and validate with a library like Zod before touching the database.
+      Blind spreads let clients set fields such as `published` or `authorId` they should not control.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="migrate">
+    <AccordionTrigger>Using migrate dev in production</AccordionTrigger>
+    <AccordionContent>
+      `migrate dev` is interactive and may reset the schema. Commit migrations and run
+      `prisma migrate deploy` in your deploy pipeline so production only applies reviewed SQL.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Tip title="Graceful shutdown">Call `await prisma.$disconnect()` on `SIGINT`/`SIGTERM` so pending queries finish and connections close cleanly when your container stops.</Tip>
 
 
 ---
@@ -74,4 +321,4 @@ app.patch("/api/posts/:id", async (req, res) => {
 
 <NextLesson title="Performance & Caching" description="Redis caching and rate limiting." href="/roadmap/express-fundamentals-advanced-performance-caching" />
 
-<Resources resources={[{"title":"Prisma Docs","href":"https://www.prisma.io/docs"}]} />
+<Resources resources={[{"title":"Prisma Docs","href":"https://www.prisma.io/docs"},{"title":"Prisma Schema Reference","href":"https://www.prisma.io/docs/orm/reference/prisma-schema-reference"},{"title":"Prisma Migrate","href":"https://www.prisma.io/docs/orm/prisma-migrate"},{"title":"Prisma Error Reference","href":"https://www.prisma.io/docs/orm/reference/error-reference"}]} />

@@ -5,7 +5,7 @@ course: "express-fundamentals"
 category: "backend"
 difficulty: "advanced"
 level: "advanced"
-duration: "24 min"
+duration: "28 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
@@ -18,40 +18,295 @@ import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react
 
 ## Testing & Deployment
 
-Ship Express APIs with confidence using automated tests and containerized deploys.
+An Express API is only production-ready when a machine can prove it works and ship it without a human clicking through routes. This lesson closes the loop: you will write **integration tests** that exercise your real HTTP layer with Supertest, isolate flaky external calls with mocks, package the app as a small, reproducible **Docker image**, and wire a **GitHub Actions** pipeline that lints, tests, and builds on every push. These are the same guardrails that let teams deploy dozens of times a day without fear.
 
-<LearningObjectives objectives={["Write integration tests with Supertest", "Mock external dependencies", "Containerize with Docker", "Run CI pipeline on push"]} />
+<LearningObjectives objectives={["Write integration tests that hit real Express routes with Supertest", "Mock external HTTP dependencies and manage test database state", "Build a small, secure multi-stage Docker image", "Automate lint, test, and build with a GitHub Actions CI pipeline", "Add health checks and graceful shutdown for production deploys"]} />
+
+## Choosing a Test Runner
+
+Supertest is transport-agnostic and works with any runner. The two most common choices for Express in 2026 are **Vitest** (fast, native ESM, Jest-compatible API) and **Jest** (mature, huge ecosystem). Pick one and stay consistent.
+
+<Tabs defaultValue="vitest">
+  <TabsList>
+    <TabsTrigger value="vitest">Vitest</TabsTrigger>
+    <TabsTrigger value="jest">Jest</TabsTrigger>
+  </TabsList>
+  <TabsContent value="vitest">
+
+```bash
+npm i -D vitest supertest
+# package.json
+#   "scripts": { "test": "vitest run", "test:watch": "vitest" }
+```
+
+  </TabsContent>
+  <TabsContent value="jest">
+
+```bash
+npm i -D jest supertest cross-env
+# package.json
+#   "scripts": { "test": "cross-env NODE_ENV=test jest --runInBand" }
+```
+
+  </TabsContent>
+</Tabs>
+
+<Tip title="Export the app, not the server">Keep `app` (the Express instance) in one module and call `app.listen()` in a separate entry file. Tests import `app` directly so Supertest can bind an ephemeral port — you never start a real server in the test process.</Tip>
+
+## Integration Tests with Supertest
+
+Unit tests check functions in isolation; **integration tests** send real requests through your middleware, routing, and controllers. Supertest wraps the Express app, boots it on a random port, and gives you a fluent assertion API.
 
 ```javascript
+// tests/health.test.js
 import request from "supertest"
-import { app } from "../app.js"
+import { describe, it, expect } from "vitest"
+import { app } from "../src/app.js"
 
 describe("GET /api/health", () => {
-  it("returns 200", async () => {
+  it("returns 200 with an ok status", async () => {
     const res = await request(app).get("/api/health")
     expect(res.status).toBe(200)
-    expect(res.body.status).toBe("ok")
+    expect(res.body).toMatchObject({ status: "ok" })
   })
 })
 ```
 
-```dockerfile
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --omit=dev
-COPY . .
-EXPOSE 3000
-CMD ["node", "src/index.js"]
+Because you get the full request lifecycle, you can assert on status codes, JSON bodies, and headers together — validation errors, auth guards, and content negotiation all run exactly as they would in production.
+
+### Testing a POST and an Authenticated Route
+
+```javascript
+// tests/users.test.js
+import request from "supertest"
+import { describe, it, expect } from "vitest"
+import { app } from "../src/app.js"
+
+describe("Users API", () => {
+  it("rejects invalid payloads with 400", async () => {
+    const res = await request(app)
+      .post("/api/users")
+      .send({ email: "not-an-email" })
+      .set("Content-Type", "application/json")
+
+    expect(res.status).toBe(400)
+    expect(res.body.errors).toBeDefined()
+  })
+
+  it("creates a user and allows access with the returned token", async () => {
+    const create = await request(app)
+      .post("/api/users")
+      .send({ email: "ada@example.com", password: "s3cret-pass" })
+    expect(create.status).toBe(201)
+
+    const token = create.body.token
+    const me = await request(app)
+      .get("/api/users/me")
+      .set("Authorization", `Bearer ${token}`)
+
+    expect(me.status).toBe(200)
+    expect(me.body.email).toBe("ada@example.com")
+  })
+})
 ```
 
-<Card><CardHeader><CardTitle>CI checklist</CardTitle></CardHeader><CardContent>Lint → test → build image → deploy. Use health checks at `/health` for load balancers.</CardContent></Card>
+## Mocking External Dependencies
 
+Tests must be deterministic. A test that calls Stripe or a third-party API over the network is slow and breaks when that service hiccups. Intercept outbound HTTP with **nock**, or replace a module with the runner's mock.
+
+<Tabs defaultValue="nock">
+  <TabsList>
+    <TabsTrigger value="nock">Intercept HTTP (nock)</TabsTrigger>
+    <TabsTrigger value="module">Mock a module</TabsTrigger>
+  </TabsList>
+  <TabsContent value="nock">
+
+```javascript
+import nock from "nock"
+import request from "supertest"
+import { afterEach, it, expect } from "vitest"
+import { app } from "../src/app.js"
+
+afterEach(() => nock.cleanAll())
+
+it("returns 502 when the payment provider fails", async () => {
+  nock("https://api.stripe.com")
+    .post("/v1/charges")
+    .reply(500, { error: "provider_down" })
+
+  const res = await request(app)
+    .post("/api/orders")
+    .send({ amount: 1000, currency: "usd" })
+
+  expect(res.status).toBe(502)
+})
+```
+
+  </TabsContent>
+  <TabsContent value="module">
+
+```javascript
+import { vi, it, expect } from "vitest"
+
+vi.mock("../src/lib/mailer.js", () => ({
+  sendWelcomeEmail: vi.fn().mockResolvedValue({ id: "msg_123" }),
+}))
+
+// The controller now uses the fake mailer — no real email is sent,
+// and you can assert it was called with the right arguments.
+```
+
+  </TabsContent>
+</Tabs>
+
+<Warning>Never point tests at your development or production database. Use a dedicated test database (or a throwaway container) and reset state between tests, or a slow suite will silently corrupt real data.</Warning>
+
+### Managing Test Database State
+
+Reset schema before the suite and clean tables between tests so cases stay independent of ordering.
+
+```javascript
+import { beforeAll, afterAll, beforeEach } from "vitest"
+import { db, migrate } from "../src/db.js"
+
+beforeAll(async () => { await migrate() })          // apply migrations once
+beforeEach(async () => { await db.query("TRUNCATE users CASCADE") })
+afterAll(async () => { await db.end() })            // close the pool so the process exits
+```
+
+## Containerizing with Docker
+
+A container packages your app, its Node runtime, and dependencies into one immutable image so "works on my machine" becomes "works everywhere." A **multi-stage build** compiles in a fat stage and copies only the runtime artifacts into a slim final image.
+
+```dockerfile
+# ---- build stage ----
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build            # e.g. tsc -> dist/ (skip if plain JS)
+
+# ---- runtime stage ----
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build /app/dist ./dist
+USER node                    # drop root privileges
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -qO- http://localhost:3000/health || exit 1
+CMD ["node", "dist/index.js"]
+```
+
+Always add a `.dockerignore` so `node_modules`, secrets, and local cruft never leak into the build context (this also makes builds dramatically faster):
+
+```bash
+node_modules
+npm-debug.log
+.env
+.git
+coverage
+dist
+```
+
+<InfoCard title="Why multi-stage?">The build stage may need dev dependencies and source files, but shipping them bloats the image and widens the attack surface. Copying only `dist/` and production deps typically cuts a Node image from hundreds of MB down to well under 200 MB.</InfoCard>
+
+## CI/CD with GitHub Actions
+
+Continuous Integration runs your checks automatically on every push and pull request, so broken code never reaches `main`. This workflow spins up a Postgres service, installs with a warm cache, then lints, tests, and builds the image.
+
+```yaml
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      - run: docker build -t my-api:${{ github.sha }} .
+```
+
+The pipeline follows a clear gate order — lint catches style and obvious mistakes cheaply, tests verify behavior, and only then do you build the deployable image.
+
+<Card><CardHeader><CardTitle>CI gate order</CardTitle></CardHeader><CardContent>Install (cached) → Lint → Test (against a real service container) → Build image → tag by commit SHA. Deploy from the exact image that passed CI — never rebuild separately for production.</CardContent></Card>
+
+## Production Readiness
+
+Two small additions make deployments safe behind a load balancer or orchestrator like Kubernetes: a **health endpoint** so the platform knows the instance is alive, and **graceful shutdown** so in-flight requests finish before the process exits on a `SIGTERM`.
+
+```javascript
+// src/app.js exports `app`; src/index.js starts the server
+import { app } from "./app.js"
+
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() })
+})
+
+const port = process.env.PORT || 3000
+const server = app.listen(port, () => console.log(`listening on ${port}`))
+
+process.on("SIGTERM", () => {
+  server.close(() => process.exit(0))   // stop accepting, drain, then exit
+})
+```
+
+## Common Pitfalls
+
+<Accordion type="multiple" className="not-prose">
+  <AccordionItem value="port">
+    <AccordionTrigger>Hard-coding the port</AccordionTrigger>
+    <AccordionContent>Cloud platforms inject the port via `process.env.PORT`. Read it with a fallback (`process.env.PORT || 3000`) or the platform's health check will hit the wrong port and mark the container unhealthy.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="leak">
+    <AccordionTrigger>Open handles keep tests hanging</AccordionTrigger>
+    <AccordionContent>If your suite doesn't exit, an unclosed database pool or timer is usually the cause. Close pools in `afterAll` and avoid `app.listen()` inside tests — Supertest manages the socket for you.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="secrets">
+    <AccordionTrigger>Baking secrets into the image</AccordionTrigger>
+    <AccordionContent>Never `COPY .env` or use `ENV DB_PASSWORD=...` in a Dockerfile — anyone with the image can read it via `docker history`. Inject secrets at runtime with environment variables or a secrets manager.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="flaky">
+    <AccordionTrigger>Order-dependent, flaky tests</AccordionTrigger>
+    <AccordionContent>Tests that share mutable state pass alone but fail together. Reset the database between cases and mock the clock/network so results are deterministic regardless of run order.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Alert>
+  <AlertTitle>You've completed Express Fundamentals</AlertTitle>
+  <AlertDescription>You can now design routes and middleware, secure APIs with JWT, integrate a database, cache and scale, split into services, and ship with tested, automated pipelines. The natural next step is production observability — structured logging, metrics, and tracing.</AlertDescription>
+</Alert>
 
 ---
 
 ## Next Steps
 
+You have finished the Express Fundamentals track. Reinforce it by adding a full test suite and a CI pipeline to one of your own projects, then explore observability (OpenTelemetry) and a managed deploy target such as Fly.io, Render, or a Kubernetes cluster.
 
-
-<Resources resources={[{"title":"Supertest","href":"https://github.com/ladjs/supertest"},{"title":"Docker Node guide","href":"https://docs.docker.com/language/nodejs/"}]} />
+<Resources resources={[{"title":"Supertest (official)","href":"https://github.com/ladjs/supertest"},{"title":"Vitest Guide","href":"https://vitest.dev/guide/"},{"title":"Dockerize a Node.js app","href":"https://docs.docker.com/language/nodejs/"},{"title":"GitHub Actions Documentation","href":"https://docs.github.com/en/actions"}]} />

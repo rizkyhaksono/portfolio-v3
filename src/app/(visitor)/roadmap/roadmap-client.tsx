@@ -190,7 +190,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
     return {
       title: formatCourseName(courseGroup.course),
       illustration: firstLesson?.meta.illustration || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80",
-      description: `Master ${formatCourseName(courseGroup.course)} from beginner to advanced — structured like Dicoding learning paths.`,
+      description: `Master ${formatCourseName(courseGroup.course)} from beginner to advanced with hands-on, structured lessons.`,
       category: firstLesson?.meta.category || "General",
       totalLessons: courseGroup.lessons.length,
       estimatedDuration: totalMinutes > 0 ? `${totalMinutes} min` : "Varied",
@@ -277,7 +277,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
             </div>
           </div>
 
-          {/* Level sections — Dicoding-style accordion */}
+          {/* Level sections — expandable accordion */}
           <div className="space-y-4">
             <h3 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
               <GraduationCap className="h-5 w-5 text-primary" />

@@ -5,7 +5,7 @@ course: "mcp-fundamentals"
 category: "ai-engineering"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "20 min"
+duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
@@ -14,9 +14,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## MCP Protocol
+## The Protocol Underneath the SDK
 
-<LearningObjectives objectives={["Understand JSON-RPC request/response flow", "Negotiate server capabilities at init", "Handle notifications vs requests", "Debug with structured logging"]} />
+When you call `server.setRequestHandler(...)` in the SDK, you are working several layers above the actual wire. Underneath, MCP is just **JSON-RPC 2.0 messages** flowing over a transport. Understanding that wire format is what separates someone who can copy an example from someone who can debug a hung handshake, negotiate the right protocol version, or build a client from scratch. In this lesson we peel back the SDK and look at the exact bytes a client and server exchange — the message envelope, the initialization handshake, capability negotiation, error semantics, and the transport layers that carry it all.
+
+<LearningObjectives objectives={["Distinguish JSON-RPC requests, responses, and notifications on the wire", "Walk through the initialize handshake and protocol version negotiation", "Read and declare a capabilities object correctly", "Interpret JSON-RPC error codes and lifecycle notifications", "Choose between stdio and Streamable HTTP transports"]} />
+
+## JSON-RPC 2.0: The Message Envelope
+
+Every MCP message is a JSON object with `"jsonrpc": "2.0"`. There are exactly three shapes, and telling them apart is the single most important skill for reading a protocol trace.
+
+**A request** has an `id`, a `method`, and optional `params`. It expects a response.
 
 ```json
 {
@@ -27,12 +35,213 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 }
 ```
 
-<Accordion type="single" collapsible className="not-prose"><AccordionItem value="init"><AccordionTrigger>Initialize handshake</AccordionTrigger><AccordionContent>Client sends initialize with protocol version; server responds with capabilities (tools, resources, prompts).</AccordionContent></AccordionItem></Accordion>
+**A response** echoes the same `id` and carries either `result` or `error` — never both.
 
----
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "get_weather",
+        "description": "Fetch the current weather for a city.",
+        "inputSchema": { "type": "object", "properties": { "city": { "type": "string" } }, "required": ["city"] }
+      }
+    ]
+  }
+}
+```
+
+**A notification** looks like a request but has **no `id`**. It is fire-and-forget — the receiver must never reply to it.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "notifications/initialized"
+}
+```
+
+<Tip>The presence of `id` is the whole game: if a message has an `id`, someone owes a response with that same `id`. If it has no `id`, it is a notification and replying to it is a protocol violation.</Tip>
+
+## The Initialization Handshake
+
+No `tools/call` or `resources/read` may happen until the connection is initialized. The handshake is a strict three-step dance:
+
+1. The client sends an `initialize` **request**.
+2. The server replies with its capabilities and chosen protocol version.
+3. The client sends a `notifications/initialized` **notification** to confirm it is ready.
+
+The client's `initialize` request advertises the newest protocol version it supports and the capabilities *it* offers (like `sampling` and `roots`):
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "roots": { "listChanged": true },
+      "sampling": {}
+    },
+    "clientInfo": { "name": "claude-desktop", "version": "1.0.0" }
+  }
+}
+```
+
+The server responds with the version it will actually speak (which may be older if it does not support the client's requested one), the capabilities *it* exposes, and an optional `instructions` string the host can inject into the model's context:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "result": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {
+      "tools": { "listChanged": true },
+      "resources": { "subscribe": true, "listChanged": true },
+      "prompts": { "listChanged": true },
+      "logging": {}
+    },
+    "serverInfo": { "name": "weather-mcp", "version": "1.0.0" },
+    "instructions": "Call get_weather for live conditions before answering weather questions."
+  }
+}
+```
+
+<Warning>Protocol versions are date strings like `2024-11-05` or `2025-06-18`, **not** semver. If the server returns a `protocolVersion` the client cannot support, the client should disconnect rather than continue. Never assume both sides landed on the same version — always read what the server echoed back.</Warning>
+
+## Capability Negotiation
+
+The `capabilities` object is a contract. A feature that is not declared **must not** be used. An empty object like `"logging": {}` means "I support this feature with no sub-options." Nested flags refine the behaviour:
+
+- `tools.listChanged` — the server will emit `notifications/tools/list_changed` when its tool set changes.
+- `resources.subscribe` — clients may call `resources/subscribe` to receive `notifications/resources/updated`.
+- `resources.listChanged` / `prompts.listChanged` — dynamic list-change notifications for those primitives.
+
+In the TypeScript SDK you declare these when constructing the server, and the SDK refuses to send notifications you never advertised:
+
+```typescript
+const server = new Server(
+  { name: "weather-mcp", version: "1.0.0" },
+  {
+    capabilities: {
+      tools: { listChanged: true },
+      resources: { subscribe: true, listChanged: true },
+      prompts: { listChanged: true },
+      logging: {},
+    },
+  },
+)
+```
+
+<InfoCard>Capabilities are symmetric. Servers declare `tools`, `resources`, `prompts`, and `logging`; clients declare `sampling` (letting the server ask the host's model to generate text) and `roots` (exposing filesystem boundaries). Each side must check what the *other* declared before invoking a related method.</InfoCard>
+
+## Requests, Responses, and Errors
+
+Because `id` correlates a response to its request, a client can have many requests in flight at once and match replies as they arrive — order is not guaranteed. When something goes wrong, the server returns an `error` object instead of `result`, using standard JSON-RPC codes:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "error": {
+    "code": -32602,
+    "message": "Invalid params: 'city' is required",
+    "data": { "missingField": "city" }
+  }
+}
+```
+
+| Code | Meaning | Typical cause |
+| --- | --- | --- |
+| `-32700` | Parse error | Malformed JSON on the wire |
+| `-32600` | Invalid Request | Missing `jsonrpc` or `method` |
+| `-32601` | Method not found | Unknown `method` name |
+| `-32602` | Invalid params | Arguments failed schema validation |
+| `-32603` | Internal error | Unhandled server exception |
+
+<Warning>A JSON-RPC protocol error (bad params, unknown method) is different from a **tool execution** error. When a tool runs but fails — an API times out, for example — you return a normal `result` with `isError: true` inside the `content`, not a `-326xx` error. That lets the model see and reason about the failure instead of the connection tearing down.</Warning>
+
+## Transport Layers
+
+JSON-RPC defines the messages; a **transport** defines how those messages travel. MCP standardizes two.
+
+<Tabs defaultValue="stdio">
+  <TabsList>
+    <TabsTrigger value="stdio">stdio</TabsTrigger>
+    <TabsTrigger value="http">Streamable HTTP</TabsTrigger>
+  </TabsList>
+  <TabsContent value="stdio">
+
+Best for **local** servers. The client launches your server as a subprocess and exchanges newline-delimited JSON over stdin/stdout. Each message is one line — embedded newlines are not allowed. Anything the server writes to **stderr** is treated as logging and never parsed as protocol.
+
+```typescript
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
+
+const transport = new StdioServerTransport()
+await server.connect(transport)
+```
+
+  </TabsContent>
+  <TabsContent value="http">
+
+Best for **remote** servers. A single HTTP endpoint accepts `POST` for client-to-server messages and can upgrade to an SSE stream for server-to-client messages. Sessions are tracked with the `Mcp-Session-Id` header returned during initialization. (This replaced the older, separate HTTP+SSE transport.)
+
+```typescript
+import express from "express"
+import { randomUUID } from "node:crypto"
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js"
+
+const app = express()
+app.use(express.json())
+
+const transport = new StreamableHTTPServerTransport({
+  sessionIdGenerator: () => randomUUID(),
+})
+await server.connect(transport)
+
+app.post("/mcp", (req, res) => transport.handleRequest(req, res, req.body))
+app.get("/mcp", (req, res) => transport.handleRequest(req, res)) // opens the SSE stream
+app.listen(3000)
+```
+
+  </TabsContent>
+</Tabs>
+
+## Notifications and Lifecycle Events
+
+Beyond `initialized`, notifications drive the live behaviour of a session. Because they carry no `id`, they never block anything — they simply inform.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "notifications/progress",
+  "params": { "progressToken": "scan-42", "progress": 60, "total": 100 }
+}
+```
+
+Common ones you will see in a trace:
+
+- `notifications/progress` — incremental progress for a long-running request (tied to a `progressToken` the caller supplied in `_meta`).
+- `notifications/cancelled` — the caller aborted a request; the receiver should stop work for that `requestId`.
+- `notifications/message` — structured server logs (`level`, `logger`, `data`) delivered to the client.
+- `notifications/tools/list_changed` — re-fetch `tools/list`; the available tools changed.
+
+<Accordion type="single" collapsible className="not-prose"><AccordionItem value="ping"><AccordionTrigger>What is the ping method for?</AccordionTrigger><AccordionContent>Either side may send a `ping` request (an empty-params request expecting an empty result) as a liveness check. If a ping is not answered within a reasonable timeout, the peer can consider the connection dead and tear it down. Unlike notifications, `ping` has an `id` and does expect a response.</AccordionContent></AccordionItem></Accordion>
+
+## Common Pitfalls
+
+<Warning>**Replying to a notification.** If a message has no `id`, sending any response — even an error — breaks the spec and confuses well-behaved clients. Route by presence of `id` first.</Warning>
+
+- **Printing to stdout on a stdio transport.** A stray `console.log` writes non-JSON to the exact stream carrying protocol messages and corrupts the session. Use `console.error` (stderr) or the `logging` capability instead.
+- **Calling methods before `initialized`.** Any request other than `initialize` (and `ping`) before the handshake completes is invalid. Wait for the client's `notifications/initialized` before treating the server as ready.
+- **Using an undeclared capability.** Emitting `notifications/resources/updated` without declaring `resources.subscribe`, or calling `sampling/createMessage` when the client never advertised `sampling`, will be rejected.
+- **Assuming the requested protocol version won.** Always branch on the `protocolVersion` the server actually returned, not the one you asked for.
 
 ## Next Steps
 
-<NextLesson title="Resources & Prompts" description="Expose data and templates." href="/roadmap/mcp-fundamentals-intermediate-resources-prompts" />
+<NextLesson title="Resources & Prompts" description="Now that you can read the wire, expose read-only data and reusable prompt templates through your server." href="/roadmap/mcp-fundamentals-intermediate-resources-prompts" />
 
-<Resources resources={[{"title":"MCP Specification","href":"https://modelcontextprotocol.io/"}]} />
+<Resources resources={[{"title":"MCP Specification","href":"https://modelcontextprotocol.io/specification/2025-06-18"},{"title":"Lifecycle & Initialization","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle"},{"title":"Transports","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/transports"},{"title":"JSON-RPC 2.0 Specification","href":"https://www.jsonrpc.org/specification"}]} />

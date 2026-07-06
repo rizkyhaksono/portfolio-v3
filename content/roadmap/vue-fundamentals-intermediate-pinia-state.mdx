@@ -5,7 +5,7 @@ course: "vue-fundamentals"
 category: "frontend"
 difficulty: "intermediate"
 level: "intermediate"
-duration: "20 min"
+duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,30 +14,301 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Pinia Stores
+## Why Pinia?
 
-<LearningObjectives objectives={["Create stores with defineStore", "Define actions for async logic", "Use getters for derived state", "Split stores by domain"]} />
+As soon as an application grows beyond a few components, passing data through props and emitting events up the tree becomes painful. **Pinia** is Vue's official state management library — the recommended successor to Vuex. It gives you centralized, reactive stores that any component can read from and write to, with full TypeScript inference, dev-tools time-travel, and hot module replacement. It works with both the Options and Composition APIs and has no mutations boilerplate: you just mutate state directly inside actions.
 
-```js
-export const useUserStore = defineStore('user', {
-  state: () => ({ user: null, token: null }),
+<LearningObjectives objectives={["Install and register Pinia in a Vue app", "Create stores with defineStore using both option and setup styles", "Model state, getters, and actions for real features", "Consume stores in components without losing reactivity", "Structure multiple domain stores and share state between them"]} />
+
+## Installing and Registering Pinia
+
+Add the package and register the root instance on your app before mounting. Every store you define later plugs into this single `createPinia()` instance.
+
+```bash
+npm install pinia
+```
+
+```ts
+// src/main.ts
+import { createApp } from "vue"
+import { createPinia } from "pinia"
+import App from "./App.vue"
+
+const app = createApp(App)
+app.use(createPinia())
+app.mount("#app")
+```
+
+<Tip>
+A store is only created the first time it is used inside a component's `setup()` (or after the app is mounted), not when the file is imported. This lazy initialization is why Pinia stores tree-shake and work cleanly with SSR.
+</Tip>
+
+## Defining a Store
+
+`defineStore` takes a unique **id** (used by dev-tools and for SSR hydration) and a definition. There are two equivalent authoring styles — pick one and stay consistent across your codebase.
+
+<Tabs defaultValue="setup" className="my-6">
+  <TabsList className="grid w-full grid-cols-2">
+    <TabsTrigger value="setup">Setup Store</TabsTrigger>
+    <TabsTrigger value="option">Option Store</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="setup">
+
+```ts
+// stores/counter.ts
+import { defineStore } from "pinia"
+import { ref, computed } from "vue"
+
+export const useCounterStore = defineStore("counter", () => {
+  // state -> refs / reactive
+  const count = ref(0)
+
+  // getters -> computed
+  const doubleCount = computed(() => count.value * 2)
+
+  // actions -> functions
+  function increment() {
+    count.value++
+  }
+
+  return { count, doubleCount, increment }
+})
+```
+
+  </TabsContent>
+
+  <TabsContent value="option">
+
+```ts
+// stores/counter.ts
+import { defineStore } from "pinia"
+
+export const useCounterStore = defineStore("counter", {
+  state: () => ({ count: 0 }),
   getters: {
-    isLoggedIn: (s) => !!s.token,
+    doubleCount: (state) => state.count * 2,
   },
   actions: {
-    async login(email, password) {
-      const res = await api.post('/auth/login', { email, password })
-      this.user = res.user
-      this.token = res.token
+    increment() {
+      this.count++
     },
   },
 })
 ```
 
+  </TabsContent>
+</Tabs>
+
+The **setup style** reuses everything you already know from the Composition API: `ref`/`reactive` become state, `computed` becomes getters, and plain functions become actions. The **option style** mirrors Vuex/Options-API components and is a natural migration path from Vuex. Both produce the same store — a reactive object exposing state, getters, and actions.
+
+### State, Getters, and Actions
+
+State is the source of truth, getters are cached derived values, and actions hold synchronous or asynchronous logic that mutates state. Unlike Vuex, there are **no mutations** — actions change state directly.
+
+```ts
+// stores/cart.ts
+import { defineStore } from "pinia"
+
+interface CartItem {
+  id: number
+  name: string
+  price: number
+  qty: number
+}
+
+export const useCartStore = defineStore("cart", {
+  state: () => ({
+    items: [] as CartItem[],
+  }),
+  getters: {
+    count: (state) => state.items.reduce((n, i) => n + i.qty, 0),
+    // A getter can call another getter via `this`
+    subtotal: (state) => state.items.reduce((sum, i) => sum + i.price * i.qty, 0),
+  },
+  actions: {
+    add(item: Omit<CartItem, "qty">) {
+      const existing = this.items.find((i) => i.id === item.id)
+      if (existing) existing.qty++
+      else this.items.push({ ...item, qty: 1 })
+    },
+    remove(id: number) {
+      this.items = this.items.filter((i) => i.id !== id)
+    },
+    clear() {
+      this.items = []
+    },
+  },
+})
+```
+
+## Using a Store in Components
+
+Call the `useXxxStore()` hook inside `<script setup>`. You can read state and getters directly in the template, and invoke actions on events.
+
+```vue
+<script setup lang="ts">
+import { useCartStore } from "@/stores/cart"
+
+const cart = useCartStore()
+
+function checkout() {
+  console.log(`Total: $${cart.subtotal}`)
+  cart.clear()
+}
+</script>
+
+<template>
+  <p>Items in cart: {{ cart.count }} — Subtotal: ${{ cart.subtotal }}</p>
+  <button @click="cart.add({ id: 1, name: 'Book', price: 20 })">Add Book</button>
+  <button :disabled="cart.count === 0" @click="checkout">Checkout</button>
+</template>
+```
+
+<Warning>
+Do **not** destructure state or getters off the store — `const { count } = cart` copies the current value and breaks reactivity. Use `storeToRefs` to keep them reactive. Actions and methods are safe to destructure directly.
+</Warning>
+
+```ts
+import { storeToRefs } from "pinia"
+import { useCartStore } from "@/stores/cart"
+
+const cart = useCartStore()
+
+// ✅ reactive refs for state + getters
+const { items, subtotal, count } = storeToRefs(cart)
+
+// ✅ actions can be pulled off directly (they are bound)
+const { add, remove, clear } = cart
+```
+
+## Async Actions
+
+Actions can be `async` and are the right place for API calls. Track loading and error state alongside the data so components can render spinners and messages.
+
+```ts
+// stores/user.ts
+import { defineStore } from "pinia"
+
+export const useUserStore = defineStore("user", {
+  state: () => ({
+    user: null as { id: number; name: string } | null,
+    token: null as string | null,
+    loading: false,
+    error: "" as string,
+  }),
+  getters: {
+    isLoggedIn: (state) => !!state.token,
+  },
+  actions: {
+    async login(email: string, password: string) {
+      this.loading = true
+      this.error = ""
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        })
+        if (!res.ok) throw new Error("Invalid credentials")
+        const data = await res.json()
+        this.user = data.user
+        this.token = data.token
+      } catch (e) {
+        this.error = (e as Error).message
+      } finally {
+        this.loading = false
+      }
+    },
+    logout() {
+      this.$reset() // restore initial state
+    },
+  },
+})
+```
+
+<InfoCard>
+Every store instance exposes helpers: `$patch()` applies multiple changes in one reactive update, `$reset()` restores the initial state (setup stores need a manual reset function), `$subscribe()` reacts to state changes, and `$onAction()` hooks into action calls — perfect for logging or analytics.
+</InfoCard>
+
+```ts
+// Batch several mutations efficiently in one patch
+cart.$patch((state) => {
+  state.items.push({ id: 2, name: "Pen", price: 3, qty: 1 })
+  state.items[0].qty += 5
+})
+
+// Persist on every change
+cart.$subscribe((mutation, state) => {
+  localStorage.setItem("cart", JSON.stringify(state.items))
+})
+```
+
+## Modular, Domain-Driven Stores
+
+Rather than one giant store, create a small store per domain — `auth`, `cart`, `products`, `ui` — each in its own file under `src/stores/`. Stores can use one another simply by calling the other store's hook inside an action or getter, which keeps concerns decoupled.
+
+```ts
+// stores/orders.ts
+import { defineStore } from "pinia"
+import { useCartStore } from "./cart"
+import { useUserStore } from "./user"
+
+export const useOrdersStore = defineStore("orders", {
+  state: () => ({ history: [] as { id: string; total: number }[] }),
+  actions: {
+    async placeOrder() {
+      const cart = useCartStore()
+      const user = useUserStore()
+      if (!user.isLoggedIn) throw new Error("Login required")
+
+      const order = { id: crypto.randomUUID(), total: cart.subtotal }
+      this.history.push(order)
+      cart.clear()
+      return order
+    },
+  },
+})
+```
+
+## Best Practices & Common Pitfalls
+
+<Accordion type="single" collapsible className="my-6">
+  <AccordionItem value="reactivity">
+    <AccordionTrigger>Losing reactivity when destructuring</AccordionTrigger>
+    <AccordionContent>
+      Plain destructuring of state/getters copies values. Always wrap them in `storeToRefs(store)` so the bindings stay live. Actions are the exception — they are already bound and can be destructured directly.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="reset-setup">
+    <AccordionTrigger>$reset does not work in setup stores</AccordionTrigger>
+    <AccordionContent>
+      `$reset()` relies on the `state` factory that only option stores provide. In a setup store, expose your own `reset()` action that reassigns each ref to its initial value.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="outside-setup">
+    <AccordionTrigger>Using a store outside setup too early</AccordionTrigger>
+    <AccordionContent>
+      Calling `useStore()` at the top level of a module (before `app.use(createPinia())` runs) throws "no active Pinia". In router guards or utilities, call the store hook inside the function body, not at import time.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Tip>
+Keep components thin: put fetching, validation, and business rules inside actions and expose derived data via getters. Components should mostly read reactive values and dispatch actions. For persistence across reloads, reach for the community plugin `pinia-plugin-persistedstate` instead of hand-writing `localStorage` logic in every store.
+</Tip>
+
 ---
 
 ## Next Steps
 
-<NextLesson title="Vue Router" description="Routing and guards." href="/roadmap/vue-fundamentals-intermediate-vue-router" />
+<NextLesson title="Vue Router" description="Wire up client-side routing, dynamic routes, and navigation guards that read from your Pinia stores." href="/roadmap/vue-fundamentals-intermediate-vue-router" />
 
-<Resources resources={[{"title":"Pinia","href":"https://pinia.vuejs.org/"}]} />
+<Resources
+  resources={[
+    { title: "Pinia — Official Docs", href: "https://pinia.vuejs.org/" },
+    { title: "Defining a Store", href: "https://pinia.vuejs.org/core-concepts/" },
+    { title: "State, Getters & Actions", href: "https://pinia.vuejs.org/core-concepts/state.html" },
+    { title: "storeToRefs API", href: "https://pinia.vuejs.org/api/modules/pinia.html#storetorefs" },
+  ]}
+/>

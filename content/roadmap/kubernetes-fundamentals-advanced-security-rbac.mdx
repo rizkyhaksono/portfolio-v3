@@ -5,7 +5,7 @@ course: "kubernetes-fundamentals"
 category: "devops"
 difficulty: "advanced"
 level: "advanced"
-duration: "26 min"
+duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
@@ -14,32 +14,224 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
-## Kubernetes Security
+## Kubernetes Security & RBAC
 
-<LearningObjectives objectives={["Apply least-privilege RBAC", "Mount secrets safely", "Enforce Pod Security Standards", "Rotate credentials regularly"]} />
+Every request that hits the Kubernetes API server — whether from `kubectl`, a controller, or a Pod running your application — passes through the same three gates: **authentication** (who are you?), **authorization** (are you allowed to do this?), and **admission control** (does this object meet cluster policy?). Role-Based Access Control (RBAC) is the authorization layer, and it is the single most important tool you have for containing the blast radius when a credential leaks or a workload is compromised. In a shared production cluster, a well-scoped RBAC policy is the difference between "one Pod was breached" and "the attacker read every Secret in the cluster." This lesson walks through the identity model, RBAC objects, Pod Security Standards, and secret handling that a real cluster needs.
+
+<LearningObjectives objectives={["Explain the authentication, authorization, and admission pipeline", "Grant least-privilege access with Roles, ClusterRoles, and their bindings", "Bind permissions to ServiceAccounts for in-cluster workloads", "Enforce Pod Security Standards with the built-in admission controller", "Handle Secrets safely with encryption at rest and external stores"]} />
+
+## The API request pipeline
+
+Understanding RBAC starts with knowing where it sits. When a request arrives, the API server resolves an identity, then checks authorization, then runs admission plugins before persisting anything to etcd.
+
+<Tabs defaultValue="authn">
+  <TabsList>
+    <TabsTrigger value="authn">Authentication</TabsTrigger>
+    <TabsTrigger value="authz">Authorization</TabsTrigger>
+    <TabsTrigger value="admission">Admission</TabsTrigger>
+  </TabsList>
+  <TabsContent value="authn">Verifies identity via client certificates, bearer tokens (including ServiceAccount tokens), or OIDC. Kubernetes has no `User` object — users are external identities the API server trusts.</TabsContent>
+  <TabsContent value="authz">RBAC evaluates whether the identity may perform the verb (`get`, `list`, `create`, `delete`) on the resource. Access is denied by default; a matching allow rule is required.</TabsContent>
+  <TabsContent value="admission">Mutating and validating webhooks (including Pod Security Admission) run last, enforcing policy such as blocking privileged containers before the object is stored.</TabsContent>
+</Tabs>
+
+<InfoCard>RBAC is purely additive — there are no "deny" rules. If no rule grants an action, it is denied. To remove access, remove or narrow the binding rather than trying to override it.</InfoCard>
+
+## Roles vs. ClusterRoles
+
+A **Role** holds a set of permissions scoped to a single namespace. A **ClusterRole** holds the same kind of rules but applies cluster-wide, and can also grant access to cluster-scoped resources (like `nodes` or `persistentvolumes`) and non-resource URLs (like `/healthz`).
 
 ```yaml
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
+  namespace: payments
   name: pod-reader
 rules:
-  - apiGroups: [""]
-    resources: ["pods"]
+  - apiGroups: [""]            # "" is the core API group
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
     verbs: ["get", "list"]
----
+```
+
+The `apiGroups`, `resources`, and `verbs` fields form the rule. The empty string `""` denotes the core group (pods, services, configmaps), while named groups like `apps` or `batch` cover higher-level objects. Subresources such as `pods/log` and `pods/exec` are addressed with a slash.
+
+<Warning>Avoid wildcard rules like `resources: ["*"]` and `verbs: ["*"]` outside of break-glass admin roles. A wildcard grant silently expands as new CRDs are installed, so a role that looked harmless can suddenly allow writing to a new resource type.</Warning>
+
+## Bindings: connecting identities to roles
+
+A rule grants nothing until a **binding** attaches it to a subject. A `RoleBinding` grants a Role (or a ClusterRole) *within one namespace*; a `ClusterRoleBinding` grants a ClusterRole *across the whole cluster*.
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: read-pods
+  namespace: payments
 subjects:
   - kind: ServiceAccount
     name: app-sa
+    namespace: payments
 roleRef:
   kind: Role
   name: pod-reader
   apiGroup: rbac.authorization.k8s.io
 ```
 
-<Warning>Never commit plain-text secrets to git — use Sealed Secrets or external secret operators.</Warning>
+A useful pattern is to define a reusable ClusterRole once and reference it from a RoleBinding in each namespace — the permissions then apply only to that namespace, not cluster-wide.
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="combos">
+    <AccordionTrigger>Which binding + role combinations are valid?</AccordionTrigger>
+    <AccordionContent>
+      RoleBinding + Role: permissions apply in the RoleBinding's namespace. RoleBinding + ClusterRole: the ClusterRole's rules apply, but only inside that namespace. ClusterRoleBinding + ClusterRole: permissions apply cluster-wide. A ClusterRoleBinding cannot reference a Role — cluster scope requires a ClusterRole.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## ServiceAccounts for workloads
+
+Human users authenticate with certificates or OIDC, but Pods authenticate as **ServiceAccounts**. Every Pod is assigned one (the namespace `default` SA if you do not specify), and a short-lived, auto-rotated token is mounted at `/var/run/secrets/kubernetes.io/serviceaccount/token` via a projected volume.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-sa
+  namespace: payments
+automountServiceAccountToken: false   # opt in per-Pod instead
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: payments
+spec:
+  selector:
+    matchLabels: { app: api }
+  template:
+    metadata:
+      labels: { app: api }
+    spec:
+      serviceAccountName: app-sa
+      automountServiceAccountToken: true   # only where the app calls the API
+      containers:
+        - name: api
+          image: registry.example.com/api:1.4.2
+```
+
+<Tip>Since Kubernetes 1.24, creating a ServiceAccount no longer generates a long-lived token Secret automatically. Tokens are issued through the TokenRequest API and are time-bound and audience-scoped, which is far safer than the old non-expiring tokens. Only mint a static token Secret if an external system genuinely cannot use projected tokens.</Tip>
+
+If a workload does not talk to the Kubernetes API, set `automountServiceAccountToken: false` so a compromised container has no token to replay against the API server.
+
+## Pod Security Standards
+
+RBAC controls *who can act on the API*; it does not stop a Pod from running as root or mounting the host filesystem. That is the job of **Pod Security Standards (PSS)**, enforced by the built-in **Pod Security Admission** controller (PodSecurityPolicy was removed in v1.25). PSS defines three levels — `privileged` (unrestricted), `baseline` (blocks known privilege escalations), and `restricted` (hardened best practice) — applied per namespace via labels.
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: payments
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: v1.30
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted
+```
+
+The `enforce` mode rejects non-compliant Pods, while `warn` and `audit` let you roll a policy out safely — surfacing violations to `kubectl` users and the audit log before you flip enforcement on. A `restricted` namespace requires Pods to drop capabilities, run as non-root, and disallow privilege escalation:
+
+```yaml
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+    - name: api
+      image: registry.example.com/api:1.4.2
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+```
+
+## Handling Secrets safely
+
+Kubernetes Secrets are only **base64-encoded, not encrypted**, and by default they are stored in plaintext in etcd. Anyone who can read the Secret object or the etcd datastore can read the value. Two controls matter most: encryption at rest and tight RBAC on `secrets`.
+
+```yaml
+# EncryptionConfiguration passed to the API server via --encryption-provider-config
+apiVersion: apiserver.config.k8s.io/v1
+kind: EncryptionConfiguration
+resources:
+  - resources: ["secrets"]
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: <base64-encoded-32-byte-key>
+      - identity: {}   # fallback so existing secrets still decrypt
+```
+
+For production, prefer a managed KMS provider (`kms` provider plugin) over a static local key, and keep secret *material* out of Git entirely.
+
+<Tabs defaultValue="sealed">
+  <TabsList>
+    <TabsTrigger value="sealed">Sealed Secrets</TabsTrigger>
+    <TabsTrigger value="eso">External Secrets</TabsTrigger>
+    <TabsTrigger value="vault">Vault Agent</TabsTrigger>
+  </TabsList>
+  <TabsContent value="sealed">Encrypt a Secret into a `SealedSecret` that is safe to commit; a cluster-side controller decrypts it back into a real Secret. Good for a GitOps-first workflow.</TabsContent>
+  <TabsContent value="eso">The External Secrets Operator syncs values from AWS Secrets Manager, GCP Secret Manager, or Vault into native Secrets, so the source of truth stays in your cloud vault.</TabsContent>
+  <TabsContent value="vault">HashiCorp Vault injects secrets directly into Pods via an init/sidecar agent, avoiding a Kubernetes Secret object altogether for the most sensitive material.</TabsContent>
+</Tabs>
+
+<Warning>Never commit plain-text secrets to Git. Anyone with read access to the repository — or its entire history — can extract them, and rotating a leaked credential is far harder than never exposing it. Use Sealed Secrets or an external secret operator instead.</Warning>
+
+## Auditing and testing permissions
+
+Before shipping an RBAC change, test it. `kubectl auth can-i` evaluates a subject's effective permissions without you having to reason through every binding by hand.
+
+```bash
+# Check what the app's ServiceAccount can do
+kubectl auth can-i list pods \
+  --as=system:serviceaccount:payments:app-sa -n payments   # -> yes
+
+kubectl auth can-i delete secrets \
+  --as=system:serviceaccount:payments:app-sa -n payments   # -> no
+
+# List everything a subject is allowed to do in a namespace
+kubectl auth can-i --list \
+  --as=system:serviceaccount:payments:app-sa -n payments
+```
+
+## Best Practices & Common Pitfalls
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="p1">
+    <AccordionTrigger>Binding cluster-admin to the default ServiceAccount</AccordionTrigger>
+    <AccordionContent>A frequent mistake in quick-start guides. It gives every Pod in the namespace (which use `default` unless told otherwise) full cluster control. Create a dedicated, minimally-scoped ServiceAccount per workload instead.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p2">
+    <AccordionTrigger>Forgetting that secret and configmap read grants are powerful</AccordionTrigger>
+    <AccordionContent>`get`/`list` on `secrets` exposes database passwords and tokens. Also note that `create` on `pods` can be escalated to read any Secret by mounting it — scope Pod-creation rights carefully.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p3">
+    <AccordionTrigger>Using ClusterRoleBindings when a RoleBinding suffices</AccordionTrigger>
+    <AccordionContent>A ClusterRoleBinding grants access in every namespace, present and future. If a team only needs access to their own namespace, bind the ClusterRole with a namespaced RoleBinding.</AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="p4">
+    <AccordionTrigger>Enforcing a restricted policy without a warm-up</AccordionTrigger>
+    <AccordionContent>Turning on `enforce: restricted` in a busy namespace can block deployments instantly. Start with `warn` and `audit`, fix the violations, then promote to `enforce`.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+<Tip>Audit RBAC regularly. Tools like `kubectl-who-can`, `rbac-lookup`, and `rakkess` reverse the question — "who can delete secrets?" — which is exactly what you need during an incident or a periodic access review.</Tip>
 
 ---
 
@@ -47,4 +239,4 @@ roleRef:
 
 <NextLesson title="GitOps & CI/CD" description="ArgoCD deployments." href="/roadmap/kubernetes-fundamentals-advanced-gitops-cicd" />
 
-<Resources resources={[{"title":"RBAC","href":"https://kubernetes.io/docs/reference/access-authn-authz/rbac/"}]} />
+<Resources resources={[{"title":"Using RBAC Authorization","href":"https://kubernetes.io/docs/reference/access-authn-authz/rbac/"},{"title":"Pod Security Standards","href":"https://kubernetes.io/docs/concepts/security/pod-security-standards/"},{"title":"Managing Service Accounts","href":"https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/"},{"title":"Encrypting Secret Data at Rest","href":"https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/"}]} />
