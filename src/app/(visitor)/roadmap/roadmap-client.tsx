@@ -2,7 +2,6 @@
 
 import { useRef, useMemo, useCallback, useState, useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { gsap } from "gsap"
 import { useGSAP } from "@gsap/react"
@@ -236,8 +235,11 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
           {/* Course Header Banner */}
           <div className="course-header relative overflow-hidden rounded-2xl border border-border bg-card">
             <div className="absolute inset-0 z-0">
-              <Image src={metadata.illustration} alt={metadata.title} fill sizes="100vw" unoptimized className="object-cover opacity-20" priority />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent" />
+              {/* Monochrome monogram — reliable, no external image */}
+              <span className="pointer-events-none absolute -right-4 -top-8 select-none font-display text-[10rem] font-black leading-none text-muted-foreground/10">
+                {metadata.title.charAt(0).toUpperCase()}
+              </span>
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/70 to-transparent" />
             </div>
             <div className="relative z-10 p-6 md:p-12 flex flex-col gap-3 md:gap-4">
               <div className="flex flex-wrap items-center gap-3">
@@ -514,16 +516,12 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                 tabIndex={0}
                 className="course-card group cursor-pointer rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden transition-all hover:shadow-xl hover:border-primary/50 flex flex-col h-full active:scale-[0.99]"
               >
-                <div className="h-40 sm:h-48 w-full relative overflow-hidden bg-muted">
-                  <Image
-                    src={meta.illustration}
-                    alt={meta.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                    unoptimized
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="h-40 sm:h-48 w-full relative overflow-hidden border-b border-border bg-secondary">
+                  {/* Monochrome monogram placeholder — reliable, no external image */}
+                  <span className="pointer-events-none absolute inset-0 flex select-none items-center justify-center font-display text-7xl font-black text-muted-foreground/15 transition-transform duration-700 ease-in-out group-hover:scale-105">
+                    {meta.title.charAt(0).toUpperCase()}
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
                   <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
                     <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-none shadow-sm uppercase text-[10px] tracking-wider">
                       {meta.category}

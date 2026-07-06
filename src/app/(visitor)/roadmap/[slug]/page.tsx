@@ -3,7 +3,6 @@ import { getRoadmapLessonBySlug, getAllRoadmapLessons } from "@/lib/mdx"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Clock, BookOpen, ArrowLeft, GraduationCap, Layers } from "lucide-react"
-import Image from "next/image"
 import { getMDXComponents } from "@/components/ui/roadmap-mdx-component"
 import { MDXRemote } from "next-mdx-remote/rsc"
 import Link from "next/link"
@@ -99,19 +98,8 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
             </Card>
           )}
 
-          {/* Illustration */}
-          {meta.illustration && !meta.video && (
-            <Card className="mb-8 overflow-hidden">
-              <CardContent className="p-0">
-                <div className="relative aspect-video w-full">
-                  <Image src={meta.illustration} alt={meta.title} fill className="object-cover" priority />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           {/* MDX Content */}
-          <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:border-b prose-h2:pb-2 prose-h2:mt-10 prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-8 prose-pre:bg-zinc-950 prose-pre:border prose-code:before:content-none prose-code:after:content-none">
+          <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:font-display prose-h2:border-b prose-h2:pb-3 prose-h2:mt-12 prose-h2:mb-5 prose-h3:text-xl prose-h3:font-semibold prose-h3:font-display prose-h3:mt-10 prose-h3:mb-4 prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border prose-code:before:content-none prose-code:after:content-none">
             <MDXRemote source={content} components={components} />
           </article>
 

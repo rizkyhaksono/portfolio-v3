@@ -82,7 +82,7 @@ const CodeSnippet = ({ children, language = "javascript" }: { children: React.Re
   const codeContent = typeof children === "string" ? children : String(children || "")
 
   return (
-    <div className="relative rounded-lg bg-zinc-950 dark:bg-zinc-900 overflow-hidden">
+    <div className="relative my-6 rounded-lg bg-zinc-950 dark:bg-zinc-900 overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800">
         <span className="text-xs text-zinc-400 font-mono">{language}</span>
       </div>
@@ -262,12 +262,14 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     MediaViewer,
     ImageViewer,
     VideoViewer,
-    Accordion,
+    // Block-level components get vertical rhythm so they don't sit tight against
+    // headings/prose (twMerge lets wrapper components override with their own margin).
+    Accordion: (props: React.ComponentProps<typeof Accordion>) => <Accordion {...props} className={cn("my-6", props.className)} />,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
     Author,
-    Card,
+    Card: (props: React.ComponentProps<typeof Card>) => <Card {...props} className={cn("my-6", props.className)} />,
     CardContent,
     CardDescription,
     CardFooter,
@@ -276,7 +278,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Alert,
     AlertDescription,
     AlertTitle,
-    Tabs,
+    Tabs: (props: React.ComponentProps<typeof Tabs>) => <Tabs {...props} className={cn("my-6", props.className)} />,
     TabsContent,
     TabsList,
     TabsTrigger,
