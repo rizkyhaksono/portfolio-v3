@@ -22,14 +22,14 @@ const WakatimeProgress = ({ data, className }: WakatimeProgressProps) => {
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="w-24">{name}</div>
-      <div className="relative flex h-3 flex-1 justify-center rounded-full bg-neutral-200 dark:bg-neutral-800">
+      <div className="relative flex h-3 flex-1 justify-center bg-secondary">
         <motion.span
           initial="initial"
           animate="animate"
           variants={progressVariants}
           className={cn(
             className,
-            "absolute left-0 top-0 h-3 rounded-full px-3"
+            "absolute left-0 top-0 h-3 px-3"
           )}
         >
           &ensp;

@@ -59,7 +59,7 @@ export async function GET(request: Request) {
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <span style={{ fontSize: 28, fontWeight: 700 }}>Rizky Haksono</span>
-            <span style={{ fontSize: 20, color: "#94a3b8" }}>Software Engineer</span>
+            <span style={{ fontSize: 20, color: "#94a3b8" }}>AI Engineer</span>
           </div>
           {label ? (
             <div

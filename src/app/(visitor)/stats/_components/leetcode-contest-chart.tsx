@@ -12,7 +12,7 @@ export default function LeetCodeContestChart({ data }: { data: LcContestPoint[] 
         <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(2, 7)} minTickGap={24} stroke="hsl(var(--muted-foreground))" />
         <YAxis tick={{ fontSize: 10 }} width={40} domain={["dataMin - 50", "dataMax + 50"]} stroke="hsl(var(--muted-foreground))" allowDecimals={false} />
         <Tooltip
-          contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 0, fontSize: 12 }}
           labelStyle={{ color: "hsl(var(--muted-foreground))" }}
           formatter={(value: number | string) => [value, "Rating"]}
         />

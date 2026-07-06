@@ -7,7 +7,7 @@ export interface Author {
 export const authors: Record<string, Author> = {
   rizky: {
     name: "Muhammad Rizky Haksono",
-    position: "Software Engineer",
+    position: "AI Engineer",
     avatar: "/rizky.jpg",
   },
   natee: {

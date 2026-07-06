@@ -22,7 +22,7 @@ export default function LazyBarChart({ chartData, title, onBarClick }: LazyBarCh
         <XAxis type="number" hide />
         <YAxis type="category" dataKey="name" width={100} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-        <Bar dataKey="value" radius={[0, 4, 4, 0]} fill="hsl(var(--primary))" onClick={onBarClick} cursor="pointer" />
+        <Bar dataKey="value" radius={[0, 0, 0, 0]} fill="hsl(var(--primary))" onClick={onBarClick} cursor="pointer" />
       </BarChart>
     </ChartContainer>
   )

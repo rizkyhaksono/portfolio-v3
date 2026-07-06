@@ -113,8 +113,8 @@ export default function LeetCodeSection({ stats }: { stats: Stats }) {
               {stats.topTags.slice(0, 8).map((t) => (
                 <div key={t.tagName} className="flex items-center gap-2">
                   <span className="w-28 shrink-0 truncate text-xs text-primary/80">{t.tagName}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted/50">
-                    <div className="h-full rounded-full bg-primary/70" style={{ width: `${(t.problemsSolved / maxTag) * 100}%` }} />
+                  <div className="h-2 flex-1 overflow-hidden bg-secondary">
+                    <div className="h-full bg-primary/70" style={{ width: `${(t.problemsSolved / maxTag) * 100}%` }} />
                   </div>
                   <span className="w-8 shrink-0 text-right text-xs text-muted-foreground">{t.problemsSolved}</span>
                 </div>
@@ -130,7 +130,7 @@ export default function LeetCodeSection({ stats }: { stats: Stats }) {
               <p className="mb-2 text-sm font-medium text-muted-foreground">Languages</p>
               <div className="flex flex-wrap gap-1.5">
                 {stats.languages.slice(0, 8).map((l) => (
-                  <span key={l.languageName} className="rounded-full border border-border/40 bg-secondary/30 px-2.5 py-1 text-xs">
+                  <span key={l.languageName} className="rounded-md border border-border/40 bg-secondary/30 px-2.5 py-1 text-xs">
                     {l.languageName} · {l.problemsSolved}
                   </span>
                 ))}

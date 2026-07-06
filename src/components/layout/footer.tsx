@@ -39,7 +39,7 @@ export default function Footer() {
         <div className="max-w-xs">
           <p className="font-display text-lg font-bold tracking-tight">Rizky Haksono</p>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground sm:text-sm">
-            Software engineer building web, mobile, cloud, and AI-driven products.
+            AI engineer building web, mobile, cloud, and AI-driven products.
           </p>
           <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground">
             © {year} Rizky Haksono

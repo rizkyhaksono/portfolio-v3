@@ -1,8 +1,8 @@
 export const MetadataConstants = {
   creator: "Muhammad Rizky Haksono",
   description:
-    "Muhammad Rizky Haksono is a software engineer who loves to build things.",
-  keyword: "Muhammad Rizky Haksono, developer, frontend, backend, software developer, UI/UX",
+    "Muhammad Rizky Haksono is an AI engineer who loves to build things.",
+  keyword: "Muhammad Rizky Haksono, AI Engineer, machine learning, LLM, RAG, developer, frontend, backend, UI/UX",
   authors: {
     name: "Muhammad Rizky Haksono",
     url: process.env.DOMAIN,

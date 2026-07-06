@@ -44,8 +44,8 @@ export function LazyAccuracyChart({ accuracyChartData, onBarClick }: LazyAccurac
         <XAxis dataKey="test" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
         <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} domain={[0, 100]} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} onClick={onBarClick} cursor="pointer" />
-        <Bar dataKey="consistency" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} onClick={onBarClick} cursor="pointer" />
+        <Bar dataKey="accuracy" fill="hsl(var(--primary))" radius={[0, 0, 0, 0]} onClick={onBarClick} cursor="pointer" />
+        <Bar dataKey="consistency" fill="hsl(var(--muted-foreground))" radius={[0, 0, 0, 0]} onClick={onBarClick} cursor="pointer" />
       </BarChart>
     </ChartContainer>
   )

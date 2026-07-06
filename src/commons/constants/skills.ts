@@ -41,6 +41,7 @@ export const skills_data: SkillCategory[] = [
       "Bootstrap",
       "Styled Components",
       "Mantine",
+      "Sass/SCSS",
       "Figma",
       "Framer Motion",
       "Responsive Design",
@@ -71,6 +72,7 @@ export const skills_data: SkillCategory[] = [
       "Bun",
       "Hapi.js",
       "Ruby on Rails",
+      "EJS",
       "RabbitMQ",
     ],
     icon: "Server",
@@ -193,6 +195,7 @@ export const skills_data: SkillCategory[] = [
   {
     name: "Data Science & AI",
     skills: [
+      "Jupyter Notebook",
       "NumPy",
       "Pandas",
       "Scikit-learn",
@@ -201,6 +204,8 @@ export const skills_data: SkillCategory[] = [
       "Keras",
       "OpenCV",
       "Matplotlib",
+      "Hugging Face",
+      "Transformers",
       "MCP",
       "Fastmcp",
       "Data Warehouse",

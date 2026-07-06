@@ -11,7 +11,7 @@ import { media_socials } from "@/commons/constants/contact"
 import { ArrowRight } from "lucide-react"
 import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
-const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
+const roles = ["AI Engineer", "Cloud Enthusiast", "DevOps Learner"]
 
 const HERO_STATS = [
   { label: "Focus", value: "AI Engineer" },
@@ -36,7 +36,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              Open to work · Software Engineer
+              Open to work · AI Engineer
             </Eyebrow>
           </div>
 

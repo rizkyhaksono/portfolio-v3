@@ -1,0 +1,47 @@
+---
+title: "Monochrome Redesign & AI Engineer Rebrand"
+description: "A clean square monochrome design system, self-hosted fonts, Gemini 3 upgrade, and hardened security."
+date: "2026-07-06"
+version: "1.4.0"
+author: "Rizky Haksono"
+---
+
+## Monochrome Redesign & AI Engineer Rebrand
+
+A full visual overhaul inspired by clean, editorial SaaS design — plus a title change to **AI Engineer**, a model upgrade, and a security pass.
+
+---
+
+### Design system
+
+<div className="my-4 flex flex-wrap gap-2">
+  <span className="border border-border bg-secondary px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Monochrome</span>
+  <span className="border border-border bg-secondary px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Square</span>
+  <span className="border border-border bg-secondary px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Self-hosted fonts</span>
+</div>
+
+- **Pure monochrome palette** for light and dark — dropped the accent colour entirely for a calm, high-contrast look.
+- **Square everything** — border-radius collapsed to `0` across cards, buttons, inputs, panels, and charts (circles kept only for avatars and status dots).
+- **New type system**: Bricolage Grotesque (display), Instrument Serif (italic accents), Inter (body), JetBrains Mono (labels) — now **self-hosted**, so builds never depend on the network.
+- **New primitives**: mono eyebrows, section headings, chips, stat strips, and a bento grid, rolled out across every page.
+- Custom square scrollbar and a proper multi-column footer.
+
+### AI Engineer
+
+- Rebranded the site to **AI Engineer** — title, metadata, Open Graph, and structured data.
+- Added AI/ML skills reflecting recent work: Jupyter, Hugging Face, Transformers, RAG, MCP, LangChain.
+
+### Etan AI — Gemini 3
+
+- Upgraded the assistant to **Gemini 3 Flash** and migrated embeddings to `gemini-embedding-001`.
+- Added free-tier quota protection: output caps, graceful rate-limit handling, and a daily budget for public endpoints.
+
+### Security
+
+- Brute-force rate limiting on login, signup, and password reset.
+- Generic login errors (no account enumeration) and blocked OAuth account-takeover paths.
+- Google-only sign-in across the site.
+
+### Fixes
+
+- Fixed a sidebar name flicker on refresh, a right-panel overflow, and dark-mode styling in the changelog.

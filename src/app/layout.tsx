@@ -46,7 +46,7 @@ const fontMono = localFont({
 const fontVariables = cn(fontSans.variable, fontDisplay.variable, fontSerif.variable, fontMono.variable)
 
 export const metadata: Metadata = {
-  title: "Rizky Haksono | Software Engineer",
+  title: "Rizky Haksono | AI Engineer",
   metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     url: MetadataConstants.openGraph.url,
   },
   openGraph: {
-    title: "Muhammad Rizky Haksono | Software Engineer",
+    title: "Muhammad Rizky Haksono | AI Engineer",
     images: MetadataConstants.profile,
     url: MetadataConstants.openGraph.url,
     siteName: MetadataConstants.openGraph.siteName,

@@ -11,7 +11,7 @@ export default function JsonLd() {
     "@type": "Person",
     name: MetadataConstants.creator,
     url: siteUrl,
-    jobTitle: "Software Engineer",
+    jobTitle: "AI Engineer",
     sameAs: [
       MetadataConstants.openGraph.url,
       "https://github.com/rizkyhaksono",
