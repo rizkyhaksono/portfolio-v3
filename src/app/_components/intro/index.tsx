@@ -14,7 +14,7 @@ import type { OwnerProfile } from "@/services/visitor/owner-profile"
 const roles = ["Software Engineer", "Full-Stack Developer", "Cloud Enthusiast", "DevOps Learner"]
 
 const HERO_STATS = [
-  { label: "Focus", value: "Full-Stack" },
+  { label: "Focus", value: "AI Engineer" },
   { label: "Stack", value: "TS · Go" },
   { label: "Cloud", value: "AWS · Azure" },
   { label: "Based in", value: "Malang, ID" },
