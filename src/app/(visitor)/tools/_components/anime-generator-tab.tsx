@@ -38,8 +38,13 @@ const ANIME_CATEGORIES: AnimeCategory[] = [
   { id: "dance", name: "Dance", description: "Dancing anime GIFs" },
 ]
 
+const HIDDEN_ANIME_CATEGORIES: AnimeType[] = ["waifu", "neko"]
+const VISIBLE_ANIME_CATEGORIES = ANIME_CATEGORIES.filter(
+  (c) => !HIDDEN_ANIME_CATEGORIES.includes(c.id)
+)
+
 export function AnimeGeneratorTab() {
-  const [selectedType, setSelectedType] = useState<AnimeType>("waifu")
+  const [selectedType, setSelectedType] = useState<AnimeType>("cringe")
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -166,8 +171,8 @@ export function AnimeGeneratorTab() {
             {/* Images Tab */}
             <TabsContent value="images" className="space-y-6 mt-6">
               {/* Category Selection */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {ANIME_CATEGORIES.map((category) => (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {VISIBLE_ANIME_CATEGORIES.map((category) => (
                   <Card
                     key={category.id}
                     className={`cursor-pointer transition-all hover:shadow-md ${selectedType === category.id ? "ring-2 ring-primary shadow-md" : "hover:ring-1 hover:ring-muted-foreground/20"}`}
