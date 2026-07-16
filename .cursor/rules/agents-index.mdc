@@ -1,0 +1,35 @@
+---
+description: Index of AI agent instruction files and UI docs for Portfolio v3.
+alwaysApply: true
+---
+
+# Agent Instructions Index
+
+Canonical entry: **`AGENTS.md`** (repo root).
+
+| Platform | File |
+|---|---|
+| All agents | `AGENTS.md` |
+| Claude | `CLAUDE.md` + `.claude/` |
+| Cursor | `.cursorrules` + `.cursor/rules/*.mdc` |
+| Gemini | `.geminirules` + `GEMINI.md` |
+| Copilot | `.github/copilot-instructions.md` |
+
+## UI documentation
+
+Human-readable design system (required reading for UI work):
+
+- `docs/ui/README.md` — index
+- `docs/ui/design-system.md` — tokens
+- `docs/ui/surfaces.md` — solid / glass / inset
+- `docs/ui/page-shell.md` — BaseLayout recipes
+- `docs/ui/components.md` — primitive catalog
+- `docs/ui/platforms.md` — visitor / user / admin / auth
+
+Enforced rule: `.cursor/rules/ui-layout-consistency.mdc`  
+Tokens: `src/lib/design-system.ts`
+
+## Progress tracking
+
+- Read `prd/feature.md` then `prd/progress.md` before feature work
+- Update `prd/progress.md` after completing tasks

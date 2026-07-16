@@ -445,12 +445,26 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create custom styles in `globals.css` only when necessary
 - Leverage Shadcn/ui components for consistency
 - Use CSS modules for scoped styles if needed: `styles.module.css`
+- **UI layout system:** monochrome, square, hairline borders — see [`docs/ui/README.md`](./docs/ui/README.md) and `src/lib/design-system.ts` (solid / glass / inset surfaces only)
 
 ### Error Handling
 
 - Use Zod for schema validation
 - Create typed error responses
 - Log errors to monitoring service (Sentry, etc.)
+
+## AI Agents & UI Docs
+
+Shared instructions for coding agents and the UI design system:
+
+| Resource | Path |
+|---|---|
+| Canonical agent instructions | [`AGENTS.md`](./AGENTS.md) |
+| Claude | [`CLAUDE.md`](./CLAUDE.md) |
+| Cursor | [`.cursorrules`](./.cursorrules) + `.cursor/rules/` |
+| Gemini | [`.geminirules`](./.geminirules) / [`GEMINI.md`](./GEMINI.md) |
+| Copilot | [`.github/copilot-instructions.md`](./.github/copilot-instructions.md) |
+| UI design system | [`docs/ui/README.md`](./docs/ui/README.md) |
 
 ## Troubleshooting
 
