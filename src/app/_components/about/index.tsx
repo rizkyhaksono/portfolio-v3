@@ -16,7 +16,7 @@ export default function AboutSection() {
           eyebrow="About"
           title="A little"
           accent="about me"
-          description="Experience in Software Development with skills in Web and Mobile Development. I am still an undergraduate and have experience related to web and mobile development as well as UI/UX design."
+          description="AI Engineer at Sarana AI building production LLM systems — RAG/embeddings, MCP integrations, and cloud-native agents on AWS. I ship end-to-end products with Next.js, Go, and Python that cut manual work and scale real business workflows. Informatics graduate from Universitas Muhammadiyah Malang (Cum Laude, 3.91/4.00)."
         />
         <div className="mt-6 flex flex-wrap gap-3">
           <Button asChild size="sm">

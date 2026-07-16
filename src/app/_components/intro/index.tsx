@@ -11,7 +11,7 @@ import { media_socials } from "@/commons/constants/contact"
 import { ArrowRight } from "lucide-react"
 import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
-const roles = ["AI Engineer", "Cloud Enthusiast", "DevOps Learner"]
+const roles = ["AI Engineer", "Cloud Enthusiast", "Full-Stack Builder"]
 
 const HERO_STATS = [
   { label: "Focus", value: "AI Engineer" },
@@ -59,8 +59,8 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           {/* Bio Text */}
           <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
             <p className="max-w-xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
-              Passionate about <span className="font-medium text-foreground">web, mobile, cloud, and DevOps development</span>. I build <Typography.Em>innovative</Typography.Em> solutions with{" "}
-              <span className="font-medium text-foreground">React, Next.js, TypeScript</span>, and more — focused on high-performance applications and clean CI/CD pipelines.
+              Building production AI systems — <span className="font-medium text-foreground">LLMs, RAG, and MCP</span> — backed by full-stack and cloud engineering. At Sarana AI I ship scalable agents and data platforms with{" "}
+              <span className="font-medium text-foreground">Python, AWS, Next.js, and Go</span>, focused on reliable CI/CD and <Typography.Em>measurable</Typography.Em> impact.
             </p>
           </div>
 
