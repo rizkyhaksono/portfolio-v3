@@ -1,17 +1,19 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { SURFACE } from "@/lib/design-system"
 
+/**
+ * Default solid content box. Do not override with glass classes
+ * (`bg-white/5`, `backdrop-blur-md`, `border-white/10`) — use MacWindow / Surface variant="glass" for chrome.
+ */
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-colors",
-      className
-    )}
+    className={cn(SURFACE.solid, className)}
     {...props}
   />
 ))

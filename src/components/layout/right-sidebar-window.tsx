@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { X, PanelRightOpen } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { SURFACE } from "@/lib/design-system"
 
 const STORAGE_KEY = "rh:right-sidebar-open"
 
@@ -52,7 +54,7 @@ export default function RightSidebarWindow({ children, defaultOpen = true }: Rea
 
   return (
     <div className="hidden lg:flex lg:w-64 xl:w-72 flex-col sticky top-16 h-[calc(100vh-4rem)]">
-      <div className="flex max-h-full flex-col overflow-hidden rounded-xl border border-border/60 bg-background/40 shadow-sm backdrop-blur-sm">
+      <div className={cn("flex max-h-full flex-col overflow-hidden", SURFACE.glass, "rounded-xl")}>
         {/* mac title bar */}
         <div className="flex shrink-0 items-center justify-between border-b border-border/60 bg-muted/40 px-3 py-2">
           <div className="flex items-center gap-1.5">

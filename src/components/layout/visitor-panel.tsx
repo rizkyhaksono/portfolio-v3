@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Typography from "@/components/ui/typography"
+import { Surface } from "@/components/ui/surface"
 import { MdWifi as IpIcon, MdLocationOn, MdDevices } from "react-icons/md"
 import { BiCalendar, BiGlobe } from "react-icons/bi"
 import { getBrowserInfo, getWeatherEmoji } from "@/commons/constants/sidebar"
@@ -77,10 +78,9 @@ export default function VisitorPanel() {
 
   return (
     <>
-      {/* Visitor Info */}
-      <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+      <Surface variant="inset" padding="compact">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
           <Typography.P className="text-sm font-semibold text-primary/80">Visitor Info</Typography.P>
         </div>
 
@@ -91,7 +91,7 @@ export default function VisitorPanel() {
               <Typography.P className="text-xs text-primary/70">IP Address</Typography.P>
             </div>
             <div className="overflow-hidden bg-secondary/30 px-2 py-1">
-              <Typography.P className="break-all text-xs font-mono text-primary/90">{ipInfo?.ip ?? "Detecting…"}</Typography.P>
+              <Typography.P className="break-all font-mono text-xs text-primary/90">{ipInfo?.ip ?? "Detecting…"}</Typography.P>
             </div>
           </div>
 
@@ -100,8 +100,8 @@ export default function VisitorPanel() {
               <MdDevices size={14} className="text-primary/60" />
               <Typography.P className="text-xs text-primary/70">Browser</Typography.P>
             </div>
-            <div className="bg-secondary/30 rounded px-2 py-1">
-              <Typography.P className="text-xs text-primary/90 truncate">{ua ? getBrowserInfo(ua) : "Detecting…"}</Typography.P>
+            <div className="bg-secondary/30 px-2 py-1">
+              <Typography.P className="truncate text-xs text-primary/90">{ua ? getBrowserInfo(ua) : "Detecting…"}</Typography.P>
             </div>
           </div>
 
@@ -110,17 +110,16 @@ export default function VisitorPanel() {
               <MdLocationOn size={14} className="text-primary/60" />
               <Typography.P className="text-xs text-primary/70">Location</Typography.P>
             </div>
-            <div className="bg-secondary/30 rounded px-2 py-1">
+            <div className="bg-secondary/30 px-2 py-1">
               <Typography.P className="text-xs text-primary/90">{locationLabel}</Typography.P>
             </div>
           </div>
         </div>
-      </div>
+      </Surface>
 
-      {/* Status */}
-      <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-2 h-2 rounded-full bg-green-500" />
+      <Surface variant="inset" padding="compact">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-green-500" />
           <Typography.P className="text-sm font-semibold text-primary/80">Status</Typography.P>
         </div>
 
@@ -135,15 +134,14 @@ export default function VisitorPanel() {
           </div>
         </div>
 
-        <div className="mt-3 p-2 bg-green-500/10 rounded-lg border border-green-500/20">
-          <Typography.P className="text-xs text-green-600 dark:text-green-400">🚀 Open to opportunities</Typography.P>
+        <div className="mt-3 rounded-lg border border-green-500/20 bg-green-500/10 p-2">
+          <Typography.P className="text-xs text-green-600 dark:text-green-400">Open to opportunities</Typography.P>
         </div>
-      </div>
+      </Surface>
 
-      {/* Weather */}
-      <div className="bg-secondary/20 rounded-lg p-4 border border-border/30">
-        <div className="flex items-center gap-2 mb-3">
-          <BiGlobe size={16} className="text-orange-500" />
+      <Surface variant="inset" padding="compact">
+        <div className="mb-3 flex items-center gap-2">
+          <BiGlobe size={16} className="text-muted-foreground" />
           <Typography.P className="text-sm font-semibold text-primary/80">Weather</Typography.P>
         </div>
 
@@ -157,7 +155,7 @@ export default function VisitorPanel() {
               </div>
             </div>
             <div className="text-right">
-              <Typography.P className="text-xs text-primary/70 capitalize">{cond?.description ?? "Unknown"}</Typography.P>
+              <Typography.P className="text-xs capitalize text-primary/70">{cond?.description ?? "Unknown"}</Typography.P>
               <Typography.P className="text-xs text-primary/60">{feelsLike !== null ? `Feels like ${feelsLike}°` : ""}</Typography.P>
               {weather.main?.humidity != null && <Typography.P className="text-xs text-primary/60">Humidity {weather.main.humidity}%</Typography.P>}
             </div>
@@ -167,7 +165,7 @@ export default function VisitorPanel() {
             <Typography.P className="text-xs text-primary/60">Detecting your local weather…</Typography.P>
           </div>
         )}
-      </div>
+      </Surface>
     </>
   )
 }

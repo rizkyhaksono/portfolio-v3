@@ -40,7 +40,7 @@ const ProfilePage = async () => {
   const profile = await getProfile()
 
   return (
-    <div className="flex flex-col gap-4 max-w-8xl mx-auto">
+    <div className="mx-auto flex w-full flex-col gap-4">
       <Suspense fallback={<ProfileSkeleton />}>
         <ProfileHeader profile={profile.data} />
       </Suspense>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Surface } from "@/components/ui/surface"
 import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { Loader2, Mail, ExternalLink, Check, Archive, Inbox } from "lucide-react"
 
@@ -72,7 +73,7 @@ export default function FeedbackAdminPage() {
       ) : (
         <div className="space-y-3">
           {items.map((f) => (
-            <div key={f.id} className="rounded-xl border border-border/50 bg-card p-4">
+            <Surface key={f.id} variant="solid" padding="compact">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary" className="capitalize">{f.category}</Badge>
                 <Badge variant={f.status === "new" ? "default" : "outline"} className="capitalize">{f.status}</Badge>
@@ -105,7 +106,7 @@ export default function FeedbackAdminPage() {
                   </Button>
                 )}
               </div>
-            </div>
+            </Surface>
           ))}
         </div>
       )}

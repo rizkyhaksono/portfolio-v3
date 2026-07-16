@@ -29,6 +29,20 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
    - Maintain mobile-first responsive design.
 6. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. Do not write superfluous comments. Let variables and function names document themselves.
 
+## UI Layout Consistency (mandatory)
+
+Monochrome, square, hairline borders. See `.cursor/rules/ui-layout-consistency.mdc` and `src/lib/design-system.ts`.
+
+Surfaces (only three):
+
+- solid → `Card` / `FeatureCard` / `Surface`
+- glass → `MacWindow` (chrome only)
+- inset → `Surface variant="inset"`
+
+Page shell: `BaseLayout` → `PageBody` → `SectionHeading` → content.
+
+Never invent glass content cards or extra padding inside BaseLayout. Prefer `PageSection` for `mt-10` blocks.
+
 ## Development Workflow
 
 - When asked to add or modify a feature, ensure you analyze existing architecture and patterns before writing code.

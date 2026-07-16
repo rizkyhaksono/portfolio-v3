@@ -1,117 +1,46 @@
-# {{Project Name}} - Progress Tracker
+# Portfolio v3 — UI Layout Consistency
 
-*Last Updated: {{date}} (Brief update note)*
-
----
-
-## 🎯 Project Overview
-**Goal:** {{Project goal and purpose}}
-**Timeline:** {{Timeline with key milestones}}
-**Success Criteria:** {{Measurable success criteria}}
+*Last Updated: 2026-07-16 — Unified surface dialects + AI rules*
 
 ---
 
-## 📊 Progress Summary
-
-### Overall Status: {{X}}% Complete
-- **{{Milestone 1}}**: ✅ **COMPLETED** - {{Brief accomplishment}}
-- **{{Milestone 2}}**: {{Status}} - {{Brief accomplishment}}
-- **{{Milestone 3}}**: {{Status}} - {{Brief accomplishment}}
+## Project Overview
+**Goal:** Make every visitor/user/admin content box use the same layout language (solid / glass / inset), and lock the pattern into Cursor/Claude/Gemini/Copilot rules so future work stays consistent.
+**Success Criteria:** No glass content cards; shared primitives used; AI instruction files document the system.
 
 ---
 
-## 🏗️ Feature Implementation Status
+## Progress Summary
 
-### ✅ **COMPLETED** Features
-
-#### {{Feature Category 1}}
-- ✅ **{{Sub-feature}}** - {{Implementation status}}
-  - {{Technical details}}
-  - {{Key components}}
-
-#### {{Feature Category 2}}
-- ✅ **{{Sub-feature}}** - {{Implementation status}}
-  - {{Technical details}}
-  - {{Key components}}
-
-### 🚧 **IN PROGRESS** Features
-
-#### {{Feature Category}}
-- ⏳ **{{Sub-feature}}** - {{Current status}}
-  - {{What's working}}
-  - {{Remaining work}}
-
-### 📋 **TODO** Features
-
-#### {{Feature Category}}
-- ❌ **{{Sub-feature}}** - {{Priority level}}
-  - {{Requirements}}
-  - {{Dependencies}}
+### Overall Status: 90% Complete
+- **Audit**: COMPLETED — mapped surface dialects and page-shell drift
+- **Primitives**: COMPLETED — `SURFACE` tokens, `Surface`, `PageSection`, `PageBody`, `MacWindow.backdrop`
+- **Migrations**: COMPLETED — glass stats/contrib cards → solid; education/visitor-panel/status/feedback → Surface; media card hover unified
+- **Rules**: COMPLETED — `.cursor/rules/ui-layout-consistency.mdc` + synced AI instruction files
+- **Remaining**: Optional — move stats/roadmap BaseLayout into `layout.tsx`; restyle legal/changelog onto BaseLayout; Signal stays outlier
 
 ---
 
-## 🔧 Technical Implementation Notes
+## Feature Implementation Status
 
-### Key Code Locations
-- **{{Feature}}:** {{File paths}}
-- **{{Integration}}:** {{File paths}}
-- **{{Utility}}:** {{File paths}}
+### COMPLETED
+- Design tokens module: `src/lib/design-system.ts`
+- Primitives: `surface.tsx`, `page-section.tsx`, `page-body.tsx`
+- BaseLayout: removed double horizontal padding
+- MacWindow: `backdrop` prop; tracker uses it instead of duplicated chrome
+- Migrated glass → solid: site-stats, duolingo, monkeytype, spotify
+- Migrated ad-hoc boxes → Surface: education, visitor-panel, status rows, leetcode section, admin feedback, stats PlatformCard
+- Media cards: blog / blog-medium / project hover → `hover:border-foreground/20`
+- Rules: Cursor / Claude / Gemini / Copilot / nextjs-development.mdc
 
-### Environment Variables Required
-- {{Environment variable}} - {{Status}}
-- {{Environment variable}} - {{Status}}
-- {{Environment variable}} - {{Status}}
-
----
-
-## 🎯 Demo/Testing Requirements
-
-### Target Demo Sequence
-1. {{Step 1}}
-2. {{Step 2}}
-3. {{Step 3}}
-4. {{Step 4}}
-
-### Success Metrics
-- ✅ **{{Metric 1}}** - {{Status}}
-- ⏳ **{{Metric 2}}** - {{Status}}
-- ❌ **{{Metric 3}}** - {{Status}}
+### TODO (non-blocking)
+- Route hygiene: stats/roadmap BaseLayout placement
+- Legal + changelog join BaseLayout or documented StandaloneLayout
+- Home sections gradually adopt `PageSection`
 
 ---
 
-## 🧱 Productionization TODO Backlog
-
-### High Priority (Post-Demo/MVP)
-- **{{Task category}}**
-  - {{Specific task}}
-  - {{Specific task}}
-  - {{Specific task}}
-
-### Medium Priority (Post-MVP)
-- **{{Task category}}**
-  - {{Specific task}}
-  - {{Specific task}}
-
-### Lower Priority (Scale)
-- **{{Task category}}**
-  - {{Specific task}}
-  - {{Specific task}}
-
----
-
-## 🧠 Development Notes
-
-### Architecture Decisions Made
-- **{{Decision}}:** {{Rationale}}
-- **{{Decision}}:** {{Rationale}}
-
-### Recent Technical Challenges
-- **{{Challenge}}:** {{Solution approach}}
-- **{{Challenge}}:** {{Solution approach}}
-
-### Testing Strategy
-- {{Testing approach}}
-- {{Testing coverage status}}
-- {{Critical test cases}}
-
----
+## Key Code Locations
+- Tokens: `src/lib/design-system.ts`
+- Primitives: `src/components/ui/surface.tsx`, `page-section.tsx`, `page-body.tsx`, `mac-window.tsx`
+- Rule: `.cursor/rules/ui-layout-consistency.mdc`

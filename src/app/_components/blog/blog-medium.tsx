@@ -30,8 +30,8 @@ export default function CardBlogMedium({
   const descriptionPreview = cleanDescription.slice(0, 100) + (cleanDescription.length > 200 ? "..." : "")
 
   return (
-    <Card className="group flex flex-col overflow-hidden rounded-xl hover:border-primary/40 hover:bg-secondary/40 hover:shadow-md transition-all duration-500 ease-out h-full">
-      <Link href={href} className="block overflow-hidden flex-1" target="_blank">
+    <Card className="group flex h-full flex-col overflow-hidden transition-colors hover:border-foreground/20">
+      <Link href={href} className="block flex-1 overflow-hidden" target="_blank">
         {imageUrl && (
           <div className="relative h-48 w-full overflow-hidden bg-secondary">
             <Image src={imageUrl} alt={title} fill className="object-cover object-top transition-transform duration-700 ease-in-out group-hover:scale-105" draggable={false} loading="lazy" />

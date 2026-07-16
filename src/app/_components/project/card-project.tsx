@@ -27,7 +27,7 @@ export default function CardProject({
   const hasImage = !!image && image !== "/no-image.jpg"
 
   return (
-    <Card className="group flex flex-col overflow-hidden rounded-xl border border-border hover:border-primary/40 bg-card shadow-sm hover:shadow-md transition-all duration-500 ease-out h-full">
+    <Card className="group flex h-full flex-col overflow-hidden transition-colors hover:border-foreground/20">
       <Link href={`/project/${id}`} className="block overflow-hidden">
         {hasImage ? (
           <div className="relative h-44 w-full overflow-hidden bg-muted">
@@ -49,7 +49,7 @@ export default function CardProject({
         )}
         <CardHeader className="p-4 pb-2">
           <div className="space-y-1.5">
-            <CardTitle className="font-display text-base sm:text-lg font-bold tracking-tight transition-colors group-hover:text-primary line-clamp-2">{title}</CardTitle>
+            <CardTitle className="line-clamp-2 font-display text-base font-bold tracking-tight transition-colors group-hover:text-primary sm:text-lg">{title}</CardTitle>
             <div className="prose max-w-full text-pretty font-sans text-xs sm:text-sm text-muted-foreground dark:prose-invert line-clamp-2 leading-snug" dangerouslySetInnerHTML={{ __html: description }} />
           </div>
         </CardHeader>

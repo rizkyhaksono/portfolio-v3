@@ -4,7 +4,7 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 ## Core Directives
 
-1. **Always refer to the specific rules in `.cursor/rules/*.mdc`** for detailed, up-to-date guidelines on Next.js development, project management, and unit testing within this project.
+1. **Always refer to the specific rules in `.cursor/rules/*.mdc`** for detailed, up-to-date guidelines (Next.js, project management, unit testing, **UI layout consistency**).
 2. Note that this project uses multiple AI assistants. For AI-specific instructions, refer to their respective configurations:
    - **Cursor**: `.cursor/rules/*.mdc`
    - **Claude**: `CLAUDE.md` and `.claude/` directory
@@ -17,5 +17,21 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 - **React Server Components (RSC):** Default to Server Components. Add `'use client'` only when hook/state/browser interactivity is necessary.
 - **Components:** Avoid inline styling. Rely wholly on Tailwind UI utilities and `cn()` from `@/lib/utils`.
-- **Architecture:** `app/` is for routes and layouts. `components/ui/` is for resuable Shadcn widgets. `components/[feature]/` handles localized logic. Extricate reusable hook logic out to `lib/` or `hooks/`.
+- **Architecture:** `app/` is for routes and layouts. `components/ui/` is for reusable Shadcn widgets. `components/[feature]/` handles localized logic. Extricate reusable hook logic out to `lib/` or `hooks/`.
 - **Quality:** Keep functions modular, readable, and typed. Do not rely on `any`.
+
+## UI Layout (mandatory)
+
+Monochrome, square, hairline borders. Three surface dialects only — see `.cursor/rules/ui-layout-consistency.mdc` and `src/lib/design-system.ts`:
+
+| Dialect | Primitive | Use |
+|---|---|---|
+| solid | `Card` / `FeatureCard` / `Surface` | Content boxes |
+| glass | `MacWindow` / `Surface variant="glass"` | Window chrome only |
+| inset | `Surface variant="inset"` | Nested rows / sidebar blocks |
+
+- Page shell: `BaseLayout` → `PageBody` → `SectionHeading` → content
+- Sections: `PageSection` (`mt-10` rhythm)
+- Never invent glass content cards (`bg-white/5`, `backdrop-blur-md`, lift shadows)
+- Prefer semantic color tokens; ban `neutral-*` / raw hex for UI chrome
+- Do not add extra `px-*` inside BaseLayout (container already pads)

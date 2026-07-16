@@ -1,0 +1,86 @@
+---
+description: UI layout & surface design system for Portfolio v3. Enforce consistent boxes, sections, and page shells.
+globs: ["src/**/*.{tsx,ts,css}", "tailwind.config.ts"]
+alwaysApply: true
+---
+
+# UI Layout & Surface Consistency
+
+Portfolio v3 uses a **monochrome, square, hairline-border** design language. Keep every new UI on this system.
+
+## Tokens (source of truth)
+
+- CSS variables in `src/app/globals.css` (semantic colors only: `background`, `foreground`, `card`, `border`, `muted`, `primary`, …)
+- Radius: all named radii collapse to `0` in `tailwind.config.ts` (square). Keep `rounded-full` only for avatars/dots.
+- Shared class tokens: `src/lib/design-system.ts` (`SURFACE`, `PAGE_WIDTH`, `SECTION_SPACING`)
+
+**Never** use raw palette classes like `neutral-*`, `text-black`, hex hovers (`#262626`, `#D9D9D9`), or `border-white/10` glass stacks on content cards.
+
+## Three surface dialects only
+
+| Variant | Use for | Primitive |
+|---|---|---|
+| **solid** | Content boxes, lists, feature/platform cards | `Card`, `FeatureCard`, `Surface variant="solid"` |
+| **glass** | Window chrome only (title bar + frosted shell) | `MacWindow`, `Surface variant="glass"` / `glass-static` |
+| **inset** | Nested rows, sidebar blocks, status cells | `Surface variant="inset"` |
+
+### Forbidden on content cards
+
+Do **not** invent glass content cards:
+
+```
+border-white/10 bg-white/5 backdrop-blur-md hover:shadow-xl hover:-translate-y-1
+```
+
+Use solid + `hover:border-foreground/20` instead.
+
+## Page shell recipe (visitor / user)
+
+```
+BaseLayout(sidebar?, rightSidebar?)
+  └─ PageBody width="default" | "prose" | "article" | "wide"
+       └─ SectionHeading (as="h1" on page routes)
+       └─ MacWindow? (tools / lists) OR Card / FeatureCard / Surface rows
+```
+
+- Prefer `PageSection` for home/page blocks (`mt-10` + optional `SectionHeading`).
+- Prefer `PageBody` for width — do **not** stack extra `px-4 lg:px-0` inside BaseLayout (container already pads).
+- Do not invent `max-w-8xl` (undefined). Use `PAGE_WIDTH` presets.
+
+## Heading & micro-UI
+
+- Section titles: always `SectionHeading` (eyebrow + display title + optional serif italic accent).
+- Labels/tags: `Eyebrow`, `Chip`.
+- Stat rows: `StatStrip`.
+
+## Media / list cards
+
+Blog and project cards share the solid Card pattern:
+
+- `hover:border-foreground/20` (not `hover:border-primary/40` + lift shadows)
+- Footer: `p-4 … border-t border-border`
+- Do not restate `border border-border bg-card shadow-sm` on Card (already defaults)
+
+## MacWindow
+
+- Default body pad: `p-4 sm:p-6`
+- Drag-and-drop pages (tracker): `backdrop={false}` — do **not** copy-paste Mac chrome markup
+- Glass is for chrome only; put solid cards *inside* the window
+
+## Admin shell
+
+Admin keeps its own sidebar/header layout, but still uses solid `Card` / `Surface` / `SectionHeading` — no third card dialect (`border-border/50` raw divs → `Surface` or `Card`).
+
+## Outliers (do not copy)
+
+- `/signal` — standalone marketing experiment
+- `terminal-overlay` — intentional dark terminal chrome
+
+## Checklist before shipping UI
+
+- [ ] Used `Card` / `FeatureCard` / `Surface` / `MacWindow` — no ad-hoc bordered box
+- [ ] No glass classes on content cards
+- [ ] No extra horizontal padding inside BaseLayout
+- [ ] Width via `PageBody` when a max-width is needed
+- [ ] Section titles via `SectionHeading`
+- [ ] Colors from semantic tokens only

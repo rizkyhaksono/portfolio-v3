@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { getHealth, type HealthData, type HealthService, type ServiceStatus } from "@/services/visitor/health"
 import { MacWindow } from "@/components/ui/mac-window"
 import { SectionHeading } from "@/components/ui/section-heading"
+import { Surface } from "@/components/ui/surface"
 import { cn } from "@/lib/utils"
 import { Activity, RefreshCw, Loader2 } from "lucide-react"
 
@@ -42,7 +43,7 @@ export default function StatusPage() {
   const allUp = overall === "operational" && services.every((s) => s.status === "operational")
 
   return (
-    <div className="w-full px-4 lg:px-0">
+    <div className="w-full">
       <SectionHeading
         as="h1"
         className="mb-6"
@@ -80,7 +81,7 @@ export default function StatusPage() {
 
         <div className="space-y-2">
           {services.map((s) => (
-            <div key={s.name} className="flex items-center justify-between rounded-lg border border-border/40 bg-secondary/20 px-4 py-3">
+            <Surface key={s.name} variant="inset" className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-3">
                 <span className={cn("h-2.5 w-2.5 rounded-full", DOT[s.status])} />
                 <div className="leading-tight">
@@ -94,7 +95,7 @@ export default function StatusPage() {
                   {LABEL[s.status]}
                 </span>
               </div>
-            </div>
+            </Surface>
           ))}
         </div>
 

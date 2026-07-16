@@ -86,7 +86,7 @@ export function PokemonTab() {
         {loading
           ? Array.from({ length: 12 }).map((_, i) => <div key={i} className="h-36 animate-pulse rounded-xl bg-muted" />)
           : cards.map((p) => (
-              <button key={p.id} onClick={() => openDetail(p.id)} className="group rounded-xl border border-muted/40 bg-card p-3 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-md">
+              <button key={p.id} onClick={() => openDetail(p.id)} className="group rounded-xl border border-border bg-card p-3 text-center shadow-sm transition-colors hover:border-foreground/20">
                 <div className="relative mx-auto h-20 w-20">
                   {p.image ? <Image src={p.image} alt={p.name} fill className="object-contain transition-transform group-hover:scale-110" unoptimized /> : null}
                 </div>

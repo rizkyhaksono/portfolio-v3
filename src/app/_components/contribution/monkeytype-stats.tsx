@@ -36,7 +36,7 @@ function formatTime(seconds: number): string {
 
 function StatCard({ icon: Icon, label, value, subValue, trend }: { icon: React.ElementType; label: string; value: string | number; subValue?: string; trend?: string }) {
   return (
-    <Card className="relative overflow-hidden group border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md hover:bg-white/10 dark:hover:bg-neutral-800/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <Card className="relative overflow-hidden group hover:border-foreground/20">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
@@ -135,7 +135,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
       {/* Charts - Lazy loaded */}
       {wpmChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+          <Card className="hover:border-foreground/20">
             <CardHeader className="pb-3 pt-4 px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-primary/10">
@@ -151,7 +151,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+          <Card className="hover:border-foreground/20">
             <CardHeader className="pb-3 pt-4 px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-primary/10">
