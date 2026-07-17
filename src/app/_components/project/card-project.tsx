@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react"
+import type { CSSProperties, ReactNode } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -29,6 +29,15 @@ function ProjectCoverImage({ src, alt }: Readonly<{ src: string; alt: string }>)
   )
 }
 
+/** Icon badge used on the placeholder cover. */
+function ProjectPlaceholderBadge() {
+  return (
+    <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-background/60 shadow-sm backdrop-blur-sm transition-transform duration-500 group-hover:scale-110">
+      <FolderGit2 className="h-7 w-7 text-primary/70" />
+    </div>
+  )
+}
+
 /** Placeholder cover when a project has no image. */
 function ProjectCoverPlaceholder({ title }: Readonly<{ title: string }>) {
   return (
@@ -38,35 +47,55 @@ function ProjectCoverPlaceholder({ title }: Readonly<{ title: string }>) {
         {title.charAt(0).toUpperCase()}
       </span>
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-background/60 shadow-sm backdrop-blur-sm transition-transform duration-500 group-hover:scale-110">
-          <FolderGit2 className="h-7 w-7 text-primary/70" />
-        </div>
+        <ProjectPlaceholderBadge />
       </div>
     </div>
   )
 }
 
-/** Footer action buttons for website / source links. */
-function ProjectActions({ href, source }: Readonly<{ href?: string; source?: string }>) {
+/** Title + description block for a project card. */
+function ProjectCardHeader({ title, description }: Readonly<{ title: string; description: string }>) {
   return (
-    <div className="flex flex-row flex-wrap items-center gap-2">
-      {href && href.length > 0 && (
-        <Link href={href} target="_blank">
-          <Button size="sm" variant="secondary" className="h-8 gap-1.5 rounded-md transition-colors hover:bg-primary hover:text-primary-foreground">
-            <Globe className="size-3.5" />
-            <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Website</span>
-          </Button>
-        </Link>
-      )}
-      {source && source.length > 0 && (
-        <Link href={source} target="_blank">
-          <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-md transition-colors hover:bg-primary/10">
-            <GitBranch className="size-3.5" />
-            <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Source</span>
-          </Button>
-        </Link>
-      )}
-    </div>
+    <CardHeader className="space-y-1.5 p-4 pb-2">
+      <CardTitle className="line-clamp-2 font-display text-base font-bold tracking-tight transition-colors group-hover:text-primary sm:text-lg">{title}</CardTitle>
+      <div className="prose max-w-full text-pretty font-sans text-xs leading-snug text-muted-foreground sm:text-sm dark:prose-invert line-clamp-2" dangerouslySetInnerHTML={{ __html: description }} />
+    </CardHeader>
+  )
+}
+
+/** Website action button. */
+function WebsiteAction({ href }: Readonly<{ href: string }>) {
+  return (
+    <Link href={href} target="_blank">
+      <Button size="sm" variant="secondary" className="h-8 gap-1.5 rounded-md transition-colors hover:bg-primary hover:text-primary-foreground">
+        <Globe className="size-3.5" />
+        <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Website</span>
+      </Button>
+    </Link>
+  )
+}
+
+/** Source action button. */
+function SourceAction({ source }: Readonly<{ source: string }>) {
+  return (
+    <Link href={source} target="_blank">
+      <Button size="sm" variant="outline" className="h-8 gap-1.5 rounded-md transition-colors hover:bg-primary/10">
+        <GitBranch className="size-3.5" />
+        <span className="font-mono text-[10px] font-medium uppercase tracking-wider">Source</span>
+      </Button>
+    </Link>
+  )
+}
+
+/** Footer action row for website / source links. */
+function ProjectCardFooter({ href, source }: Readonly<{ href?: string; source?: string }>) {
+  return (
+    <CardFooter className="mt-auto border-t border-border p-4 pt-4">
+      <div className="flex flex-row flex-wrap items-center gap-2">
+        {href && href.length > 0 ? <WebsiteAction href={href} /> : null}
+        {source && source.length > 0 ? <SourceAction source={source} /> : null}
+      </div>
+    </CardFooter>
   )
 }
 
@@ -75,21 +104,15 @@ function ProjectActions({ href, source }: Readonly<{ href?: string; source?: str
  */
 export default function CardProject({ id, title, description, source, image, href }: Readonly<CardProjectProps>) {
   const hasImage = Boolean(image) && image !== "/no-image.jpg"
+  const cover: ReactNode = hasImage && image ? <ProjectCoverImage src={image} alt={title} /> : <ProjectCoverPlaceholder title={title} />
 
   return (
     <Card className="group flex h-full flex-col overflow-hidden transition-colors hover:border-foreground/20">
       <Link href={`/project/${id}`} className="block overflow-hidden">
-        {hasImage ? <ProjectCoverImage src={image!} alt={title} /> : <ProjectCoverPlaceholder title={title} />}
-        <CardHeader className="p-4 pb-2">
-          <div className="space-y-1.5">
-            <CardTitle className="line-clamp-2 font-display text-base font-bold tracking-tight transition-colors group-hover:text-primary sm:text-lg">{title}</CardTitle>
-            <div className="prose max-w-full text-pretty font-sans text-xs leading-snug text-muted-foreground sm:text-sm dark:prose-invert line-clamp-2" dangerouslySetInnerHTML={{ __html: description }} />
-          </div>
-        </CardHeader>
+        {cover}
+        <ProjectCardHeader title={title} description={description} />
       </Link>
-      <CardFooter className="mt-auto border-t border-border p-4 pt-4">
-        <ProjectActions href={href} source={source} />
-      </CardFooter>
+      <ProjectCardFooter href={href} source={source} />
     </Card>
   )
 }
