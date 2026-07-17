@@ -1,14 +1,15 @@
-import * as React from "react"
+import type { ComponentProps, HTMLAttributes, ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 import { SECTION_SPACING } from "@/lib/design-system"
 import { SectionHeading } from "@/components/ui/section-heading"
 
-interface PageSectionProps extends React.HTMLAttributes<HTMLElement> {
+interface PageSectionProps extends HTMLAttributes<HTMLElement> {
   /** Optional section heading props — when set, renders SectionHeading above children. */
-  heading?: React.ComponentProps<typeof SectionHeading>
+  heading?: ComponentProps<typeof SectionHeading>
   /** Spacing between heading and content. Defaults to mt-6. */
   contentClassName?: string
+  children?: ReactNode
 }
 
 /**

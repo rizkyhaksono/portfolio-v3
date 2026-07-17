@@ -1,9 +1,9 @@
-import * as React from "react"
+import type { HTMLAttributes } from "react"
 
 import { cn } from "@/lib/utils"
 import { PAGE_WIDTH, type PageWidth } from "@/lib/design-system"
 
-interface PageBodyProps extends React.HTMLAttributes<HTMLDivElement> {
+interface PageBodyProps extends HTMLAttributes<HTMLDivElement> {
   /**
    * Content width preset.
    * - default: trust BaseLayout container (no nested max-w / extra px)

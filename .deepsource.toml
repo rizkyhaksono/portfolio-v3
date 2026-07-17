@@ -1,8 +1,33 @@
 version = 1
 
+test_patterns = [
+  "**/*.test.ts",
+  "**/*.test.tsx",
+  "**/*.spec.ts",
+  "**/*.spec.tsx",
+  "**/__tests__/**",
+  "**/__mocks__/**",
+]
+
+exclude_patterns = [
+  "node_modules/**",
+  ".next/**",
+  "out/**",
+  "coverage/**",
+  "public/**",
+  "content/**",
+  "docs/**",
+  "**/*.d.ts",
+]
+
 [[analyzers]]
 name = "javascript"
+enabled = true
 
   [analyzers.meta]
   plugins = ["react"]
-  environment = ["nodejs"]
+  environment = ["nodejs", "browser"]
+  dialect = "typescript"
+  module_system = "es-modules"
+  # React components are usually arrow/function expressions; require docs on declarations instead.
+  skip_doc_coverage = ["arrow-function-expression", "function-expression", "method-definition"]
