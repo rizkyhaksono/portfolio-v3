@@ -29,5 +29,5 @@ enabled = true
   environment = ["nodejs", "browser"]
   dialect = "typescript"
   module_system = "es-modules"
-  # React components are usually arrow/function expressions; require docs on declarations instead.
-  skip_doc_coverage = ["arrow-function-expression", "function-expression", "method-definition"]
+  # Match existing DeepSource dashboard setting used on main.
+  skip_doc_coverage = ["arrow-function-expression"]

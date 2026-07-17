@@ -17,6 +17,13 @@ interface CardBlogProps {
   href: string
 }
 
+/**
+ * Strips HTML tags for safe card preview text (avoids dangerouslySetInnerHTML).
+ */
+function toPlainText(html: string): string {
+  return html.replace(/<\/?[^>]+(>|$)/g, " ").replace(/\s+/g, " ").trim()
+}
+
 /** Cover image for a blog list card. */
 function BlogCoverImage({ src, alt }: Readonly<{ src: string; alt: string }>) {
   return (
@@ -56,7 +63,7 @@ function BlogCardHeader({ title, description }: Readonly<{ title: string; descri
   return (
     <CardHeader className="space-y-1.5 p-4 pb-2">
       <CardTitle className="line-clamp-2 font-display text-base font-bold tracking-tight transition-colors group-hover:text-primary sm:text-lg">{title}</CardTitle>
-      <div className="prose max-w-full text-pretty font-sans text-xs leading-snug text-muted-foreground sm:text-sm dark:prose-invert line-clamp-3" dangerouslySetInnerHTML={{ __html: description }} />
+      <p className="line-clamp-3 text-pretty font-sans text-xs leading-snug text-muted-foreground sm:text-sm">{toPlainText(description)}</p>
     </CardHeader>
   )
 }
