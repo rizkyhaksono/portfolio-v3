@@ -23,6 +23,11 @@ const SidebarSecondary = ({
 }) => {
   const pathname = usePathname();
 
+  const isActive = (href: string) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+
   return (
     <nav>
       <ul className="flex flex-col items-start space-y-1">
@@ -33,10 +38,12 @@ const SidebarSecondary = ({
               {groupLabel}
             </Typography.P>
             {menus.map(({ href, label, icon: Icon }, index) => {
+              const active = isActive(href);
+
               return (
                 <Button
                   key={href + index}
-                  variant={pathname.endsWith(href) ? "secondary" : "ghost"}
+                  variant={active ? "secondary" : "ghost"}
                   className="w-full justify-between h-10 mb-1"
                   asChild
                 >
@@ -50,9 +57,7 @@ const SidebarSecondary = ({
                       </Typography.P>
                     </div>
                     <ArrowRightIcon
-                      className={
-                        pathname.endsWith(href) ? "block opacity-60" : "hidden"
-                      }
+                      className={active ? "block opacity-60" : "hidden"}
                       height={14}
                       width={14}
                     />

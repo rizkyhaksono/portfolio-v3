@@ -9,12 +9,12 @@
 
 export const SURFACE = {
   solid:
-    "rounded-xl border border-border bg-card text-card-foreground shadow-sm transition-colors",
+    "rounded-none border border-border bg-card text-card-foreground shadow-sm transition-colors",
   solidHover: "hover:border-foreground/20",
   glass:
-    "rounded-2xl border border-border/60 bg-background/40 shadow-sm backdrop-blur-sm",
-  glassNoBlur: "rounded-2xl border border-border/60 bg-background/40 shadow-sm",
-  inset: "rounded-lg border border-border/40 bg-secondary/20",
+    "rounded-none border border-border/60 bg-background/40 shadow-sm backdrop-blur-sm",
+  glassNoBlur: "rounded-none border border-border/60 bg-background/40 shadow-sm",
+  inset: "rounded-none border border-border/40 bg-secondary/20",
 } as const
 
 /** Default content padding for solid cards and feature boxes. */

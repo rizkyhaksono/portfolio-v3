@@ -28,7 +28,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
     getProfile().then(setProfile)
   }, [])
 
-  if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-xl" />
+  if (!profile || profile?.status === 401 || !profile?.data?.name) return <AuthCard className="border rounded-none" />
 
   const avatarSrc = profile.data.iconUrl || profile.data.avatarUrl
   const avatarClass = cn(
@@ -40,7 +40,7 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
-        <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-xl transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
+        <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-none transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
           <Avatar className={cn(avatarClass)}>
             {avatarSrc ? <AvatarImage src={avatarSrc} alt={profile.data.name} className="object-cover" referrerPolicy="no-referrer" /> : null}
             <AvatarFallback>{getInitials(profile.data.name)}</AvatarFallback>

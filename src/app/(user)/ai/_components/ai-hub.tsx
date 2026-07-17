@@ -34,7 +34,7 @@ export default function AIHub({ chat, docTool, loggedIn }: { chat: ReactNode; do
       </div>
 
       <div className="mb-5 flex justify-center">
-        <div className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-0.5">
+        <div className="inline-flex rounded-none border border-border/60 bg-muted/30 p-0.5">
           {TABS.map((t) => {
             const Icon = t.icon
             return (
@@ -42,7 +42,7 @@ export default function AIHub({ chat, docTool, loggedIn }: { chat: ReactNode; do
                 key={t.id}
                 onClick={() => setMode(t.id)}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-1.5 rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
                   mode === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-pressed={mode === t.id}

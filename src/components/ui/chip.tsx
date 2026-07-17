@@ -12,7 +12,7 @@ export function Chip({ icon, className, children, ...props }: Readonly<ChipProps
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-secondary px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground",
+        "inline-flex items-center gap-1.5 rounded-none border border-border/70 bg-secondary px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground",
         className,
       )}
       {...props}

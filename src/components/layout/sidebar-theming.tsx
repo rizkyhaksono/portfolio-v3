@@ -9,7 +9,7 @@ const SidebarTheming = () => {
       <Typography.P className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate pt-5">
         Theming
       </Typography.P>
-      <div className="inline-flex items-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-4 py-2 w-full justify-between h-10 mb-1">
+      <div className="inline-flex items-center whitespace-nowrap rounded-none text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-4 py-2 w-full justify-between h-10 mb-1">
         <div className="flex items-center">
           <span className={cn("mr-4")}>
             <SunIcon className="h-[1.2rem] w-[1.2rem] text-neutral-800 dark:hidden dark:text-neutral-200" />
