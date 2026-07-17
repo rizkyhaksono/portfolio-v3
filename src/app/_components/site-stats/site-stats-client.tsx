@@ -43,7 +43,7 @@ function StatCard({ icon: Icon, label, value, subValue, className, trend }: Read
   return (
     <Card
       className={cn(
-        "relative overflow-hidden group border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md hover:bg-white/10 dark:hover:bg-neutral-800/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1",
+        "relative overflow-hidden group hover:border-foreground/20",
         className,
       )}
     >
@@ -92,7 +92,7 @@ function BarChartMetrics({
   }))
 
   return (
-    <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg h-full">
+    <Card className="h-full hover:border-foreground/20">
       <CardHeader className="pb-3 pt-4 px-4 md:px-5">
         <CardTitle className="text-sm md:text-base font-semibold flex items-center gap-2">
           <div className="p-1.5 rounded-md bg-primary/10">

@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, lazy, Suspense } from "react"
+import { useState, lazy, Suspense, type ElementType } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MonkeyTypeUserData } from "@/commons/types/monkeytype"
 import { Keyboard, Target, MousePointerClick, Timer, TrendingUp, Zap, Award, Activity } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 
-const LazyCharts = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: () => null })))
 const LazyWpmChartComponent = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: mod.LazyWpmChart })))
 const LazyAccuracyChartComponent = lazy(() => import("./lazy-monkeytype-charts").then((mod) => ({ default: mod.LazyAccuracyChart })))
 
@@ -15,6 +14,17 @@ interface MonkeyTypeStatsProps {
   typingStats: MonkeyTypeUserData
 }
 
+interface StatCardProps {
+  icon: ElementType
+  label: string
+  value: string | number
+  subValue?: string
+  trend?: string
+}
+
+/**
+ * Formats large numbers with K/M suffixes.
+ */
 function formatNumber(num: number): string {
   if (num >= 1000000) {
     return (num / 1000000).toFixed(1) + "M"
@@ -25,6 +35,9 @@ function formatNumber(num: number): string {
   return num.toString()
 }
 
+/**
+ * Formats typing duration as hours/minutes.
+ */
 function formatTime(seconds: number): string {
   const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor((seconds % 3600) / 60)
@@ -34,26 +47,43 @@ function formatTime(seconds: number): string {
   return `${minutes}m`
 }
 
-function StatCard({ icon: Icon, label, value, subValue, trend }: { icon: React.ElementType; label: string; value: string | number; subValue?: string; trend?: string }) {
+/** Icon bubble shown on the left of a StatCard. */
+function StatCardIcon({ icon: Icon }: Readonly<{ icon: ElementType }>) {
   return (
-    <Card className="relative overflow-hidden group border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md hover:bg-white/10 dark:hover:bg-neutral-800/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+    <div className="rounded-xl bg-primary/10 p-2 transition-colors group-hover:bg-primary/20">
+      <Icon className="h-5 w-5 text-primary" />
+    </div>
+  )
+}
+
+/** Text/value block for a StatCard. */
+function StatCardBody({ label, value, subValue, trend }: Readonly<Omit<StatCardProps, "icon">>) {
+  return (
+    <div className="min-w-0 flex-1">
+      <div className="mb-0.5 flex items-center gap-2">
+        <p className="truncate text-2xl font-bold tracking-tight">{value}</p>
+        {trend && (
+          <Badge variant="secondary" className="text-xs">
+            {trend}
+          </Badge>
+        )}
+      </div>
+      <p className="truncate text-xs font-medium text-muted-foreground">{label}</p>
+      {subValue && <p className="truncate text-[10px] text-muted-foreground/80">{subValue}</p>}
+    </div>
+  )
+}
+
+/**
+ * Compact solid metric card used in the Monkeytype overview grid.
+ */
+function StatCard({ icon, label, value, subValue, trend }: Readonly<StatCardProps>) {
+  return (
+    <Card className="group relative overflow-hidden hover:border-foreground/20">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-            <Icon className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <p className="text-2xl font-bold tracking-tight truncate">{value}</p>
-              {trend && (
-                <Badge variant="secondary" className="text-xs">
-                  {trend}
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs font-medium text-muted-foreground truncate">{label}</p>
-            {subValue && <p className="text-[10px] text-muted-foreground/80 truncate">{subValue}</p>}
-          </div>
+          <StatCardIcon icon={icon} />
+          <StatCardBody label={label} value={value} subValue={subValue} trend={trend} />
         </div>
       </CardContent>
     </Card>
@@ -135,7 +165,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
       {/* Charts - Lazy loaded */}
       {wpmChartData.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+          <Card className="hover:border-foreground/20">
             <CardHeader className="pb-3 pt-4 px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-primary/10">
@@ -151,7 +181,7 @@ export default function MonkeyTypeStats({ typingStats }: MonkeyTypeStatsProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300 hover:shadow-lg">
+          <Card className="hover:border-foreground/20">
             <CardHeader className="pb-3 pt-4 px-5">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <div className="p-1.5 rounded-md bg-primary/10">

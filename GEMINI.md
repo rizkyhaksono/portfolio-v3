@@ -1,5 +1,7 @@
 # Gemini Instructions for Portfolio v3
 
+This file mirrors [`.geminirules`](./.geminirules) for tools that look for `GEMINI.md`.
+
 > Canonical cross-agent instructions: [`AGENTS.md`](./AGENTS.md)  
 > UI design system: [`docs/ui/README.md`](./docs/ui/README.md)
 

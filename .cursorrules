@@ -1,15 +1,20 @@
 # Cursor Rules for Portfolio v3
 
+> Canonical cross-agent instructions: [`AGENTS.md`](./AGENTS.md)  
+> UI design system: [`docs/ui/README.md`](./docs/ui/README.md)
+
 You are an expert full-stack TypeScript engineer working on this Next.js project. Produce production-ready code that follows modern Next.js App Router patterns and best practices.
 
 ## Core Directives
 
-1. **Always refer to the specific rules in `.cursor/rules/*.mdc`** for detailed, up-to-date guidelines on Next.js development, project management, and unit testing within this project.
-2. Note that this project uses multiple AI assistants. For AI-specific instructions, refer to their respective configurations:
-   - **Cursor**: `.cursor/rules/*.mdc`
-   - **Claude**: `CLAUDE.md` and `.claude/` directory
-   - **Gemini**: `.geminirules`
+1. **Always refer to** [`AGENTS.md`](./AGENTS.md) and `.cursor/rules/*.mdc` (Next.js, project management, unit testing, **UI layout consistency**).
+2. Platform instruction map:
+   - **All agents**: `AGENTS.md`
+   - **Cursor**: `.cursorrules` + `.cursor/rules/*.mdc`
+   - **Claude**: `CLAUDE.md` + `.claude/`
+   - **Gemini**: `.geminirules` / `GEMINI.md`
    - **Copilot**: `.github/copilot-instructions.md`
+   - **UI docs**: `docs/ui/`
 3. Adhere strictly to the Next.js 15+ App Router, TypeScript (strict mode), Tailwind CSS, and shadcn/ui.
 4. Use **npm** as the standard package manager.
 
@@ -17,5 +22,24 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 - **React Server Components (RSC):** Default to Server Components. Add `'use client'` only when hook/state/browser interactivity is necessary.
 - **Components:** Avoid inline styling. Rely wholly on Tailwind UI utilities and `cn()` from `@/lib/utils`.
-- **Architecture:** `app/` is for routes and layouts. `components/ui/` is for resuable Shadcn widgets. `components/[feature]/` handles localized logic. Extricate reusable hook logic out to `lib/` or `hooks/`.
+- **Architecture:** `app/` is for routes and layouts. `components/ui/` is for reusable Shadcn widgets. Feature logic in `components/[feature]/` or `app/_components/`. Extricate reusable hook logic to `lib/` or `hooks/`.
 - **Quality:** Keep functions modular, readable, and typed. Do not rely on `any`.
+- **Progress:** Read/update `prd/feature.md` and `prd/progress.md` for tracked work.
+
+## UI Layout (mandatory)
+
+Monochrome, square, hairline borders. Three surface dialects only — see `.cursor/rules/ui-layout-consistency.mdc`, [`docs/ui/`](./docs/ui/), and `src/lib/design-system.ts`:
+
+| Dialect | Primitive | Use |
+|---|---|---|
+| solid | `Card` / `FeatureCard` / `Surface` | Content boxes |
+| glass | `MacWindow` / `Surface variant="glass"` | Window chrome only |
+| inset | `Surface variant="inset"` | Nested rows / sidebar blocks |
+
+- Page shell: `BaseLayout` → `PageBody` → `SectionHeading` → content
+- Sections: `PageSection` (`mt-10` rhythm)
+- Never invent glass content cards (`bg-white/5`, `backdrop-blur-md`, lift shadows)
+- Prefer semantic color tokens; ban `neutral-*` / raw hex for UI chrome
+- Do not add extra `px-*` inside BaseLayout (container already pads)
+
+Platform shells (visitor / user / admin / auth): [`docs/ui/platforms.md`](./docs/ui/platforms.md)

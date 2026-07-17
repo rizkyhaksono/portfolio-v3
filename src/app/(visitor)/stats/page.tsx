@@ -4,7 +4,9 @@ import BaseLayout from "@/components/layout/base-layout"
 import SidebarMain from "@/components/layout/sidebar-main"
 import Typography from "@/components/ui/typography"
 import { MacWindow } from "@/components/ui/mac-window"
+import { PageBody } from "@/components/ui/page-body"
 import { SectionHeading } from "@/components/ui/section-heading"
+import { Surface } from "@/components/ui/surface"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
@@ -38,14 +40,14 @@ function PlatformCard({
   unavailable?: boolean
 }) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 transition-colors hover:border-foreground/20">
+    <Surface variant="solid" padding="cozy" className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <Typography.P className="font-display text-base font-semibold tracking-tight">{title}</Typography.P>
         <Link
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-muted-foreground hover:text-primary transition-colors"
+          className="text-muted-foreground transition-colors hover:text-primary"
           aria-label={`Open ${title} profile`}
         >
           <ExternalLink size={16} />
@@ -56,7 +58,7 @@ function PlatformCard({
       ) : (
         children
       )}
-    </div>
+    </Surface>
   )
 }
 
@@ -108,7 +110,7 @@ export default async function StatsPage() {
 
   return (
     <BaseLayout sidebar={<SidebarMain />} useGridBackground={false}>
-      <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full px-4 lg:px-0">
+      <PageBody width="wide">
         <SectionHeading
           as="h1"
           eyebrow="Activity"
@@ -229,7 +231,7 @@ export default async function StatsPage() {
           })()}
         </PlatformCard>
         </MacWindow>
-      </div>
+      </PageBody>
     </BaseLayout>
   )
 }

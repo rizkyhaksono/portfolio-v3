@@ -50,7 +50,7 @@ export default function SpotifyCard() {
           href={data.songUrl || "#"}
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-3 rounded-xl border border-border/50 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md p-2 max-w-sm transition-all hover:bg-white/10 dark:hover:bg-neutral-800/60 hover:shadow-md hover:-translate-y-0.5"
+          className="group flex max-w-sm items-center gap-3 rounded-xl border border-border bg-card p-2 shadow-sm transition-colors hover:border-foreground/20 hover:bg-accent/40"
         >
           {data.albumImageUrl ? (
             <Image src={data.albumImageUrl} alt={data.album ?? ""} width={40} height={40} className="size-10 object-cover rounded-md shadow-sm opacity-70 group-hover:opacity-100 transition-opacity" />
@@ -87,7 +87,7 @@ export default function SpotifyCard() {
       href={data.songUrl || "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col md:flex-row items-center gap-3 rounded-xl border border-border/50 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md p-2 max-w-sm transition-all hover:bg-white/10 dark:hover:bg-neutral-800/60 hover:shadow-md hover:-translate-y-0.5"
+      className="group flex max-w-sm flex-col items-center gap-3 rounded-xl border border-border bg-card p-2 shadow-sm transition-colors hover:border-foreground/20 hover:bg-accent/40 md:flex-row"
     >
       {data.albumImageUrl ? (
         <Image src={data.albumImageUrl} alt={data.album ?? ""} width={40} height={40} className="size-10 object-cover rounded-md shadow-sm group-hover:shadow-md transition-shadow" />

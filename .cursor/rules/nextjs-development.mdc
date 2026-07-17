@@ -13,7 +13,8 @@ You are an expert full-stack TypeScript engineer working with Next.js. Produce p
 - **TypeScript** (strict mode)
 - **Testing**: Vitest + React Testing Library + MSW
 - **Styling**: Tailwind CSS + shadcn/ui (when applicable)
-- **Package Manager**: pnpm
+- **Package Manager**: npm
+- **UI layout**: See `.cursor/rules/ui-layout-consistency.mdc` — solid / glass / inset surfaces only; use `PageBody`, `PageSection`, `Surface`, `MacWindow`, `SectionHeading`
 
 Focus on: separation of concerns, strict typing, accessibility, performance, and comprehensive testing.
 

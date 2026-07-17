@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { SURFACE, SURFACE_PADDING } from "@/lib/design-system"
 
 export function BentoGrid({ className, children }: Readonly<{ className?: string; children: React.ReactNode }>) {
   return <div className={cn("grid grid-cols-1 gap-4 md:grid-cols-3", className)}>{children}</div>
@@ -17,14 +18,18 @@ interface FeatureCardProps {
 }
 
 /**
- * Hairline-bordered feature card with a small icon top-left. Compose inside
+ * Hairline-bordered solid feature card with a small icon top-left. Compose inside
  * <BentoGrid>; mark one card `large` for the Sapa 1-large + N-small layout.
+ * Prefer this over inventing another bordered box for feature/platform grids.
  */
 export function FeatureCard({ icon, title, accent, description, large, className, children }: Readonly<FeatureCardProps>) {
   return (
     <div
       className={cn(
-        "group flex flex-col gap-3 rounded-xl border border-border bg-card p-6 transition-colors hover:border-foreground/20",
+        "group flex flex-col gap-3",
+        SURFACE.solid,
+        SURFACE.solidHover,
+        SURFACE_PADDING.default,
         large && "md:row-span-2 md:justify-between",
         className,
       )}

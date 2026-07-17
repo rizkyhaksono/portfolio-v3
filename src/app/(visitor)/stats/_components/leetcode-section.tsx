@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { Surface } from "@/components/ui/surface"
 import type { LeetCodeStats } from "@/services/visitor/leetcode"
 import LeetCodeContestChart from "./leetcode-contest-chart"
 import { Flame, CalendarDays, Trophy } from "lucide-react"
@@ -39,13 +40,13 @@ function buildWeeks(calendar: { date: string; count: number }[]): { date: string
 
 function StatPill({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | number }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-border/30 bg-secondary/20 px-3 py-2">
+    <Surface variant="inset" className="flex items-center gap-2 px-3 py-2">
       <span className="text-primary/70">{icon}</span>
       <div className="leading-tight">
         <p className="text-sm font-semibold text-primary">{value}</p>
         <p className="text-[11px] text-muted-foreground">{label}</p>
       </div>
-    </div>
+    </Surface>
   )
 }
 
@@ -55,7 +56,7 @@ export default function LeetCodeSection({ stats }: { stats: Stats }) {
   const totalSubmissionsInYear = stats.calendar.reduce((a, b) => a + b.count, 0)
 
   return (
-    <div className="space-y-6 rounded-xl border border-border/30 bg-secondary/10 p-5">
+    <Surface variant="inset" padding="cozy" className="space-y-6 rounded-xl">
       <div className="flex flex-wrap items-center gap-2">
         <Flame className="h-5 w-5 text-primary" />
         <p className="text-base font-semibold">LeetCode activity</p>
@@ -177,6 +178,6 @@ export default function LeetCodeSection({ stats }: { stats: Stats }) {
           </div>
         </div>
       )}
-    </div>
+    </Surface>
   )
 }

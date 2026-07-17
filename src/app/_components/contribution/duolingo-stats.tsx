@@ -69,7 +69,7 @@ export default function DuolingoStats({ duolingo }: DuolingoStatsProps) {
           return (
             <Card
               key={stat.label}
-              className="relative overflow-hidden group border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md hover:bg-white/10 dark:hover:bg-neutral-800/60 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              className="relative overflow-hidden group hover:border-foreground/20"
             >
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
@@ -93,7 +93,7 @@ export default function DuolingoStats({ duolingo }: DuolingoStatsProps) {
       {topCourses.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {topCourses.map((course, index) => (
-            <Card key={`${course.language}-${index}`} className="border-white/10 dark:border-white/5 bg-white/5 dark:bg-neutral-900/40 backdrop-blur-md transition-all duration-300">
+            <Card key={`${course.language}-${index}`}>
               <CardContent className="flex items-center justify-between p-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-sm font-medium">{course.language}</span>
