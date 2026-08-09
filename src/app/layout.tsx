@@ -93,6 +93,17 @@ export default function RootLayout({
           data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614"}
           strategy="afterInteractive"
         />
+        {/* Umami session replay + heatmaps recorder. Enabled per-site in the Umami
+            dashboard (Website settings → Replays & Heatmaps); this only loads the
+            recorder script so the toggle there takes effect. */}
+        {process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC && (
+          <Script
+            defer
+            src={process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614"}
+            strategy="afterInteractive"
+          />
+        )}
       </head>
       <body className={cn("bg-background font-sans antialiased mx-auto", fontVariables)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
