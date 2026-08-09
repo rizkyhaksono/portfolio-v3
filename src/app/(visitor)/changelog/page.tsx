@@ -4,6 +4,7 @@ import { getAllChangelogs } from "@/lib/mdx"
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
 import { formatDate } from "@/commons/helpers"
 import { MDXRemote } from "next-mdx-remote/rsc"
+import remarkGfm from "remark-gfm"
 import { getMDXComponents } from "@/components/ui/changelog-mdx-component"
 import { Button } from "@/components/ui/button"
 import { Eyebrow } from "@/components/ui/eyebrow"
@@ -73,7 +74,11 @@ export default function ChangelogPage() {
                       </div>
 
                       <div className="prose dark:prose-invert max-w-none prose-headings:scroll-mt-8 prose-headings:font-semibold prose-a:no-underline prose-headings:tracking-tight prose-headings:text-balance prose-p:tracking-tight prose-p:text-balance">
-                        <MDXRemote source={content} components={components} />
+                        <MDXRemote
+                          source={content}
+                          components={components}
+                          options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+                        />
                       </div>
                     </div>
                   </div>

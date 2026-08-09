@@ -54,6 +54,14 @@ function Author({ id }: AuthorProps) {
   return <AuthorCard author={author} className="my-8" />;
 }
 
+// Table wrapper — prose doesn't add horizontal scroll on its own, so a wide
+// markdown table (many columns) would otherwise overflow the viewport on mobile.
+const Table = (props: React.ComponentProps<"table">) => (
+  <div className="my-6 w-full overflow-x-auto">
+    <table {...props} />
+  </div>
+);
+
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     img: ({ className, ...props }: React.ComponentProps<"img">) => (
@@ -62,6 +70,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     MediaViewer,
     ImageViewer,
     VideoViewer,
+    table: Table,
     Accordion,
     AccordionContent,
     AccordionItem,

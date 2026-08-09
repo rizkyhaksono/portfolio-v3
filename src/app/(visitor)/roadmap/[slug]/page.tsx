@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Clock, BookOpen, ArrowLeft, GraduationCap, Layers } from "lucide-react"
 import { getMDXComponents } from "@/components/ui/roadmap-mdx-component"
 import { MDXRemote } from "next-mdx-remote/rsc"
+import remarkGfm from "remark-gfm"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -100,7 +101,11 @@ export default async function RoadmapLessonPage({ params }: { params: Promise<{ 
 
           {/* MDX Content */}
           <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:font-display prose-h2:border-b prose-h2:pb-3 prose-h2:mt-12 prose-h2:mb-5 prose-h3:text-xl prose-h3:font-semibold prose-h3:font-display prose-h3:mt-10 prose-h3:mb-4 prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border prose-code:before:content-none prose-code:after:content-none">
-            <MDXRemote source={content} components={components} />
+            <MDXRemote
+              source={content}
+              components={components}
+              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+            />
           </article>
 
           {/* Completion Action */}
