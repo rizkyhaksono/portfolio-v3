@@ -14,8 +14,8 @@ interface TableProps {
 }
 
 const Table = ({ children }: TableProps) => (
-  <div className="table-container">
-    <table className="table w-full">{children}</table>
+  <div className="my-4 w-full overflow-x-auto">
+    <table className="w-full">{children}</table>
   </div>
 );
 
@@ -57,6 +57,7 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
         ),
         code: (props) => <CodeBlock {...props} />,
         blockquote: (props) => <Typography.quote {...props} />,
+        table: (props) => <Table {...(props as TableProps)} />,
         th: (props) => (
           <th className="border px-3 py-1 text-left dark:border-neutral-600">
             {props.children}

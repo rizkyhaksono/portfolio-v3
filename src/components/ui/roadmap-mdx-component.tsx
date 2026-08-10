@@ -238,6 +238,14 @@ const Warning = ({ title = "Warning", children }: WarningProps) => {
   )
 }
 
+// Table wrapper — prose doesn't add horizontal scroll on its own, so a wide
+// markdown table (many columns) would otherwise overflow the viewport on mobile.
+const Table = (props: React.ComponentProps<"table">) => (
+  <div className="my-6 w-full overflow-x-auto">
+    <table {...props} />
+  </div>
+)
+
 // Info Card
 interface InfoProps {
   title?: string
@@ -259,6 +267,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     img: ({ className, alt, ...props }: React.ComponentProps<"img">) => <img className={cn("rounded-md border", className)} alt={alt || ""} {...props} />,
     pre: Pre,
     code: CodeBlock,
+    table: Table,
     MediaViewer,
     ImageViewer,
     VideoViewer,
