@@ -1,0 +1,11 @@
+{
+  "name": "Portfolio v3",
+  "install": "npm ci && bash .cursor/setup-env.sh",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [3000, 3001]
+}
