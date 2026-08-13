@@ -59,7 +59,7 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
         {/* Sidebar nav + active tool content */}
         <MacWindow title="~/tools" bodyClassName="p-3 sm:p-5">
         <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="lg:w-60 lg:shrink-0">
+          <aside className="min-w-0 lg:w-60 lg:shrink-0">
             <div className="rounded-xl border border-border bg-card/40 p-3 lg:sticky lg:top-20">
               <ToolsBrowser activeTab={activeTab} />
             </div>

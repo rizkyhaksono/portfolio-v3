@@ -7,6 +7,7 @@ import {
   PORTFOLIO_PDF_GOOGLE_DRIVE_URL,
   RESUME_GOOGLE_DRIVE_URL,
 } from "@/commons/constants/external-links"
+import { JOB_TITLE } from "@/commons/constants/author"
 
 export default function AboutSection() {
   return (
@@ -16,7 +17,7 @@ export default function AboutSection() {
           eyebrow="About"
           title="A little"
           accent="about me"
-          description="AI Engineer at Sarana AI building production LLM systems — RAG/embeddings, MCP integrations, and cloud-native agents on AWS. I ship end-to-end products with Next.js, Go, and Python that cut manual work and scale real business workflows. Informatics graduate from Universitas Muhammadiyah Malang (Cum Laude, 3.91/4.00)."
+          description={`${JOB_TITLE} at Sarana AI building production LLM systems — RAG/embeddings, MCP integrations, and cloud-native agents on AWS. I ship end-to-end products with Next.js, Go, and Python that cut manual work and scale real business workflows. Informatics graduate from Universitas Muhammadiyah Malang (Cum Laude, 3.91/4.00).`}
         />
         <div className="mt-6 flex flex-wrap gap-3">
           <Button asChild size="sm">

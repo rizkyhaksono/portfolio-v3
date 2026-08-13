@@ -1,21 +1,22 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-07-17 (UI layout consistency + DeepSource fixes; About Me refresh retained from main)*
+*Last Updated: 2026-08-13 (Senior AI Engineer copy + square/mobile UI pass)*
 
 ---
 
 ## Project Overview
-**Goal:** Keep the public portfolio accurate (AI Engineer positioning) and visually consistent (solid / glass / inset surfaces) so recruiters and agents see one coherent system.
-**Success Criteria:** About/Intro reflect Sarana AI role; all content boxes use shared layout primitives; AI platform docs + DeepSource stay green.
+**Goal:** Keep the public portfolio accurate (Senior AI Engineer positioning) and visually consistent (solid / glass / inset surfaces, square chips) so recruiters and agents see one coherent system on desktop and mobile.
+**Success Criteria:** About/Intro/SEO say Senior AI Engineer from `JOB_TITLE`; leftover pill controls on visitor tools are square; downloader and intro wrap cleanly on small screens.
 
 ---
 
 ## Progress Summary
 
 ### Overall Status: 100% Complete (current tracks)
-- **About Me refresh**: ✅ COMPLETED — AI Engineer @ Sarana AI copy on About + Intro
+- **About Me refresh**: ✅ COMPLETED — Senior AI Engineer @ Sarana AI copy on About + Intro + SEO
 - **UI layout consistency**: ✅ COMPLETED — shared surfaces, migrations, agent/UI docs
 - **DeepSource JavaScript**: ✅ COMPLETED — nesting / imports / HTML preview issues fixed
+- **Senior AI + square/mobile pass**: ✅ COMPLETED — `JOB_TITLE` constant, square tool chips, mobile wrap
 
 ---
 
@@ -23,15 +24,34 @@
 
 ### COMPLETED
 
-#### About Me (HR-ready AI Engineer)
-- ✅ **About section description** - COMPLETED (2026-07-16)
-  - Removed undergraduate and web/mobile-only framing
-  - New copy: AI Engineer at Sarana AI, production LLM/RAG/MCP/AWS, Next.js/Go/Python, UMM Informatics Cum Laude 3.91/4.00
+#### About Me (HR-ready Senior AI Engineer)
+- ✅ **About section description** - COMPLETED (2026-08-13)
+  - Lead-in uses `JOB_TITLE` (“Senior AI Engineer at Sarana AI…”)
+  - Production LLM/RAG/MCP/AWS, Next.js/Go/Python, UMM Informatics Cum Laude 3.91/4.00
   - File: `src/app/_components/about/index.tsx`
-- ✅ **Intro hero bio + roles** - COMPLETED (2026-07-16)
-  - Bio leads with LLMs, RAG, MCP, Sarana AI, Python/AWS/Next.js/Go
-  - Roles: `AI Engineer`, `Cloud Enthusiast`, `Full-Stack Builder`
+- ✅ **Intro hero bio + roles** - COMPLETED (2026-08-13)
+  - Roles / eyebrow / Focus stat / bio lead-in all read `JOB_TITLE`
   - File: `src/app/_components/intro/index.tsx`
+- ✅ **Centralized title constant** - COMPLETED (2026-08-13)
+  - `JOB_TITLE` in `src/commons/constants/author.ts`; `authors.*.position` points at it
+  - `MetadataConstants.jobTitle`, `pageTitle`, `ogTitle`, `ogPersonTitle`
+  - JSON-LD `jobTitle`, root layout titles, OG image route, manifest, terminal `whoami`
+  - Visitor/user/auth layout Open Graph titles use `MetadataConstants.ogPersonTitle`
+
+#### Square chips + mobile (visitor tools)
+- ✅ **Downloader** - COMPLETED (2026-08-13)
+  - Platform selector: square `Button` `size="sm"` (`default` vs `outline`), `flex-wrap` + `min-w-0`
+  - URL + Download stack on small screens (`flex-col sm:flex-row`); Download `w-full sm:w-auto`
+  - Error icon wrap: `Surface variant="inset"` (square); spinner stays `rounded-full`
+  - File: `src/app/(visitor)/tools/_components/downloader-tab.tsx`
+- ✅ **Tools pill tags** - COMPLETED (2026-08-13)
+  - Pokémon type tags: square (`rounded-none`); progress bars stay circular
+  - Star Wars `#id` overlay: square; rocket avatar circle unchanged
+  - Ask-resume sample prompts: square outline `Button`; mobile FAB stays circular
+- ✅ **Mobile wrap** - COMPLETED (2026-08-13)
+  - Intro typing row + socials: `min-w-0` / `flex-wrap`
+  - StatStrip: `min-w-0` + `break-words` so “Senior AI Engineer” wraps
+  - Tools aside: `min-w-0`; 2-col nav kept; MacWindow already avoids `overflow-hidden`
 
 #### UI Layout Consistency
 - ✅ Design tokens: `src/lib/design-system.ts`
@@ -50,16 +70,21 @@
 - Legal + changelog join BaseLayout or documented StandaloneLayout
 - Home sections gradually adopt `PageSection`
 
-### Out of scope (unchanged from About Me track)
-- Supabase career/education rows (DB-backed)
+### Out of scope (unchanged)
+- Supabase career/education rows (DB-backed titles)
 - Owner-profile API `about` field
-- Footer / terminal / metadata (already AI Engineer)
+- Admin dashboard copy
+- `/signal` marketing experiment
+- Terminal overlay visual chrome (copy only)
 
 ---
 
 ## Key Code Locations
+- **Job title constant:** `src/commons/constants/author.ts` (`JOB_TITLE`)
+- **Metadata:** `src/commons/constants/metadata.ts`
 - **About section:** `src/app/_components/about/index.tsx`
 - **Intro section:** `src/app/_components/intro/index.tsx`
+- **Downloader:** `src/app/(visitor)/tools/_components/downloader-tab.tsx`
 - **Tokens:** `src/lib/design-system.ts`
 - **Primitives:** `src/components/ui/surface.tsx`, `page-section.tsx`, `page-body.tsx`, `mac-window.tsx`
 - **Rule:** `.cursor/rules/ui-layout-consistency.mdc`

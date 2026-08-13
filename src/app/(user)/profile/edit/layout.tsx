@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     url: MetadataConstants.openGraph.url,
   },
   openGraph: {
-    title: "Muhammad Rizky Haksono - AI Engineer",
+    title: MetadataConstants.ogPersonTitle,
     images: MetadataConstants.profile,
     url: MetadataConstants.openGraph.url,
     siteName: MetadataConstants.openGraph.siteName,

@@ -8,13 +8,14 @@ import { StatStrip } from "@/components/ui/stat-strip"
 import { Button } from "@/components/ui/button"
 import Typography from "@/components/ui/typography"
 import { media_socials } from "@/commons/constants/contact"
+import { JOB_TITLE } from "@/commons/constants/author"
 import { ArrowRight } from "lucide-react"
 import type { OwnerProfile } from "@/services/visitor/owner-profile"
 
-const roles = ["AI Engineer", "Cloud Enthusiast", "Full-Stack Builder"]
+const roles = [JOB_TITLE, "Cloud Enthusiast", "Full-Stack Builder"]
 
 const HERO_STATS = [
-  { label: "Focus", value: "AI Engineer" },
+  { label: "Focus", value: JOB_TITLE },
   { label: "Stack", value: "TS · Go" },
   { label: "Cloud", value: "AWS · Azure" },
   { label: "Based in", value: "Malang, ID" },
@@ -36,7 +37,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
-              Open to work · AI Engineer
+              Open to work · {JOB_TITLE}
             </Eyebrow>
           </div>
 
@@ -50,16 +51,16 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
 
           {/* Typing Animation for Roles */}
           <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">I&apos;m a</span>
-              <TypingAnimation words={roles} className="font-semibold text-base md:text-lg text-primary" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
+            <div className="flex min-w-0 items-center gap-2 text-sm">
+              <span className="shrink-0 text-muted-foreground">I&apos;m a</span>
+              <TypingAnimation words={roles} className="min-w-0 font-semibold text-base md:text-lg text-primary" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
             </div>
           </div>
 
           {/* Bio Text */}
           <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
             <p className="max-w-xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
-              Building production AI systems — <span className="font-medium text-foreground">LLMs, RAG, and MCP</span> — backed by full-stack and cloud engineering. At Sarana AI I ship scalable agents and data platforms with{" "}
+              {JOB_TITLE} building production AI systems — <span className="font-medium text-foreground">LLMs, RAG, and MCP</span> — backed by full-stack and cloud engineering. At Sarana AI I ship scalable agents and data platforms with{" "}
               <span className="font-medium text-foreground">Python, AWS, Next.js, and Go</span>, focused on reliable CI/CD and <Typography.Em>measurable</Typography.Em> impact.
             </p>
           </div>
@@ -81,7 +82,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
 
           {/* Social Links */}
           <div className="animate-fade-in-up" style={{ animationDelay: "500ms" }}>
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-wrap items-center gap-3">
               <Eyebrow>Find me on</Eyebrow>
               <div className="flex flex-wrap gap-2 items-center">
                 {media_socials.map((social) => (
@@ -90,7 +91,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2.5 rounded-lg border border-border bg-background hover:bg-accent hover:text-primary transition-colors"
+                    className="rounded-lg border border-border bg-background p-2.5 transition-colors hover:border-foreground/20 hover:bg-accent hover:text-primary"
                     title={social.title}
                   >
                     <social.icon className="size-4" />

@@ -54,7 +54,7 @@ function Characters() {
                   ) : (
                     <div className="flex h-full w-full items-center justify-center"><User className="h-8 w-8 text-muted-foreground" /></div>
                   )}
-                  <span className="absolute right-1.5 top-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">#{p.id}</span>
+                  <span className="absolute right-1.5 top-1.5 rounded-none bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">#{p.id}</span>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-2.5 pt-6">
                     <p className="truncate text-sm font-semibold text-white">{p.name}</p>
                     <p className="truncate text-[11px] capitalize text-white/70">{p.species !== "unknown" ? p.species : p.gender}</p>
