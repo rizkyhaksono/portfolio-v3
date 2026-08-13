@@ -1,8 +1,13 @@
+import { JOB_TITLE } from "@/commons/constants/author"
+
 export const MetadataConstants = {
   creator: "Muhammad Rizky Haksono",
-  description:
-    "Muhammad Rizky Haksono is an AI engineer who loves to build things.",
-  keyword: "Muhammad Rizky Haksono, AI Engineer, machine learning, LLM, RAG, developer, frontend, backend, UI/UX",
+  jobTitle: JOB_TITLE,
+  description: `Muhammad Rizky Haksono is a ${JOB_TITLE} building production LLM systems — RAG, MCP, and cloud-native agents.`,
+  keyword: `Muhammad Rizky Haksono, ${JOB_TITLE}, machine learning, LLM, RAG, MCP, developer, frontend, backend, UI/UX`,
+  pageTitle: `Rizky Haksono | ${JOB_TITLE}`,
+  ogTitle: `Muhammad Rizky Haksono | ${JOB_TITLE}`,
+  ogPersonTitle: `Muhammad Rizky Haksono - ${JOB_TITLE}`,
   authors: {
     name: "Muhammad Rizky Haksono",
     url: process.env.DOMAIN,

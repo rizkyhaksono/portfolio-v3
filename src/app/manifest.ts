@@ -1,10 +1,11 @@
 import { MetadataRoute } from "next";
+import { MetadataConstants } from "@/commons/constants/metadata";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Muhammad Rizky Haksono - AI Engineer",
+    name: MetadataConstants.ogPersonTitle,
     short_name: "Rizky Haksono",
-    description: "Muhammad Rizky Haksono is an AI engineer who loves to build things.",
+    description: MetadataConstants.description,
     start_url: "/",
     display: "standalone",
     background_color: "#fff",

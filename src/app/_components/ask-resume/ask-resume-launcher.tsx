@@ -184,18 +184,21 @@ export default function AskResumeLauncher() {
             </form>
 
             {!answer && !loading && (
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <div className="mt-2.5 flex min-w-0 flex-wrap gap-1.5">
                 {SAMPLES.map((s) => (
-                  <button
+                  <Button
                     key={s}
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => {
                       setQ(s)
                       ask(s)
                     }}
-                    className="rounded-full border border-border/60 bg-background/60 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:bg-muted hover:text-foreground"
+                    className="h-auto min-w-0 whitespace-normal px-2.5 py-1 text-xs text-muted-foreground"
                   >
                     {s}
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}

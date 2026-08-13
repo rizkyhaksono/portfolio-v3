@@ -25,7 +25,7 @@ const STAT_LABELS: Record<string, string> = {
 }
 
 function TypeBadge({ type }: { type: string }) {
-  return <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium capitalize text-white", TYPE_COLORS[type] ?? "bg-stone-400")}>{type}</span>
+  return <span className={cn("rounded-none px-2.5 py-0.5 text-xs font-medium capitalize text-white", TYPE_COLORS[type] ?? "bg-stone-400")}>{type}</span>
 }
 
 export function PokemonTab() {

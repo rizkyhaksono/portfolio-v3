@@ -33,3 +33,33 @@ Unify Portfolio v3 UI so all boxes, sections, and page shells share one monochro
 ## 4. Out of Scope
 - Full Signal page restyle (documented outlier)
 - Admin shell redesign (keep separate; reuse solid surfaces)
+
+---
+
+## 5. Track — Senior AI Engineer copy + square/mobile UI
+
+### 5.1 Copy
+Promote visitor-facing title from “AI Engineer” to **Senior AI Engineer**. Keep Sarana AI, stack, and UMM credentials.
+
+- Centralize `JOB_TITLE = "Senior AI Engineer"` in `src/commons/constants/author.ts`
+- Point `authors.*.position` and `MetadataConstants.jobTitle` / page / OG titles at that constant
+- Update hero, about, SEO/chrome (layouts, JSON-LD, OG image, manifest, terminal `whoami`)
+- Leave Supabase career rows and admin dashboard copy unchanged
+
+### 5.2 Square chips (visitor tools + ask-resume)
+- Downloader platform selector: square `Button` (`default` / `outline`, `size="sm"`) — no `rounded-full` pills
+- Pokémon type tags and Star Wars `#id` overlay: square, not pills
+- Ask-resume sample prompts: square `Button` outline chips
+- Keep circular: avatars, status dots, Mac traffic lights, progress bars, switch thumbs, mobile FAB, spinners
+
+### 5.3 Mobile
+- Downloader: stack URL + Download (`flex-col sm:flex-row`); Download `w-full sm:w-auto`
+- Platform chips: `flex-wrap` + `min-w-0` so labels like “X (Twitter)” wrap instead of overflowing
+- Intro typing/socials: `min-w-0` / `flex-wrap`; StatStrip values wrap on small screens
+- Tools shell: keep 2-col mobile nav; MacWindow body `p-3` must not clip sticky search
+
+### 5.4 Out of scope (this track)
+- `/signal` marketing experiment
+- Admin login chrome
+- Terminal overlay visual chrome (copy only)
+- Career titles stored in Supabase

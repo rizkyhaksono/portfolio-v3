@@ -1,3 +1,5 @@
+export const JOB_TITLE = "Senior AI Engineer"
+
 export interface Author {
   name: string;
   position: string;
@@ -7,12 +9,12 @@ export interface Author {
 export const authors: Record<string, Author> = {
   rizky: {
     name: "Muhammad Rizky Haksono",
-    position: "AI Engineer",
+    position: JOB_TITLE,
     avatar: "/rizky.jpg",
   },
   natee: {
     name: "rizkyhaksono",
-    position: "AI Engineer",
+    position: JOB_TITLE,
     avatar: "/rizky.jpg",
   },
 } as const;

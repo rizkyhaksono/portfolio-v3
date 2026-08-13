@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "@/lib/utils"
+import { JOB_TITLE } from "@/commons/constants/author"
 
 type Line = { kind: "in" | "out"; text: string }
 
@@ -43,7 +44,7 @@ const COMMANDS: Command[] = [
   {
     name: "whoami",
     description: "About me",
-    run: () => ["Muhammad Rizky Haksono", "Software / AI Engineer — RAG, LLMs, multi-cloud.", "Type `socials` to connect, `open /project` to see my work."],
+    run: () => ["Muhammad Rizky Haksono", `${JOB_TITLE} — RAG, LLMs, multi-cloud.`, "Type `socials` to connect, `open /project` to see my work."],
   },
   {
     name: "ls",

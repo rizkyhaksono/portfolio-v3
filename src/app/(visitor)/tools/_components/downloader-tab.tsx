@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Download, Video, ImageIcon, Play, ExternalLink, Info, Copy, CheckCircle2 } from "lucide-react"
 import Image from "next/image"
+import { Surface } from "@/components/ui/surface"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
@@ -178,26 +179,29 @@ export function DownloaderTab() {
 
   return (
     <div className="space-y-6">
-      {/* Platform Selector - Horizontal Pills */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex min-w-0 flex-wrap gap-2">
         {PLATFORMS.map((platform) => {
           const PlatformIcon = platform.icon
           const isActive = activePlatform === platform.id
           return (
-            <button
+            <Button
               key={platform.id}
+              type="button"
+              size="sm"
+              variant={isActive ? "default" : "outline"}
+              aria-pressed={isActive}
               onClick={() => setActivePlatform(platform.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${isActive ? "bg-foreground text-background" : "bg-secondary/50 hover:bg-secondary text-foreground"}`}
+              className="min-w-0"
             >
               <PlatformIcon size={16} />
               {platform.name}
-            </button>
+            </Button>
           )
         })}
       </div>
 
       {/* Supported Formats */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <span>Supports:</span>
         {currentPlatform.supportedFormats.map((format) => (
           <Badge key={format} variant="outline" className="text-xs">
@@ -208,9 +212,9 @@ export function DownloaderTab() {
 
       {/* Download Input */}
       <div className="space-y-3">
-        <div className="flex gap-2">
-          <Input placeholder={`Paste ${currentPlatform.name} URL here...`} value={url} onChange={(e) => setUrl(e.target.value)} className="flex-1" />
-          <Button onClick={handleDownload} disabled={!url.trim() || isLoading} className="px-6">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
+          <Input placeholder={`Paste ${currentPlatform.name} URL here...`} value={url} onChange={(e) => setUrl(e.target.value)} className="min-w-0 w-full flex-1" />
+          <Button onClick={handleDownload} disabled={!url.trim() || isLoading} className="w-full px-6 sm:w-auto">
             {isLoading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin mr-2" />
@@ -326,9 +330,9 @@ export function DownloaderTab() {
             </CardContent>
           ) : (
             <CardContent className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-              <div className="rounded-full bg-destructive/10 p-3">
+              <Surface variant="inset" className="p-3">
                 <Info className="h-6 w-6 text-destructive" />
-              </div>
+              </Surface>
               <p className="font-semibold">Download failed</p>
               <p className="max-w-sm text-sm text-muted-foreground">
                 {result.data.author || "Couldn't fetch this URL. Check the link and try again."}
