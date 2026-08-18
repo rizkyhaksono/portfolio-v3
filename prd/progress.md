@@ -1,6 +1,6 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-08-13 (Senior AI Engineer copy + square/mobile UI pass)*
+*Last Updated: 2026-08-18 (GitHub contribution calendar horizontal scroll)*
 
 ---
 
@@ -17,6 +17,7 @@
 - **UI layout consistency**: ✅ COMPLETED — shared surfaces, migrations, agent/UI docs
 - **DeepSource JavaScript**: ✅ COMPLETED — nesting / imports / HTML preview issues fixed
 - **Senior AI + square/mobile pass**: ✅ COMPLETED — `JOB_TITLE` constant, square tool chips, mobile wrap
+- **GitHub contribution calendar overflow**: ✅ COMPLETED — heatmap scrolls horizontally; newest weeks visible
 
 ---
 
@@ -53,6 +54,13 @@
   - StatStrip: `min-w-0` + `break-words` so “Senior AI Engineer” wraps
   - Tools aside: `min-w-0`; 2-col nav kept; MacWindow already avoids `overflow-hidden`
 
+#### GitHub contribution calendar overflow
+- ✅ **Horizontal scroll + newest week** - COMPLETED (2026-08-18)
+  - Replaced `overflow-hidden` on month labels and week grid with one `overflow-x-auto` scroller (`w-max` inner, week columns `shrink-0`)
+  - `useLayoutEffect` pins `scrollLeft` to the right so the current streak is visible on mobile
+  - `BaseLayout` main + flex row get `min-w-0` so the heatmap can shrink instead of being clipped
+  - Files: `src/app/_components/contribution/github-calender.tsx`, `src/components/layout/base-layout.tsx`
+
 #### UI Layout Consistency
 - ✅ Design tokens: `src/lib/design-system.ts`
 - ✅ Primitives: `surface.tsx`, `page-section.tsx`, `page-body.tsx`
@@ -85,6 +93,7 @@
 - **About section:** `src/app/_components/about/index.tsx`
 - **Intro section:** `src/app/_components/intro/index.tsx`
 - **Downloader:** `src/app/(visitor)/tools/_components/downloader-tab.tsx`
+- **GitHub calendar:** `src/app/_components/contribution/github-calender.tsx`
 - **Tokens:** `src/lib/design-system.ts`
 - **Primitives:** `src/components/ui/surface.tsx`, `page-section.tsx`, `page-body.tsx`, `mac-window.tsx`
 - **Rule:** `.cursor/rules/ui-layout-consistency.mdc`

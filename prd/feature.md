@@ -63,3 +63,13 @@ Promote visitor-facing title from “AI Engineer” to **Senior AI Engineer**. K
 - Admin login chrome
 - Terminal overlay visual chrome (copy only)
 - Career titles stored in Supabase
+
+---
+
+## 6. Track — GitHub contribution calendar overflow
+
+The home heatmap was clipped on the right (newest weeks) because the grid used `overflow-hidden` and `main` in a flex row lacked `min-w-0`.
+
+- Single `overflow-x-auto` scroller wrapping month labels + week columns (`w-max`, week columns `shrink-0`)
+- Default scroll position: newest week (right edge)
+- `main`/`flex` row: `min-w-0` so the scroller can actually shrink and scroll
