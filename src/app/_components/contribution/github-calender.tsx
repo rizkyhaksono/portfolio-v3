@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 
 interface Contribution {
   date: string
@@ -27,7 +27,21 @@ interface GithubCalendarProps {
   }
 }
 
+const CELL_SIZE_PX = 12
+const CELL_GAP_PX = 3
+const WEEK_COLUMN_PX = CELL_SIZE_PX + CELL_GAP_PX
+
+/**
+ * Pins the heatmap to the newest week so mobile viewports show the current
+ * streak first; older months remain reachable by scrolling left.
+ */
+const scrollToNewestWeek = (node: HTMLDivElement | null) => {
+  if (!node) return
+  node.scrollLeft = node.scrollWidth
+}
+
 const GithubCalendar = ({ data }: GithubCalendarProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [selectContribution, setSelectContribution] = useState<{
     count: number | null
     date: string | null
@@ -53,48 +67,63 @@ const GithubCalendar = ({ data }: GithubCalendarProps) => {
 
   const contributionColors = data?.colors ?? []
 
+  useLayoutEffect(() => {
+    scrollToNewestWeek(scrollRef.current)
+  }, [weeks.length])
+
   return (
     <>
-      <div className="relative flex flex-col">
-        <ul className="flex justify-end gap-[3px] overflow-hidden text-xs dark:text-neutral-400 md:justify-start">
-          {months.map((month) => (
-            <li key={month.firstDay} className={cn(`${month.totalWeeks < 2 ? "invisible" : ""}`)} style={{ minWidth: 14.3 * month.totalWeeks }}>
-              {month.name}
-            </li>
-          ))}
-        </ul>
+      <div
+        ref={scrollRef}
+        tabIndex={0}
+        aria-label="GitHub contribution calendar"
+        className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-1"
+      >
+        <div className="flex w-max min-w-full flex-col">
+          <ul className="flex gap-[3px] text-xs text-muted-foreground">
+            {months.map((month) => (
+              <li
+                key={month.firstDay}
+                className={cn(month.totalWeeks < 2 && "invisible")}
+                style={{ minWidth: WEEK_COLUMN_PX * month.totalWeeks }}
+              >
+                {month.name}
+              </li>
+            ))}
+          </ul>
 
-        <div className="flex justify-start gap-[3px] overflow-hidden">
-          {weeks?.map((week) => (
-            <div key={week.firstDay}>
-              {week.contributionDays.map((contribution) => {
-                const backgroundColor = contribution.contributionCount > 0 && contribution.color
+          <div className="flex gap-[3px] py-0.5">
+            {weeks.map((week) => (
+              <div key={week.firstDay} className="flex w-[12px] shrink-0 flex-col">
+                {week.contributionDays.map((contribution) => {
+                  const backgroundColor = contribution.contributionCount > 0 && contribution.color
 
-                return (
-                  <span
-                    key={contribution.date}
-                    className="my-[2px] block h-[12px] w-[12px] rounded-sm bg-neutral-300 dark:bg-neutral-800 transition-transform duration-150 hover:scale-125"
-                    style={backgroundColor ? { backgroundColor } : undefined}
-                    onMouseEnter={() =>
-                      setSelectContribution({
-                        count: contribution.contributionCount,
-                        date: contribution.date,
-                      })
-                    }
-                    onMouseLeave={() => setSelectContribution({ count: null, date: null })}
-                  />
-                )
-              })}
-            </div>
-          ))}
+                  return (
+                    <span
+                      key={contribution.date}
+                      className="my-[2px] block h-[12px] w-[12px] rounded-sm bg-muted transition-transform duration-150 hover:scale-125"
+                      style={backgroundColor ? { backgroundColor } : undefined}
+                      onMouseEnter={() =>
+                        setSelectContribution({
+                          count: contribution.contributionCount,
+                          date: contribution.date,
+                        })
+                      }
+                      onMouseLeave={() => setSelectContribution({ count: null, date: null })}
+                    />
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm">
-          <span className="dark:text-neutral-400">Less</span>
+          <span className="text-muted-foreground">Less</span>
           <ul className="flex gap-1">
-            <li className="h-[10px] w-[10px] rounded-sm bg-neutral-300 dark:bg-neutral-800" />
+            <li className="h-[10px] w-[10px] rounded-sm bg-muted" />
             {contributionColors.map((item) => (
               <li key={item} className="h-[10px] w-[10px] rounded-sm" style={{ backgroundColor: item }} />
             ))}
@@ -102,7 +131,12 @@ const GithubCalendar = ({ data }: GithubCalendarProps) => {
           <span>More</span>
         </div>
 
-        <div className={cn(`${selectContribution?.date ? "opacity-100" : "opacity-0"}`, "rounded bg-neutral-200 px-2 text-sm dark:bg-neutral-700 transition-opacity duration-200")}>
+        <div
+          className={cn(
+            selectContribution?.date ? "opacity-100" : "opacity-0",
+            "rounded-md bg-muted px-2 text-sm transition-opacity duration-200",
+          )}
+        >
           {selectContribution?.count} contributions on {selectContribution?.date}
         </div>
       </div>

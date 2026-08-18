@@ -42,9 +42,9 @@ export default async function BaseLayout({
         <div className="block md:hidden">
           <Navbar isHaveToken={isHaveToken} />
         </div>
-        <div className="flex md:gap-6">
+        <div className="flex min-w-0 md:gap-6">
           {sidebar && <aside>{sidebar}</aside>}
-          <main className="mb-16 pt-4 w-full overflow-hidden">{children}</main>
+          <main className="mb-16 min-w-0 w-full overflow-x-clip pt-4">{children}</main>
           {rightSidebar && <aside className="hidden md:block">{rightSidebar}</aside>}
         </div>
         <Footer />
