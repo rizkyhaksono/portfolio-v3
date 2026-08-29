@@ -11,7 +11,7 @@ Modern portfolio website built with Next.js 16, React 19, TypeScript, and Tailwi
 
 This is my third iteration of my personal portfolio website, showcasing my work as a software engineer. Built with cutting-edge technologies and modern web development practices, this project demonstrates my skills in full-stack development, UI/UX design, and software architecture.
 
-**Live Site:** [nateee.com](https://nateee.com)
+**Live Site:** [natee.my.id](https://natee.my.id)
 
 ## Tech Stack
 
@@ -623,7 +623,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 **Muhammad Rizky Haksono**
 
-- Website: [nateee.com](https://nateee.com)
+- Website: [natee.my.id](https://natee.my.id)
 - GitHub: [@rizkyhaksono](https://github.com/rizkyhaksono)
 - LinkedIn: [rizkyhaksono](https://www.linkedin.com/in/rizkyhaksono)
 - Email: mrizkyhaksono@gmail.com

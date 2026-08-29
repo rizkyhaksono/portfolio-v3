@@ -90,7 +90,7 @@ export default function RootLayout({
         <Script
           defer
           src={process.env.NEXT_PUBLIC_UMAMI_SRC ?? "https://cloud.umami.is/script.js"}
-          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614"}
+          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "4a749f88-f2ec-445e-830f-209ce5188c9d"}
           strategy="afterInteractive"
         />
         {/* Umami session replay + heatmaps recorder. Enabled per-site in the Umami
@@ -100,7 +100,7 @@ export default function RootLayout({
           <Script
             defer
             src={process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614"}
+            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "4a749f88-f2ec-445e-830f-209ce5188c9d"}
             strategy="afterInteractive"
           />
         )}

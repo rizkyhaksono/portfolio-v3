@@ -11,7 +11,7 @@ import { logNonCriticalError } from "@/lib/logging";
 //   Cloud:       UMAMI_API_URL=https://api.umami.is/v1   (data API needs a Pro plan)
 //   Self-hosted: UMAMI_API_URL=https://umami.example.com/api  (all features, free)
 const UMAMI_API_URL = process.env.UMAMI_API_URL ?? "https://api.umami.is/v1";
-const WEBSITE_ID = process.env.UMAMI_WEBSITE_ID ?? "3344dd5c-2e88-4ae5-95f7-e142cdbff614";
+const WEBSITE_ID = process.env.UMAMI_WEBSITE_ID ?? "4a749f88-f2ec-445e-830f-209ce5188c9d";
 
 // Auth: either a static API key (Cloud Pro / self-host API key) OR username+password
 // login (self-hosted → POST /auth/login returns a JWT we cache and send as Bearer).
@@ -57,7 +57,7 @@ function normalizeStats(raw: any): UmamiStats {
 }
 
 // Helper to quickly add timeouts to fetches
-const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 6000) => {
+const fetchWithTimeout = async (url: string, options: RequestInit, timeoutMs = 12000) => {
   const controller = new AbortController()
   const id = setTimeout(() => controller.abort(), timeoutMs)
   try {

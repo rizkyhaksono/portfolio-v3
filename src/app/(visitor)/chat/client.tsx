@@ -14,7 +14,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-const WS_LABEL = "wscat -c wss://api.nateee.com/v3/public-chat"
+const WS_LABEL = "wscat -c wss://api.natee.my.id/v3/public-chat"
 
 const JSON_HEADERS = { "Content-Type": "application/json" }
 
