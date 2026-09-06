@@ -1,6 +1,5 @@
 import IntroSection from "@/app/_components/intro"
 import AboutSection from "@/app/_components/about"
-import AskResumeLauncher from "@/app/_components/ask-resume/ask-resume-launcher"
 import SkillSection from "@/app/_components/skills"
 import CarrerSection from "@/app/_components/career"
 import EducationSection from "@/app/_components/education"
@@ -39,8 +38,6 @@ export default async function Home() {
         <LinkedinRecommendations recommendations={recommendations} />
         <ContactSection />
       </div>
-
-      <AskResumeLauncher />
     </BaseLayout>
   )
 }
