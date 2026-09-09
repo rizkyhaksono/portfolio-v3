@@ -6,9 +6,7 @@ import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Toaster } from "sonner"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import ScrollToTop from "@/components/ui/scroll-to-top"
-import { CommandPalette } from "@/components/ui/command-palette"
-import TerminalOverlay from "@/components/ui/terminal-overlay"
-import FeedbackWidget from "@/components/ui/feedback-widget"
+import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
@@ -108,9 +106,7 @@ export default function RootLayout({
       <body className={cn("bg-background font-sans antialiased mx-auto", fontVariables)}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
-          <CommandPalette />
-          <TerminalOverlay />
-          <FeedbackWidget />
+          <DeferredClientUtilities />
           <ScrollToTop />
           <Toaster position="top-right" />
           {/* <div className="hidden sm:block">

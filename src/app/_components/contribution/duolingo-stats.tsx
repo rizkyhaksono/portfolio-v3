@@ -95,10 +95,10 @@ export default function DuolingoStats({ duolingo }: DuolingoStatsProps) {
           {topCourses.map((course, index) => (
             <Card key={`${course.language}-${index}`}>
               <CardContent className="flex items-center justify-between p-3">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-medium">{course.language}</span>
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-medium" title={course.language}>{course.language}</span>
                 </div>
-                <Badge variant="secondary" className="font-mono text-[10px] px-1.5 py-0 h-4">
+                <Badge variant="secondary" className="ml-2 h-auto shrink-0 whitespace-nowrap px-1.5 py-1 font-mono text-[9px] tabular-nums">
                   {formatNumber(course.xp)} XP
                 </Badge>
               </CardContent>

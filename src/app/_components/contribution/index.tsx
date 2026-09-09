@@ -13,17 +13,19 @@ import DuolingoStats from "./duolingo-stats"
 import MonkeyTypeStats from "./monkeytype-stats"
 
 export default async function ContributionSection() {
-  const readStatsResponse = await getReadStats()
-  const allTimeSinceTodayResponse = await getALLTimeSinceToday()
-  const duolingoProfile = await getDuolingoProfile()
-  const typingData = await getMonkeyTypeData()
+  const [readStatsResponse, allTimeSinceTodayResponse, duolingoProfile, typingData, github] =
+    await Promise.all([
+      getReadStats(),
+      getALLTimeSinceToday(),
+      getDuolingoProfile(),
+      getMonkeyTypeData(),
+      fetchGithubData(GITHUB_ACCOUNTS[0].username, GITHUB_ACCOUNTS[0].token),
+    ])
 
   const wakatime = {
     ...readStatsResponse.data,
     all_time_since_today: allTimeSinceTodayResponse.data,
   }
-
-  const github = await fetchGithubData(GITHUB_ACCOUNTS[0].username, GITHUB_ACCOUNTS[0].token)
 
   return (
     <BlurFade delay={0.25} inView>

@@ -77,9 +77,9 @@ const GithubCalendar = ({ data }: GithubCalendarProps) => {
         ref={scrollRef}
         tabIndex={0}
         aria-label="GitHub contribution calendar"
-        className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-1"
+        className="w-full min-w-0 overflow-x-auto overscroll-x-contain pb-1 [direction:rtl] sm:[direction:ltr]"
       >
-        <div className="flex w-max min-w-full flex-col">
+        <div className="flex w-max min-w-full flex-col [direction:ltr]">
           <ul className="flex gap-[3px] text-xs text-muted-foreground">
             {months.map((month) => (
               <li

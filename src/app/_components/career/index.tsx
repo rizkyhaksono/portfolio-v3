@@ -40,13 +40,13 @@ export default async function CarrerSection() {
               {companyCarers.map((career: any, idx: number) => (
                 <div key={career.id} className="relative">
                   {idx > 0 && <div className="absolute left-[28px] top-[26px] w-2 h-2 rounded-full bg-primary z-10" />}
-                  <div className="max-w-full text-pretty mt-3 flex flex-row items-start gap-4">
+                  <div className="mt-3 grid max-w-full grid-cols-[4rem_minmax(0,1fr)] items-start gap-x-4 gap-y-2 text-pretty sm:grid-cols-[4rem_minmax(0,1fr)_auto]">
                     {idx === 0 ? <FallbackImage src={career.image} alt={`${career.title} logo`} width={64} height={64} className="rounded-full object-cover size-16 flex-shrink-0 ring-1 ring-border" /> : <div className="size-16 flex-shrink-0" />}
-                    <div className="flex-1">
+                    <div className="min-w-0">
                       <h3 className="font-display text-sm sm:text-base font-semibold leading-snug tracking-tight text-foreground">{career.title}</h3>
                       <p className="mt-0.5 text-muted-foreground text-xs sm:text-sm">{career.subtitle}</p>
                     </div>
-                    <Chip className="ml-auto self-start whitespace-nowrap">{career.duration}</Chip>
+                    <Chip className="col-start-2 w-fit whitespace-nowrap sm:col-start-3 sm:row-start-1">{career.duration}</Chip>
                   </div>
                 </div>
               ))}

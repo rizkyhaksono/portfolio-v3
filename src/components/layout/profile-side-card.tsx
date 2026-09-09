@@ -40,14 +40,14 @@ const ProfileSideCard = ({ avatarSize }: { avatarSize?: number }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="w-full overflow-hidden">
-        <div data-cy="auth-card-side" className={cn(`flex p-3 gap-3 items-center cursor-pointer border rounded-none transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955]`)}>
-          <Avatar className={cn(avatarClass)}>
+        <div data-cy="auth-card-side" className="flex w-full min-w-0 cursor-pointer items-center gap-3 border p-3 transition-colors hover:bg-secondary">
+          <Avatar className={cn(avatarClass, "shrink-0")}>
             {avatarSrc ? <AvatarImage src={avatarSrc} alt={profile.data.name} className="object-cover" referrerPolicy="no-referrer" /> : null}
             <AvatarFallback>{getInitials(profile.data.name)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col gap-1">
-            <Typography.P className="text-sm text-start font-medium text-ellipsis truncate max-w-[140px]">{profile?.data?.name}</Typography.P>
-            <Typography.P className="text-xs text-start opacity-75 text-ellipsis truncate max-w-[140px]">{profile?.data?.email}</Typography.P>
+          <div className="min-w-0 flex-1 space-y-1">
+            <Typography.P className="truncate text-start text-sm font-medium" title={profile.data.name}>{profile.data.name}</Typography.P>
+            <Typography.P className="truncate text-start text-xs text-muted-foreground" title={profile.data.email}>{profile.data.email}</Typography.P>
           </div>
         </div>
       </DropdownMenuTrigger>

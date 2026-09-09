@@ -127,17 +127,16 @@ describe('Navbar Component', () => {
   })
 
   describe('Component Structure', () => {
-    it('should render with proper dock structure', () => {
-      const { container } = render(<Navbar isHaveToken={false} />)
+    it('should render a labelled compact navigation', () => {
+      render(<Navbar isHaveToken={false} />)
 
-      const dock = container.querySelector('[class*="rounded-full"]')
-      expect(dock).toBeInTheDocument()
+      expect(screen.getByRole('navigation', { name: 'Mobile navigation' })).toBeInTheDocument()
     })
 
-    it('should render separator between navigation and expand button', () => {
+    it('should render a quiet separator before the expand button', () => {
       const { container } = render(<Navbar isHaveToken={false} />)
 
-      const separator = container.querySelector('[data-orientation="vertical"]')
+      const separator = container.querySelector('[aria-hidden="true"]')
       expect(separator).toBeInTheDocument()
     })
 

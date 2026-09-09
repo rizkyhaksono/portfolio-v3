@@ -61,6 +61,7 @@ export const getALLTimeSinceToday = async (): Promise<{
 }> => {
   const response = await fetch(ALL_TIME_SINCE_TODAY, {
     method: "GET",
+    next: { revalidate: 3600 },
     headers: {
       Authorization: `Basic ${process.env.WAKATIME_API_KEY}`,
     },

@@ -11,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Eyebrow } from "@/components/ui/eyebrow"
-import { ChevronsLeft, ChevronsRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, BarChart3, Sparkles, ChevronUp, MessageSquare, type LucideIcon } from "lucide-react"
+import { ChevronsLeft, ChevronsRight, Home, Laptop, School, Briefcase, GraduationCap, Settings, LogOut, Menu, User, NotebookPen, BarChart3, ChevronUp, MessageSquare, type LucideIcon } from "lucide-react"
 import { performAdminLogout } from "@/lib/admin-logout"
 
 interface NavItem {
@@ -89,15 +89,14 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
     <Link
       href={item.href}
       className={cn(
-        "group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
+        "group relative flex items-center gap-3 border-l-2 px-3 py-2 text-sm font-medium transition-colors",
         isActive
-          ? "bg-primary/10 text-foreground"
-          : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+          ? "border-foreground bg-secondary text-foreground"
+          : "border-transparent text-muted-foreground hover:bg-secondary hover:text-foreground",
         !isExpanded && "justify-center px-2"
       )}
     >
-      {isActive && <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary" />}
-      <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-colors", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+      <Icon className={cn("h-[18px] w-[18px] shrink-0", isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")} />
       {isExpanded && <span className="truncate">{item.title}</span>}
       {isExpanded && item.badge && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground">{item.badge}</span>}
     </Link>
@@ -123,14 +122,13 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
 function Brand({ isExpanded }: { isExpanded: boolean }) {
   return (
     <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center border border-border bg-primary font-display text-sm font-bold text-primary-foreground">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-border bg-background font-display text-sm font-bold text-foreground">
         RH
-        <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-primary" />
       </div>
       {isExpanded && (
         <div className="flex flex-col leading-none">
-          <span className="font-display text-sm font-semibold">Admin Panel</span>
-          <span className="mt-0.5 text-[11px] text-muted-foreground">Portfolio v3</span>
+          <span className="font-display text-sm font-semibold">Rizky Haksono</span>
+          <span className="mt-0.5 text-[11px] text-muted-foreground">Portfolio admin</span>
         </div>
       )}
     </Link>
@@ -220,7 +218,7 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 hidden flex-col border-r bg-background transition-all duration-300 sm:flex", isExpanded ? "w-64" : "w-16")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 hidden flex-col border-r bg-background sm:flex", isExpanded ? "w-56" : "w-16")}>
         {/* Header */}
         <div className={cn("flex h-16 items-center border-b px-3", isExpanded ? "justify-between" : "justify-center")}>
           <Brand isExpanded={isExpanded} />

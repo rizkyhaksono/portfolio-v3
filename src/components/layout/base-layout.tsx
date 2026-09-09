@@ -1,7 +1,6 @@
 import { isHaveValidToken } from "@/app/actions/actions"
 import Footer from "@/components/layout/footer"
 import Navbar from "@/components/layout/navbar"
-import ScrollProgress from "@/components/ui/scroll-progress"
 
 export default async function BaseLayout({
   children,
@@ -18,7 +17,6 @@ export default async function BaseLayout({
 
   return (
     <>
-      <ScrollProgress />
       {/* Padding comes from Tailwind `container` (2rem) — do not add extra px-* here. */}
       <div className="container min-h-screen pt-6 sm:pt-10">
         <div className="block md:hidden">

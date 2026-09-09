@@ -1,752 +1,369 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Cloud, Database, RefreshCw } from "lucide-react"
+import { formatDistanceToNow } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { Eyebrow } from "@/components/ui/eyebrow"
+import { StatStrip } from "@/components/ui/stat-strip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { BarChart3, Briefcase, FolderKanban, GraduationCap, MessageSquare, RefreshCw, Users, Eye, ArrowUpRight, ArrowDownRight, Clock, CheckCircle, Loader2, Database, Cloud, Server } from "lucide-react"
 import {
   getProjectsClient,
-  getWorkClient,
-  getEducationClient,
-  getCurrentUserClient,
-  getPublicChatsClient,
   getSupabaseProjectsClient,
   getSupabaseCareersClient,
   getSupabaseEducationsClient,
   type BackendProject,
-  type BackendWork,
-  type BackendEducation,
   type SupabaseProject,
   type SupabaseCareer,
   type SupabaseEducation,
 } from "@/services/admin/client-services"
-import { formatDistanceToNow } from "date-fns"
 
-interface DashboardStats {
-  backend: {
-    projects: number
-    work: number
-    education: number
-    users: number
-    publicChats: number
-  }
-  supabase: {
-    projects: number
-    careers: number
-    educations: number
-  }
-}
+const PAGE_SIZE = 10
 
-// Helper components to avoid nested ternaries
-function LoadingState() {
-  return (
-    <div className="flex items-center justify-center py-8">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-    </div>
-  )
-}
-
-function EmptyState({ icon: Icon, message, action }: { icon: React.ElementType; message: string; action?: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-8 text-center">
-      <Icon className="h-12 w-12 text-muted-foreground mb-4" />
-      <p className="text-muted-foreground">{message}</p>
-      {action && (
-        <Button variant="link" className="mt-2">
-          {action}
-        </Button>
-      )}
-    </div>
-  )
-}
-
-function DatabaseBadge({ source }: { source: "backend" | "supabase" }) {
-  return (
-    <Badge variant={source === "backend" ? "default" : "secondary"} className="text-xs">
-      {source === "backend" ? <Server className="h-3 w-3 mr-1" /> : <Cloud className="h-3 w-3 mr-1" />}
-      {source === "backend" ? "Backend" : "Supabase"}
-    </Badge>
-  )
-}
-
-// Backend Projects Tab Content
-function BackendProjectsTabContent({
-  isLoading,
-  projects,
-}: Readonly<{
-  isLoading: boolean
-  projects: BackendProject[]
-}>) {
-  if (isLoading) return <LoadingState />
-  if (projects.length === 0) return <EmptyState icon={FolderKanban} message="No backend projects yet" action="Create your first project" />
-
-  return (
-    <ScrollArea className="h-[300px]">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Featured</TableHead>
-            <TableHead>Source</TableHead>
-            <TableHead className="text-right">Created</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {projects.map((project) => (
-            <TableRow key={project.id}>
-              <TableCell className="font-medium">{project.title}</TableCell>
-              <TableCell>
-                <Badge variant={project.isFeatured ? "default" : "secondary"}>
-                  {project.isFeatured ? <CheckCircle className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
-                  {project.isFeatured ? "Featured" : "Normal"}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <DatabaseBadge source="backend" />
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground">{project.created_at ? formatDistanceToNow(new Date(project.created_at), { addSuffix: true }) : "N/A"}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </ScrollArea>
-  )
-}
-
-// Supabase Projects Tab Content
-function SupabaseProjectsTabContent({
-  isLoading,
-  projects,
-}: Readonly<{
-  isLoading: boolean
-  projects: SupabaseProject[]
-}>) {
-  if (isLoading) return <LoadingState />
-  if (projects.length === 0) return <EmptyState icon={FolderKanban} message="No Supabase projects yet" action="Create your first project" />
-
-  return (
-    <ScrollArea className="h-[300px]">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>URL</TableHead>
-            <TableHead>Source</TableHead>
-            <TableHead className="text-right">Created</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {projects.map((project) => (
-            <TableRow key={project.id}>
-              <TableCell className="font-medium">{project.title}</TableCell>
-              <TableCell>
-                {project.url ? (
-                  <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    Link
-                  </a>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell>
-                <DatabaseBadge source="supabase" />
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground">{project.created_at ? formatDistanceToNow(new Date(project.created_at), { addSuffix: true }) : "N/A"}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </ScrollArea>
-  )
-}
-
-// Users Tab Content
-function UsersTabContent({
-  isLoading,
-  recentUsers,
-}: Readonly<{
-  isLoading: boolean
-  recentUsers: any[]
-}>) {
-  if (isLoading) return <LoadingState />
-  if (recentUsers.length === 0) return <EmptyState icon={Users} message="No users yet" />
-
-  return (
-    <ScrollArea className="h-[300px]">
-      <div className="space-y-4">
-        {recentUsers.map((user: any) => (
-          <div key={user.id} className="flex items-center justify-between p-3 rounded-lg border">
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={user.avatar || user.avatarUrl} />
-                <AvatarFallback>{user.name?.charAt(0) || user.email?.charAt(0) || "U"}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{user.name || "Unnamed User"}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>{user.role}</Badge>
-              <DatabaseBadge source="backend" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  )
-}
-
-// Chats Tab Content
-function ChatsTabContent({
-  isLoading,
-  recentChats,
-}: Readonly<{
-  isLoading: boolean
-  recentChats: any[]
-}>) {
-  if (isLoading) return <LoadingState />
-  if (recentChats.length === 0) return <EmptyState icon={MessageSquare} message="No chats yet" />
-
-  return (
-    <ScrollArea className="h-[300px]">
-      <div className="space-y-4">
-        {recentChats.map((chat: any) => (
-          <div key={chat.id} className="p-3 rounded-lg border space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={chat.user?.avatar || chat.user?.avatarUrl} />
-                  <AvatarFallback>{chat.user?.name?.charAt(0) || "U"}</AvatarFallback>
-                </Avatar>
-                <span className="font-medium text-sm">{chat.user?.name || "Anonymous"}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">{chat.createdAt ? formatDistanceToNow(new Date(chat.createdAt), { addSuffix: true }) : "N/A"}</span>
-                <DatabaseBadge source="backend" />
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground line-clamp-2">{chat.message}</p>
-          </div>
-        ))}
-      </div>
-    </ScrollArea>
-  )
-}
-
-// Work/Career comparison tab
-function WorkCareerTabContent({
-  isLoading,
-  backendWork,
-  supabaseCareers,
-}: Readonly<{
-  isLoading: boolean
-  backendWork: BackendWork[]
+interface DashboardData {
+  supabaseProjects: SupabaseProject[]
   supabaseCareers: SupabaseCareer[]
-}>) {
-  if (isLoading) return <LoadingState />
-
-  return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {/* Backend Work */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Server className="h-4 w-4" />
-            Backend Work Experience
-          </CardTitle>
-          <CardDescription>{backendWork.length} entries</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px]">
-            {backendWork.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No work entries</p>
-            ) : (
-              <div className="space-y-3">
-                {backendWork.map((work) => (
-                  <div key={work.id} className="p-2 rounded border">
-                    <p className="font-medium text-sm">{work.jobTitle}</p>
-                    <p className="text-xs text-muted-foreground">{work.instance}</p>
-                    <p className="text-xs text-muted-foreground">{work.duration}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-
-      {/* Supabase Careers */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Cloud className="h-4 w-4" />
-            Supabase Careers
-          </CardTitle>
-          <CardDescription>{supabaseCareers.length} entries</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px]">
-            {supabaseCareers.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No career entries</p>
-            ) : (
-              <div className="space-y-3">
-                {supabaseCareers.map((career) => (
-                  <div key={career.id} className="p-2 rounded border">
-                    <p className="font-medium text-sm">{career.title}</p>
-                    <p className="text-xs text-muted-foreground">{career.subtitle}</p>
-                    <p className="text-xs text-muted-foreground">{career.duration}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-// Education comparison tab
-function EducationTabContent({
-  isLoading,
-  backendEducation,
-  supabaseEducations,
-}: Readonly<{
-  isLoading: boolean
-  backendEducation: BackendEducation[]
   supabaseEducations: SupabaseEducation[]
-}>) {
-  if (isLoading) return <LoadingState />
+  backendProjects: BackendProject[]
+}
+
+interface PaginationProps {
+  page: number
+  total: number
+  onPageChange: (page: number) => void
+}
+
+/** Returns one page from an in-memory admin dataset. */
+function paginate<T>(items: T[], page: number): T[] {
+  const start = (page - 1) * PAGE_SIZE
+  return items.slice(start, start + PAGE_SIZE)
+}
+
+/** Provides compact pagination with a fixed ten-row page size. */
+function Pagination({ page, total, onPageChange }: Readonly<PaginationProps>) {
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const firstItem = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
+  const lastItem = Math.min(page * PAGE_SIZE, total)
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {/* Backend Education */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Server className="h-4 w-4" />
-            Backend Education
-          </CardTitle>
-          <CardDescription>{backendEducation.length} entries</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px]">
-            {backendEducation.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No education entries</p>
-            ) : (
-              <div className="space-y-3">
-                {backendEducation.map((edu) => (
-                  <div key={edu.id} className="p-2 rounded border">
-                    <p className="font-medium text-sm">{edu.instance}</p>
-                    <p className="text-xs text-muted-foreground">{edu.address}</p>
-                    <p className="text-xs text-muted-foreground">{edu.duration}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
-
-      {/* Supabase Education */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Cloud className="h-4 w-4" />
-            Supabase Education
-          </CardTitle>
-          <CardDescription>{supabaseEducations.length} entries</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px]">
-            {supabaseEducations.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No education entries</p>
-            ) : (
-              <div className="space-y-3">
-                {supabaseEducations.map((edu) => (
-                  <div key={edu.id} className="p-2 rounded border">
-                    <p className="font-medium text-sm">{edu.title}</p>
-                    <p className="text-xs text-muted-foreground">{edu.subtitle}</p>
-                    <p className="text-xs text-muted-foreground">{edu.duration}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </CardContent>
-      </Card>
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+      <p className="text-xs text-muted-foreground">
+        {firstItem}–{lastItem} of {total} · {PAGE_SIZE} per page
+      </p>
+      <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+          Previous
+        </Button>
+        <span className="min-w-16 text-center text-xs tabular-nums">{page} / {totalPages}</span>
+        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>
+          Next
+        </Button>
+      </div>
     </div>
   )
 }
 
+/** Formats database timestamps consistently for the compact tables. */
+function formatDate(value: string | null | undefined): string {
+  if (!value) return "—"
+  return new Intl.DateTimeFormat("en", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(value))
+}
+
+/** Displays a lightweight loading state without animated spinners. */
+function LoadingRows() {
+  return (
+    <div className="border-y border-border py-12 text-center text-sm text-muted-foreground">
+      Loading data…
+    </div>
+  )
+}
+
+/** Displays a concise empty-state message for database tables. */
+function EmptyRows({ label }: Readonly<{ label: string }>) {
+  return (
+    <div className="border-y border-border py-12 text-center text-sm text-muted-foreground">
+      No {label.toLowerCase()} found.
+    </div>
+  )
+}
+
+/** Renders Supabase project rows. */
+function SupabaseProjectsTable({ items }: Readonly<{ items: SupabaseProject[] }>) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Project</TableHead>
+          <TableHead className="hidden md:table-cell">Description</TableHead>
+          <TableHead>Link</TableHead>
+          <TableHead className="text-right">Created</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((project) => (
+          <TableRow key={project.id}>
+            <TableCell className="font-medium">{project.title}</TableCell>
+            <TableCell className="hidden max-w-md truncate text-muted-foreground md:table-cell">{project.description}</TableCell>
+            <TableCell>
+              {project.url ? <a href={project.url} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">Open</a> : "—"}
+            </TableCell>
+            <TableCell className="text-right text-muted-foreground">{formatDate(project.created_at)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+
+/** Renders Supabase career rows. */
+function CareersTable({ items }: Readonly<{ items: SupabaseCareer[] }>) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Role</TableHead>
+          <TableHead>Company</TableHead>
+          <TableHead className="text-right">Duration</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((career) => (
+          <TableRow key={career.id}>
+            <TableCell className="font-medium">{career.title}</TableCell>
+            <TableCell className="text-muted-foreground">{career.subtitle}</TableCell>
+            <TableCell className="text-right font-mono text-xs">{career.duration}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+
+/** Renders Supabase education rows. */
+function EducationTable({ items }: Readonly<{ items: SupabaseEducation[] }>) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Education</TableHead>
+          <TableHead>Program</TableHead>
+          <TableHead className="text-right">Duration</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((education) => (
+          <TableRow key={education.id}>
+            <TableCell className="font-medium">{education.title}</TableCell>
+            <TableCell className="text-muted-foreground">{education.subtitle}</TableCell>
+            <TableCell className="text-right font-mono text-xs">{education.duration}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+
+/** Renders legacy backend project rows for comparison. */
+function BackendProjectsTable({ items }: Readonly<{ items: BackendProject[] }>) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Project</TableHead>
+          <TableHead className="hidden md:table-cell">Description</TableHead>
+          <TableHead>Featured</TableHead>
+          <TableHead className="text-right">Created</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {items.map((project) => (
+          <TableRow key={project.id}>
+            <TableCell className="font-medium">{project.title}</TableCell>
+            <TableCell className="hidden max-w-md truncate text-muted-foreground md:table-cell">{project.description}</TableCell>
+            <TableCell>{project.isFeatured ? "Yes" : "No"}</TableCell>
+            <TableCell className="text-right text-muted-foreground">{formatDate(project.created_at)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+
+interface DataTabProps<T> {
+  label: string
+  description: string
+  items: T[]
+  page: number
+  isLoading: boolean
+  onPageChange: (page: number) => void
+  renderTable: (items: T[]) => React.ReactNode
+}
+
+/** Composes a table, empty state, and its pagination controls. */
+function DataTab<T>({
+  label,
+  description,
+  items,
+  page,
+  isLoading,
+  onPageChange,
+  renderTable,
+}: Readonly<DataTabProps<T>>) {
+  const visibleItems = useMemo(() => paginate(items, page), [items, page])
+
+  let content: React.ReactNode
+  if (isLoading) content = <LoadingRows />
+  else if (items.length === 0) content = <EmptyRows label={label} />
+  else content = renderTable(visibleItems)
+
+  return (
+    <section className="border-y border-border py-5">
+      <div className="mb-4">
+        <h2 className="font-display text-lg font-semibold">{label}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </div>
+      <div className="overflow-x-auto">{content}</div>
+      {!isLoading && items.length > 0 ? (
+        <Pagination page={page} total={items.length} onPageChange={onPageChange} />
+      ) : null}
+    </section>
+  )
+}
+
+/** Loads and presents the admin overview in the portfolio's editorial language. */
 export function AdminDashboardClient() {
-  const [stats, setStats] = useState<DashboardStats>({
-    backend: { projects: 0, work: 0, education: 0, users: 0, publicChats: 0 },
-    supabase: { projects: 0, careers: 0, educations: 0 },
+  const [data, setData] = useState<DashboardData>({
+    supabaseProjects: [],
+    supabaseCareers: [],
+    supabaseEducations: [],
+    backendProjects: [],
   })
-
-  // Backend data
-  const [backendProjects, setBackendProjects] = useState<BackendProject[]>([])
-  const [backendWork, setBackendWork] = useState<BackendWork[]>([])
-  const [backendEducation, setBackendEducation] = useState<BackendEducation[]>([])
-  const [recentChats, setRecentChats] = useState<any[]>([])
-  const [recentUsers, setRecentUsers] = useState<any[]>([])
-
-  // Supabase data
-  const [supabaseProjects, setSupabaseProjects] = useState<SupabaseProject[]>([])
-  const [supabaseCareers, setSupabaseCareers] = useState<SupabaseCareer[]>([])
-  const [supabaseEducations, setSupabaseEducations] = useState<SupabaseEducation[]>([])
-
+  const [pages, setPages] = useState<Record<string, number>>({
+    projects: 1,
+    careers: 1,
+    education: 1,
+    backend: 1,
+  })
   const [isLoading, setIsLoading] = useState(true)
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     setIsLoading(true)
-    try {
-      // Fetch Backend API data
-      const [projectsRes, worksRes, educationRes, currentUserRes, chatsRes] = await Promise.all([
-        getProjectsClient({ page: 1, limit: 10 }).catch(() => ({ data: [] })),
-        getWorkClient({ page: 1, limit: 10 }).catch(() => ({ data: [] })),
-        getEducationClient({ page: 1, limit: 10 }).catch(() => ({ data: [] })),
-        getCurrentUserClient().catch(() => null),
-        getPublicChatsClient(undefined, 10).catch(() => ({ data: [] })),
-      ])
+    const [supabaseProjects, supabaseCareers, supabaseEducations, backendResponse] = await Promise.all([
+      getSupabaseProjectsClient().catch(() => []),
+      getSupabaseCareersClient().catch(() => []),
+      getSupabaseEducationsClient().catch(() => []),
+      getProjectsClient({ page: 1, limit: 100 }).catch(() => ({ data: [] })),
+    ])
 
-      // Fetch Supabase data
-      const [sbProjects, sbCareers, sbEducations] = await Promise.all([getSupabaseProjectsClient().catch(() => []), getSupabaseCareersClient().catch(() => []), getSupabaseEducationsClient().catch(() => [])])
-
-      // Set backend data
-      const projects = projectsRes.data || []
-      const works = worksRes.data || []
-      const education = educationRes.data || []
-      const currentUser = currentUserRes
-      const chats = chatsRes.data || []
-
-      setBackendProjects(projects)
-      setBackendWork(works)
-      setBackendEducation(education)
-      setRecentChats(chats.slice(0, 5))
-      setRecentUsers(currentUser ? [currentUser] : [])
-
-      // Set Supabase data
-      setSupabaseProjects(sbProjects)
-      setSupabaseCareers(sbCareers)
-      setSupabaseEducations(sbEducations)
-
-      // Update stats
-      setStats({
-        backend: {
-          projects: projects.length,
-          work: works.length,
-          education: education.length,
-          users: currentUser ? 1 : 0,
-          publicChats: chats.length,
-        },
-        supabase: {
-          projects: sbProjects.length,
-          careers: sbCareers.length,
-          educations: sbEducations.length,
-        },
-      })
-
-      setLastRefresh(new Date())
-    } catch (error) {
-      console.error("Failed to fetch dashboard data:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchDashboardData()
+    setData({
+      supabaseProjects,
+      supabaseCareers,
+      supabaseEducations,
+      backendProjects: backendResponse.data ?? [],
+    })
+    setPages({ projects: 1, careers: 1, education: 1, backend: 1 })
+    setLastRefresh(new Date())
+    setIsLoading(false)
   }, [])
 
-  // Stats cards configuration
-  const backendStatsCards = [
-    {
-      title: "Backend Projects",
-      value: stats.backend.projects,
-      description: "From personal API",
-      icon: FolderKanban,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
-      source: "backend" as const,
-    },
-    {
-      title: "Work Experience",
-      value: stats.backend.work,
-      description: "Job entries",
-      icon: Briefcase,
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900/30",
-      source: "backend" as const,
-    },
-    {
-      title: "Education",
-      value: stats.backend.education,
-      description: "Education records",
-      icon: GraduationCap,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100 dark:bg-purple-900/30",
-      source: "backend" as const,
-    },
-    {
-      title: "Public Chats",
-      value: stats.backend.publicChats,
-      description: "Chat messages",
-      icon: MessageSquare,
-      color: "text-pink-600",
-      bgColor: "bg-pink-100 dark:bg-pink-900/30",
-      source: "backend" as const,
-    },
-  ]
+  useEffect(() => {
+    void fetchDashboardData()
+  }, [fetchDashboardData])
 
-  const supabaseStatsCards = [
-    {
-      title: "Supabase Projects",
-      value: stats.supabase.projects,
-      description: "From Supabase DB",
-      icon: FolderKanban,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-100 dark:bg-cyan-900/30",
-      source: "supabase" as const,
-    },
-    {
-      title: "Careers",
-      value: stats.supabase.careers,
-      description: "Career entries",
-      icon: Briefcase,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100 dark:bg-orange-900/30",
-      source: "supabase" as const,
-    },
-    {
-      title: "Education",
-      value: stats.supabase.educations,
-      description: "Education records",
-      icon: GraduationCap,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
-      source: "supabase" as const,
-    },
+  const updatePage = (key: string, page: number) => {
+    setPages((current) => ({ ...current, [key]: page }))
+  }
+
+  const overviewItems = [
+    { label: "Supabase projects", value: data.supabaseProjects.length },
+    { label: "Careers", value: data.supabaseCareers.length },
+    { label: "Education", value: data.supabaseEducations.length },
+    { label: "Backend projects", value: data.backendProjects.length },
   ]
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Status row + actions — the topbar already names the page */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="outline" className="text-sm py-1 px-3">
-          <Server className="h-4 w-4 mr-2 text-green-600" />
-          Backend API Connected
-        </Badge>
-        <Badge variant="outline" className="text-sm py-1 px-3">
-          <Cloud className="h-4 w-4 mr-2 text-blue-600" />
-          Supabase Connected
-        </Badge>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Updated {formatDistanceToNow(lastRefresh, { addSuffix: true })}</span>
-          <Button variant="outline" size="sm" onClick={fetchDashboardData} disabled={isLoading}>
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            <span className="ml-2 hidden sm:inline">Refresh</span>
+    <div className="mx-auto w-full max-w-6xl py-4 sm:py-8">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <Eyebrow>Content</Eyebrow>
+          <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight sm:text-3xl">Portfolio data</h1>
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+            Supabase is the primary source. Legacy backend data remains available for comparison.
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {lastRefresh ? (
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              Updated {formatDistanceToNow(lastRefresh, { addSuffix: true })}
+            </span>
+          ) : null}
+          <Button variant="outline" size="sm" onClick={() => void fetchDashboardData()} disabled={isLoading}>
+            <RefreshCw className="h-4 w-4" /> Refresh
           </Button>
         </div>
       </div>
 
-      {/* Backend Stats */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Server className="h-5 w-5" />
-          Backend API (Prisma)
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {backendStatsCards.map((stat) => (
-            <Card key={stat.title} className="relative overflow-hidden border-l-4 border-l-blue-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-baseline gap-2">
-                  <div className="text-2xl font-bold">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stat.value}</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
+      <StatStrip items={overviewItems} className="mb-8 border-x-0" />
 
-      {/* Supabase Stats */}
-      <div>
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Cloud className="h-5 w-5" />
-          Supabase Database
-        </h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {supabaseStatsCards.map((stat) => (
-            <Card key={stat.title} className="relative overflow-hidden border-l-4 border-l-green-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-baseline gap-2">
-                  <div className="text-2xl font-bold">{isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stat.value}</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Tabs Section */}
-      <Tabs defaultValue="backend-projects" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 lg:w-auto">
-          <TabsTrigger value="backend-projects" className="gap-2">
-            <Server className="h-4 w-4" />
-            <span className="hidden sm:inline">Backend Projects</span>
+      <Tabs defaultValue="supabase-projects">
+        <TabsList className="h-auto w-full justify-start overflow-x-auto border-y border-border bg-transparent p-0">
+          <TabsTrigger value="supabase-projects" className="gap-2 border-r border-border px-4 py-3 data-[state=active]:bg-secondary">
+            <Cloud className="h-4 w-4" /> Supabase projects
           </TabsTrigger>
-          <TabsTrigger value="supabase-projects" className="gap-2">
-            <Cloud className="h-4 w-4" />
-            <span className="hidden sm:inline">Supabase Projects</span>
-          </TabsTrigger>
-          <TabsTrigger value="work-career" className="gap-2">
-            <Briefcase className="h-4 w-4" />
-            <span className="hidden sm:inline">Work/Career</span>
-          </TabsTrigger>
-          <TabsTrigger value="education" className="gap-2">
-            <GraduationCap className="h-4 w-4" />
-            <span className="hidden sm:inline">Education</span>
-          </TabsTrigger>
-          <TabsTrigger value="users" className="gap-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Users</span>
-          </TabsTrigger>
-          <TabsTrigger value="chats" className="gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">Chats</span>
+          <TabsTrigger value="careers" className="border-r border-border px-4 py-3 data-[state=active]:bg-secondary">Careers</TabsTrigger>
+          <TabsTrigger value="education" className="border-r border-border px-4 py-3 data-[state=active]:bg-secondary">Education</TabsTrigger>
+          <TabsTrigger value="backend-projects" className="gap-2 px-4 py-3 data-[state=active]:bg-secondary">
+            <Database className="h-4 w-4" /> Backend
           </TabsTrigger>
         </TabsList>
 
-        {/* Backend Projects Tab */}
-        <TabsContent value="backend-projects">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Server className="h-5 w-5" />
-                Backend Projects
-              </CardTitle>
-              <CardDescription>Projects stored in your personal Backend API (Prisma database).</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <BackendProjectsTabContent isLoading={isLoading} projects={backendProjects} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Supabase Projects Tab */}
         <TabsContent value="supabase-projects">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Cloud className="h-5 w-5" />
-                Supabase Projects
-              </CardTitle>
-              <CardDescription>Projects stored in your Supabase database.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SupabaseProjectsTabContent isLoading={isLoading} projects={supabaseProjects} />
-            </CardContent>
-          </Card>
+          <DataTab
+            label="Supabase projects"
+            description="Primary project records from Supabase."
+            items={data.supabaseProjects}
+            page={pages.projects}
+            isLoading={isLoading}
+            onPageChange={(page) => updatePage("projects", page)}
+            renderTable={(items) => <SupabaseProjectsTable items={items} />}
+          />
         </TabsContent>
-
-        {/* Work/Career Comparison Tab */}
-        <TabsContent value="work-career">
-          <WorkCareerTabContent isLoading={isLoading} backendWork={backendWork} supabaseCareers={supabaseCareers} />
+        <TabsContent value="careers">
+          <DataTab
+            label="Careers"
+            description="Work history published on the portfolio."
+            items={data.supabaseCareers}
+            page={pages.careers}
+            isLoading={isLoading}
+            onPageChange={(page) => updatePage("careers", page)}
+            renderTable={(items) => <CareersTable items={items} />}
+          />
         </TabsContent>
-
-        {/* Education Comparison Tab */}
         <TabsContent value="education">
-          <EducationTabContent isLoading={isLoading} backendEducation={backendEducation} supabaseEducations={supabaseEducations} />
+          <DataTab
+            label="Education"
+            description="Education and training records from Supabase."
+            items={data.supabaseEducations}
+            page={pages.education}
+            isLoading={isLoading}
+            onPageChange={(page) => updatePage("education", page)}
+            renderTable={(items) => <EducationTable items={items} />}
+          />
         </TabsContent>
-
-        {/* Users Tab */}
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>Users (Backend)</CardTitle>
-              <CardDescription>Users registered in your Backend API.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <UsersTabContent isLoading={isLoading} recentUsers={recentUsers} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Chats Tab */}
-        <TabsContent value="chats">
-          <Card>
-            <CardHeader>
-              <CardTitle>Public Chats (Backend)</CardTitle>
-              <CardDescription>Recent public chat messages.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChatsTabContent isLoading={isLoading} recentChats={recentChats} />
-            </CardContent>
-          </Card>
+        <TabsContent value="backend-projects">
+          <DataTab
+            label="Backend projects"
+            description="Legacy Prisma project records."
+            items={data.backendProjects}
+            page={pages.backend}
+            isLoading={isLoading}
+            onPageChange={(page) => updatePage("backend", page)}
+            renderTable={(items) => <BackendProjectsTable items={items} />}
+          />
         </TabsContent>
       </Tabs>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Manage both databases from here</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <a href="/admin/dashboard/project">
-                <FolderKanban className="h-5 w-5" />
-                <span>Manage Projects</span>
-                <span className="text-xs text-muted-foreground">Both DBs</span>
-              </a>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <a href="/admin/dashboard/work">
-                <Briefcase className="h-5 w-5" />
-                <span>Manage Work</span>
-                <span className="text-xs text-muted-foreground">Both DBs</span>
-              </a>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <a href="/admin/dashboard/education">
-                <GraduationCap className="h-5 w-5" />
-                <span>Manage Education</span>
-                <span className="text-xs text-muted-foreground">Both DBs</span>
-              </a>
-            </Button>
-            <Button variant="outline" className="h-auto py-4 flex-col gap-2" asChild>
-              <a href="/admin/dashboard/career">
-                <Briefcase className="h-5 w-5" />
-                <span>Manage Career</span>
-                <span className="text-xs text-muted-foreground">Supabase</span>
-              </a>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

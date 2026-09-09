@@ -11,8 +11,7 @@ function LayoutContent({ children, user }: Readonly<{ children: React.ReactNode;
     <div className="admin-shell relative flex min-h-screen w-full flex-col bg-background">
       <AdminExpandableSidebar user={user} />
       <AdminTopHeader />
-      {/* Full-width content — the page owns no outer padding, so space is maximized */}
-      <main className={cn("flex-1 p-3 transition-all duration-300 sm:p-4", isExpanded ? "sm:pl-[272px]" : "sm:pl-[80px]")}>
+      <main className={cn("flex-1 px-4 pb-10 pt-3 sm:px-6", isExpanded ? "sm:pl-[248px]" : "sm:pl-[88px]")}>
         {children}
       </main>
     </div>
