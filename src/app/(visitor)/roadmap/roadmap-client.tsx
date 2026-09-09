@@ -73,6 +73,7 @@ function getLessonLevel(lesson: RoadmapContent): RoadmapLevel {
   return lesson.meta.level ?? "beginner"
 }
 
+/** Displays one compact course metadata item. */
 function CourseFact({ icon: Icon, children }: Readonly<{
   icon: React.ComponentType<{ className?: string }>
   children: React.ReactNode
@@ -85,6 +86,7 @@ function CourseFact({ icon: Icon, children }: Readonly<{
   )
 }
 
+/** Displays reusable course completion text and its progress bar. */
 function ProgressMeter({ current, total, percent, compact = false }: Readonly<{
   current: number
   total: number
@@ -107,6 +109,7 @@ function ProgressMeter({ current, total, percent, compact = false }: Readonly<{
   )
 }
 
+/** Presents the active course summary and overall progress. */
 function CourseHeader({ metadata, completedCount, progressPercent, isLoaded }: Readonly<{
   metadata: CourseMetadata
   completedCount: number
@@ -141,6 +144,7 @@ function CourseHeader({ metadata, completedCount, progressPercent, isLoaded }: R
   )
 }
 
+/** Summarizes a curriculum level inside its accordion trigger. */
 function LevelTrigger({ config, lessons, completed, complete }: Readonly<{
   config: (typeof levelConfig)[RoadmapLevel]
   lessons: RoadmapContent[]
@@ -166,6 +170,7 @@ function LevelTrigger({ config, lessons, completed, complete }: Readonly<{
   )
 }
 
+/** Links to one lesson and communicates its completion state. */
 function LessonRow({ lesson, index, completed }: Readonly<{
   lesson: RoadmapContent
   index: number
@@ -191,6 +196,7 @@ function LessonRow({ lesson, index, completed }: Readonly<{
   )
 }
 
+/** Displays optional duration and video metadata for a lesson. */
 function LessonMeta({ lesson }: Readonly<{ lesson: RoadmapContent }>) {
   return (
     <span className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -200,6 +206,7 @@ function LessonMeta({ lesson }: Readonly<{ lesson: RoadmapContent }>) {
   )
 }
 
+/** Renders the lessons and completion summary for one course level. */
 function CurriculumLevel({
   courseId,
   group,
@@ -239,6 +246,7 @@ function CurriculumLevel({
   )
 }
 
+/** Builds the ordered accordion for all populated course levels. */
 function CourseCurriculum({ courseId, groups, isLoaded, isModuleComplete }: Readonly<{
   courseId: string
   groups: LevelGroup[]
@@ -273,6 +281,7 @@ function CourseCurriculum({ courseId, groups, isLoaded, isModuleComplete }: Read
   )
 }
 
+/** Links to a themed certificate when a recipient name is available. */
 function CertificateDownload({ courseId, certName, theme }: Readonly<{
   courseId: string
   certName: string
@@ -294,6 +303,7 @@ function CertificateDownload({ courseId, certName, theme }: Readonly<{
   )
 }
 
+/** Displays certificate controls after every course lesson is complete. */
 function CompletedCertificate({ courseId, certName, onNameChange }: Readonly<{
   courseId: string
   certName: string
@@ -316,6 +326,7 @@ function CompletedCertificate({ courseId, certName, onNameChange }: Readonly<{
   )
 }
 
+/** Explains the remaining certificate requirement and current progress. */
 function IncompleteCertificate({ current, total, percent }: Readonly<{
   current: number
   total: number
@@ -333,6 +344,7 @@ function IncompleteCertificate({ current, total, percent }: Readonly<{
   )
 }
 
+/** Selects the loading, locked, or completed certificate presentation. */
 function CertificatePanel({
   courseId,
   certName,
@@ -375,6 +387,7 @@ function CertificatePanel({
   )
 }
 
+/** Keeps active course progress visible on small screens. */
 function MobileCourseProgress({ title, current, total, percent }: Readonly<{
   title: string
   current: number
@@ -394,6 +407,7 @@ function MobileCourseProgress({ title, current, total, percent }: Readonly<{
   )
 }
 
+/** Composes the focused view for a selected roadmap course. */
 function ActiveCourseView({
   courseId,
   course,

@@ -88,6 +88,7 @@ type ChessData = NonNullable<Awaited<ReturnType<typeof getChessStats>>>
 type NpmData = NonNullable<Awaited<ReturnType<typeof getNpmStats>>>
 type LetterboxdData = NonNullable<Awaited<ReturnType<typeof getLetterboxdStats>>>
 
+/** Displays the available LeetCode problem and contest metrics. */
 function LeetCodeCard({ data }: Readonly<{ data: LeetCodeData | null }>) {
   return (
     <PlatformCard
@@ -113,6 +114,7 @@ function LeetCodeCard({ data }: Readonly<{ data: LeetCodeData | null }>) {
   )
 }
 
+/** Displays the available Chess.com ratings and match record. */
 function ChessCard({ data }: Readonly<{ data: ChessData | null }>) {
   return (
     <PlatformCard
@@ -136,6 +138,7 @@ function ChessCard({ data }: Readonly<{ data: ChessData | null }>) {
   )
 }
 
+/** Displays npm package and recent download metrics. */
 function NpmCard({ data }: Readonly<{ data: NpmData | null }>) {
   const topPackages = data?.topPackages ?? []
 
@@ -156,6 +159,7 @@ function NpmCard({ data }: Readonly<{ data: NpmData | null }>) {
   )
 }
 
+/** Lists the most-downloaded packages in descending order. */
 function NpmTopPackages({ packages }: Readonly<{ packages: NpmData["topPackages"] }>) {
   return (
     <div className="space-y-1 border-t border-border pt-2">
@@ -170,6 +174,7 @@ function NpmTopPackages({ packages }: Readonly<{ packages: NpmData["topPackages"
   )
 }
 
+/** Organizes Letterboxd favorites, recent films, and highest ratings. */
 function LetterboxdCard({ data }: Readonly<{ data: LetterboxdData | null }>) {
   const latest = data?.films.slice(0, 8) ?? []
   const topRated = data
@@ -197,6 +202,7 @@ function LetterboxdCard({ data }: Readonly<{ data: LetterboxdData | null }>) {
   )
 }
 
+/** Renders a labeled group of film posters. */
 function FilmSection({ title, films }: Readonly<{ title: string; films: LetterboxdFilm[] }>) {
   return (
     <section>
@@ -214,6 +220,7 @@ interface StatsContentProps {
   letterboxd: LetterboxdData | null
 }
 
+/** Composes the public statistics overview and platform panels. */
 function StatsContent({
   overviewStats,
   leetcode,

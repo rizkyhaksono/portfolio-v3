@@ -46,6 +46,7 @@ const oauthProviders: OAuthProviderConfig[] = [
   },
 ]
 
+/** Introduces the protected admin sign-in area. */
 function AdminLoginHeader() {
   return (
     <div className="mb-6 flex flex-col gap-1">
@@ -63,6 +64,7 @@ function AdminLoginHeader() {
   )
 }
 
+/** Renders a labeled credential input with a leading icon. */
 function CredentialField({
   id,
   label,
@@ -104,6 +106,7 @@ interface CredentialsFormProps {
   onSubmit: (event: React.FormEvent) => void
 }
 
+/** Collects and submits the administrator's email credentials. */
 function CredentialsForm({
   email,
   password,
@@ -152,6 +155,7 @@ function CredentialsForm({
   )
 }
 
+/** Separates credential login from the available OAuth providers. */
 function LoginDivider() {
   return (
     <div className="relative my-6">

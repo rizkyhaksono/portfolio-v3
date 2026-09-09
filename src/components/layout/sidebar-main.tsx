@@ -15,6 +15,7 @@ interface OwnerHeaderProps {
   settled: boolean
 }
 
+/** Displays the portfolio owner's identity and availability. */
 function OwnerHeader({ name, settled }: Readonly<OwnerHeaderProps>) {
   const ownerName = settled ? (
     <>
