@@ -10,17 +10,12 @@ const AuthCard = ({ className }: { className?: string }) => {
     <button
       onClick={() => router.push("/auth")}
       className={cn(
-        "flex p-3 gap-3 items-center cursor-pointer transition-all dark:hover:bg-[#262626] hover:bg-[#D9D9D955] w-full text-left justify-between",
+        "flex h-9 items-center justify-between gap-3 px-3 text-left transition-colors hover:bg-secondary w-full",
         className
       )}
     >
-      <div className="flex flex-col gap-1">
-        <Typography.P className="text-sm font-medium">Sign in</Typography.P>
-        <Typography.P className="text-xs opacity-75">
-          To access all features and personalization
-        </Typography.P>
-      </div>
-      <ArrowUpRight className=" opacity-65" />
+      <Typography.P className="text-sm font-medium">Sign in</Typography.P>
+      <ArrowUpRight className="h-4 w-4 opacity-65" />
     </button>
   );
 };

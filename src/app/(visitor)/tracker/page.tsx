@@ -29,11 +29,7 @@ export default async function TrackerPage() {
         description="A public Jira-style board — drag cards across columns. Anyone can view; sign in to add & move."
       />
 
-      {/*
-        backdrop={false}: @hello-pangea/dnd uses position:fixed for drag ghosts;
-        backdrop-blur / filter on an ancestor becomes the containing block and offsets the drag.
-      */}
-      <MacWindow title="~/tracker" backdrop={false} bodyClassName="p-3 sm:p-4">
+      <MacWindow title="~/tracker" bodyClassName="p-3 sm:p-4">
         <TrackerBoard initialTasks={tasks} currentUserId={currentUserId} isAdmin={isAdmin} />
       </MacWindow>
     </div>

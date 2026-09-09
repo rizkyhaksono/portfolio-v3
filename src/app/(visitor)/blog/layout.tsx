@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import SidebarMain from "@/components/layout/sidebar-main"
-import RightSidebarMain from "@/components/layout/right-sidebar-main"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />}>
       {children}
     </BaseLayout>
   )

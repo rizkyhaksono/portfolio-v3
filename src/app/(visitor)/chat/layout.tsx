@@ -35,7 +35,7 @@ export default function ChatLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useInteractiveGrid={true}>
+    <BaseLayout sidebar={<SidebarMain />} hideFooter>
       {children}
     </BaseLayout>
   )

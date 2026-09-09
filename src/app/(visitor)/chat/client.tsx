@@ -14,7 +14,7 @@ import { format } from "date-fns"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-const WS_LABEL = "wscat -c wss://api.natee.my.id/v3/public-chat"
+const CHAT_LABEL = "Public chat"
 
 const JSON_HEADERS = { "Content-Type": "application/json" }
 
@@ -67,7 +67,7 @@ function avatarSrc(user: PublicChatMessage["user"]): string | undefined {
 
 function QuoteBox({ quoted }: { quoted: PublicChatMessage }) {
   return (
-    <div className="mb-1.5 rounded-lg border border-border/50 bg-background/50 px-2.5 py-1.5">
+    <div className="mb-1.5 border-l-2 border-border bg-background px-2.5 py-1.5">
       <p className="truncate text-xs font-semibold text-foreground/90">{quoted.user?.name || "Anonymous"}</p>
       <p className="line-clamp-2 text-xs text-muted-foreground">{quoted.message}</p>
     </div>
@@ -141,8 +141,8 @@ function Bubble({ message, quoted, alignRight, canReply, canManage, onReply, onE
           {Actions}
           <div
             className={cn(
-              "rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
-              alignRight ? "rounded-tr-sm bg-primary/10" : "rounded-tl-sm bg-muted/60",
+              "border px-3 py-2 text-sm leading-relaxed",
+              alignRight ? "border-foreground/20 bg-primary/10" : "border-border bg-muted/40",
             )}
           >
             {quoted && <QuoteBox quoted={quoted} />}
@@ -167,7 +167,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
   const [editingMessage, setEditingMessage] = useState<PublicChatMessage | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesScrollRef = useRef<HTMLDivElement>(null)
 
   // Derive directly from the prop (not state) so router.refresh() — which refetches
   // the force-dynamic page after send/edit/delete — surfaces the updated messages.
@@ -197,7 +197,8 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
   }, [initialMessages])
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    const container = messagesScrollRef.current
+    if (container) container.scrollTop = container.scrollHeight
   }, [])
 
   // Scroll to the newest message on mount and whenever the stream changes.
@@ -292,19 +293,13 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
 
   return (
     <div className="w-full">
-      {/* Terminal window */}
-      <div className="overflow-hidden rounded-2xl border border-border/60 bg-background/60 shadow-xl backdrop-blur-sm">
+      <section className="flex h-[calc(100svh-7rem)] max-h-[820px] min-h-[520px] flex-col overflow-hidden border-y border-border bg-background">
         {/* Title bar */}
         <div className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-4 py-3">
-          <p className="flex-1 truncate font-mono text-xs text-muted-foreground">{WS_LABEL}</p>
+          <p className="flex-1 truncate font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{CHAT_LABEL}</p>
           <button onClick={refresh} className="text-muted-foreground transition-colors hover:text-foreground" aria-label="Refresh">
             <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
           </button>
-          <div className="flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-red-400/90" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400/90" />
-            <span className="h-3 w-3 rounded-full bg-green-400/90" />
-          </div>
         </div>
 
         {/* Pinned message — fixed above the scroll area so it stays visible */}
@@ -319,7 +314,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
         </div>
 
         {/* Messages */}
-        <div className="flex max-h-[58vh] min-h-[360px] flex-col gap-5 overflow-y-auto px-4 py-5 sm:px-6">
+        <div ref={messagesScrollRef} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6">
           {stream.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
               <p className="font-medium">No messages yet</p>
@@ -343,7 +338,6 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
               )
             })
           )}
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Composer (only when signed in) */}
@@ -369,20 +363,20 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
                 placeholder={editingMessage ? "Edit your message…" : replyTo ? `Reply to ${replyTo.user?.name || "Anonymous"}…` : "Type a message…"}
                 disabled={isPending}
                 rows={1}
-                className="max-h-32 min-h-[42px] flex-1 resize-none rounded-xl bg-background focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="max-h-32 min-h-[42px] flex-1 resize-none bg-background focus-visible:ring-2 focus-visible:ring-primary/40"
               />
-              <Button type="submit" size="icon" disabled={!inputMessage.trim() || isPending} className="h-[42px] w-[42px] shrink-0 rounded-xl">
+              <Button type="submit" size="icon" disabled={!inputMessage.trim() || isPending} className="h-[42px] w-[42px] shrink-0">
                 {isPending ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
               </Button>
             </form>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Sign-in pill (only when signed out) */}
       {!currentUser && (
         <div className="mt-6 flex justify-center">
-          <Button asChild className="gap-2 rounded-full px-6 shadow-lg">
+          <Button asChild className="gap-2 px-6">
             <Link href="/auth">
               <LogIn size={16} />
               Sign in to use Realtime Chats

@@ -89,7 +89,7 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
     <Link
       href={item.href}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+        "group relative flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
         isActive
           ? "bg-primary/10 text-foreground"
           : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -123,7 +123,7 @@ function NavLink({ item, isExpanded }: Readonly<NavLinkProps>) {
 function Brand({ isExpanded }: { isExpanded: boolean }) {
   return (
     <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary font-display text-sm font-bold text-primary-foreground shadow-sm">
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center border border-border bg-primary font-display text-sm font-bold text-primary-foreground">
         RH
         <Sparkles className="absolute -right-1 -top-1 h-3.5 w-3.5 text-primary" />
       </div>
@@ -153,7 +153,7 @@ function UserMenu({ user, isExpanded, onLogout }: Readonly<UserMenuProps>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={cn("flex w-full items-center gap-2.5 rounded-lg border border-transparent p-2 text-sm transition-all hover:border-border hover:bg-secondary", !isExpanded && "justify-center")}>
+        <button className={cn("flex w-full items-center gap-2.5 border border-transparent p-2 text-sm transition-colors hover:border-border hover:bg-secondary", !isExpanded && "justify-center")}>
           {user?.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={user.avatarUrl} alt={user.name} referrerPolicy="no-referrer" className="h-8 w-8 shrink-0 rounded-full object-cover" />
@@ -220,7 +220,7 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className={cn("fixed inset-y-0 left-0 z-50 hidden flex-col border-r bg-background/80 backdrop-blur-xl transition-all duration-300 sm:flex", isExpanded ? "w-64" : "w-16")}>
+      <aside className={cn("fixed inset-y-0 left-0 z-50 hidden flex-col border-r bg-background transition-all duration-300 sm:flex", isExpanded ? "w-64" : "w-16")}>
         {/* Header */}
         <div className={cn("flex h-16 items-center border-b px-3", isExpanded ? "justify-between" : "justify-center")}>
           <Brand isExpanded={isExpanded} />
@@ -297,7 +297,7 @@ export function AdminExpandableSidebar({ user }: Readonly<AdminExpandableSidebar
                 <NavLink key={item.href} item={item} isExpanded={true} />
               ))}
             </nav>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-destructive transition-all hover:bg-destructive/10" onClick={() => setShowLogoutDialog(true)}>
+            <button className="flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10" onClick={() => setShowLogoutDialog(true)}>
               <LogOut className="h-[18px] w-[18px]" />
               Log out
             </button>

@@ -51,7 +51,7 @@ Design language: **monochrome, square (radius 0), hairline borders**.
 ### Three surface dialects only
 
 1. **solid** — `Card`, `FeatureCard`, `Surface variant="solid"` for content boxes
-2. **glass** — `MacWindow` / `Surface variant="glass"` for window chrome only
+2. **glass** — `Surface variant="glass"` for exceptional translucent chrome only
 3. **inset** — `Surface variant="inset"` for nested rows and sidebar blocks
 
 ### Page recipe
@@ -60,7 +60,7 @@ Design language: **monochrome, square (radius 0), hairline borders**.
 BaseLayout(sidebar?, rightSidebar?)
   └─ PageBody width="default" | "prose" | "article" | "wide"
        └─ SectionHeading (as="h1" on page routes)
-       └─ MacWindow? (tools / lists) OR Card / FeatureCard / Surface rows
+       └─ MacWindow? (legacy-named editorial panel) OR Card / FeatureCard / Surface rows
 ```
 
 ### Do not
@@ -68,7 +68,7 @@ BaseLayout(sidebar?, rightSidebar?)
 - Invent glass content cards (`border-white/10`, `bg-white/5`, `backdrop-blur-md`, `hover:-translate-y`)
 - Stack extra `px-4` / `lg:px-0` inside BaseLayout
 - Use `neutral-*`, raw hex, or `max-w-8xl` (undefined)
-- Copy-paste Mac chrome — use `MacWindow` (`backdrop={false}` when DnD needs it)
+- Add decorative operating-system chrome or traffic-light controls
 
 ### Prefer
 
@@ -78,7 +78,7 @@ BaseLayout(sidebar?, rightSidebar?)
 
 | Group | Shell | Surfaces |
 |---|---|---|
-| Visitor / home | `BaseLayout` | solid + MacWindow chrome |
+| Visitor / home | `BaseLayout` | solid + editorial panels |
 | User (profile, AI) | `BaseLayout` | solid |
 | Admin | Admin sidebar + top header | solid Card / Surface |
 | Auth | Centered form / split | solid Card |

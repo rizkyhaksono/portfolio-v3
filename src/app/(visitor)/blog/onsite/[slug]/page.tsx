@@ -35,8 +35,8 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
   return (
     <>
       <ReadingProgress />
-      <BlurFade delay={0.2} inView>
-        <article className="mx-auto max-w-3xl px-4 py-8 md:py-12">
+      <BlurFade delay={0.15} inView>
+        <article className="mx-auto max-w-3xl py-8 md:py-12">
           <Link
             href="/blog"
             className="group mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -72,14 +72,14 @@ export default async function OnsiteBlogArticlePage({ params }: Props) {
           </header>
 
           {post.coverImage && (
-            <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-2xl border border-border/50 shadow-lg">
+            <div className="relative mb-10 aspect-[16/9] overflow-hidden border-y border-border">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
             </div>
           )}
 
           <div
-            className="prose prose-neutral max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-semibold prose-a:font-medium prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-pre:border prose-pre:border-border prose-pre:bg-muted"
+            className="prose prose-neutral max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-p:text-[1.05rem] prose-p:leading-8 prose-a:font-medium prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-none prose-pre:rounded-none prose-pre:border prose-pre:border-border prose-pre:bg-muted"
             dangerouslySetInnerHTML={{ __html: content }}
           />
 

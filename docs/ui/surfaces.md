@@ -7,8 +7,8 @@ Portfolio v3 allows **exactly three** surface dialects. Do not invent blends.
 | Variant | Visual | Primitive | Use for |
 |---|---|---|---|
 | **solid** | `border-border bg-card shadow-sm` | `Card`, `FeatureCard`, `Surface variant="solid"` | Content boxes, lists, feature/platform cards, media cards |
-| **glass** | `border-border/60 bg-background/40 backdrop-blur-sm` | `MacWindow`, `Surface variant="glass"` | Window chrome only (title bar + frosted shell) |
-| **glass-static** | glass without blur | `MacWindow backdrop={false}`, `Surface variant="glass-static"` | Same chrome when an ancestor filter breaks DnD / fixed positioning |
+| **glass** | `border-border/60 bg-background/40 backdrop-blur-sm` | `Surface variant="glass"` | Exceptional translucent chrome only |
+| **glass-static** | glass without blur | `Surface variant="glass-static"` | Static translucent chrome when a filter would break positioning |
 | **inset** | `border-border/40 bg-secondary/20` | `Surface variant="inset"` | Nested rows, sidebar blocks, status cells |
 
 ## Solid (default content)
@@ -26,16 +26,15 @@ import { FeatureCard } from "@/components/ui/bento"
 Hover standard for interactive solid cards: `hover:border-foreground/20`.  
 Do **not** restate `border border-border bg-card shadow-sm` on `Card` — already defaults.
 
-## Glass (chrome only)
+## Glass (exceptional chrome only)
 
 ```tsx
-import { MacWindow } from "@/components/ui/mac-window"
+import { Surface } from "@/components/ui/surface"
 
-<MacWindow title="~/tools">{/* solid cards inside */}</MacWindow>
-<MacWindow title="~/tracker" backdrop={false}>{/* DnD board */}</MacWindow>
+<Surface variant="glass">{/* exceptional translucent chrome */}</Surface>
 ```
 
-Glass wraps tools/lists. Put **solid** cards *inside* the window. Never make the content card itself glass.
+Use glass sparingly for translucent chrome. `MacWindow` is a legacy-named, solid editorial panel and no longer controls glass or backdrop behavior. Never make ordinary content cards glass.
 
 ## Inset (nested)
 
@@ -65,5 +64,5 @@ Replace with solid + `hover:border-foreground/20`.
 | Default Card Header/Content | `p-6` / `p-6 pt-0` |
 | Compact rows / education / feedback | `p-4` (`Surface padding="compact"`) |
 | Platform / cozier cards | `p-5` (`padding="cozy"`) |
-| MacWindow body | `p-4 sm:p-6` (override only when needed) |
+| MacWindow body | `py-4 sm:py-5` (override only when needed) |
 | Media card footer | `p-4` + `border-t border-border` |

@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import MDXComponent from "@/components/ui/mdx-components";
 import BlogCommentList from "./blog-comment-list";
 import Typography from "@/components/ui/typography";
-import { Badge } from "@/components/ui/badge";
+import { Chip } from "@/components/ui/chip";
 
 interface BlogReaderViewProps {
   content: BlogDetailProps;
@@ -32,12 +32,12 @@ const BlogReaderView = ({
     url,
   } = content;
   return (
-    <>
-      <div className="mb-5 text-start text-sm font-normal underline underline-offset-4">
+    <article className="mx-auto w-full max-w-3xl pb-12 pt-4">
+      <div className="mb-10 text-start text-sm text-muted-foreground">
         <Link
           href={"/blog"}
         >
-          Back
+          ← Back to blog
         </Link>
       </div>
       <BlogReaderHeader
@@ -47,32 +47,32 @@ const BlogReaderView = ({
         published_at={published_at}
         page_views_count={pageViewCount}
       />
-      <div className="space-y-6 leading-[1.8] text-foreground/90">
-        <div className="overflow-hidden rounded-xl">
+      <div className="space-y-8 text-foreground/90">
+        <div className="overflow-hidden border-y border-border">
           <ImageRender
             src={cover_image}
             width={800}
             height={500}
             alt={title}
-            className="transition-all w-full duration-700 hover:scale-105"
+            className="w-full"
           />
         </div>
         {body_markdown && <MDXComponent>{body_markdown}</MDXComponent>}
       </div>
       {tags?.length >= 1 && (
-        <div className="my-10 space-y-2">
-          <Typography.H3 className="text-lg font-medium">Tags:</Typography.H3>
+        <div className="my-12 border-y border-border py-5">
+          <Typography.H3 className="m-0 text-sm font-medium">Filed under</Typography.H3>
           <div className="flex flex-wrap gap-2 pt-2">
-            {tags?.map((stack: string, index: number) => (
-              <Badge key={index}>{stack}</Badge>
+            {Array.from(new Set(tags)).map((stack: string) => (
+              <Chip key={stack}>{stack}</Chip>
             ))}
           </div>
         </div>
       )}
-      <Separator className="my-6" />
+      <Separator className="my-10" />
       <div className="mb-4 flex flex-col space-y-2">
         <Typography.H3 className="text-lg font-medium">
-          Comment on DEV Community:
+          Continue the conversation on DEV Community
         </Typography.H3>
         <Link href={url} target="_blank" className="text-primary hover:underline">
           {url}
@@ -83,7 +83,7 @@ const BlogReaderView = ({
         totalComments={comments_count}
         comments={comments}
       />
-    </>
+    </article>
   );
 };
 

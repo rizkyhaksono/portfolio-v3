@@ -11,7 +11,7 @@ How each route group should compose layout and surfaces.
 **Surfaces:**
 
 - Page title → `SectionHeading as="h1"`
-- Tools / boards / lists → wrap in `MacWindow`
+- Tools / boards / lists → use the legacy-named `MacWindow` editorial panel
 - Content tiles → solid `Card` / `FeatureCard` / `Surface`
 - Nested rows (status, leetcode pills) → `Surface variant="inset"`
 
@@ -20,9 +20,9 @@ How each route group should compose layout and surfaces.
 | Page | Pattern |
 |---|---|
 | Home sections | `PageSection` + solid rows |
-| Blog / Project index | `MacWindow` + media Cards |
+| Blog / Project index | Editorial panel/rows + media Cards |
 | Stats | `PageBody width="wide"` + `MacWindow` + solid PlatformCards |
-| Tracker | `MacWindow backdrop={false}` + board |
+| Tracker | `MacWindow` + board |
 | Status | `MacWindow` + inset service rows |
 
 ## User (authenticated)

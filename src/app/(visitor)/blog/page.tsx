@@ -4,7 +4,7 @@ import BlurFade from "@/components/magicui/blur-fade"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog"
 import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
-import { MacWindow } from "@/components/ui/mac-window"
+import { PageBody } from "@/components/ui/page-body"
 import { SectionHeading } from "@/components/ui/section-heading"
 import { Newspaper } from "lucide-react"
 
@@ -27,9 +27,9 @@ export default async function BlogPage() {
   ])
 
   return (
-    <BlurFade delay={0.25} inView>
+    <BlurFade delay={0.15} inView>
+      <PageBody width="article">
       <SectionHeading
-        align="center"
         className="mb-8"
         eyebrow={
           <>
@@ -39,33 +39,32 @@ export default async function BlogPage() {
         }
         title="Blog"
         accent="& notes"
-        description="I write about my experiences, thoughts, and ideas on various topics."
+        description="Notes from building software, learning in public, and the work behind the finished product."
       />
-      <MacWindow title="~/blog">
       <Tabs defaultValue="devto" className="w-full">
-        <div className="flex justify-center">
-          <TabsList>
+        <div className="border-y border-border py-3">
+          <TabsList className="h-auto bg-transparent p-0">
             <TabsTrigger value="devto">Dev To<TabCount value={blogs?.length ?? 0} /></TabsTrigger>
             <TabsTrigger value="medium">Medium<TabCount value={medium?.items?.length ?? 0} /></TabsTrigger>
             <TabsTrigger value="onsite">Written here<TabCount value={onsite?.length ?? 0} /></TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="devto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6 w-full">
+          <div className="mt-8 w-full">
             {blogs.map((blog) => (
               <CardBlog key={blog.id} title={blog.title} description={blog.description} image={blog.cover_image} href={`/blog/${blog.slug}?id=${blog.id}`} />
             ))}
           </div>
         </TabsContent>
         <TabsContent value="medium">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6 w-full">
+          <div className="mt-8 w-full">
             {medium?.items?.map((blog: any) => (
               <CardBlogMedium key={blog.guid} title={blog.title} description={blog.description} href={blog.link} />
             ))}
           </div>
         </TabsContent>
         <TabsContent value="onsite">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6 w-full">
+          <div className="mt-8 w-full">
             {onsite.length === 0 ? (
               <p className="text-sm text-muted-foreground col-span-2 text-center py-8">No on-site posts yet.</p>
             ) : (
@@ -82,7 +81,7 @@ export default async function BlogPage() {
           </div>
         </TabsContent>
       </Tabs>
-      </MacWindow>
+      </PageBody>
     </BlurFade>
   )
 }

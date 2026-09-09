@@ -21,7 +21,7 @@ Prefer these over ad-hoc bordered `div`s.
 | `Card` (+ Header/Content/Footer/Title/Description) | `components/ui/card.tsx` | solid |
 | `Surface` | `components/ui/surface.tsx` | solid / glass / glass-static / inset |
 | `FeatureCard` / `BentoGrid` | `components/ui/bento.tsx` | solid feature grid |
-| `MacWindow` | `components/ui/mac-window.tsx` | glass chrome |
+| `MacWindow` | `components/ui/mac-window.tsx` | legacy-named editorial panel; no OS chrome |
 
 ### Surface API
 
@@ -39,7 +39,7 @@ Prefer these over ad-hoc bordered `div`s.
 </MacWindow>
 ```
 
-- `backdrop` defaults to `true`. Set `false` for DnD pages (tracker).
+- `backdrop` is retained only for call-site compatibility; the panel no longer uses blur.
 
 ## Typography & chrome
 
@@ -71,9 +71,9 @@ Need section spacing?       → PageSection
 Need a title block?         → SectionHeading
 Need a content box?         → Card or Surface solid
 Need a feature/platform tile? → FeatureCard or Surface solid + cozy pad
-Need tool/list chrome?      → MacWindow
+Need a bordered tool/list panel? → MacWindow (legacy name; editorial panel)
 Need a nested row?          → Surface inset
-Need DnD inside a window?   → MacWindow backdrop={false}
+Need DnD inside a panel?    → MacWindow (solid editorial panel)
 ```
 
 ## Outliers (do not copy)

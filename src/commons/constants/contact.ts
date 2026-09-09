@@ -2,7 +2,6 @@ import {
   GitHubLogoIcon,
   LinkedInLogoIcon,
   InstagramLogoIcon,
-  TwitterLogoIcon,
 } from "@radix-ui/react-icons"
 
 export const media_socials = [
@@ -20,10 +19,5 @@ export const media_socials = [
     title: "Instagram",
     href: "https://instagram.com/rizkyhaksonoo",
     icon: InstagramLogoIcon,
-  },
-  {
-    title: "Twitter",
-    href: "https://x.com/rizkyhaksono",
-    icon: TwitterLogoIcon,
   },
 ]

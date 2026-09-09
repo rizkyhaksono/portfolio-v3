@@ -55,7 +55,7 @@ const BlogReaderHeader = ({
   return (
     <>
       <motion.h1
-        className="text-2xl font-semibold"
+        className="max-w-3xl text-balance font-display text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl md:text-5xl"
         initial="initial"
         animate="animate"
         variants={titleVariants}
@@ -67,7 +67,7 @@ const BlogReaderHeader = ({
       >
         {title}
       </motion.h1>
-      <div className="mb-6 flex flex-col justify-between gap-2 pb-6 pt-5 text-[14px] text-neutral-600 dark:text-neutral-400 sm:flex-row">
+      <div className="mb-10 mt-5 flex flex-col justify-between gap-3 border-y border-border py-4 font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground sm:flex-row">
         <Typography.P>
           Published on <span className="px-1 font-medium">{published_at ? formatDate(published_at) : ""}</span>
         </Typography.P>
