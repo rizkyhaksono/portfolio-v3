@@ -31,7 +31,11 @@ const SidebarSecondary = ({
   return (
     <nav>
       <ul className="flex flex-col items-start">
-        {!disableProfileCard && <ProfileSideCard />}
+        {!disableProfileCard && (
+          <li className="w-full">
+            <ProfileSideCard />
+          </li>
+        )}
         {menu.map(({ groupLabel, menus }, index) => (
           <li className={cn("w-full", groupLabel ? "pt-2" : "")} key={groupLabel + index}>
             <Typography.P className="max-w-[248px] truncate px-3 pb-1 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -67,7 +71,11 @@ const SidebarSecondary = ({
             })}
           </li>
         ))}
-        {!disableThemeSetting && <SidebarTheming key="theme-settings" />}
+        {!disableThemeSetting && (
+          <li className="w-full">
+            <SidebarTheming />
+          </li>
+        )}
       </ul>
     </nav>
   );

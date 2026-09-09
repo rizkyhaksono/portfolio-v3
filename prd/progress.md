@@ -1,6 +1,6 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-09-09 (editorial simplicity and reading pass)*
+*Last Updated: 2026-09-10 (PR #25 quality remediation)*
 
 ---
 
@@ -19,12 +19,20 @@
 - **Senior AI + square/mobile pass**: ✅ COMPLETED — `JOB_TITLE` constant, square tool chips, mobile wrap
 - **GitHub contribution calendar overflow**: ✅ COMPLETED — heatmap scrolls horizontally; newest weeks visible
 - **Editorial simplicity pass**: ✅ COMPLETED — calmer long-form reading, no animated backgrounds or visitor panel, compact navigation, visible theme control, and OS chrome removed
+- **PR #25 quality remediation**: ✅ COMPLETED — Copilot review comments and introduced DeepSource issues addressed
 
 ---
 
 ## Feature Implementation Status
 
 ### COMPLETED
+
+#### PR #25 quality remediation
+- ✅ Restored valid list semantics in the sidebar and stable React keys for blog tags
+- ✅ Preserved editorial MDX classes when markdown nodes provide custom classes
+- ✅ Split deeply nested login, roadmap, stats, and sidebar JSX into focused components
+- ✅ Reconciled `MacWindow`/glass/backdrop documentation and removed the obsolete tracker option
+- ✅ Added documentation for exported blog-card components
 
 #### Editorial simplicity and reading experience
 - ✅ Blog index uses quiet single-column editorial rows for DEV, Medium, and on-site posts
@@ -79,7 +87,7 @@
 - ✅ Design tokens: `src/lib/design-system.ts`
 - ✅ Primitives: `surface.tsx`, `page-section.tsx`, `page-body.tsx`
 - ✅ BaseLayout: removed double horizontal padding
-- ✅ MacWindow: `backdrop` prop; tracker uses it instead of duplicated chrome
+- ✅ MacWindow: solid editorial panel; deprecated `backdrop` prop retained only for call-site compatibility
 - ✅ Migrated glass → solid: site-stats, duolingo, monkeytype, spotify
 - ✅ Migrated ad-hoc boxes → Surface: education, visitor-panel, status rows, leetcode section, admin feedback, stats PlatformCard
 - ✅ Media cards: blog / blog-medium / project hover → `hover:border-foreground/20`

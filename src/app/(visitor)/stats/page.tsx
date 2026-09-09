@@ -83,6 +83,167 @@ function FilmGrid({ films }: { films: LetterboxdFilm[] }) {
   )
 }
 
+type LeetCodeData = NonNullable<Awaited<ReturnType<typeof getLeetCodeStats>>>
+type ChessData = NonNullable<Awaited<ReturnType<typeof getChessStats>>>
+type NpmData = NonNullable<Awaited<ReturnType<typeof getNpmStats>>>
+type LetterboxdData = NonNullable<Awaited<ReturnType<typeof getLetterboxdStats>>>
+
+function LeetCodeCard({ data }: Readonly<{ data: LeetCodeData | null }>) {
+  return (
+    <PlatformCard
+      title="LeetCode"
+      href={STATS_PROFILE_URLS.leetcode(STATS_PROFILES.leetcode)}
+      unavailable={!data}
+    >
+      {data ? (
+        <div className="space-y-2">
+          <StatRow label="Easy" value={data.easySolved} />
+          <StatRow label="Medium" value={data.mediumSolved} />
+          <StatRow label="Hard" value={data.hardSolved} />
+          <StatRow label="Total solved" value={data.totalSolved} />
+          {data.ranking != null ? (
+            <StatRow label="Ranking" value={`#${data.ranking.toLocaleString()}`} />
+          ) : null}
+          {data.currentRating != null ? (
+            <StatRow label="Contest rating" value={data.currentRating} />
+          ) : null}
+        </div>
+      ) : null}
+    </PlatformCard>
+  )
+}
+
+function ChessCard({ data }: Readonly<{ data: ChessData | null }>) {
+  return (
+    <PlatformCard
+      title="Chess.com"
+      href={STATS_PROFILE_URLS.chess(STATS_PROFILES.chess)}
+      unavailable={!data}
+    >
+      {data ? (
+        <div className="space-y-2">
+          {data.rapid != null ? <StatRow label="Rapid" value={data.rapid} /> : null}
+          {data.blitz != null ? <StatRow label="Blitz" value={data.blitz} /> : null}
+          {data.bullet != null ? <StatRow label="Bullet" value={data.bullet} /> : null}
+          {data.daily != null ? <StatRow label="Daily" value={data.daily} /> : null}
+          {data.tacticsHighest != null ? (
+            <StatRow label="Tactics (best)" value={data.tacticsHighest} />
+          ) : null}
+          <StatRow label="Record" value={`${data.wins}W · ${data.losses}L · ${data.draws}D`} />
+        </div>
+      ) : null}
+    </PlatformCard>
+  )
+}
+
+function NpmCard({ data }: Readonly<{ data: NpmData | null }>) {
+  const topPackages = data?.topPackages ?? []
+
+  return (
+    <PlatformCard
+      title="npm"
+      href={STATS_PROFILE_URLS.npm(STATS_PROFILES.npm)}
+      unavailable={!data}
+    >
+      {data ? (
+        <div className="space-y-2">
+          <StatRow label="Packages" value={data.packageCount} />
+          <StatRow label="Downloads (30d)" value={formatDownloads(data.totalDownloadsLastMonth)} />
+          {topPackages.length > 0 ? <NpmTopPackages packages={topPackages} /> : null}
+        </div>
+      ) : null}
+    </PlatformCard>
+  )
+}
+
+function NpmTopPackages({ packages }: Readonly<{ packages: NpmData["topPackages"] }>) {
+  return (
+    <div className="space-y-1 border-t border-border pt-2">
+      <Eyebrow>Top packages</Eyebrow>
+      {packages.map((pkg) => (
+        <div key={pkg.name} className="flex justify-between text-xs">
+          <span className="max-w-[60%] truncate text-primary/80">{pkg.name}</span>
+          <span className="text-muted-foreground">{formatDownloads(pkg.downloads)}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function LetterboxdCard({ data }: Readonly<{ data: LetterboxdData | null }>) {
+  const latest = data?.films.slice(0, 8) ?? []
+  const topRated = data
+    ? [...data.films]
+        .filter((film) => film.rating != null)
+        .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
+        .slice(0, 8)
+    : []
+  const hasFilms = Boolean(data && (data.films.length > 0 || data.favorites.length > 0))
+
+  return (
+    <PlatformCard
+      title="Letterboxd"
+      href={STATS_PROFILE_URLS.letterboxd(STATS_PROFILES.letterboxd)}
+      unavailable={!hasFilms}
+    >
+      {hasFilms && data ? (
+        <div className="space-y-6">
+          {data.favorites.length > 0 ? <FilmSection title="Favorite Films" films={data.favorites} /> : null}
+          {latest.length > 0 ? <FilmSection title="Latest Activity" films={latest} /> : null}
+          {topRated.length > 0 ? <FilmSection title="Highest Rated" films={topRated} /> : null}
+        </div>
+      ) : null}
+    </PlatformCard>
+  )
+}
+
+function FilmSection({ title, films }: Readonly<{ title: string; films: LetterboxdFilm[] }>) {
+  return (
+    <section>
+      <Eyebrow className="mb-3">{title}</Eyebrow>
+      <FilmGrid films={films} />
+    </section>
+  )
+}
+
+interface StatsContentProps {
+  overviewStats: { label: string; value: React.ReactNode }[]
+  leetcode: LeetCodeData | null
+  chess: ChessData | null
+  npm: NpmData | null
+  letterboxd: LetterboxdData | null
+}
+
+function StatsContent({
+  overviewStats,
+  leetcode,
+  chess,
+  npm,
+  letterboxd,
+}: Readonly<StatsContentProps>) {
+  return (
+    <>
+      <SectionHeading
+        as="h1"
+        eyebrow="Activity"
+        title="Stats &"
+        accent="Activity"
+        description="My public data from various platforms."
+      />
+      {overviewStats.length > 0 ? <StatStrip items={overviewStats} className="border-x-0" /> : null}
+      <MacWindow title="~/stats" bodyClassName="space-y-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <LeetCodeCard data={leetcode} />
+          <ChessCard data={chess} />
+          <NpmCard data={npm} />
+        </div>
+        {leetcode ? <LeetCodeSection stats={leetcode} /> : null}
+        <LetterboxdCard data={letterboxd} />
+      </MacWindow>
+    </>
+  )
+}
+
 function formatDownloads(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
@@ -111,126 +272,13 @@ export default async function StatsPage() {
   return (
     <BaseLayout sidebar={<SidebarMain />}>
       <PageBody width="wide">
-        <SectionHeading
-          as="h1"
-          eyebrow="Activity"
-          title="Stats &"
-          accent="Activity"
-          description="My public data from various platforms."
+        <StatsContent
+          overviewStats={overviewStats}
+          leetcode={leetcode}
+          chess={chess}
+          npm={npm}
+          letterboxd={letterboxd}
         />
-
-        {overviewStats.length > 0 && <StatStrip items={overviewStats} className="border-x-0" />}
-
-        <MacWindow title="~/stats" bodyClassName="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <PlatformCard
-            title="LeetCode"
-            href={STATS_PROFILE_URLS.leetcode(STATS_PROFILES.leetcode)}
-            unavailable={!leetcode}
-          >
-            {leetcode && (
-              <div className="space-y-2">
-                <StatRow label="Easy" value={leetcode.easySolved} />
-                <StatRow label="Medium" value={leetcode.mediumSolved} />
-                <StatRow label="Hard" value={leetcode.hardSolved} />
-                <StatRow label="Total solved" value={leetcode.totalSolved} />
-                {leetcode.ranking != null && (
-                  <StatRow label="Ranking" value={`#${leetcode.ranking.toLocaleString()}`} />
-                )}
-                {leetcode.currentRating != null && (
-                  <StatRow label="Contest rating" value={leetcode.currentRating} />
-                )}
-              </div>
-            )}
-          </PlatformCard>
-
-          <PlatformCard
-            title="Chess.com"
-            href={STATS_PROFILE_URLS.chess(STATS_PROFILES.chess)}
-            unavailable={!chess}
-          >
-            {chess && (
-              <div className="space-y-2">
-                {chess.rapid != null && <StatRow label="Rapid" value={chess.rapid} />}
-                {chess.blitz != null && <StatRow label="Blitz" value={chess.blitz} />}
-                {chess.bullet != null && <StatRow label="Bullet" value={chess.bullet} />}
-                {chess.daily != null && <StatRow label="Daily" value={chess.daily} />}
-                {chess.tacticsHighest != null && (
-                  <StatRow label="Tactics (best)" value={chess.tacticsHighest} />
-                )}
-                <StatRow label="Record" value={`${chess.wins}W · ${chess.losses}L · ${chess.draws}D`} />
-              </div>
-            )}
-          </PlatformCard>
-
-          <PlatformCard
-            title="npm"
-            href={STATS_PROFILE_URLS.npm(STATS_PROFILES.npm)}
-            unavailable={!npm}
-          >
-            {npm && (
-              <div className="space-y-2">
-                <StatRow label="Packages" value={npm.packageCount} />
-                <StatRow
-                  label="Downloads (30d)"
-                  value={formatDownloads(npm.totalDownloadsLastMonth)}
-                />
-                {npm.topPackages.length > 0 && (
-                  <div className="pt-2 border-t border-border space-y-1">
-                    <Eyebrow>Top packages</Eyebrow>
-                    {npm.topPackages.map((pkg) => (
-                      <div key={pkg.name} className="flex justify-between text-xs">
-                        <span className="truncate text-primary/80 max-w-[60%]">{pkg.name}</span>
-                        <span className="text-muted-foreground">{formatDownloads(pkg.downloads)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </PlatformCard>
-
-        </div>
-
-        {leetcode && <LeetCodeSection stats={leetcode} />}
-
-        <PlatformCard
-          title="Letterboxd"
-          href={STATS_PROFILE_URLS.letterboxd(STATS_PROFILES.letterboxd)}
-          unavailable={!letterboxd || (letterboxd.films.length === 0 && letterboxd.favorites.length === 0)}
-        >
-          {letterboxd && (letterboxd.films.length > 0 || letterboxd.favorites.length > 0) && (() => {
-            const latest = letterboxd.films.slice(0, 8)
-            const topRated = [...letterboxd.films]
-              .filter((f) => f.rating != null)
-              .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-              .slice(0, 8)
-
-            return (
-              <div className="space-y-6">
-                {letterboxd.favorites.length > 0 && (
-                  <div>
-                    <Eyebrow className="mb-3">Favorite Films</Eyebrow>
-                    <FilmGrid films={letterboxd.favorites} />
-                  </div>
-                )}
-                {latest.length > 0 && (
-                  <div>
-                    <Eyebrow className="mb-3">Latest Activity</Eyebrow>
-                    <FilmGrid films={latest} />
-                  </div>
-                )}
-                {topRated.length > 0 && (
-                  <div>
-                    <Eyebrow className="mb-3">Highest Rated</Eyebrow>
-                    <FilmGrid films={topRated} />
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-        </PlatformCard>
-        </MacWindow>
       </PageBody>
     </BaseLayout>
   )

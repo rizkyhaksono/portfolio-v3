@@ -13,13 +13,9 @@ interface MacWindowProps {
  * Legacy name retained for compatibility. This is now a quiet editorial panel:
  * square, solid, and free of decorative operating-system chrome.
  */
-export function MacWindow({
-  title,
-  children,
-  className,
-  bodyClassName,
-  backdrop: _backdrop = true,
-}: Readonly<MacWindowProps>) {
+export function MacWindow(props: Readonly<MacWindowProps>) {
+  const { title, children, className, bodyClassName } = props
+
   return (
     <section className={cn("border-y border-border bg-background", className)}>
       {title ? <h2 className="sr-only">{title.replace(/^~\//, "")}</h2> : null}

@@ -16,6 +16,7 @@ function toPlainText(html: string): string {
   return html.replace(/<\/?[^>]+(>|$)/g, " ").replace(/\s+/g, " ").trim()
 }
 
+/** Renders a compact on-site article preview in the editorial blog list. */
 export default function CardBlog({ title, description, image, href }: Readonly<CardBlogProps>) {
   return (
     <article className="group border-t border-border last:border-b">

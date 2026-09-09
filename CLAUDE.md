@@ -45,7 +45,7 @@ Design language: monochrome, square (radius 0), hairline borders.
 **Three surface dialects only:**
 
 1. **solid** — `Card`, `FeatureCard`, `Surface variant="solid"` for content boxes
-2. **glass** — `MacWindow` / `Surface variant="glass"` for window chrome only
+2. **glass** — `Surface variant="glass"` for exceptional translucent chrome only
 3. **inset** — `Surface variant="inset"` for nested rows and sidebar blocks
 
 **Page recipe:** `BaseLayout` → `PageBody` → `SectionHeading` → content (`MacWindow` for tools/lists, solid cards for content).
@@ -55,7 +55,7 @@ Design language: monochrome, square (radius 0), hairline borders.
 - Invent glass content cards (`border-white/10`, `bg-white/5`, `backdrop-blur-md`, `hover:-translate-y`)
 - Stack extra `px-4` / `lg:px-0` inside BaseLayout
 - Use `neutral-*`, raw hex, or `max-w-8xl` (undefined)
-- Copy-paste Mac chrome — use `MacWindow` (`backdrop={false}` when DnD needs it)
+- Copy-paste Mac chrome — use the solid editorial `MacWindow` panel
 
 **Prefer:** `PageSection`, `PageBody`, `SectionHeading`, `Eyebrow`, `Chip`, `StatStrip`.
 

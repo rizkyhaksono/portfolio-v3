@@ -22,7 +22,7 @@ How each route group should compose layout and surfaces.
 | Home sections | `PageSection` + solid rows |
 | Blog / Project index | Editorial panel/rows + media Cards |
 | Stats | `PageBody width="wide"` + `MacWindow` + solid PlatformCards |
-| Tracker | `MacWindow backdrop={false}` + board |
+| Tracker | `MacWindow` + board |
 | Status | `MacWindow` + inset service rows |
 
 ## User (authenticated)

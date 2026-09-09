@@ -24,6 +24,18 @@ interface OAuthProviderConfig {
   className: string
 }
 
+interface CredentialFieldProps {
+  id: string
+  label: string
+  type: "email" | "password"
+  placeholder: string
+  value: string
+  autoComplete: string
+  disabled: boolean
+  icon: React.ComponentType<{ className?: string }>
+  onChange: (value: string) => void
+}
+
 // Admin sign-in is Google-only by design (smaller OAuth attack surface).
 const oauthProviders: OAuthProviderConfig[] = [
   {
@@ -33,6 +45,125 @@ const oauthProviders: OAuthProviderConfig[] = [
     className: "hover:bg-muted/80",
   },
 ]
+
+function AdminLoginHeader() {
+  return (
+    <div className="mb-6 flex flex-col gap-1">
+      <div className="mb-1 flex items-center gap-2">
+        <span className="inline-flex h-9 w-9 items-center justify-center border border-border bg-muted text-primary">
+          <Shield className="h-5 w-5" />
+        </span>
+        <Eyebrow>Admin</Eyebrow>
+      </div>
+      <h1 className="font-display text-2xl font-bold tracking-tight">Sign in</h1>
+      <p className="text-sm text-muted-foreground">
+        Manage projects, blog, and portfolio content.
+      </p>
+    </div>
+  )
+}
+
+function CredentialField({
+  id,
+  label,
+  type,
+  placeholder,
+  value,
+  autoComplete,
+  disabled,
+  icon: Icon,
+  onChange,
+}: Readonly<CredentialFieldProps>) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-11 bg-background pl-10"
+          required
+          disabled={disabled}
+          autoComplete={autoComplete}
+        />
+      </div>
+    </div>
+  )
+}
+
+interface CredentialsFormProps {
+  email: string
+  password: string
+  isLoading: boolean
+  onEmailChange: (value: string) => void
+  onPasswordChange: (value: string) => void
+  onSubmit: (event: React.FormEvent) => void
+}
+
+function CredentialsForm({
+  email,
+  password,
+  isLoading,
+  onEmailChange,
+  onPasswordChange,
+  onSubmit,
+}: Readonly<CredentialsFormProps>) {
+  const submitLabel = isLoading ? (
+    <>
+      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      Signing in...
+    </>
+  ) : (
+    "Sign in to dashboard"
+  )
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-4">
+      <CredentialField
+        id="admin-email"
+        label="Email"
+        type="email"
+        placeholder="admin@example.com"
+        value={email}
+        onChange={onEmailChange}
+        disabled={isLoading}
+        autoComplete="email"
+        icon={Mail}
+      />
+      <CredentialField
+        id="admin-password"
+        label="Password"
+        type="password"
+        placeholder="••••••••"
+        value={password}
+        onChange={onPasswordChange}
+        disabled={isLoading}
+        autoComplete="current-password"
+        icon={Lock}
+      />
+      <Button type="submit" className="mt-1 h-11 w-full font-medium" disabled={isLoading}>
+        {submitLabel}
+      </Button>
+    </form>
+  )
+}
+
+function LoginDivider() {
+  return (
+    <div className="relative my-6">
+      <div className="absolute inset-0 flex items-center" aria-hidden="true">
+        <span className="w-full border-t border-border" />
+      </div>
+      <div className="relative flex justify-center text-xs uppercase tracking-wide">
+        <span className="bg-card px-3 text-muted-foreground">Or continue with</span>
+      </div>
+    </div>
+  )
+}
 
 export function AdminLoginForm() {
   const router = useRouter()
@@ -84,7 +215,6 @@ export function AdminLoginForm() {
   return (
     <Card className="overflow-hidden border border-border bg-card shadow-none">
       <CardContent className="p-0">
-        {/* Form panel */}
         <div className="flex flex-col p-6 sm:p-8">
           <Link
             href="/"
@@ -94,76 +224,16 @@ export function AdminLoginForm() {
             Back to portfolio
           </Link>
 
-          <div className="flex flex-col gap-1 mb-6">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex h-9 w-9 items-center justify-center border border-border bg-muted text-primary">
-                <Shield className="h-5 w-5" />
-              </span>
-              <Eyebrow>Admin</Eyebrow>
-            </div>
-            <h1 className="font-display text-2xl font-bold tracking-tight">Sign in</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage projects, blog, and portfolio content.
-            </p>
-          </div>
-
-          <form onSubmit={handleEmailLogin} className="flex flex-col gap-4 flex-1">
-            <div className="space-y-2">
-              <Label htmlFor="admin-email">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-email"
-                  type="email"
-                  placeholder="admin@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-11 bg-background"
-                  required
-                  disabled={isLoading}
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="admin-password">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-11 bg-background"
-                  required
-                  disabled={isLoading}
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full h-11 font-medium mt-1" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign in to dashboard"
-              )}
-            </Button>
-          </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-wide">
-              <span className="bg-card px-3 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
+          <AdminLoginHeader />
+          <CredentialsForm
+            email={email}
+            password={password}
+            isLoading={isLoading}
+            onEmailChange={setEmail}
+            onPasswordChange={setPassword}
+            onSubmit={handleEmailLogin}
+          />
+          <LoginDivider />
 
           <div className="grid gap-2">
             {oauthProviders.map((provider) => (
@@ -181,7 +251,6 @@ export function AdminLoginForm() {
             ))}
           </div>
         </div>
-
       </CardContent>
     </Card>
   )

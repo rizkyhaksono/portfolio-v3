@@ -18,7 +18,7 @@ Unify Portfolio v3 UI so all boxes, sections, and page shells share one monochro
 - `Surface` — solid / glass / glass-static / inset
 - `PageSection` — mt-10 + optional SectionHeading
 - `PageBody` — width presets (default / prose / article / wide)
-- `MacWindow.backdrop` — disable blur for DnD pages
+- `MacWindow` — legacy-compatible solid editorial panel; `backdrop` is deprecated/no-op
 
 ### 3.3 Migrations
 - Glass content cards (stats, duolingo, monkeytype, spotify) → solid

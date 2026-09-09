@@ -24,6 +24,7 @@ function extractImageFromDescription(html: string): { imageUrl: string | null; c
   return { imageUrl, cleanDescription: textOnly }
 }
 
+/** Renders a compact Medium article preview in the editorial blog list. */
 export default function CardBlogMedium({ title, description, href }: Readonly<CardBlogMediumProps>) {
   const { imageUrl, cleanDescription } = extractImageFromDescription(description)
   const descriptionPreview = cleanDescription.slice(0, 100) + (cleanDescription.length > 200 ? "..." : "")

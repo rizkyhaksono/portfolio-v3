@@ -63,8 +63,8 @@ const BlogReaderView = ({
         <div className="my-12 border-y border-border py-5">
           <Typography.H3 className="m-0 text-sm font-medium">Filed under</Typography.H3>
           <div className="flex flex-wrap gap-2 pt-2">
-            {tags?.map((stack: string, index: number) => (
-              <Chip key={index}>{stack}</Chip>
+            {Array.from(new Set(tags)).map((stack: string) => (
+              <Chip key={stack}>{stack}</Chip>
             ))}
           </div>
         </div>

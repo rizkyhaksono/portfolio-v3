@@ -73,7 +73,7 @@ Need a content box?         → Card or Surface solid
 Need a feature/platform tile? → FeatureCard or Surface solid + cozy pad
 Need a bordered tool/list panel? → MacWindow (legacy name; editorial panel)
 Need a nested row?          → Surface inset
-Need DnD inside a window?   → MacWindow backdrop={false}
+Need DnD inside a panel?    → MacWindow (solid editorial panel)
 ```
 
 ## Outliers (do not copy)
