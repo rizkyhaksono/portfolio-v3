@@ -1,8 +1,6 @@
-"use client"
-
+import Image from "next/image"
 import Link from "next/link"
 import BlurFade from "@/components/magicui/blur-fade"
-import { TypingAnimation } from "@/components/ui/typing-animation"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { Button } from "@/components/ui/button"
@@ -11,8 +9,6 @@ import { media_socials } from "@/commons/constants/contact"
 import { JOB_TITLE } from "@/commons/constants/author"
 import { ArrowRight } from "lucide-react"
 import type { OwnerProfile } from "@/services/visitor/owner-profile"
-
-const roles = [JOB_TITLE, "Cloud Enthusiast", "Full-Stack Builder"]
 
 const HERO_STATS = [
   { label: "Focus", value: JOB_TITLE },
@@ -31,10 +27,9 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
       <BlurFade delay={0.1} inView>
         <div className="text-left space-y-5">
           {/* Eyebrow */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "0ms" }}>
+          <div>
             <Eyebrow>
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
               Open to work · {JOB_TITLE}
@@ -42,23 +37,15 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           </div>
 
           {/* Name — display headline with a serif-italic accent */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+          <div>
             <h1 className="font-display text-3xl font-bold leading-[1.05] tracking-tight text-balance sm:text-4xl md:text-5xl">
               Hi, I&apos;m {name}
               <Typography.Em className="text-3xl sm:text-4xl md:text-5xl">.</Typography.Em>
             </h1>
           </div>
 
-          {/* Typing Animation for Roles */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-            <div className="flex min-w-0 items-center gap-2 text-sm">
-              <span className="shrink-0 text-muted-foreground">I&apos;m a</span>
-              <TypingAnimation words={roles} className="min-w-0 font-semibold text-base md:text-lg text-primary" duration={120} pauseDelay={2500} loop showCursor cursorStyle="line" />
-            </div>
-          </div>
-
           {/* Bio Text */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+          <div>
             <p className="max-w-xl text-xs sm:text-sm leading-relaxed text-muted-foreground">
               {JOB_TITLE} building production AI systems — <span className="font-medium text-foreground">LLMs, RAG, and MCP</span> — backed by full-stack and cloud engineering. At Sarana AI I ship scalable agents and data platforms with{" "}
               <span className="font-medium text-foreground">Python, AWS, Next.js, and Go</span>, focused on reliable CI/CD and <Typography.Em>measurable</Typography.Em> impact.
@@ -66,7 +53,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           </div>
 
           {/* CTA Buttons */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+          <div>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
                 <Link href="/project">
@@ -81,7 +68,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           </div>
 
           {/* Social Links */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "500ms" }}>
+          <div>
             <div className="flex min-w-0 flex-wrap items-center gap-3">
               <Eyebrow>Find me on</Eyebrow>
               <div className="flex flex-wrap gap-2 items-center">
@@ -102,7 +89,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           </div>
 
           {/* Stat strip */}
-          <div className="animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+          <div>
             <StatStrip items={HERO_STATS} className="border-x-0" />
           </div>
         </div>
@@ -114,9 +101,7 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           {/* Soft depth behind the portrait — neutral, no rainbow gradient */}
           <div className="absolute inset-0 rounded-full bg-primary/10 blur-2xl" />
 
-          {/* Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={avatar}
             alt={name}
             width={200}
@@ -127,7 +112,6 @@ export default function IntroSection({ profile }: Readonly<{ profile?: OwnerProf
           {/* Status Dot */}
           <div className="absolute bottom-2 right-2 md:bottom-3 md:right-3">
             <span className="relative flex h-3 w-3 md:h-4 md:w-4">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-green-500 ring-2 ring-background" />
             </span>
           </div>

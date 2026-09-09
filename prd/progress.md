@@ -100,6 +100,16 @@
 - Legal + changelog join BaseLayout or documented StandaloneLayout
 - Home sections gradually adopt `PageSection`
 
+### Performance + compact editorial pass (2026-09-10)
+
+- ✅ Removed continuous page animations, scroll progress, dock magnification, and deferred non-critical global utilities.
+- ✅ Homepage now streams remote sections independently and fetches contribution sources in parallel.
+- ✅ Removed the rotating “I’m a …” line and replaced the 153-item skill expansion with four focused production groups.
+- ✅ Fixed logged-in profile truncation, Duolingo XP overlap, mobile career/education spacing, and initial mobile GitHub calendar position.
+- ✅ Rebuilt the admin dashboard as a monochrome editorial data view; Supabase is first and tables paginate at 10 rows.
+- ✅ Simplified appearance controls to an icon, label, and switch without a surrounding card.
+- ✅ Reworked changelog layout and all release-note copy; removed decorative remote images and promotional filler.
+
 ### Out of scope (unchanged)
 - Supabase career/education rows (DB-backed titles)
 - Owner-profile API `about` field

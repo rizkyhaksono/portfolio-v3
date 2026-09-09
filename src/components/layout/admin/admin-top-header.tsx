@@ -41,8 +41,8 @@ export function AdminTopHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 transition-all duration-300 sm:px-5",
-        isExpanded ? "sm:pl-[276px]" : "sm:pl-[84px]"
+        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6",
+        isExpanded ? "sm:pl-[248px]" : "sm:pl-[88px]"
       )}
     >
       {/* Single page identity — pages don't repeat their own title */}
