@@ -1,10 +1,8 @@
 ﻿"use client"
 
-import { useRef, useMemo, useCallback, useState, useEffect } from "react"
+import { useMemo, useCallback, useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { gsap } from "gsap"
-import { useGSAP } from "@gsap/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Eyebrow } from "@/components/ui/eyebrow"
@@ -26,8 +24,6 @@ import {
 } from "lucide-react"
 import type { RoadmapContent, RoadmapLevel } from "@/lib/mdx"
 import { useRoadmapProgress } from "@/hooks/use-roadmap-progress"
-
-gsap.registerPlugin(useGSAP)
 
 interface CourseGroup {
   course: string
@@ -65,7 +61,6 @@ function getLessonLevel(lesson: RoadmapContent): RoadmapLevel {
 export function RoadmapClient({ courses }: RoadmapClientProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const containerRef = useRef<HTMLDivElement>(null)
 
   const selectedCategory = searchParams.get("category") ?? "All"
   const activeCourseId = searchParams.get("course")
@@ -113,37 +108,6 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
     const query = params.toString()
     router.replace(query ? `/roadmap?${query}` : "/roadmap", { scroll: false })
   }, [router, searchParams])
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia()
-
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        if (activeCourseId) {
-          const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
-          tl.fromTo(".back-btn", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4 })
-          tl.fromTo(".course-header", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.2")
-          tl.fromTo(".level-section", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, "-=0.3")
-          tl.fromTo(".cert-card", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.6 }, "-=0.2")
-        } else {
-          const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
-          tl.fromTo(".filter-badge", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 })
-          tl.fromTo(".course-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1 }, "-=0.2")
-          tl.fromTo(".empty-state", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.5 }, "-=0.2")
-        }
-      })
-
-      mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set([".back-btn", ".course-header", ".level-section", ".cert-card", ".filter-badge", ".course-card", ".empty-state"], {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-        })
-      })
-    },
-    { scope: containerRef, dependencies: [activeCourseId, selectedCategory] },
-  )
 
   const allCategories = useMemo(
     () => ["All", ...Array.from(new Set(courses.flatMap(({ lessons }) => lessons.map((l) => l.meta.category))))],
@@ -219,7 +183,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
     const courseComplete = isLoaded && isCourseComplete(activeCourseId, metadata.totalLessons)
 
     return (
-      <div ref={containerRef} className="pb-24 md:pb-8">
+      <div className="pb-24 md:pb-8">
         {/* Sticky mobile header */}
         <div className="sticky top-0 z-30 -mx-6 px-6 py-3 mb-4 bg-background/95 backdrop-blur-sm border-b md:static md:mx-0 md:px-0 md:py-0 md:mb-0 md:bg-transparent md:backdrop-blur-none md:border-none">
           <button
@@ -233,7 +197,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
 
         <div className="space-y-6 md:space-y-8">
           {/* Course Header Banner */}
-          <div className="course-header relative overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="course-header relative overflow-hidden border-y border-border bg-card">
             <div className="absolute inset-0 z-0">
               {/* Monochrome monogram — reliable, no external image */}
               <span className="pointer-events-none absolute -right-4 -top-8 select-none font-display text-[10rem] font-black leading-none text-muted-foreground/10">
@@ -296,7 +260,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                   <AccordionItem
                     key={level}
                     value={level}
-                    className="level-section border rounded-xl overflow-hidden bg-card/50 data-[state=open]:shadow-sm"
+                    className="level-section overflow-hidden border bg-card"
                   >
                     <AccordionTrigger className="px-4 md:px-6 py-4 hover:no-underline hover:bg-muted/30 [&[data-state=open]]:bg-muted/20 min-h-[56px]">
                       <div className="flex flex-1 items-center gap-3 text-left pr-2">
@@ -376,12 +340,12 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
           </div>
 
           {/* Certificate Section */}
-          <div className="cert-card relative overflow-hidden rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent p-6 md:p-12">
+          <div className="cert-card relative overflow-hidden border-y border-border bg-card p-6 md:p-12">
             <div className="absolute top-0 right-0 -mt-8 -mr-8 opacity-[0.03] dark:opacity-10 pointer-events-none">
               <Medal className="w-64 h-64 text-primary" />
             </div>
             <div className="relative z-10 flex flex-col md:flex-row gap-6 md:gap-8 items-center md:items-start text-center md:text-left">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30 shadow-inner">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center border border-border bg-muted md:h-24 md:w-24">
                 {courseComplete ? <Award className="w-10 h-10 md:w-12 md:h-12 text-primary" /> : <Lock className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground" />}
               </div>
               <div className="flex-1 w-full">
@@ -480,7 +444,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
   }
 
   return (
-    <div ref={containerRef}>
+    <div>
       <div className="space-y-6 md:space-y-8 py-6 md:py-8">
         {/* Category Filters */}
         {allCategories.length > 1 && (
@@ -514,15 +478,15 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                 onKeyDown={(e) => e.key === "Enter" && openCourse(courseGroup.course)}
                 role="button"
                 tabIndex={0}
-                className="course-card group cursor-pointer rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden transition-all hover:shadow-xl hover:border-primary/50 flex flex-col h-full active:scale-[0.99]"
+                className="course-card group flex h-full cursor-pointer flex-col overflow-hidden border bg-card text-card-foreground transition-colors hover:border-foreground/40"
               >
-                <div className="h-40 sm:h-48 w-full relative overflow-hidden border-b border-border bg-secondary">
+                <div className="relative h-24 w-full overflow-hidden border-b border-border bg-secondary">
                   {/* Monochrome monogram placeholder — reliable, no external image */}
-                  <span className="pointer-events-none absolute inset-0 flex select-none items-center justify-center font-display text-7xl font-black text-muted-foreground/15 transition-transform duration-700 ease-in-out group-hover:scale-105">
+                  <span className="pointer-events-none absolute inset-0 flex select-none items-center justify-center font-display text-4xl font-black text-muted-foreground/15">
                     {meta.title.charAt(0).toUpperCase()}
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
+                  <div className="absolute bottom-2 left-3 flex flex-wrap gap-1.5">
                     <Badge variant="secondary" className="bg-primary/90 text-primary-foreground border-none shadow-sm uppercase text-[10px] tracking-wider">
                       {meta.category}
                     </Badge>
@@ -532,7 +496,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
                   </div>
                 </div>
 
-                <div className="p-4 md:p-6 flex flex-col flex-1">
+                <div className="flex flex-1 flex-col p-4">
                   <h3 className="font-bold text-lg md:text-xl tracking-tight mb-2 group-hover:text-primary transition-colors">{meta.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">{meta.description}</p>
 
@@ -567,7 +531,7 @@ export function RoadmapClient({ courses }: RoadmapClientProps) {
 
         {filteredCourses.length === 0 && (
           <div className="empty-state text-center py-16 md:py-20 border-2 border-dashed rounded-2xl bg-muted/30">
-            <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <BookOpen className="mx-auto mb-4 h-10 w-10 text-muted-foreground opacity-50" />
             <h3 className="text-lg font-semibold">No Courses Found</h3>
             <p className="text-muted-foreground text-sm">Try selecting a different category filter.</p>
           </div>

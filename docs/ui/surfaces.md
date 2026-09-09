@@ -7,8 +7,8 @@ Portfolio v3 allows **exactly three** surface dialects. Do not invent blends.
 | Variant | Visual | Primitive | Use for |
 |---|---|---|---|
 | **solid** | `border-border bg-card shadow-sm` | `Card`, `FeatureCard`, `Surface variant="solid"` | Content boxes, lists, feature/platform cards, media cards |
-| **glass** | `border-border/60 bg-background/40 backdrop-blur-sm` | `MacWindow`, `Surface variant="glass"` | Window chrome only (title bar + frosted shell) |
-| **glass-static** | glass without blur | `MacWindow backdrop={false}`, `Surface variant="glass-static"` | Same chrome when an ancestor filter breaks DnD / fixed positioning |
+| **glass** | `border-border/60 bg-background/40 backdrop-blur-sm` | `Surface variant="glass"` | Exceptional translucent chrome only |
+| **glass-static** | glass without blur | `Surface variant="glass-static"` | Static translucent chrome when a filter would break positioning |
 | **inset** | `border-border/40 bg-secondary/20` | `Surface variant="inset"` | Nested rows, sidebar blocks, status cells |
 
 ## Solid (default content)

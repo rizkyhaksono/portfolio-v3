@@ -75,6 +75,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Admin uses the same square editorial language as the public site. */
+  .admin-shell [class*="rounded-"] {
+    border-radius: 0;
+  }
 }
 
 /* Custom scrollbar — thin, square, monochrome. Track transparent so it reads clean. */

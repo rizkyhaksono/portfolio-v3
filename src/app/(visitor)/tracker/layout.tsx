@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 
 export default function TrackerLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false} useInteractiveGrid={true}>
+    <BaseLayout sidebar={<SidebarMain />}>
       {children}
     </BaseLayout>
   )

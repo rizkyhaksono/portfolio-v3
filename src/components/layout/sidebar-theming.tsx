@@ -1,31 +1,22 @@
-import { cn } from "@/lib/utils";
-import Typography from "@/components/ui/typography";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { AnimatedThemeToggler } from "../ui/animated-theme-toggler";
 
 const SidebarTheming = () => {
   return (
-    <>
-      <Typography.P className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate pt-5">
-        Theming
-      </Typography.P>
-      <div className="inline-flex items-center whitespace-nowrap rounded-none text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 px-4 py-2 w-full justify-between h-10 mb-1">
-        <div className="flex items-center">
-          <span className={cn("mr-4")}>
-            <SunIcon className="h-[1.2rem] w-[1.2rem] text-neutral-800 dark:hidden dark:text-neutral-200" />
-            <MoonIcon className="hidden h-[1.2rem] w-[1.2rem] text-neutral-800 dark:block dark:text-neutral-200" />
-          </span>
-          <Typography.P
-            className={cn(
-              "leading-7 flex flex-grow max-w-[200px] truncate translate-x-0 opacity-100"
-            )}
-          >
-            Dark Mode
-          </Typography.P>
-        </div>
+    <div className="mt-3 w-full border-t border-border pt-3">
+      <div className="mb-1 px-3 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        Appearance
+      </div>
+      <div className="flex h-10 w-full items-center justify-between border border-border bg-background px-3 text-sm font-medium">
+        <span className="flex items-center gap-3">
+          <SunIcon className="h-4 w-4 dark:hidden" />
+          <MoonIcon className="hidden h-4 w-4 dark:block" />
+          <span className="dark:hidden">Light</span>
+          <span className="hidden dark:inline">Dark</span>
+        </span>
         <AnimatedThemeToggler />
       </div>
-    </>
+    </div>
   );
 };
 

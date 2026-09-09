@@ -33,13 +33,10 @@ export function SectionHeading({
   children,
 }: Readonly<SectionHeadingProps>) {
   const Tag = as
-  const sizes =
-    as === "h1"
-      ? "text-3xl sm:text-4xl md:text-5xl"
-      : "text-2xl sm:text-3xl"
+  const sizes = as === "h1" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
 
   return (
-    <div className={cn("flex flex-col gap-2", align === "center" && "items-center text-center", className)}>
+    <div className={cn("flex flex-col gap-1.5", align === "center" && "items-center text-center", className)}>
       {eyebrow && <Eyebrow marker={marker}>{eyebrow}</Eyebrow>}
       <Tag className={cn("font-display font-bold leading-[1.05] tracking-tight text-balance", sizes, titleClassName)}>
         {title}

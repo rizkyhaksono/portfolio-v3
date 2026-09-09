@@ -109,7 +109,7 @@ export default async function StatsPage() {
   if (letterboxd) overviewStats.push({ label: "Films Logged", value: letterboxd.films.length })
 
   return (
-    <BaseLayout sidebar={<SidebarMain />} useGridBackground={false}>
+    <BaseLayout sidebar={<SidebarMain />}>
       <PageBody width="wide">
         <SectionHeading
           as="h1"

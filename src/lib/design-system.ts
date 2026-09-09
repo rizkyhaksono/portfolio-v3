@@ -3,7 +3,7 @@
  *
  * Three surface dialects only — do not invent ad-hoc glass/solid blends:
  * - solid:  default content boxes (Card / FeatureCard)
- * - glass:  window chrome only (MacWindow, right-sidebar shell)
+ * - glass:  exceptional translucent chrome only
  * - inset:  nested rows, sidebar blocks, status cells
  */
 
@@ -19,15 +19,15 @@ export const SURFACE = {
 
 /** Default content padding for solid cards and feature boxes. */
 export const SURFACE_PADDING = {
-  default: "p-6",
-  compact: "p-4",
-  cozy: "p-5",
+  default: "p-5",
+  compact: "p-3",
+  cozy: "p-4",
 } as const
 
 /** Section spacing used by PageSection / home blocks. */
 export const SECTION_SPACING = {
-  section: "mt-10",
-  sectionGap: "mt-6",
+  section: "mt-8",
+  sectionGap: "mt-4",
 } as const
 
 /**

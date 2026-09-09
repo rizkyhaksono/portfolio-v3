@@ -41,7 +41,7 @@ export function AdminTopHeader() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/70 px-4 backdrop-blur-xl transition-all duration-300 sm:px-5",
+        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 transition-all duration-300 sm:px-5",
         isExpanded ? "sm:pl-[276px]" : "sm:pl-[84px]"
       )}
     >

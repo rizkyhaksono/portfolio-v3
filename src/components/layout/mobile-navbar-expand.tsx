@@ -4,7 +4,6 @@ import Typography from "@/components/ui/typography"
 import { Avatar } from "@/components/ui/avatar"
 import Image from "next/image"
 import SidebarSecondary from "./sidebar-secondary"
-import MobileNavbarRightSidebar from "./mobile-navbar-right-sidebar"
 
 interface NavbarExpandProps {
   onItemClick?: () => void
@@ -39,7 +38,6 @@ const MobileNavbarExpand = ({ onItemClick }: NavbarExpandProps) => {
         </div>
       </div>
       <SidebarSecondary menu={publicDashboardMenu} onItemClick={onItemClick} />
-      <MobileNavbarRightSidebar />
     </div>
   )
 }

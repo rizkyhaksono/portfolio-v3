@@ -1,6 +1,6 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-08-18 (GitHub contribution calendar horizontal scroll)*
+*Last Updated: 2026-09-09 (editorial simplicity and reading pass)*
 
 ---
 
@@ -18,12 +18,26 @@
 - **DeepSource JavaScript**: ✅ COMPLETED — nesting / imports / HTML preview issues fixed
 - **Senior AI + square/mobile pass**: ✅ COMPLETED — `JOB_TITLE` constant, square tool chips, mobile wrap
 - **GitHub contribution calendar overflow**: ✅ COMPLETED — heatmap scrolls horizontally; newest weeks visible
+- **Editorial simplicity pass**: ✅ COMPLETED — calmer long-form reading, no animated backgrounds or visitor panel, compact navigation, visible theme control, and OS chrome removed
 
 ---
 
 ## Feature Implementation Status
 
 ### COMPLETED
+
+#### Editorial simplicity and reading experience
+- ✅ Blog index uses quiet single-column editorial rows for DEV, Medium, and on-site posts
+- ✅ Blog articles use a focused reading measure, larger type, calmer metadata, square media, and improved markdown rhythm
+- ✅ Legacy `MacWindow` renders as a square editorial panel without traffic-light controls or glass blur across Projects, Tools, Stats, Status, Tracker, AI, Blog, and Roadmap
+- ✅ Animated grid/gradient backgrounds removed from the shared shell, Roadmap, and admin login
+- ✅ Visitor/IP/weather panel removed from desktop and mobile layouts
+- ✅ Left navigation compacted; theme switch is now a clearly labeled Appearance control above the fold
+- ✅ Roadmap animation and rounded decorative card treatment removed; Changelog now shares the main editorial shell
+- ✅ Shared page, card, panel, section, and admin spacing tightened; Roadmap course art compressed to a small label strip
+- ✅ Admin shell/login flattened to the same monochrome, square language
+- ✅ Twitter removed from public social links
+- ✅ Chat now scrolls only its message pane instead of moving the document, and uses a focused no-footer viewport
 
 #### About Me (HR-ready Senior AI Engineer)
 - ✅ **About section description** - COMPLETED (2026-08-13)

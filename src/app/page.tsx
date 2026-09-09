@@ -10,7 +10,6 @@ import LinkedinRecommendations from "@/app/_components/contact/linkedin-recommen
 import SiteStatsSection from "@/app/_components/site-stats"
 import BaseLayout from "@/components/layout/base-layout"
 import SidebarMain from "@/components/layout/sidebar-main"
-import RightSidebarMain from "@/components/layout/right-sidebar-main"
 import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
 import { getOwnerProfile } from "@/services/visitor/owner-profile"
 
@@ -24,7 +23,7 @@ export default async function Home() {
   const recommendations = linkedinRecommendationsResponse?.data || []
 
   return (
-    <BaseLayout sidebar={<SidebarMain />} rightSidebar={<RightSidebarMain />}>
+    <BaseLayout sidebar={<SidebarMain />}>
       <IntroSection profile={ownerProfile} />
       <AboutSection />
       <SkillSection />

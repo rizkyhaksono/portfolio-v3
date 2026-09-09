@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeBlock from "./code-block";
-import Typography from "./typography";
 import NextImage from "next/image";
 
 interface MarkdownRendererProps {
@@ -31,22 +30,22 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
             {...props}
           />
         ),
-        p: (props) => <Typography.P {...props} />,
-        h1: (props) => <Typography.H1 {...props} />,
-        h2: (props) => <Typography.H2 {...props} />,
-        h3: (props) => <Typography.H3 {...props} />,
+        p: (props) => <p className="mb-6 text-[1.02rem] leading-8 text-foreground/85 sm:text-[1.08rem]" {...props} />,
+        h1: (props) => <h1 className="mb-5 mt-12 scroll-m-24 font-display text-3xl font-semibold tracking-tight" {...props} />,
+        h2: (props) => <h2 className="mb-4 mt-12 scroll-m-24 font-display text-2xl font-semibold tracking-tight" {...props} />,
+        h3: (props) => <h3 className="mb-3 mt-10 scroll-m-24 font-display text-xl font-semibold tracking-tight" {...props} />,
         ul: (props) => (
-          <ul className="list-disc space-y-3 pb-5 pl-10 font-sans" {...props} />
+          <ul className="mb-7 list-disc space-y-3 pl-6 text-[1.02rem] leading-8 text-foreground/85" {...props} />
         ),
         ol: (props) => (
           <ol
-            className="list-decimal space-y-3 pb-5 pl-10 font-sans"
+            className="mb-7 list-decimal space-y-3 pl-6 text-[1.02rem] leading-8 text-foreground/85"
             {...props}
           />
         ),
         img: (props) => (
           <NextImage
-            className="rounded-xl mx-auto my-3"
+            className="mx-auto my-8 border-y border-border"
             width={(props.width as number) || 1600}
             height={(props.height as number) || 1600}
             src={props.src as string}
@@ -56,7 +55,7 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
           />
         ),
         code: (props) => <CodeBlock {...props} />,
-        blockquote: (props) => <Typography.quote {...props} />,
+        blockquote: (props) => <blockquote className="my-8 border-l-2 border-foreground pl-6 text-lg italic leading-8 text-muted-foreground" {...props} />,
         table: (props) => <Table {...(props as TableProps)} />,
         th: (props) => (
           <th className="border px-3 py-1 text-left dark:border-neutral-600">

@@ -30,11 +30,11 @@ const SidebarSecondary = ({
 
   return (
     <nav>
-      <ul className="flex flex-col items-start space-y-1">
+      <ul className="flex flex-col items-start">
         {!disableProfileCard && <ProfileSideCard />}
         {menu.map(({ groupLabel, menus }, index) => (
-          <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={groupLabel + index}>
-            <Typography.P className="text-sm font-medium text-muted-foreground px-4 pb-2 max-w-[248px] truncate">
+          <li className={cn("w-full", groupLabel ? "pt-2" : "")} key={groupLabel + index}>
+            <Typography.P className="max-w-[248px] truncate px-3 pb-1 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               {groupLabel}
             </Typography.P>
             {menus.map(({ href, label, icon: Icon }, index) => {
@@ -44,13 +44,13 @@ const SidebarSecondary = ({
                 <Button
                   key={href + index}
                   variant={active ? "secondary" : "ghost"}
-                  className="w-full justify-between h-10 mb-1"
+                  className="h-8 w-full justify-between px-3"
                   asChild
                 >
                   <Link href={href} onClick={onItemClick}>
                     <div className="flex items-center">
-                      <span className="mr-4">
-                        <Icon size={18} />
+                      <span className="mr-3">
+                        <Icon size={16} />
                       </span>
                       <Typography.P className="flex flex-grow max-w-[200px] truncate">
                         {label}

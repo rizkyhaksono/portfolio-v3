@@ -20,7 +20,7 @@ interface PageBodyProps extends HTMLAttributes<HTMLDivElement> {
  */
 export function PageBody({ width = "default", className, children, ...props }: Readonly<PageBodyProps>) {
   return (
-    <div className={cn(PAGE_WIDTH[width], "flex flex-col gap-6", className)} {...props}>
+    <div className={cn(PAGE_WIDTH[width], "flex flex-col gap-4", className)} {...props}>
       {children}
     </div>
   )

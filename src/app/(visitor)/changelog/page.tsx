@@ -1,41 +1,22 @@
-import Link from "next/link"
-import { ArrowLeftIcon } from "lucide-react"
 import { getAllChangelogs } from "@/lib/mdx"
-import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
 import { formatDate } from "@/commons/helpers"
 import { MDXRemote } from "next-mdx-remote/rsc"
 import remarkGfm from "remark-gfm"
 import { getMDXComponents } from "@/components/ui/changelog-mdx-component"
-import { Button } from "@/components/ui/button"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { Chip } from "@/components/ui/chip"
 import { SectionHeading } from "@/components/ui/section-heading"
+import BaseLayout from "@/components/layout/base-layout"
+import SidebarMain from "@/components/layout/sidebar-main"
+import { PageBody } from "@/components/ui/page-body"
 
 export default function ChangelogPage() {
   const changelogs = getAllChangelogs()
   const components = getMDXComponents()
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <div className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-5xl mx-auto relative">
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button asChild variant="outline" size="sm">
-                <Link href="/" aria-label="Go back to homepage">
-                  <ArrowLeftIcon />
-                  <span className="hidden sm:inline">Back</span>
-                </Link>
-              </Button>
-              <div className="h-5 w-px bg-border hidden sm:block" />
-              <h1 className="font-display text-lg font-bold tracking-tight">Changelog</h1>
-            </div>
-            <AnimatedThemeToggler />
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-6 lg:px-10 pt-10">
+    <BaseLayout sidebar={<SidebarMain />}>
+      <PageBody width="article" className="pt-4">
         <SectionHeading
           className="mb-12"
           eyebrow="CHANGELOG"
@@ -44,7 +25,7 @@ export default function ChangelogPage() {
           description="A running log of everything I've shipped — new features, fixes, and refinements across the portfolio."
         />
 
-        <div className="relative">
+        <div className="relative border-t border-border pt-10">
           {changelogs.map((changelog) => {
             const { meta, content, slug } = changelog
             const date = new Date(meta.date)
@@ -65,7 +46,7 @@ export default function ChangelogPage() {
 
                   <div className="flex-1 md:pl-8 relative pb-10">
                     <div className="hidden md:block absolute top-2 left-0 w-px h-full bg-border">
-                      <div className="hidden md:block absolute -translate-x-1/2 size-3 bg-primary rounded-full z-10" />
+                      <div className="absolute size-2 -translate-x-1/2 bg-primary" />
                     </div>
 
                     <div className="space-y-6">
@@ -87,7 +68,7 @@ export default function ChangelogPage() {
             )
           })}
         </div>
-      </div>
-    </div>
+      </PageBody>
+    </BaseLayout>
   )
 }

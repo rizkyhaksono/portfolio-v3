@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { FcGoogle } from "react-icons/fc"
-import { ArrowLeft, LayoutDashboard, Loader2, Lock, Mail, Shield } from "lucide-react"
+import { ArrowLeft, Loader2, Lock, Mail, Shield } from "lucide-react"
 import { toast } from "sonner"
 import {
   loginWithCredentials,
@@ -83,8 +82,8 @@ export function AdminLoginForm() {
   }
 
   return (
-    <Card className="overflow-hidden border border-border/60 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-card">
-      <CardContent className="grid p-0 md:grid-cols-2">
+    <Card className="overflow-hidden border border-border bg-card shadow-none">
+      <CardContent className="p-0">
         {/* Form panel */}
         <div className="flex flex-col p-6 sm:p-8">
           <Link
@@ -97,7 +96,7 @@ export function AdminLoginForm() {
 
           <div className="flex flex-col gap-1 mb-6">
             <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <span className="inline-flex h-9 w-9 items-center justify-center border border-border bg-muted text-primary">
                 <Shield className="h-5 w-5" />
               </span>
               <Eyebrow>Admin</Eyebrow>
@@ -183,40 +182,6 @@ export function AdminLoginForm() {
           </div>
         </div>
 
-        {/* Brand panel */}
-        <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/85 p-8 text-primary-foreground">
-          <div className="absolute inset-0 opacity-30">
-            <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary-foreground/20 blur-3xl" />
-            <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-primary-foreground/20 blur-2xl" />
-          </div>
-
-          <div className="relative z-10">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-foreground/15 backdrop-blur-sm border border-primary-foreground/20 mb-6">
-              <LayoutDashboard className="h-6 w-6" />
-            </div>
-            <h2 className="font-display text-2xl font-bold leading-tight">Portfolio CMS</h2>
-            <p className="mt-2 text-sm text-primary-foreground/75 max-w-[240px] leading-relaxed">
-              Secure workspace for editing projects, work history, blog posts, and site settings.
-            </p>
-          </div>
-
-          <div className="relative z-10 space-y-4">
-            <div className="relative aspect-[4/3] w-full max-w-[280px] mx-auto rounded-xl overflow-hidden border border-primary-foreground/20 shadow-lg">
-              <Image
-                src="https://i.pinimg.com/736x/a0/f5/cd/a0f5cdfbb60d16bd37ebc10c18e8da89.jpg"
-                width={400}
-                height={300}
-                alt=""
-                className="object-cover w-full h-full brightness-90"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent" />
-            </div>
-            <p className="text-xs text-primary-foreground/60 text-center">
-              Admin access only · Role verified on sign-in
-            </p>
-          </div>
-        </div>
       </CardContent>
     </Card>
   )
