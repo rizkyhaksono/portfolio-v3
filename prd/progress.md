@@ -109,6 +109,8 @@
 - ✅ Rebuilt the admin dashboard as a monochrome editorial data view; Supabase is first and tables paginate at 10 rows.
 - ✅ Simplified appearance controls to an icon, label, and switch without a surrounding card.
 - ✅ Reworked changelog layout and all release-note copy; removed decorative remote images and promotional filler.
+- ✅ Unified DEV.to, Medium, and portfolio articles into one chronological feed with visible source labels.
+- ✅ Added a curated featured-work section for Info Pangan Jakarta, Adaro Water Solution, and eCRF Biofarma above the remaining project archive.
 
 ### Out of scope (unchanged)
 - Supabase career/education rows (DB-backed titles)
