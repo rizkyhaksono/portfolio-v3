@@ -12,7 +12,6 @@ import {
   LogIn,
   User,
   KanbanSquare,
-  Activity,
 } from "lucide-react";
 
 type Menu = {
@@ -84,11 +83,6 @@ export const publicDashboardMenu = [
         href: "/stats",
         label: "Stats",
         icon: BarChart2,
-      },
-      {
-        href: "/status",
-        label: "Status",
-        icon: Activity,
       },
     ],
   },

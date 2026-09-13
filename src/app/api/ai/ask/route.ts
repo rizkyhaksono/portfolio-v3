@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { trustedClientIpHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
@@ -13,12 +14,11 @@ export async function POST(req: NextRequest) {
   if (!apiUrl) {
     return Response.json({ message: "AI service is not configured." }, { status: 503 })
   }
-  const fwd = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? ""
 
   try {
     const res = await fetch(`${apiUrl}/v3/ai/ask`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(fwd ? { "x-forwarded-for": fwd } : {}) },
+      headers: { "Content-Type": "application/json", ...trustedClientIpHeaders(req) },
       body: JSON.stringify({ question: body.question }),
     })
     const text = await res.text()
