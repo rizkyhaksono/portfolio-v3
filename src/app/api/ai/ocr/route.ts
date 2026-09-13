@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { trustedClientIpHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
@@ -10,11 +11,9 @@ export async function POST(req: NextRequest) {
   }
 
   const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL
-  const fwd = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? ""
-
   const res = await fetch(`${apiUrl}/v3/ai/ocr`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(fwd ? { "x-forwarded-for": fwd } : {}) },
+    headers: { "Content-Type": "application/json", ...trustedClientIpHeaders(req) },
     body: JSON.stringify({ imageBase64: body.imageBase64, mimeType: body.mimeType, mode: body.mode }),
   })
 

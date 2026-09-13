@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server"
+import { trustedClientIpHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
-/** Public proxy for the recruiter JD-fit matcher — forwards the visitor IP for rate-limiting. */
+/** Public proxy for the recruiter JD-fit matcher — forwards a proxy-trusted IP for rate-limiting. */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   if (!body?.jobDescription) {
@@ -13,12 +14,11 @@ export async function POST(req: NextRequest) {
   if (!apiUrl) {
     return Response.json({ message: "AI service is not configured." }, { status: 503 })
   }
-  const fwd = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? ""
 
   try {
     const res = await fetch(`${apiUrl}/v3/ai/jd-fit`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...(fwd ? { "x-forwarded-for": fwd } : {}) },
+      headers: { "Content-Type": "application/json", ...trustedClientIpHeaders(req) },
       body: JSON.stringify({ jobDescription: body.jobDescription }),
     })
     const text = await res.text()

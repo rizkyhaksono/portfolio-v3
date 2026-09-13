@@ -23,7 +23,7 @@ interface Command {
   run: (args: string[], ctx: TerminalCtx) => string[] | void
 }
 
-const PAGES = ["/", "/project", "/blog", "/ai", "/chat", "/tracker", "/tools", "/roadmap", "/stats", "/status", "/certificates", "/changelog"]
+const PAGES = ["/", "/project", "/blog", "/ai", "/chat", "/tracker", "/tools", "/roadmap", "/stats", "/certificates", "/changelog"]
 const SOCIALS: Record<string, string> = {
   github: "https://github.com/rizkyhaksono",
   linkedin: "https://linkedin.com/in/rizkyhaksono",

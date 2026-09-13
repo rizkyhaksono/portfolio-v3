@@ -17,7 +17,6 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
       { label: "Etan AI", href: "/ai" },
       { label: "Tools", href: "/tools" },
       { label: "Chat", href: "/chat" },
-      { label: "Status", href: "/status" },
     ],
   },
   {

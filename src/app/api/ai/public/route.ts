@@ -1,11 +1,11 @@
 import { NextRequest } from "next/server"
+import { trustedClientIpHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
 /**
- * Public (no-auth) streaming proxy for the anonymous portfolio chat. Forwards the
- * client IP so the backend can rate-limit per visitor, and streams the response
- * (text + trailing `<!--meta-->` sentinel) straight through.
+ * Public (no-auth) streaming proxy for the anonymous portfolio chat. Forwards a
+ * proxy-trusted client IP so the backend can rate-limit per visitor.
  */
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
@@ -14,11 +14,9 @@ export async function POST(req: NextRequest) {
   }
 
   const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL
-  const fwd = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? ""
-
   const backendRes = await fetch(`${apiUrl}/v3/ai/public`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...(fwd ? { "x-forwarded-for": fwd } : {}) },
+    headers: { "Content-Type": "application/json", ...trustedClientIpHeaders(req) },
     body: JSON.stringify({ text: body.text }),
   })
 
