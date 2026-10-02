@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Toaster } from "sonner"
 import { MetadataConstants } from "@/commons/constants/metadata"
+import { getMetadataBaseUrl } from "@/lib/site-url"
 import ScrollToTop from "@/components/ui/scroll-to-top"
 import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
@@ -45,7 +46,7 @@ const fontVariables = cn(fontSans.variable, fontDisplay.variable, fontSerif.vari
 
 export const metadata: Metadata = {
   title: MetadataConstants.pageTitle,
-  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.DOMAIN ?? ""),
+  metadataBase: getMetadataBaseUrl(),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,

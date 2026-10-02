@@ -3,6 +3,7 @@ import { getBlogDetail, getBlogViews, getComments } from "@/services/visitor/blo
 import BlogReaderView from "@/app/_components/blog/blog-reader-view"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
+import { getSiteUrl } from "@/lib/site-url"
 
 export const dynamic = "force-dynamic"
 
@@ -21,14 +22,19 @@ export async function generateMetadata(
   }
 
   const ogImage = blog.cover_image ?? `/api/og?type=blog&title=${encodeURIComponent(blog.title)}&subtitle=${encodeURIComponent(blog.description ?? "")}`
+  const pageUrl = `${getSiteUrl()}/blog/${blog.slug}`
 
   return {
     title: `${blog.title} | Blog`,
     description: blog.description,
+    alternates: {
+      canonical: pageUrl,
+    },
     openGraph: {
       title: blog.title,
       description: blog.description,
       type: "article",
+      url: pageUrl,
       images: [{ url: ogImage }],
     },
     twitter: {

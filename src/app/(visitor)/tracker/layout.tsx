@@ -1,13 +1,14 @@
 import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
+import { getMetadataBaseUrl } from "@/lib/site-url"
 import SidebarMain from "@/components/layout/sidebar-main"
 
 export const dynamic = "force-dynamic"
 
 export const metadata: Metadata = {
   title: "Tracker - Public Kanban Board | Rizky Haksono",
-  metadataBase: new URL(process.env.NODE_ENV === "development" ? "http://localhost:3000" : (process.env.DOMAIN ?? "")),
+  metadataBase: getMetadataBaseUrl(),
   description:
     "A public, interactive Jira-style Kanban board. Drag cards across columns. Anyone can view; sign in to add and move cards.",
   keywords: [...MetadataConstants.keyword, "kanban", "tracker", "board", "drag and drop", "jira"],

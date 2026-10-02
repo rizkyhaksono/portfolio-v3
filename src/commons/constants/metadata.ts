@@ -1,4 +1,7 @@
 import { JOB_TITLE } from "@/commons/constants/author"
+import { getSiteUrl } from "@/lib/site-url"
+
+const siteUrl = getSiteUrl()
 
 export const MetadataConstants = {
   creator: "Muhammad Rizky Haksono",
@@ -10,10 +13,10 @@ export const MetadataConstants = {
   ogPersonTitle: `Muhammad Rizky Haksono - ${JOB_TITLE}`,
   authors: {
     name: "Muhammad Rizky Haksono",
-    url: process.env.DOMAIN,
+    url: siteUrl,
   },
   openGraph: {
-    url: process.env.DOMAIN,
+    url: siteUrl,
     siteName: "Rizky Haksono",
     locale: "id-ID",
   },

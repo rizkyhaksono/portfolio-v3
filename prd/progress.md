@@ -1,6 +1,6 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-09-10 (PR #25 quality remediation)*
+*Last Updated: 2026-10-02 (SEO canonical domain natee.my.id)*
 
 ---
 
@@ -20,6 +20,7 @@
 - **GitHub contribution calendar overflow**: ✅ COMPLETED — heatmap scrolls horizontally; newest weeks visible
 - **Editorial simplicity pass**: ✅ COMPLETED — calmer long-form reading, no animated backgrounds or visitor panel, compact navigation, visible theme control, and OS chrome removed
 - **PR #25 quality remediation**: ✅ COMPLETED — Copilot review comments and introduced DeepSource issues addressed
+- **SEO canonical domain**: ✅ COMPLETED (code) — `getSiteUrl()` + all crawler signals default to `https://natee.my.id`; **deploy:** rotate `DOMAIN` secret in GitHub/Azure and submit GSC sitemap (manual)
 
 ---
 
@@ -83,6 +84,17 @@
   - `BaseLayout` main + flex row get `min-w-0` so the heatmap can shrink instead of being clipped
   - Files: `src/app/_components/contribution/github-calender.tsx`, `src/components/layout/base-layout.tsx`
 
+#### SEO canonical domain (`natee.my.id`)
+- ✅ **Site URL helper** - COMPLETED (2026-10-02)
+  - `src/lib/site-url.ts`: `CANONICAL_SITE_ORIGIN`, `getSiteUrl()`, `getMetadataBaseUrl()`; warns if `DOMAIN` still contains `nateee.com`
+  - `robots.ts`, `sitemap.ts`, `feed.xml`, `changelog.xml` use helper (apex default, not `www`)
+  - `MetadataConstants`, all route `metadataBase`, root layout, JSON-LD (`sameAs` social only)
+  - Project/blog page `alternates.canonical` + `openGraph.url` per path
+  - `.env.example` + README `DOMAIN=https://natee.my.id`
+- ⏳ **Production secrets** - MANUAL after merge
+  - GitHub Actions secret `DOMAIN` and Azure app setting → `https://natee.my.id`
+  - Redeploy; verify `curl` robots/sitemap/HTML; Google Search Console sitemap + URL inspection
+
 #### UI Layout Consistency
 - ✅ Design tokens: `src/lib/design-system.ts`
 - ✅ Primitives: `surface.tsx`, `page-section.tsx`, `page-body.tsx`
@@ -124,6 +136,7 @@
 ## Key Code Locations
 - **Job title constant:** `src/commons/constants/author.ts` (`JOB_TITLE`)
 - **Metadata:** `src/commons/constants/metadata.ts`
+- **Canonical site URL:** `src/lib/site-url.ts` (`getSiteUrl`, `getMetadataBaseUrl`)
 - **About section:** `src/app/_components/about/index.tsx`
 - **Intro section:** `src/app/_components/intro/index.tsx`
 - **Downloader:** `src/app/(visitor)/tools/_components/downloader-tab.tsx`

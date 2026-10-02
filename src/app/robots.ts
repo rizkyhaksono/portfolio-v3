@@ -1,12 +1,8 @@
 import type { MetadataRoute } from "next";
-
-function getBaseUrl(): string {
-  const raw = process.env.DOMAIN ?? "https://www.natee.my.id";
-  return raw.replace(/\/$/, "");
-}
+import { getSiteUrl } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = getBaseUrl();
+  const base = getSiteUrl();
   return {
     rules: [
       {

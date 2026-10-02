@@ -73,3 +73,17 @@ The home heatmap was clipped on the right (newest weeks) because the grid used `
 - Single `overflow-x-auto` scroller wrapping month labels + week columns (`w-max`, week columns `shrink-0`)
 - Default scroll position: newest week (right edge)
 - `main`/`flex` row: `min-w-0` so the scroller can actually shrink and scroll
+
+---
+
+## 7. Track — SEO canonical domain (`natee.my.id`)
+
+Portfolio live at `https://natee.my.id`; legacy `nateee.com` is no longer owned. All crawler-facing signals must use the apex origin.
+
+- `src/lib/site-url.ts`: `CANONICAL_SITE_ORIGIN`, `getSiteUrl()`, `getMetadataBaseUrl()`
+- Wire robots, sitemap, RSS feeds, `MetadataConstants`, root/route `metadataBase`, JSON-LD
+- Page canonicals for project detail and DEV blog articles
+- `.env.example` / README: `DOMAIN=https://natee.my.id`
+- **Deploy (manual):** GitHub secret + Azure app setting `DOMAIN=https://natee.my.id`, redeploy, GSC sitemap
+
+Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
