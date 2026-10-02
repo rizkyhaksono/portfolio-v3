@@ -2,13 +2,9 @@ import type { MetadataRoute } from "next";
 import { getAllChangelogs, getAllRoadmapLessons } from "@/lib/mdx";
 import { getBlogData } from "@/services/visitor/blog";
 import { getAllProject } from "@/services/visitor/project";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const revalidate = 3600;
-
-function getBaseUrl(): string {
-  const raw = process.env.DOMAIN ?? "https://www.natee.my.id";
-  return raw.replace(/\/$/, "");
-}
 
 const staticRoutes: Array<{
   path: string;
@@ -30,7 +26,7 @@ const staticRoutes: Array<{
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = getBaseUrl();
+  const base = getSiteUrl();
   const now = new Date();
 
   const entries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({

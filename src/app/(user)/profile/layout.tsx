@@ -1,15 +1,12 @@
 import { type Metadata } from "next"
 import { MetadataConstants } from "@/commons/constants/metadata";
+import { getMetadataBaseUrl } from "@/lib/site-url";
 import BaseLayout from "@/components/layout/base-layout";
 import SidebarMain from "@/components/layout/sidebar-main";
 
 export const metadata: Metadata = {
   title: "Profile | Rizky Haksono",
-  metadataBase: new URL(
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.DOMAIN ?? ""
-  ),
+  metadataBase: getMetadataBaseUrl(),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,

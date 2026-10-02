@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { MetadataConstants } from "@/commons/constants/metadata";
 import { getAllProject } from "@/services/visitor/project";
+import { getMetadataBaseUrl, getSiteUrl } from "@/lib/site-url";
 
 type Props = {
   params: Promise<{
@@ -21,26 +22,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const cleanDescription = project.description.replace(/<[^>]*>?/gm, '').substring(0, 160);
   const ogImage = project.image ?? `/api/og?type=project&title=${encodeURIComponent(project.title)}&subtitle=${encodeURIComponent(cleanDescription)}`;
+  const pageUrl = `${getSiteUrl()}/project/${id}`;
 
   return {
     title: `${project.title} | Rizky Haksono`,
     description: cleanDescription,
-    metadataBase: new URL(
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:3000"
-        : process.env.DOMAIN ?? ""
-    ),
+    metadataBase: getMetadataBaseUrl(),
     keywords: MetadataConstants.keyword,
     creator: MetadataConstants.creator,
     authors: {
       name: MetadataConstants.creator,
       url: MetadataConstants.openGraph.url,
     },
+    alternates: {
+      canonical: pageUrl,
+    },
     openGraph: {
       title: project.title,
       description: cleanDescription,
       images: [ogImage],
-      url: MetadataConstants.openGraph.url,
+      url: pageUrl,
       siteName: MetadataConstants.openGraph.siteName,
       locale: MetadataConstants.openGraph.locale,
       type: "website",

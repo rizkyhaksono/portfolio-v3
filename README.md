@@ -181,7 +181,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_key
 
 # Domain
-DOMAIN=https://your-domain.com
+DOMAIN=https://natee.my.id
 
 # Email (optional for contact form)
 EMAILJS_SERVICE_ID=your_service_id

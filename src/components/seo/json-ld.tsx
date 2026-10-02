@@ -1,11 +1,10 @@
 import { MetadataConstants } from "@/commons/constants/metadata"
-
-const siteUrl =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : process.env.NEXT_PUBLIC_SITE_URL ?? MetadataConstants.openGraph.url
+import { JOB_TITLE } from "@/commons/constants/author"
+import { getSiteUrl } from "@/lib/site-url"
 
 export default function JsonLd() {
+  const siteUrl = getSiteUrl()
+
   const person = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -13,7 +12,6 @@ export default function JsonLd() {
     url: siteUrl,
     jobTitle: MetadataConstants.jobTitle,
     sameAs: [
-      MetadataConstants.openGraph.url,
       "https://github.com/rizkyhaksono",
       "https://www.linkedin.com/in/rizkyhaksono",
     ],

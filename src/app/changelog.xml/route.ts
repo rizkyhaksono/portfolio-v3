@@ -2,16 +2,12 @@ import { Feed } from "feed";
 import { getAllChangelogs } from "@/lib/mdx";
 import { MetadataConstants } from "@/commons/constants/metadata";
 import { authors } from "@/commons/constants/author";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const revalidate = 3600;
 
-function getBaseUrl(): string {
-  const raw = process.env.DOMAIN ?? "https://www.natee.my.id";
-  return raw.replace(/\/$/, "");
-}
-
 export function GET() {
-  const base = getBaseUrl();
+  const base = getSiteUrl();
   const author = authors.rizky;
 
   const feed = new Feed({
