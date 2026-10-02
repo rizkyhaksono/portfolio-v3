@@ -1,5 +1,4 @@
 import { MetadataConstants } from "@/commons/constants/metadata"
-import { JOB_TITLE } from "@/commons/constants/author"
 import { getSiteUrl } from "@/lib/site-url"
 
 export default function JsonLd() {
