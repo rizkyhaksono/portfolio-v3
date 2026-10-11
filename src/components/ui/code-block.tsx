@@ -70,7 +70,7 @@ const CodeBlock = ({
       {!inline ? (
         <div className="relative">
           <button
-            className="absolute right-3 top-3 rounded-lg border border-neutral-700 p-2 hover:bg-neutral-800"
+            className="absolute right-3 top-3 rounded-none border border-neutral-700 p-2 hover:bg-neutral-800"
             type="button"
             aria-label="Copy to Clipboard"
             onClick={() => handleCopy(children.toString())}
@@ -89,7 +89,7 @@ const CodeBlock = ({
             customStyle={{
               padding: "20px",
               fontSize: "14px",
-              borderRadius: "8px",
+              borderRadius: "0",
               paddingRight: "50px",
             }}
             PreTag="div"
@@ -100,7 +100,7 @@ const CodeBlock = ({
           </SyntaxHighlighter>
         </div>
       ) : (
-        <code className="rounded-md bg-neutral-200 px-2 py-1 text-[14px] font-light text-sky-600 dark:bg-neutral-700 dark:text-sky-300">
+        <code className="rounded-none bg-neutral-200 px-2 py-1 text-[14px] font-light text-sky-600 dark:bg-neutral-700 dark:text-sky-300">
           {children}
         </code>
       )}

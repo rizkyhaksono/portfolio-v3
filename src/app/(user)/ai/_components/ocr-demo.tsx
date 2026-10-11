@@ -98,7 +98,7 @@ export default function OcrDemo() {
             <div className="relative overflow-hidden rounded-xl border border-border/60">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt="Document preview" className="max-h-72 w-full object-contain bg-muted/30" />
-              <button onClick={reset} className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white hover:bg-black/80" aria-label="Remove image">
+              <button onClick={reset} className="absolute right-2 top-2 rounded-none bg-black/60 p-1 text-white hover:bg-black/80" aria-label="Remove image">
                 <X className="h-4 w-4" />
               </button>
             </div>

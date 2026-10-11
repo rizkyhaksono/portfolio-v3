@@ -314,14 +314,14 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
             onChange={(e) => setInput(e.target.value)}
             placeholder={remaining <= 0 ? `Rate limited — wait ${cooldown}s…` : "Say something…"}
             disabled={loading || remaining <= 0}
-            className="h-11 rounded-full"
+            className="h-11 rounded-none"
             autoComplete="off"
           />
           <MicButton onTranscript={(t) => setInput((p) => (p ? `${p} ${t}` : t))} disabled={loading || remaining <= 0} />
           {tts.supported && (
             <TtsToggle on={ttsOn} onToggle={() => { const n = !ttsOn; setTtsOn(n); if (!n) tts.cancel() }} />
           )}
-          <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" disabled={loading || !input.trim() || remaining <= 0}>
+          <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-none" disabled={loading || !input.trim() || remaining <= 0}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </form>

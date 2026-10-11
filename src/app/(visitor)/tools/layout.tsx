@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Tools - Japanese Quiz, Anime Generator & More | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: "Collection of useful tools including Japanese JLPT Quiz, Anime Image Generator, Social Media Downloader, WPM Test, File Manager, and Online Compiler. Free and easy to use!",
+  description: "Collection of useful tools including Japanese JLPT Quiz, Anime Image Generator, Social Media Downloader, WPM Test, postal code lookup, and Web3 utilities. Free and easy to use!",
   keywords: [
     ...MetadataConstants.keyword,
     "Japanese quiz",
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
     "youtube downloader",
     "wpm test",
     "typing speed test",
-    "online compiler",
-    "file manager",
+    "postal code lookup",
+    "web3 utilities",
   ],
   creator: MetadataConstants.creator,
   authors: {

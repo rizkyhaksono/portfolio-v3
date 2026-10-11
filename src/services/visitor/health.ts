@@ -17,7 +17,7 @@ export async function getHealth(): Promise<HealthData | null> {
   try {
     const res = await fetch("/api/health", { cache: "no-store" })
     const json = await res.json().catch(() => null)
-    if (!json?.data) return null
+    if (!res.ok || !json?.data) return null
     return json.data as HealthData
   } catch {
     return null

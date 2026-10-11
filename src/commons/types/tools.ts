@@ -317,8 +317,6 @@ export type ToolTab =
   | "anime-generator"
   | "downloader"
   | "wpm"
-  | "files"
-  | "compiler"
   | "postal-code"
   | "web3-crypto"
   | "pokemon"
@@ -330,4 +328,3 @@ export interface ToolCategory {
   description: string;
   icon: string;
 }
-

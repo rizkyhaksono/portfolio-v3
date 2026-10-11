@@ -42,7 +42,7 @@ export default function AnalyticsChart({ series, unit }: { series: UmamiTimeseri
         <XAxis dataKey="date" tickFormatter={fmt} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={24} />
         <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={34} allowDecimals={false} />
         <Tooltip
-          contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+          contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 0, fontSize: 12 }}
           labelFormatter={fmt}
         />
         <Area type="monotone" dataKey="views" name="Views" stroke="hsl(var(--primary))" fill="url(#grad-views)" strokeWidth={2} />

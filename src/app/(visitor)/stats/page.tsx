@@ -175,6 +175,7 @@ function StatsContent({
         description="My public data from various platforms, plus live API health."
       />
       {overviewStats.length > 0 ? <StatStrip items={overviewStats} className="border-x-0" /> : null}
+      <SystemStatus />
       <MacWindow title="~/stats" bodyClassName="space-y-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <LeetCodeCard data={leetcode} />
@@ -183,7 +184,6 @@ function StatsContent({
         </div>
         {leetcode ? <LeetCodeSection stats={leetcode} /> : null}
       </MacWindow>
-      <SystemStatus />
     </>
   )
 }

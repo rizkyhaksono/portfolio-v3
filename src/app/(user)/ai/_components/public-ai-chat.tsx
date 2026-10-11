@@ -189,7 +189,7 @@ export default function PublicAIChat() {
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               {SUGGESTIONS.map((s) => (
-                <button key={s} onClick={() => ask(s)} className="rounded-full border border-border/60 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                <button key={s} onClick={() => ask(s)} className="rounded-none border border-border/60 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                   {s}
                 </button>
               ))}
@@ -233,13 +233,13 @@ export default function PublicAIChat() {
           placeholder={remaining <= 0 ? `Rate limited — wait ${cooldown}s…` : "Ask about my projects, work, skills…"}
           maxLength={600}
           disabled={loading || remaining <= 0}
-          className="h-11 rounded-full"
+          className="h-11 rounded-none"
         />
         <MicButton onTranscript={(t) => setInput((p) => (p ? `${p} ${t}` : t))} disabled={loading || remaining <= 0} />
         {tts.supported && (
           <TtsToggle on={ttsOn} onToggle={() => { const n = !ttsOn; setTtsOn(n); if (!n) tts.cancel() }} />
         )}
-        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" disabled={loading || !input.trim() || remaining <= 0}>
+        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-none" disabled={loading || !input.trim() || remaining <= 0}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </Button>
       </form>

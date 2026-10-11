@@ -109,7 +109,18 @@ export default function RootLayout({
           {children}
           <DeferredClientUtilities />
           <ScrollToTop />
-          <Toaster position="top-right" />
+          <Toaster
+            position="top-right"
+            theme="system"
+            toastOptions={{
+              classNames: {
+                toast: "!rounded-none !border-border !bg-popover !text-popover-foreground",
+                actionButton: "!rounded-none",
+                cancelButton: "!rounded-none",
+                closeButton: "!rounded-none",
+              },
+            }}
+          />
           {/* <div className="hidden sm:block">
             <SmoothCursor />
           </div> */}

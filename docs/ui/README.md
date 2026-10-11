@@ -18,6 +18,7 @@ Canonical documentation for layout, surfaces, and page shells. Agents should als
 2. Only three surface dialects: **solid**, **glass**, **inset**.
 3. Page recipe: `BaseLayout` → `PageBody` → `SectionHeading` → content.
 4. Tokens live in `src/lib/design-system.ts` and CSS vars in `src/app/globals.css`.
+5. Dark hierarchy: `#161616` page, `#1b1b1b` card/popover, `#202020` muted surface, `#242424` border.
 
 ## Source of truth (code)
 

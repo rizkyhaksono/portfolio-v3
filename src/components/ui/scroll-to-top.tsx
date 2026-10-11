@@ -9,36 +9,23 @@ export default function ScrollToTop() {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      // Check both window scroll and document scroll
-      const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop
-      if (scrollTop > 300) {
-        setIsVisible(true)
-      } else {
-        setIsVisible(false)
-      }
+      setIsVisible(window.scrollY > 300)
     }
 
     // Check on mount
     toggleVisibility()
 
     window.addEventListener("scroll", toggleVisibility, { passive: true })
-    document.addEventListener("scroll", toggleVisibility, { passive: true })
-
     return () => {
       window.removeEventListener("scroll", toggleVisibility)
-      document.removeEventListener("scroll", toggleVisibility)
     }
   }, [])
 
   const scrollToTop = () => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
-    })
-    // Also try document scroll for compatibility
-    document.documentElement.scrollTo({
-      top: 0,
-      behavior: "smooth",
+      behavior: reduceMotion ? "auto" : "smooth",
     })
   }
 
@@ -46,10 +33,10 @@ export default function ScrollToTop() {
     <button
       onClick={scrollToTop}
       className={cn(
-        "fixed bottom-20 right-6 z-[9999] p-3 rounded-full",
+        "fixed bottom-20 right-6 z-40 flex size-11 items-center justify-center rounded-none border border-primary",
         "bg-primary text-primary-foreground shadow-lg",
-        "hover:bg-primary/90 hover:scale-110",
-        "transition-all duration-300 ease-in-out",
+        "hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "transition-[opacity,transform,background-color] duration-300 ease-in-out motion-reduce:transition-none",
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
       )}
       aria-label="Scroll to top"

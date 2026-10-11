@@ -8,7 +8,6 @@ import { IeltsTab } from "./_components/ielts-tab"
 import { AnimeGeneratorTab } from "./_components/anime-generator-tab"
 import { DownloaderTab } from "./_components/downloader-tab"
 import { WpmTab } from "./_components/wpm-tab"
-import { CompilerTab } from "./_components/compiler-tab"
 import { PostalCodeTab } from "./_components/postal-code-tab"
 import { Web3CryptoTab } from "./_components/web3-crypto-tab"
 import { PokemonTab } from "./_components/pokemon-tab"
@@ -20,15 +19,29 @@ import { logNonCriticalError } from "@/lib/logging"
 
 export const dynamic = "force-dynamic"
 
+const TOOL_TABS: ToolTab[] = [
+  "pokemon",
+  "starwars",
+  "japanese-quiz",
+  "ielts",
+  "anime-generator",
+  "downloader",
+  "wpm",
+  "postal-code",
+  "web3-crypto",
+]
+
 interface ToolsPageProps {
   searchParams: Promise<{
-    tab?: ToolTab
+    tab?: string
   }>
 }
 
 export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProps>) {
   const params = await searchParams
-  const activeTab = params?.tab || "pokemon"
+  const activeTab: ToolTab = TOOL_TABS.includes(params?.tab as ToolTab)
+    ? (params.tab as ToolTab)
+    : "pokemon"
 
   let jlptLevels: JLPTLevel[] = []
   try {
@@ -74,7 +87,6 @@ export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProp
               <TabsContent value="anime-generator" className="mt-0"><AnimeGeneratorTab /></TabsContent>
               <TabsContent value="downloader" className="mt-0"><DownloaderTab /></TabsContent>
               <TabsContent value="wpm" className="mt-0"><WpmTab /></TabsContent>
-              <TabsContent value="compiler" className="mt-0"><CompilerTab /></TabsContent>
               <TabsContent value="postal-code" className="mt-0"><PostalCodeTab /></TabsContent>
               <TabsContent value="web3-crypto" className="mt-0"><Web3CryptoTab /></TabsContent>
             </Tabs>

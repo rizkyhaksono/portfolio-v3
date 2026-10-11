@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eyebrow } from "@/components/ui/eyebrow"
-import { toast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint } from "lucide-react"
 import {
   getCurrentUserClient,
@@ -177,16 +177,13 @@ export default function AdminDashboardSettingPage() {
       await updateAdminSettingsClient({ website: data.website || "" })
       // Keep the on-screen account card in sync without a full reload.
       setUser((prev) => (prev ? { ...prev, name: data.name, email: data.email, about: data.bio, location: data.location } : prev))
-      toast({
-        title: "Profile updated",
+      toast.success("Profile updated", {
         description: "Your profile has been updated successfully.",
       })
     } catch (error) {
       console.error("Failed to update profile:", error)
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update profile. Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSaving(false)
@@ -197,16 +194,13 @@ export default function AdminDashboardSettingPage() {
     setIsSaving(true)
     try {
       await updateAdminSettingsClient(data)
-      toast({
-        title: "Notifications updated",
+      toast.success("Notifications updated", {
         description: "Your notification preferences have been saved.",
       })
     } catch (error) {
       console.error("Failed to update notifications:", error)
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update notifications. Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSaving(false)
@@ -218,16 +212,13 @@ export default function AdminDashboardSettingPage() {
     try {
       await updateAdminSettingsClient(data)
       setTheme(data.theme)
-      toast({
-        title: "Appearance updated",
+      toast.success("Appearance updated", {
         description: "Your appearance settings have been saved.",
       })
     } catch (error) {
       console.error("Failed to update appearance:", error)
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update appearance. Please try again.",
-        variant: "destructive",
       })
     } finally {
       setIsSaving(false)
@@ -238,7 +229,7 @@ export default function AdminDashboardSettingPage() {
     const file = event.target.files?.[0]
     if (!file) return
     if (file.size > 2 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Avatar must be 2MB or smaller.", variant: "destructive" })
+      toast.error("File too large", { description: "Avatar must be 2MB or smaller." })
       return
     }
     setIsUploadingAvatar(true)
@@ -246,9 +237,9 @@ export default function AdminDashboardSettingPage() {
       const res = (await uploadAvatarClient(file)) as { url?: string; data?: { url?: string; avatarUrl?: string } }
       const newUrl = res?.data?.avatarUrl ?? res?.data?.url ?? res?.url
       setUser((prev) => (prev ? { ...prev, avatarUrl: newUrl ?? prev.avatarUrl } : prev))
-      toast({ title: "Avatar updated", description: "Your profile picture has been changed." })
+      toast.success("Avatar updated", { description: "Your profile picture has been changed." })
     } catch {
-      toast({ title: "Upload failed", description: "Could not upload the avatar. Please try again.", variant: "destructive" })
+      toast.error("Upload failed", { description: "Could not upload the avatar. Please try again." })
     } finally {
       setIsUploadingAvatar(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -261,7 +252,7 @@ export default function AdminDashboardSettingPage() {
       await performAdminLogout()
     } catch {
       setIsLoggingOut(false)
-      toast({ title: "Error", description: "Failed to sign out. Please try again.", variant: "destructive" })
+      toast.error("Error", { description: "Failed to sign out. Please try again." })
     }
   }
 

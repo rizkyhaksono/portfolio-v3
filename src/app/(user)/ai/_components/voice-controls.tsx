@@ -13,7 +13,7 @@ export function MicButton({ onTranscript, disabled }: { onTranscript: (t: string
       type="button"
       variant={listening ? "default" : "ghost"}
       size="icon"
-      className="h-11 w-11 shrink-0 rounded-full"
+      className="h-11 w-11 shrink-0 rounded-none"
       disabled={disabled}
       onClick={() => (listening ? stop() : start())}
       aria-label={listening ? "Stop dictation" : "Dictate"}
@@ -31,7 +31,7 @@ export function TtsToggle({ on, onToggle }: { on: boolean; onToggle: () => void 
       type="button"
       variant={on ? "default" : "ghost"}
       size="icon"
-      className="h-11 w-11 shrink-0 rounded-full"
+      className="h-11 w-11 shrink-0 rounded-none"
       onClick={onToggle}
       aria-label={on ? "Turn off voice replies" : "Turn on voice replies"}
       title={on ? "Voice replies on" : "Voice replies off"}

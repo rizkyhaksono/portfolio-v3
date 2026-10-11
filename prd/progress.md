@@ -21,12 +21,22 @@
 - **Editorial simplicity pass**: ✅ COMPLETED — calmer long-form reading, no animated backgrounds or visitor panel, compact navigation, visible theme control, and OS chrome removed
 - **PR #25 quality remediation**: ✅ COMPLETED — Copilot review comments and introduced DeepSource issues addressed
 - **SEO canonical domain**: ✅ COMPLETED (code) — `getSiteUrl()` + all crawler signals default to `https://natee.my.id`; **deploy:** rotate `DOMAIN` secret in GitHub/Azure and submit GSC sitemap (manual)
+- **Runtime cleanup and dark UI refinement**: ✅ COMPLETED — compiler removed, dark palette refined, system status promoted, square controls/toasts enforced
 
 ---
 
 ## Feature Implementation Status
 
 ### COMPLETED
+
+#### Runtime cleanup and dark UI refinement
+- ✅ Removed compiler UI, frontend integration code, backend execution route, and Piston/Paiza environment configuration
+- ✅ Invalid or obsolete tool tabs now fall back to Pokémon instead of rendering an empty panel
+- ✅ Adopted the up2dul.dev dark grayscale hierarchy through semantic theme tokens (`#161616` background, `#1b1b1b` surfaces)
+- ✅ Moved System Status below overview metrics and improved loading, failure, duplicate-service, refresh, and responsive states
+- ✅ Reworked scroll-to-top as a square 44px control with reduced-motion support and safe overlay stacking
+- ✅ Standardized toast rendering on Sonner, made toast chrome square, and removed the unused Radix toast implementation
+- ✅ Removed remaining pill treatment from shared clap and AI action controls; preserved semantic circular indicators and avatars
 
 #### PR #25 quality remediation
 - ✅ Restored valid list semantics in the sidebar and stable React keys for blog tags

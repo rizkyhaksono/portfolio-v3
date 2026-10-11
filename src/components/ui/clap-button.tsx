@@ -59,7 +59,7 @@ export default function ClapButton({
       aria-label={reacted ? "You clapped" : "Clap"}
       title={reacted ? "Thanks for the clap!" : "Clap"}
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-default",
+        "inline-flex items-center gap-2 rounded-none border px-3.5 py-1.5 text-sm transition-colors disabled:cursor-default",
         reacted ? "border-primary/40 bg-primary/10 text-primary" : "border-border/60 hover:border-primary/40 hover:bg-muted",
         className,
       )}

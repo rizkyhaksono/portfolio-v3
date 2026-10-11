@@ -34,25 +34,25 @@
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 96%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 96%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 96%;
-    --primary: 0 0% 96%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 96%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 62%;
-    --accent: 0 0% 16%;
-    --accent-foreground: 0 0% 96%;
+    --background: 0 0% 8.6%;
+    --foreground: 0 0% 96.1%;
+    --card: 0 0% 10.6%;
+    --card-foreground: 0 0% 96.1%;
+    --popover: 0 0% 10.6%;
+    --popover-foreground: 0 0% 96.1%;
+    --primary: 0 0% 96.1%;
+    --primary-foreground: 0 0% 14.9%;
+    --secondary: 0 0% 12.5%;
+    --secondary-foreground: 0 0% 96.1%;
+    --muted: 0 0% 12.5%;
+    --muted-foreground: 0 0% 50.6%;
+    --accent: 0 0% 12.5%;
+    --accent-foreground: 0 0% 96.1%;
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 0 0% 70%;
+    --border: 0 0% 14.1%;
+    --input: 0 0% 16.1%;
+    --ring: 0 0% 45.1%;
     --chart-1: 0 0% 78%;
     --chart-2: 0 0% 62%;
     --chart-3: 0 0% 50%;
@@ -65,6 +65,13 @@
     --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
     --animate-grid: grid 15s linear infinite;
   }
+}
+
+/* Sonner owns its radius token, so enforce the shared square language at its portal. */
+[data-sonner-toast],
+[data-sonner-toast] [data-button],
+[data-sonner-toast] [data-close-button] {
+  border-radius: 0 !important;
 }
 
 @layer base {

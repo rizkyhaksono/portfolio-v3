@@ -87,3 +87,27 @@ Portfolio live at `https://natee.my.id`; legacy `nateee.com` is no longer owned.
 - **Deploy (manual):** GitHub secret + Azure app setting `DOMAIN=https://natee.my.id`, redeploy, GSC sitemap
 
 Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
+
+---
+
+## 8. Track — Runtime cleanup and dark UI refinement
+
+### 8.1 Compiler removal
+- Remove compiler UI, client service, constants, and types
+- Remove backend execution endpoint and Piston/Paiza configuration
+- Fall back to the default tool when an obsolete compiler URL is opened
+
+### 8.2 Dark palette
+- Use the up2dul.dev grayscale hierarchy as visual reference
+- Dark background `#161616`, card/popover `#1b1b1b`, muted surfaces `#202020`
+- Keep semantic tokens, square corners, and hairline borders
+
+### 8.3 Stats and system status
+- Place system health directly below overview metrics
+- Use responsive service rows and explicit loading, degraded, and down states
+- Prevent duplicate API rows and stale refresh responses
+
+### 8.4 Square controls and toast
+- Make scroll-to-top, toast surfaces/actions, AI controls, and clap controls square
+- Keep avatars, status dots, spinners, progress indicators, radio controls, and switch thumbs circular
+- Standardize notifications on Sonner and remove unused Radix toast state

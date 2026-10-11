@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
-import { Search, Gamepad2, Rocket, Sparkles, Code, Keyboard, Download, Languages, MapPin, TrendingUp, GraduationCap } from "lucide-react"
+import { Search, Gamepad2, Rocket, Sparkles, Keyboard, Download, Languages, MapPin, TrendingUp, GraduationCap, type LucideIcon } from "lucide-react"
 import type { ToolTab } from "@/commons/types/tools"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { cn } from "@/lib/utils"
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils"
 interface ToolItem {
   id: ToolTab
   name: string
-  icon: typeof Code
+  icon: LucideIcon
   category: string
 }
 
@@ -19,7 +19,6 @@ const TOOLS: ToolItem[] = [
   { id: "pokemon", name: "Pokédex", icon: Gamepad2, category: "Fun & Lore" },
   { id: "starwars", name: "Star Wars", icon: Rocket, category: "Fun & Lore" },
   { id: "anime-generator", name: "Anime Generator", icon: Sparkles, category: "Fun & Lore" },
-  { id: "compiler", name: "Compiler", icon: Code, category: "Developer" },
   { id: "wpm", name: "WPM Test", icon: Keyboard, category: "Developer" },
   { id: "downloader", name: "Downloader", icon: Download, category: "Media" },
   { id: "japanese-quiz", name: "Japanese Quiz", icon: Languages, category: "Learning" },
