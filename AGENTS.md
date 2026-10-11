@@ -10,7 +10,7 @@ You are an expert full-stack TypeScript engineer. Produce production-ready code 
 - **TypeScript** (strict mode)
 - **Styling**: Tailwind CSS + shadcn/ui
 - **Testing**: Vitest + React Testing Library + MSW
-- **Package Manager**: npm
+- **Package Manager**: bun
 
 ## AI Instruction Map
 

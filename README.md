@@ -205,7 +205,7 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
 
    ```bash
    # Using npm
-   npm install
+   bun install
 
    # Using bun (recommended)
    bun install
@@ -227,7 +227,7 @@ NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_site_key
 5. **Start development server**
 
    ```bash
-   npm run dev
+   bun run dev
    # or
    bun dev
    ```
@@ -245,22 +245,22 @@ This project includes comprehensive testing using Jest, React Testing Library, a
 
 ```bash
 # Run all unit and component tests
-npm run test
+bun run test
 
 # Run tests in watch mode (recommended for development)
-npm run test:watch
+bun run test:watch
 
 # Run tests with coverage report
-npm run test:coverage
+bun run test:coverage
 
 # Run end-to-end tests with Playwright
-npm run test:e2e
+bun run test:e2e
 
 # Run E2E tests with interactive UI
-npm run test:e2e:ui
+bun run test:e2e:ui
 
 # Debug E2E tests
-npm run test:e2e:debug
+bun run test:e2e:debug
 ```
 
 ### Test Structure
@@ -494,17 +494,17 @@ kill -9 <PID>
 ```bash
 # Clear build cache
 rm -rf .next
-npm run build
+bun run build
 ```
 
 #### Tests Failing
 
 ```bash
 # Clear Jest cache
-npm run test -- --clearCache
+bun run test -- --clearCache
 
 # Run tests with verbose output
-npm run test -- --verbose
+bun run test -- --verbose
 ```
 
 ### Hot Reload Not Working

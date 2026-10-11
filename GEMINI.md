@@ -13,7 +13,7 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 - TypeScript (strict mode)
 - Styling: Tailwind CSS + shadcn/ui
 - Testing: Vitest + React Testing Library + MSW
-- Package Manager: npm
+- Package Manager: bun
 
 ## Architectural Guidelines
 
