@@ -3,6 +3,15 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import '@testing-library/jest-dom'
 
 describe('Button Component', () => {
+  it('renders its single child when asChild is set, for every variant', () => {
+    render(
+      <Button asChild variant="destructive">
+        <a href="/x">Go</a>
+      </Button>,
+    )
+    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute('href', '/x')
+  })
+
   it('renders a button with default variant', () => {
     render(<Button>Click me</Button>)
     const button = screen.getByRole('button', { name: /click me/i })

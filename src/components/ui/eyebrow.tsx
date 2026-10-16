@@ -1,24 +1,15 @@
 import { cn } from "@/lib/utils"
 
 interface EyebrowProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  /** Optional leading marker, e.g. a step number "3" rendered before the label. */
+  /** Leading number for a real sequence only (roadmap stage, changelog version). */
   marker?: React.ReactNode
 }
 
-/**
- * Monospace uppercase micro-label used above section headings, on chips, stat
- * labels, and footer columns — the signature "eyebrow" of the Sapa design language.
- */
+/** Italic caption above a heading. Use only when it tells the reader something the heading does not. */
 export function Eyebrow({ marker, className, children, ...props }: Readonly<EyebrowProps>) {
   return (
-    <p
-      className={cn(
-        "flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground",
-        className,
-      )}
-      {...props}
-    >
-      {marker != null && <span className="font-display text-base font-bold not-italic tracking-normal text-primary">{marker}</span>}
+    <p className={cn("font-display text-caption text-ink-soft", className)} {...props}>
+      {marker != null && <span className="tabular-nums">{marker} </span>}
       {children}
     </p>
   )

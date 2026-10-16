@@ -22,6 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.x
+
+      - name: Typecheck and test
+        run: bun install --frozen-lockfile && bunx tsc --noEmit && bun run test
+
       - uses: docker/setup-buildx-action@v3
 
       # Next.js inlines NEXT_PUBLIC_* at build time, and prerendered pages may call
@@ -41,7 +48,6 @@ jobs:
           NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID: ${{ secrets.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
           NEXT_PUBLIC_RESUME_GOOGLE_DRIVE_URL: ${{ secrets.NEXT_PUBLIC_RESUME_GOOGLE_DRIVE_URL }}
-          NEXT_PUBLIC_SPOTIFY_PROFILE_URL: ${{ secrets.NEXT_PUBLIC_SPOTIFY_PROFILE_URL }}
           NEXT_PUBLIC_UMAMI_SRC: ${{ secrets.NEXT_PUBLIC_UMAMI_SRC }}
           NEXT_PUBLIC_UMAMI_WEBSITE_ID: ${{ secrets.NEXT_PUBLIC_UMAMI_WEBSITE_ID }}
           NEXT_PUBLIC_UMAMI_RECORDER_SRC: ${{ secrets.NEXT_PUBLIC_UMAMI_RECORDER_SRC }}
@@ -51,13 +57,16 @@ jobs:
           GH_READ_USER_TOKEN_PERSONAL: ${{ secrets.GH_READ_USER_TOKEN_PERSONAL }}
           DEVTO_KEY: ${{ secrets.DEVTO_KEY }}
           WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
-          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-          SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+          # The runner cannot reach the internal Umami/API hosts, so prerender uses the public ones.
+          UMAMI_API_URL: ${{ secrets.UMAMI_API_URL }}
+          UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
+          UMAMI_USERNAME: ${{ secrets.UMAMI_USERNAME }}
+          UMAMI_PASSWORD: ${{ secrets.UMAMI_PASSWORD }}
+          MONKEYTYPE_API_KEY: ${{ secrets.MONKEYTYPE_API_KEY }}
         run: |
           # The tracker has no fallback id any more; fail here instead of shipping without analytics.
           : "${NEXT_PUBLIC_UMAMI_SRC:?secret not set}" "${NEXT_PUBLIC_UMAMI_WEBSITE_ID:?secret not set}"
-          env | grep -E '^(DOMAIN|API_URL|NEXT_PUBLIC_|SUPABASE_|GH_READ_|DEVTO_|WAKATIME_|SPOTIFY_)' \
+          env | grep -E '^(DOMAIN|API_URL|NEXT_PUBLIC_|SUPABASE_|GH_READ_|DEVTO_|WAKATIME_|UMAMI_|MONKEYTYPE_)' \
             | grep -v '=$' > "$RUNNER_TEMP/buildenv"
 
       - uses: docker/build-push-action@v6

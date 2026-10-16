@@ -3,10 +3,8 @@ import { Eyebrow } from "@/components/ui/eyebrow"
 
 interface SectionHeadingProps {
   eyebrow?: React.ReactNode
-  /** Optional step marker shown inside the eyebrow (e.g. "3"). */
-  marker?: React.ReactNode
   title: React.ReactNode
-  /** Serif-italic accent appended to the title, rendered in the accent colour. */
+  /** Trailing words set roman inside the italic title. */
   accent?: React.ReactNode
   description?: React.ReactNode
   align?: "left" | "center"
@@ -16,13 +14,11 @@ interface SectionHeadingProps {
   children?: React.ReactNode
 }
 
-/**
- * Eyebrow + display heading (with optional serif-italic accent word) + description.
- * The one section-header pattern used across the whole site.
- */
+const TITLE_SIZE = { h1: "text-h1", h2: "text-h2", h3: "text-h3" } as const
+
+/** Italic display heading with an optional caption above and a short description below. */
 export function SectionHeading({
   eyebrow,
-  marker,
   title,
   accent,
   description,
@@ -33,17 +29,16 @@ export function SectionHeading({
   children,
 }: Readonly<SectionHeadingProps>) {
   const Tag = as
-  const sizes = as === "h1" ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
 
   return (
-    <div className={cn("flex flex-col gap-1.5", align === "center" && "items-center text-center", className)}>
-      {eyebrow && <Eyebrow marker={marker}>{eyebrow}</Eyebrow>}
-      <Tag className={cn("font-display font-bold leading-[1.05] tracking-tight text-balance", sizes, titleClassName)}>
+    <div className={cn("flex flex-col gap-2", align === "center" && "items-center text-center", className)}>
+      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+      <Tag className={cn("font-display text-balance text-ink", TITLE_SIZE[as], titleClassName)}>
         {title}
-        {accent && <span className="font-serif font-normal italic tracking-normal text-primary"> {accent}</span>}
+        {accent && <> <em>{accent}</em></>}
       </Tag>
       {description && (
-        <p className={cn("max-w-xl text-xs leading-relaxed text-muted-foreground sm:text-sm", align === "center" && "mx-auto")}>
+        <p className={cn("max-w-[60ch] text-body text-ink-soft", align === "center" && "mx-auto")}>
           {description}
         </p>
       )}

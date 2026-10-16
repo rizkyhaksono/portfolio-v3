@@ -1,50 +1,89 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { getReadStats, getALLTimeSinceToday } from "@/services/visitor/wakatime"
-import { getDuolingoProfile } from "@/services/visitor/duolingo"
-import { getMonkeyTypeData } from "@/services/visitor/monkeytype"
+import type { ReactNode } from "react"
+import { PageSection } from "@/components/ui/page-section"
+import { InkHeatmap, type InkHeatmapWeek } from "@/components/ui/ink-heatmap"
 import { GITHUB_ACCOUNTS } from "@/commons/constants/github"
 import { fetchGithubData } from "@/services/visitor/github"
-import GithubCalendar from "@/app/_components/contribution/github-calender"
-import GithubOverview from "@/app/_components/contribution/github-overview"
-import WakatimeActive from "@/app/_components/contribution/wakatime-active"
-import WakatimeOverview from "@/app/_components/contribution/wakatime-overview"
-import DuolingoStats from "./duolingo-stats"
-import MonkeyTypeStats from "./monkeytype-stats"
+import { getReadStats } from "@/services/visitor/wakatime"
+import { getDuolingoProfile } from "@/services/visitor/duolingo"
+import { getMonkeyTypeData } from "@/services/visitor/monkeytype"
+import { DEFERRED_SECTION } from "../deferred"
+import { HatchBar, formatHours, type WakatimeLanguage } from "./wakatime-progress"
 
+const valueOf = <T,>(result: PromiseSettledResult<T>) => (result.status === "fulfilled" ? result.value : undefined)
+
+function Numeral({ children }: Readonly<{ children: ReactNode }>) {
+  return <span className="font-display text-[1.6em] leading-none tabular-nums text-ink">{children}</span>
+}
+
+/** GitHub year, WakaTime week and two learning numerals; each part (and the section) hides without data. */
 export default async function ContributionSection() {
-  const [readStatsResponse, allTimeSinceTodayResponse, duolingoProfile, typingData, github] =
-    await Promise.all([
-      getReadStats(),
-      getALLTimeSinceToday(),
-      getDuolingoProfile(),
-      getMonkeyTypeData(),
-      fetchGithubData(GITHUB_ACCOUNTS[0].username, GITHUB_ACCOUNTS[0].token),
-    ])
+  const [github, wakatime, duolingo, monkeytype] = await Promise.allSettled([
+    fetchGithubData(GITHUB_ACCOUNTS[0].username, GITHUB_ACCOUNTS[0].token),
+    getReadStats(),
+    getDuolingoProfile(),
+    getMonkeyTypeData(),
+  ])
 
-  const wakatime = {
-    ...readStatsResponse.data,
-    all_time_since_today: allTimeSinceTodayResponse.data,
-  }
+  const weeks: InkHeatmapWeek[] = valueOf(github)?.data?.contributionsCollection?.contributionCalendar?.weeks ?? []
+  const counts = weeks.flatMap((week) => week.contributionDays.map((day) => day.contributionCount))
+  const total = counts.reduce((sum, n) => sum + n, 0)
+  const busiest = Math.max(0, ...counts)
+
+  const languages: WakatimeLanguage[] = (valueOf(wakatime)?.data?.languages ?? [])
+    .filter((language: WakatimeLanguage) => language.name !== "Other")
+    .slice(0, 5)
+  const hours = languages.reduce((sum, l) => sum + (l.hours || 0), 0)
+  const minutes = languages.reduce((sum, l) => sum + (l.minutes || 0), 0)
+
+  const streak = valueOf(duolingo)?.data?.streak ?? 0
+  const wpm = valueOf(monkeytype)?.bestWpm ?? 0
+  const facts = [
+    streak > 0 && (
+      <>
+        a streak of <Numeral>{streak.toLocaleString("en")}</Numeral> days on Duolingo
+      </>
+    ),
+    wpm > 0 && (
+      <>
+        <Numeral>{wpm}</Numeral> words a minute at best on MonkeyType
+      </>
+    ),
+  ].filter(Boolean)
+
+  if (total === 0 && languages.length === 0 && facts.length === 0) return null
 
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="mt-10">
-        <SectionHeading
-          as="h3"
-          eyebrow="Activity"
-          title="@rizkyhaksono's"
-          accent="contributions"
-          description="Coding hours, GitHub streaks, and learning stats pulled live from around the web."
-          className="mb-6"
-        />
-        <DuolingoStats duolingo={duolingoProfile} />
-        <WakatimeOverview data={wakatime} />
-        <WakatimeActive data={wakatime} />
-        <GithubOverview data={github?.data?.contributionsCollection?.contributionCalendar} />
-        <GithubCalendar data={github?.data?.contributionsCollection?.contributionCalendar} />
-        <MonkeyTypeStats typingStats={typingData} />
-      </div>
-    </BlurFade>
+    <PageSection id="activity" heading={{ title: "Activity" }} className={DEFERRED_SECTION} contentClassName="mt-6 space-y-12">
+      {total > 0 && (
+        <div>
+          <h3 className="font-display text-h4 text-ink">GitHub, the last year</h3>
+          <p className="mt-1 text-small text-ink-soft">
+            {total.toLocaleString("en")} contributions; the busiest day had {busiest.toLocaleString("en")}.
+          </p>
+          <InkHeatmap weeks={weeks} className="mt-4" />
+        </div>
+      )}
+
+      {languages.length > 0 && (
+        <div>
+          <h3 className="font-display text-h4 text-ink">Coding time, the last seven days</h3>
+          <p className="mt-1 text-small text-ink-soft">
+            {formatHours(hours, minutes)} across the {languages.length === 1 ? "language" : `${languages.length} languages`} below.
+          </p>
+          <ul role="list" className="mt-4 max-w-[40rem]">
+            {languages.map((language) => (
+              <HatchBar key={language.name} {...language} />
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {facts.length > 0 && (
+        <p className="max-w-[40ch] text-lead text-ink">
+          Elsewhere, {facts[0]}
+          {facts[1] && <> and {facts[1]}</>}.
+        </p>
+      )}
+    </PageSection>
   )
 }

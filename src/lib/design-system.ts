@@ -1,20 +1,20 @@
 /**
- * Shared design-system class tokens for Portfolio v3.
+ * Shared design-system class tokens for Portfolio v3 (one ink on paper).
  *
- * Three surface dialects only — do not invent ad-hoc glass/solid blends:
- * - solid:  default content boxes (Card / FeatureCard)
- * - glass:  exceptional translucent chrome only
- * - inset:  nested rows, sidebar blocks, status cells
+ * Surfaces are ruled frames on the paper itself, never filled cards:
+ * - solid:  hairline frame, transparent ground (Card / FeatureCard)
+ * - glass:  retired, same as solid (no blur, no translucency)
+ * - inset:  tint ground for nested rows and code
  */
 
+const SOLID = "rounded-none border border-border bg-transparent"
+
 export const SURFACE = {
-  solid:
-    "rounded-none border border-border bg-card text-card-foreground shadow-sm transition-colors",
+  solid: SOLID,
   solidHover: "hover:border-foreground/20",
-  glass:
-    "rounded-none border border-border/60 bg-background/40 shadow-sm backdrop-blur-sm",
-  glassNoBlur: "rounded-none border border-border/60 bg-background/40 shadow-sm",
-  inset: "rounded-none border border-border/40 bg-secondary/20",
+  glass: SOLID,
+  glassNoBlur: SOLID,
+  inset: "bg-muted",
 } as const
 
 /** Default content padding for solid cards and feature boxes. */
@@ -26,7 +26,7 @@ export const SURFACE_PADDING = {
 
 /** Section spacing used by PageSection / home blocks. */
 export const SECTION_SPACING = {
-  section: "mt-8",
+  section: "mt-16 sm:mt-24",
   sectionGap: "mt-4",
 } as const
 
@@ -39,6 +39,7 @@ export const PAGE_WIDTH = {
   prose: "mx-auto w-full max-w-3xl",
   article: "mx-auto w-full max-w-5xl",
   wide: "mx-auto w-full max-w-7xl",
+  ledger: "mx-auto w-full max-w-[60rem]",
 } as const
 
 export type SurfaceVariant = keyof typeof SURFACE

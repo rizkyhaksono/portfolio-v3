@@ -5,7 +5,7 @@
 ---
 
 ## Project Overview
-**Goal:** Keep the public portfolio accurate (Senior AI Engineer positioning) and visually consistent (solid / glass / inset surfaces, square chips) so recruiters and agents see one coherent system on desktop and mobile.
+**Goal:** Keep the public portfolio accurate (Senior AI Engineer positioning) and visually consistent (one cobalt ink on cream paper, frame / inset / lift surfaces, per `docs/ui/`) so recruiters and agents see one coherent system on desktop and mobile.
 **Success Criteria:** About/Intro/SEO say Senior AI Engineer from `JOB_TITLE`; leftover pill controls on visitor tools are square; downloader and intro wrap cleanly on small screens.
 
 ---
@@ -23,12 +23,20 @@
 - **SEO canonical domain**: ✅ COMPLETED (code) — `getSiteUrl()` + all crawler signals default to `https://natee.my.id`; **deploy:** rotate `DOMAIN` secret in GitHub/Azure and submit GSC sitemap (manual)
 - **Runtime cleanup and dark UI refinement**: ✅ COMPLETED — compiler removed, dark palette refined, system status promoted, square controls/toasts enforced
 - **Redesign P1 D+E (AI fix web, security/privacy)**: ✅ COMPLETED (code, not deployed) — AI proxies guarded (502/413/timeouts), OCR client downscale + HEIC, inline AI errors + `ai-error` event, server code blocks; Umami tracker gated + `umamiBeforeSend` token scrub, recorder gated/sampled, `chat_user` writes removed, logout revokes the API session, forgot/reset hidden, image hosts allow-listed
+- **Redesign P1 review fixes**: ✅ COMPLETED (2026-10-17, not deployed) — masthead fits 1280x600 (svh caps, plate strip takes the remaining height), 404 inside BaseLayout + `not-found` event, error.tsx on NotFoundView, quartile heatmap levels, token durations on Button/Tabs, site-theme Turnstile, `[id]` scroll-margin instead of html scroll-padding, Contents sheet lazy-loaded, wordscroll sr-only sentence, legacy `min-height` media query, 44px inputs/links, terminal on Radix Dialog, Umami failures never cached, spotify/weather removed, blog covers moved to `art-src/`, speckle mask, hex tokens only in `src/lib/print-hex.ts`
+- **Redesign P1 H (governance docs)**: ✅ COMPLETED (2026-10-17) — agent files and `docs/ui/` rewritten for the one-ink system; monochrome / grayscale / old-font / `MacWindow` mandates removed; `docs/ui/` declared source of truth; grep gate documented
 
 ---
 
 ## Feature Implementation Status
 
 ### COMPLETED
+
+#### Redesign P1 H — governance docs (2026-10-17)
+- ✅ `docs/ui/{README,design-system,surfaces,components,page-shell,platforms}.md` rewritten: ink / paper tokens with Paper and Night values and measured contrast, Literata roles and scale, three surfaces (frame, inset, lift), page patterns table, motion tiers and banned list, Umami event rules and table, grep gate
+- ✅ `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, `.github/copilot-instructions.md`, `.cursor/rules/ui-layout-consistency.mdc`, `.cursor/rules/nextjs-development.mdc` point at `docs/ui/` as source of truth and carry the same summary; package manager is bun everywhere, tests are Jest + Playwright
+- ✅ README styling passage and `prd/feature.md` (§9, superseded notes on §1–3, §5.2, §8) updated
+- ⏳ `.cursorrules` and `.cursor/rules/agents-index.mdc` still describe glass / `MacWindow` and npm (outside this task's scope)
 
 #### Runtime cleanup and dark UI refinement
 - ✅ Removed compiler UI, frontend integration code, backend execution route, and Piston/Paiza environment configuration
@@ -156,7 +164,7 @@
 - **Primitives:** `src/components/ui/surface.tsx`, `page-section.tsx`, `page-body.tsx`, `mac-window.tsx`
 - **Rule:** `.cursor/rules/ui-layout-consistency.mdc`
 - **Agents:** `AGENTS.md`
-- **UI docs:** `docs/ui/`
+- **UI docs (source of truth):** `docs/ui/`
 
 ### Source of truth for copy
 - Public LinkedIn: https://www.linkedin.com/in/rizkyhaksono

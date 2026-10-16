@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import { getRoadmapCourses } from "@/lib/mdx"
 import BaseLayout from "@/components/layout/base-layout"
 import { RoadmapClient } from "./roadmap-client"
-import SidebarMain from "@/components/layout/sidebar-main"
 import { MacWindow } from "@/components/ui/mac-window"
 import { PageBody } from "@/components/ui/page-body"
 import { SectionHeading } from "@/components/ui/section-heading"
@@ -30,7 +29,7 @@ export default function CourseRoadmap() {
   const courses = getRoadmapCourses()
 
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout>
       <PageBody width="wide">
         <SectionHeading
           as="h1"

@@ -12,9 +12,13 @@ const nextConfig: NextConfig = {
         destination: RESUME_GOOGLE_DRIVE_URL,
         permanent: false,
       },
+      { source: '/signal', destination: '/', permanent: true },
+      { source: '/status', destination: '/stats', permanent: true },
+      { source: '/playground', destination: '/ai', permanent: true },
     ]
   },
-  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  // Keeps the TypeScript compiler (pulled in by tracing) out of the standalone image.
+  outputFileTracingExcludes: { '*': ['node_modules/typescript/**'] },
   compress: true,
   poweredByHeader: false,
   images: {
@@ -34,28 +38,19 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "encrypted-tbn0.gstatic.com" },
       { protocol: "https", hostname: "images.icon-icons.com" },
       { protocol: "https", hostname: "media.licdn.com" },
-      // Spotify album art, signup illustration, /signal hero
-      { protocol: "https", hostname: "i.scdn.co" },
+      // Signup illustration, roadmap images
       { protocol: "https", hostname: "i.pinimg.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
     formats: ["image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    deviceSizes: [640, 828, 1200, 1600],
+    imageSizes: [32, 64, 128, 256],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     unoptimized: false,
   },
   experimental: {
-    mdxRs: true,
-    optimizePackageImports: [
-      "lucide-react",
-      "react-icons",
-      "recharts",
-      "date-fns",
-      "date-fns-tz",
-      "motion",
-      "@radix-ui/react-icons",
-    ],
+    // lucide-react, date-fns, react-icons/* and the P3 chart library are already in the default list.
+    optimizePackageImports: ["date-fns-tz", "@radix-ui/react-icons"],
   },
 }
 

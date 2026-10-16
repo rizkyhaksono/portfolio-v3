@@ -31,5 +31,5 @@ COPY --from=builder --chown=bun:bun /app/.next/static ./.next/static
 USER bun
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=5 \
-  CMD bun -e "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
+  CMD bun -e "fetch('http://127.0.0.1:3000/favicon.ico').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 CMD ["bun", "server.js"]

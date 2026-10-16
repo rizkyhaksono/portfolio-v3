@@ -3,8 +3,11 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { JOB_TITLE } from "@/commons/constants/author"
+import { NAV_SECTIONS } from "@/commons/constants/navigation-menu"
 
 type Line = { kind: "in" | "out"; text: string }
 
@@ -23,7 +26,7 @@ interface Command {
   run: (args: string[], ctx: TerminalCtx) => string[] | void
 }
 
-const PAGES = ["/", "/project", "/blog", "/ai", "/chat", "/tracker", "/tools", "/roadmap", "/stats", "/certificates", "/changelog"]
+const PAGES = ["/", ...NAV_SECTIONS.map((section) => section.href)]
 const SOCIALS: Record<string, string> = {
   github: "https://github.com/rizkyhaksono",
   linkedin: "https://linkedin.com/in/rizkyhaksono",
@@ -100,7 +103,7 @@ const COMMANDS: Command[] = [
   { name: "echo", description: "Print text", run: (args) => [args.join(" ")] },
   { name: "clear", description: "Clear the screen", run: (_a, ctx) => ctx.clear() },
   { name: "exit", description: "Close the terminal", run: (_a, ctx) => ctx.close() },
-  { name: "sudo", description: "Nice try", run: () => ["Permission denied: nice try 😏"] },
+  { name: "sudo", description: "Nice try", run: () => ["Permission denied. Nice try."] },
 ]
 
 const WELCOME: Line[] = [
@@ -117,15 +120,11 @@ export default function TerminalOverlay() {
   const { setTheme } = useTheme()
   const inputRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const boxRef = useRef<HTMLDivElement>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
 
-  // Backtick toggles; Escape closes. Ignore backtick while typing in a field.
+  // Backtick toggles (Radix handles Escape, outside clicks and the focus trap). Ignore backtick while typing in a field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false)
-        return
-      }
       const el = e.target as HTMLElement | null
       const typing = !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable)
       if (e.key === "`" && !typing) {
@@ -138,21 +137,8 @@ export default function TerminalOverlay() {
   }, [])
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 0)
-  }, [open])
-
-  useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [lines, open])
-
-  useEffect(() => {
-    if (!open) return
-    const onDown = (e: MouseEvent) => {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener("mousedown", onDown)
-    return () => document.removeEventListener("mousedown", onDown)
-  }, [open])
+  }, [lines])
 
   const run = useCallback(
     (raw: string) => {
@@ -209,47 +195,62 @@ export default function TerminalOverlay() {
     }
   }
 
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-[10001] flex items-start justify-center bg-black/40 p-4 pt-[12vh] print:hidden">
-      <div
-        ref={boxRef}
-        className="flex h-[60vh] max-h-[520px] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-border/60 bg-[#0c0c0c] shadow-2xl"
-        onClick={() => inputRef.current?.focus()}
-      >
-        <div className="flex shrink-0 items-center gap-3 border-b border-white/10 bg-white/5 px-4 py-2.5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-red-400/90" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400/90" />
-            <span className="h-3 w-3 rounded-full bg-green-400/90" />
+    <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[10001] bg-[hsl(var(--scrim,var(--ink)/.35))] print:hidden" />
+        <DialogPrimitive.Content
+          aria-describedby={undefined}
+          onOpenAutoFocus={(e) => {
+            // No Radix trigger here (backtick opens it), so remember where focus was and give it back on close.
+            returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+            e.preventDefault()
+            inputRef.current?.focus()
+            if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+          }}
+          onCloseAutoFocus={(e) => {
+            e.preventDefault()
+            returnFocusRef.current?.focus({ preventScroll: true })
+          }}
+          onClick={() => inputRef.current?.focus()}
+          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col border border-ink bg-paper text-ink shadow-[3px_3px_0_hsl(var(--ink))] print:hidden"
+        >
+          <div className="flex shrink-0 items-center justify-between border-b border-rule pl-4">
+            <DialogPrimitive.Title className="font-display text-caption text-ink-soft">Terminal</DialogPrimitive.Title>
+            <DialogPrimitive.Close
+              aria-label="Close terminal"
+              className="inline-flex h-11 w-11 items-center justify-center hover:bg-tint md:h-9 md:w-9"
+            >
+              <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+            </DialogPrimitive.Close>
           </div>
-          <p className="flex-1 truncate text-center font-mono text-xs text-white/50">rizky@portfolio ~ terminal</p>
-          <button onClick={() => setOpen(false)} className="font-mono text-xs text-white/40 hover:text-white/80" aria-label="Close terminal">esc</button>
-        </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 font-mono text-[13px] leading-relaxed text-green-300/90">
-          {lines.map((l, i) => (
-            <div key={i} className={cn("whitespace-pre-wrap break-words", l.kind === "in" && "text-white/90")}>
-              {l.kind === "in" ? `$ ${l.text}` : l.text}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 text-[13.5px] leading-relaxed">
+            {lines.map((l, i) => (
+              <samp key={i} className={cn("block whitespace-pre-wrap break-words", l.kind === "in" && "text-ink-soft")}>
+                {l.kind === "in" ? `$ ${l.text}` : l.text}
+              </samp>
+            ))}
+            <div className="mt-1 flex items-center gap-2">
+              <samp aria-hidden>$</samp>
+              {/* kbd carries the system mono to the input, which inherits its font. */}
+              <kbd className="flex flex-1">
+                <input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  spellCheck={false}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  className="flex-1 bg-transparent text-base text-ink md:text-[13.5px]"
+                  aria-label="Terminal input"
+                />
+              </kbd>
             </div>
-          ))}
-          <div className="mt-1 flex items-center gap-2">
-            <span className="text-white/60">$</span>
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={onKeyDown}
-              spellCheck={false}
-              autoComplete="off"
-              autoCapitalize="off"
-              className="flex-1 bg-transparent font-mono text-[13px] text-white/90 outline-none"
-              aria-label="Terminal input"
-            />
           </div>
-        </div>
-      </div>
-    </div>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   )
 }

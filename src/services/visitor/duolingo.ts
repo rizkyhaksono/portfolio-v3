@@ -19,6 +19,7 @@ export async function getDuolingoProfile(): Promise<DuolingoApiResponse> {
     const response = await fetch(`${process.env.API_URL}/v3/duolingo/profile?username=rizkyhaksono`, {
       method: "GET",
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) {

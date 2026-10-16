@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
+import { installTrackDelegation, track } from "@/lib/analytics"
 
 const CommandPalette = dynamic(
   () => import("@/components/ui/command-palette").then((module) => module.CommandPalette),
@@ -17,6 +18,9 @@ const RECORDER_SAMPLE = 0.15
 const PRIVATE_SECTIONS = new Set(["admin", "auth", "profile", "ai"])
 const recorderSampled = typeof window !== "undefined" && Math.random() < RECORDER_SAMPLE
 
+// BaseLayout remounts this on every section change; after the first settle, tools show at once.
+let settledOnce = false
+
 /** Umami replay/heatmap recorder: production visitor pages only, after idle, for a sample of visits. */
 function useUmamiRecorder(pathname: string) {
   useEffect(() => {
@@ -27,7 +31,7 @@ function useUmamiRecorder(pathname: string) {
       if (loaded) window.location.reload()
       return
     }
-    // Signed-in visitors see their name and email in the sidebar, so they are never recorded.
+    // Signed-in visitors are never recorded.
     if (loaded || /(?:^|; )NATEE_V3_TOKEN=/.test(document.cookie)) return
 
     const load = () => {
@@ -48,23 +52,68 @@ function useUmamiRecorder(pathname: string) {
   }, [pathname])
 }
 
-/** Defers non-essential global tools until the initial page has settled. */
-export function DeferredClientUtilities() {
-  const [ready, setReady] = useState(false)
+/** Mounted once in the root layout so it also sees admin and auth routes, which have no BaseLayout. */
+export function UmamiRecorder() {
   useUmamiRecorder(usePathname())
+  return null
+}
+
+/**
+ * BaseLayout's client tools. The `data-track` listener installs at mount; the command palette loads on
+ * ⌘K or a `[data-open-search]` click; the terminal and feedback widget wait for the page to settle.
+ */
+export function DeferredClientUtilities() {
+  const [ready, setReady] = useState(settledOnce)
+  const [paletteLoaded, setPaletteLoaded] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const paletteOpenRef = useRef(false)
+  paletteOpenRef.current = paletteOpen
+
+  useEffect(() => installTrackDelegation(), [])
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => setReady(true), 1200)
-    return () => window.clearTimeout(timeout)
+    const openPalette = (via: string) => {
+      setPaletteLoaded(true)
+      setPaletteOpen(true)
+      track("search-open", { via })
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      // Autofill fires keydown without a key.
+      if (event.key?.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey)) return
+      event.preventDefault()
+      if (paletteOpenRef.current) setPaletteOpen(false)
+      else openPalette("keyboard")
+    }
+    const onClick = (event: MouseEvent) => {
+      const trigger = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-open-search]") : null
+      if (trigger) openPalette(trigger.dataset.openSearch || "button")
+    }
+    document.addEventListener("keydown", onKeyDown)
+    document.addEventListener("click", onClick)
+    return () => {
+      document.removeEventListener("keydown", onKeyDown)
+      document.removeEventListener("click", onClick)
+    }
   }, [])
 
-  if (!ready) return null
+  useEffect(() => {
+    if (ready) return
+    const timeout = window.setTimeout(() => {
+      settledOnce = true
+      setReady(true)
+    }, 1200)
+    return () => window.clearTimeout(timeout)
+  }, [ready])
 
   return (
     <>
-      <CommandPalette />
-      <TerminalOverlay />
-      <FeedbackWidget />
+      {paletteLoaded && <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />}
+      {ready && (
+        <>
+          <TerminalOverlay />
+          <FeedbackWidget />
+        </>
+      )}
     </>
   )
 }

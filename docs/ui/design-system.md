@@ -1,35 +1,151 @@
-# Design System Tokens
+# Design system: tokens, type, shape, motion
 
-## Visual language
+## Ink and paper
 
-- **Monochrome** — near-black on white (light) / near-white on near-black (dark). No accent hue.
-- **Square** — every named Tailwind radius collapses to `0` in `tailwind.config.ts`. Keep `rounded-full` only for avatars, status dots, and icon bubbles.
-- **Hairline borders** — use semantic `border` / `border-border` tokens, not heavy shadows or glow.
+Tokens are HSL triples in `src/app/globals.css` so every shadcn part re-inks from two values. `:root` is the paper print; `<html class="dark">` is Night print.
 
-## CSS variables
+| Token | Tailwind class | Paper (light) | Night (dark) | Role |
+|---|---|---|---|---|
+| `--paper` | `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
+| `--ink` | `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `--ink-soft` | `ink-soft` | #445BAA | #A9B5E3 | Secondary text, on paper or tint only |
+| `--rule` | `rule` | #BFC6DE | #2C3870 | Decorative hairlines only |
+| `--rule-strong` | `rule-strong` | #6476B2 | #7383C4 | Control boundaries (3:1 or better) |
+| `--tint` | `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
 
-Defined in `src/app/globals.css` (`:root` and `.dark`):
+The six Tailwind colours are defined as `hsl(var(--x) / <alpha-value>)`. Hex values above are rounded from the HSL triples.
 
-| Token | Role |
+shadcn names map onto the same ink, so existing components keep working:
+
+| shadcn token | Maps to |
 |---|---|
-| `--background` / `--foreground` | Page canvas + body text |
-| `--card` / `--card-foreground` | Solid content boxes |
-| `--primary` / `--primary-foreground` | Primary actions / emphasis |
-| `--secondary` / `--muted` / `--accent` | Soft fills and nests |
-| `--border` / `--input` / `--ring` | Hairlines and focus |
-| `--destructive` | Errors / danger only |
-| `--radius` | `0rem` (square) |
+| `background`, `card`, `popover`, `primary-foreground`, `destructive-foreground` | paper |
+| `foreground`, `card-foreground`, `popover-foreground`, `primary`, `destructive`, `ring` | ink |
+| `secondary`, `muted`, `accent` | tint |
+| `muted-foreground` | ink-soft |
+| `border` | rule |
+| `input` | rule-strong |
+| `--radius` | `0rem` |
 
-Fonts (via layout / Tailwind):
+`--chart-1..5` stay mapped to ink, ink-soft, rule-strong, rule and tint only until recharts is removed in phase 3.
 
-- `--font-sans` — body
-- `--font-display` — section titles
-- `--font-serif` — italic accent words in headings
-- `--font-mono` — chips, MacWindow titles, code
+Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted wordscroll opacity), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
+
+### Contrast
+
+Measured from the triples (WCAG ratio):
+
+| Pair | Paper | Night |
+|---|---|---|
+| ink on paper | 8.13 | 14.51 |
+| ink on tint | 7.54 | 11.01 |
+| ink-soft on paper | 5.36 | 8.96 |
+| ink-soft on tint | 4.97 | 6.80 |
+| rule-strong on paper | 3.74 | 4.96 |
+
+Rules that keep it that way:
+
+- Never put `ink-soft` text on a fill of 12% ink or more.
+- Night print never uses full cobalt as a ground behind text.
+- Text never takes an opacity modifier (`text-foreground/70` fails the gate). Use `text-ink-soft`.
+- Status is shape plus word, never colour. There is no red, green or amber anywhere.
+- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost` .6 paper, .38 night).
+
+## Type: Literata
+
+One family, Literata (variable, OFL), roman and italic, loaded with `next/font/google` in `src/app/layout.tsx` (`subsets: ['latin']`, `display: 'swap'`, `adjustFontFallback`). No committed font binaries. Machine text uses the system mono stack `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`, which costs 0 bytes.
+
+| Variable | Tailwind | Use |
+|---|---|---|
+| `--font-serif` | `font-sans`, `font-serif` | Literata for body, prose, UI |
+| `--font-display` | `font-display` | Literata for headings, display, numerals |
+| system mono | `font-mono` (code-block and kbd only) | Code, slugs, keys such as TRK-12, raw JSON, WPM passage, kbd |
+
+Italic is rationed. Italic: h1 to h4, the masthead, one standfirst per page, captions, datelines, pull quotes, numerals. Roman: body, prose, nav, buttons, labels (14px / 600), table heads (13px / 600, ink-soft), tags (13px), form values.
+
+### Scale
+
+Fluid between 375px and 1280px, defined as `fontSize` keys in `tailwind.config.ts`.
+
+| Key | Size / leading | Notes |
+|---|---|---|
+| `caption`, `xs` | 13 / 1.35 | Italic for captions; `xs` is 13px |
+| `small` | 14 / 1.45 | |
+| `body` | 16 to 17 / 1.6 | |
+| `prose` | 17 to 19 / 1.65 | 66ch measure |
+| `lead` | 20 to 22 / 1.4 | Italic standfirst |
+| `h4` | 18 / 1.3 | |
+| `h3` | 22 to 24 / 1.25 | |
+| `h2` | 28 to 40 / 1.1 | |
+| `h1` | 40 to 64 / 1.02 | |
+| `display` | 56 to 152 / 0.92 | Italic, weight 360, `text-wrap: balance` |
+| `numeral` | 44 to 72 / 1 | Italic, `tabular-nums` |
+
+Spacing uses a 4px base. Section rhythm is 96px desktop, 64px mobile (`SECTION_SPACING.section = 'mt-16 sm:mt-24'`).
+
+### Type rules
+
+- `font-synthesis: none`. Never fake a weight or an italic.
+- No `uppercase`, no `tracking-[...]`, no small caps labels.
+- Headings are literal and sentence case ("Career", not "Where I've been").
+- Eyebrows only when they carry information, and then as an italic caption `<p>`, never all-caps.
+- No middle-dot meta strings. Datelines are sentences: "Published 3 March 2026, six minute read."
+- Numbers only for real sequences: changelog versions, roadmap stages, legal sections. No "01 / 02 / 03" section markers.
+- Links: underline 1px at offset .18em, 2px on hover. No "→" or arrow glyph after link text.
+- External links carry a screen-reader note "(opens in a new tab)".
+- `tabular-nums` in ledgers, tables and figures.
+- Glyphs such as check, cross, external and half-circle are inline SVG, not emoji or icon fonts.
+
+## Shape and lines
+
+- Radius 0 everywhere. `borderRadius` keys all resolve to 0; `full` exists only for radio dots.
+- Line vocabulary:
+
+| Line | How | Where |
+|---|---|---|
+| Hairline | 1px `rule` (`border-border`) | Frames, row separators, decorative rules |
+| Strong | 1px `ink` | Controls, outline buttons, floating layers |
+| Active | 2px `ink` underline | Current nav item, active tab, link hover |
+| Double rule | 1px ink, 3px gap, 1px rule | Page heads and above the colophon only |
+| Plate frame | double rule around a figure | `PlateFigure` |
+| Dotted leader | dotted `rule` | Definition lists, profile card, ledgers |
+| Dashed | dashed `rule-strong` | Draft and archived states |
+
+## Texture
+
+1. **Grain.** A 128px WebP tile (4 KB or less) per theme on `body`. Opaque sticky surfaces add `.bg-paper-grain` so the grain does not stop at their edge.
+2. **Ink speckle.** A small mask, only on numerals 48px and up below the fold, inverted blocks, and the 404 line.
+3. **Hatching.** 45 degree hatching (`repeating-linear-gradient(135deg, ...)`) for chart areas and `HatchBar`. This is the only permitted use of a gradient function, and it lives in CSS, not in class names.
+
+Photos use the `.plate` duotone. The engraving is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. Engravings never go through `next/image`.
+
+## Motion: the press moves once
+
+| Tier | What | Rules |
+|---|---|---|
+| 0 (no JS) | Native scroll, `data-scroll-behavior="smooth"` on `<html>`, `scroll-behavior: smooth` under no-preference, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (not `scroll-padding-top` on `html`, which scrolls the page whenever focus lands in the sticky head), sticky layouts (skills deck, ledger years, article rail, project figure column, stats chart, tools index, chat composer) | `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky. |
+| 1 (CSS scroll-driven) | Home wordscroll (`.ws`), article reading hairline (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
+| Response | Underline 1px to 2px, button `translateY(1px)`, tab underline slide, accordion, dialog and sheet fade plus 4px, toasts, tracker drag lift | Use `--dur-press`, `--dur-ui`, `--dur-sheet`, `--ease-print`. |
+
+**Banned:** parallax, marquees and infinite scrollers, typing effects, smooth cursors, page transitions, pulsing dots and pulse skeletons, fade-up or reveal-on-scroll on sections, hover lifts (`hover:-translate-y`), Lenis, GSAP, `motion` / framer-motion, any scroll animation library on any route.
+
+**Reduced motion:** durations drop to .01ms and the wordscroll prints fully inked. Sticky stays, because it is layout.
+
+**Media:** nothing autoplays. YouTube is a click-to-load facade.
+
+## Night print (dark mode)
+
+- Token flip on `<html class="dark">`, driven by next-themes. Default theme is System; the Contents sheet offers Paper, Night and System.
+- Do not write `dark:` classes. Every colour already flips through the tokens; existing `dark:` classes are deleted as files are touched.
+- Engravings flip through `--plate-alpha`; photos keep the `.plate` duotone; the grain tile swaps.
+- `color-scheme` follows the theme. Viewport `themeColor` is #F3ECDC on paper and #0D1433 at night. The manifest uses #F3ECDC.
+- OG and certificate images are always printed on paper.
+
+## Print
+
+The print stylesheet forces paper tokens, hides the running head, Contents sheet and engraving band, stops the wordscroll, and prints link URLs.
 
 ## Shared class tokens
-
-Import from `@/lib/design-system`:
 
 ```ts
 import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/design-system"
@@ -37,23 +153,7 @@ import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/des
 
 | Export | Keys | Use |
 |---|---|---|
-| `SURFACE` | `solid`, `solidHover`, `glass`, `glassNoBlur`, `inset` | Box chrome |
-| `SURFACE_PADDING` | `default` (`p-6`), `compact` (`p-4`), `cozy` (`p-5`) | Inner pad |
-| `SECTION_SPACING` | `section` (`mt-10`), `sectionGap` (`mt-6`) | Section rhythm |
-| `PAGE_WIDTH` | `default`, `prose`, `article`, `wide` | Max-width presets |
-
-## Forbidden patterns
-
-| Avoid | Prefer |
-|---|---|
-| `neutral-*`, `text-black`, `dark:text-white` | `foreground`, `muted-foreground` |
-| Hex hovers (`#262626`, `#D9D9D9`) | `accent`, `secondary`, `muted` |
-| `border-white/10 bg-white/5 backdrop-blur-md` on content | solid `Card` / `Surface` |
-| `hover:shadow-xl hover:-translate-y-1` on cards | `hover:border-foreground/20` |
-| `max-w-8xl` (undefined) | `PAGE_WIDTH` via `PageBody` |
-| Extra `px-4 lg:px-0` inside BaseLayout | Trust container padding |
-
-## Container
-
-Tailwind `container`: centered, `padding: 2rem`, `2xl: 1400px`.  
-`BaseLayout` uses `container` **without** stacking another horizontal `px-*`.
+| `SURFACE` | `solid` (frame), `inset`; `glass` and `glassNoBlur` are retired aliases of `solid` | Surface classes, see [surfaces.md](./surfaces.md) |
+| `SURFACE_PADDING` | `default`, `compact`, `cozy` | Inner padding |
+| `SECTION_SPACING` | `section` (`mt-16 sm:mt-24`), `sectionGap` | Section rhythm |
+| `PAGE_WIDTH` | `default`, `prose`, `article`, `wide`, `ledger` (`max-w-[60rem]`) | Width presets for `PageBody` |

@@ -14,17 +14,14 @@ test.describe("Auth & public pages", () => {
     await expect(page.getByRole("link", { name: /forgot password/i })).toHaveCount(0);
   });
 
-  test("blog page has onsite tab", async ({ page }) => {
+  test("blog feed includes posts written here", async ({ page }) => {
     await page.goto("/blog");
-    await page.waitForLoadState("networkidle");
-    await expect(page.getByRole("tab", { name: /written here/i })).toBeVisible();
+    await expect(page.locator('main a[href^="/blog/onsite/"]').first()).toBeVisible();
   });
 
-  test("ai page requires auth redirect or content", async ({ page }) => {
+  test("ai page shows a sign-in gate that returns to /ai", async ({ page }) => {
     await page.goto("/ai");
-    await page.waitForLoadState("networkidle");
-    const loginPrompt = page.getByText(/authentication required|log in/i);
-    const chatInput = page.getByPlaceholder(/ask etan/i);
-    await expect(loginPrompt.or(chatInput)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /sign in to use etan ai/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^sign in$/i })).toHaveAttribute("href", "/auth?redirect=/ai");
   });
 });

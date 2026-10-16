@@ -15,8 +15,8 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
    - **Gemini**: `.geminirules` / `GEMINI.md`
    - **Copilot**: `.github/copilot-instructions.md`
    - **UI docs**: `docs/ui/`
-3. Adhere strictly to the Next.js 15+ App Router, TypeScript (strict mode), Tailwind CSS, and shadcn/ui.
-4. Use **npm** as the standard package manager.
+3. Adhere strictly to the Next.js 16 App Router, React 19, TypeScript (strict mode), Tailwind CSS 3 (not v4) and shadcn/ui primitives restyled to the one-ink system.
+4. Use **bun** as the package manager (`bun install`, `bun run test`, `bunx tsc --noEmit`). Never npm.
 
 ## Quick Reference
 
@@ -26,20 +26,17 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 - **Quality:** Keep functions modular, readable, and typed. Do not rely on `any`.
 - **Progress:** Read/update `prd/feature.md` and `prd/progress.md` for tracked work.
 
-## UI Layout (mandatory)
+## UI rules (mandatory)
 
-Monochrome, square, hairline borders. Three surface dialects only — see `.cursor/rules/ui-layout-consistency.mdc`, [`docs/ui/`](./docs/ui/), and `src/lib/design-system.ts`:
+[`docs/ui/`](./docs/ui/README.md) is the source of truth; `.cursor/rules/ui-layout-consistency.mdc` summarises it. The old monochrome / grayscale rules, glass surfaces, `MacWindow` panels, Instrument Serif, Bricolage Grotesque, Inter and JetBrains Mono are retired. Do not bring them back.
 
-| Dialect | Primitive | Use |
-|---|---|---|
-| solid | `Card` / `FeatureCard` / `Surface` | Content boxes |
-| glass | `MacWindow` / `Surface variant="glass"` | Window chrome only |
-| inset | `Surface variant="inset"` | Nested rows / sidebar blocks |
-
-- Page shell: `BaseLayout` → `PageBody` → `SectionHeading` → content
-- Sections: `PageSection` (`mt-10` rhythm)
-- Never invent glass content cards (`bg-white/5`, `backdrop-blur-md`, lift shadows)
-- Prefer semantic color tokens; ban `neutral-*` / raw hex for UI chrome
-- Do not add extra `px-*` inside BaseLayout (container already pads)
+- **Ink and paper.** One cobalt ink (`ink` #1E3C9E) on cream paper (`paper` #F3ECDC), plus `ink-soft`, `rule`, `rule-strong` and `tint`. Night print flips the same tokens to cream ink on night paper (#0D1433) through `<html class="dark">`. No other hue, no hex in UI code, no `white` / `black`, no `dark:` classes. Status is shape plus word, never colour.
+- **Literata.** One family, roman and italic. Italic for h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals. Roman for body, nav, buttons, labels, table heads, tags, form values. System mono only for code, slugs, keys, raw JSON and kbd.
+- **Three surfaces.** Frame: 1px `rule` hairline on paper (`Card`, `Surface variant="solid"`). Inset: `tint` ground (`Surface variant="inset"`). Lift: paper, 1px ink, `shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only. Radius 0. No gradients, glass, blur, glows or soft shadows.
+- **Page patterns.** Every route uses one: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found ([`docs/ui/page-shell.md`](./docs/ui/page-shell.md)). The shell is `BaseLayout` with running head, Contents sheet and colophon; no sidebars, no extra `px-*` inside it.
+- **Motion.** Native scroll and sticky layouts; CSS scroll-driven home wordscroll and article reading hairline only; otherwise response motion on input. Banned: parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up on sections, hover lifts, Lenis, GSAP, `motion`.
+- **Copy.** Sentence case. No `uppercase`, letter-spacing, all-caps eyebrows, middle-dot meta strings, mono small labels or "→" on links. Numbers only for real sequences.
+- **Umami.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track="nav-click" data-track-item="..."`. Kebab-case names, enum values, never PII.
+- **Grep gate.** Both commands in [`AGENTS.md`](./AGENTS.md) must print nothing for the files you touched.
 
 Platform shells (visitor / user / admin / auth): [`docs/ui/platforms.md`](./docs/ui/platforms.md)

@@ -1,59 +1,49 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Chip } from "@/components/ui/chip"
+import { PageSection } from "@/components/ui/page-section"
+import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { getAllCarrer } from "@/services/visitor/career"
-import { FallbackImage } from "@/components/ui/fallback-image"
+import { getAllEducation } from "@/services/visitor/education"
 
-function getCompanyName(title: string): string {
-  return title.split(" - ")[0].trim()
+interface Entry {
+  id: string
+  title: string
+  subtitle: string
+  duration: string
 }
 
-function groupCareersByCompany(careers: any[]): Map<string, any[]> {
-  const grouped = new Map<string, any[]>()
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-  for (const career of careers) {
-    const companyName = getCompanyName(career.title)
-    const existing = grouped.get(companyName) || []
-    existing.push(career)
-    grouped.set(companyName, existing)
+/** "Aug 2026 - Present" → months since year 0 of the start date (0 when unparseable). */
+const startOf = (duration: string) => {
+  const match = /([A-Za-z]{3})[a-z]* (\d{4})/.exec(duration)
+  return match ? Number(match[2]) * 12 + Math.max(0, MONTHS.indexOf(match[1])) : 0
+}
+
+const fulfilled = <T,>(result: PromiseSettledResult<T[] | null>) =>
+  result.status === "fulfilled" ? (result.value ?? []) : []
+
+/** Work and education in one ledger, newest first, grouped under a sticky start year. */
+export default async function CareerSection() {
+  const [career, education] = await Promise.allSettled([getAllCarrer(), getAllEducation()])
+  const entries: Entry[] = [...fulfilled(career), ...fulfilled(education)].sort((a, b) => startOf(b.duration) - startOf(a.duration))
+  if (entries.length === 0) return null
+
+  const years = new Map<string, Entry[]>()
+  for (const entry of entries) {
+    const year = String(Math.floor(startOf(entry.duration) / 12) || "Undated")
+    years.set(year, [...(years.get(year) ?? []), entry])
   }
 
-  return grouped
-}
-
-export default async function CarrerSection() {
-  const careers = await getAllCarrer()
-  if (!careers || careers.length === 0) return null
-
-  const groupedCareers = groupCareersByCompany(careers)
-
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="mt-10">
-        <SectionHeading eyebrow="Career" title="Work" accent="Experience" />
-
-        <div className="mt-6">
-          {Array.from(groupedCareers.entries()).map(([companyName, companyCarers]) => (
-            <div key={companyName} className="relative">
-              {companyCarers.length > 1 && <div className="absolute left-[31px] top-[72px] bottom-4 w-px bg-border" />}
-
-              {companyCarers.map((career: any, idx: number) => (
-                <div key={career.id} className="relative">
-                  {idx > 0 && <div className="absolute left-[28px] top-[26px] w-2 h-2 rounded-full bg-primary z-10" />}
-                  <div className="mt-3 grid max-w-full grid-cols-[4rem_minmax(0,1fr)] items-start gap-x-4 gap-y-2 text-pretty sm:grid-cols-[4rem_minmax(0,1fr)_auto]">
-                    {idx === 0 ? <FallbackImage src={career.image} alt={`${career.title} logo`} width={64} height={64} className="rounded-full object-cover size-16 flex-shrink-0 ring-1 ring-border" /> : <div className="size-16 flex-shrink-0" />}
-                    <div className="min-w-0">
-                      <h3 className="font-display text-sm sm:text-base font-semibold leading-snug tracking-tight text-foreground">{career.title}</h3>
-                      <p className="mt-0.5 text-muted-foreground text-xs sm:text-sm">{career.subtitle}</p>
-                    </div>
-                    <Chip className="col-start-2 w-fit whitespace-nowrap sm:col-start-3 sm:row-start-1">{career.duration}</Chip>
-                  </div>
-                </div>
-              ))}
-            </div>
+    <PageSection id="career" heading={{ title: "Career" }} contentClassName="mt-6">
+      {[...years].map(([year, rows]) => (
+        <LedgerList key={year} marker={year}>
+          {rows.map((row) => (
+            <LedgerRow key={row.id} title={row.title} meta={row.duration.replace(" - ", " – ")}>
+              {row.subtitle.trim()}
+            </LedgerRow>
           ))}
-        </div>
-      </div>
-    </BlurFade>
+        </LedgerList>
+      ))}
+    </PageSection>
   )
 }

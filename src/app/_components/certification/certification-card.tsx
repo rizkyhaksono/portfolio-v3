@@ -49,7 +49,7 @@ export function CertificationCard({ certification, compact = false }: Readonly<C
 
             {/* Link Icon */}
             {certification.link && (
-              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors" aria-label="View credential">
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" data-umami-event="cert-verify" data-umami-event-issuer={certification.provider} className="flex-shrink-0 text-primary hover:text-primary/80 transition-colors" aria-label="View credential">
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
@@ -92,7 +92,7 @@ export function CertificationCard({ certification, compact = false }: Readonly<C
             </div>
 
             {certification.link && (
-              <a href={certification.link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline">
+              <a href={certification.link} target="_blank" rel="noopener noreferrer" data-umami-event="cert-verify" data-umami-event-issuer={certification.provider} className="mt-3 inline-flex items-center gap-1 text-xs text-primary hover:underline">
                 <span>View Credential</span>
                 <ExternalLink className="w-3 h-3" />
               </a>

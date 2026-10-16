@@ -1,56 +1,55 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Chip } from "@/components/ui/chip"
+import type { CSSProperties } from "react"
+import { PageSection } from "@/components/ui/page-section"
 
 const FOCUS_SKILLS = [
   {
     name: "AI systems",
-    skills: ["LLMs", "RAG", "MCP", "AI Agents", "Embeddings", "LangChain"],
+    note: "Models, retrieval and the protocols that connect them.",
+    skills: ["LLMs", "RAG", "MCP", "AI agents", "Embeddings", "LangChain"],
   },
   {
     name: "Application",
+    note: "The languages and frameworks the products are written in.",
     skills: ["TypeScript", "Python", "Go", "Next.js", "FastAPI", "PostgreSQL"],
   },
   {
     name: "Cloud",
+    note: "Where it runs, and how it gets there.",
     skills: ["AWS", "Azure", "Docker", "Kubernetes", "GitHub Actions", "Terraform"],
   },
   {
     name: "Quality",
+    note: "How I know it still works.",
     skills: ["Playwright", "Jest", "OpenTelemetry", "Grafana", "Prometheus"],
   },
 ] as const
 
-/** Presents a concise working stack instead of an exhaustive technology inventory. */
+/**
+ * Stacking deck from 768px: each plate sticks a header strip (3.25rem) lower than the last, so earlier
+ * headers stay visible as the next plate slides over. Below 768px it is a plain ruled list.
+ */
 export default function SkillSection() {
   return (
-    <BlurFade>
-      <section className="mt-10">
-        <SectionHeading
-          eyebrow="Toolkit"
-          title="Skills"
-          accent="& stack"
-          description="A focused view of the tools I use in production."
-          className="mb-5"
-        />
-        <div className="border-y border-border">
-          {FOCUS_SKILLS.map((category) => (
-            <div
-              key={category.name}
-              className="grid gap-3 border-b border-border py-4 last:border-b-0 sm:grid-cols-[8rem_1fr] sm:items-start"
-            >
-              <h3 className="font-display text-sm font-semibold">{category.name}</h3>
-              <ul className="flex flex-wrap gap-2">
-                {category.skills.map((skill) => (
-                  <li key={skill}>
-                    <Chip>{skill}</Chip>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
-    </BlurFade>
+    <PageSection id="skills" heading={{ title: "Skills" }} contentClassName="mt-6">
+      <ul role="list" className="border-b border-ink">
+        {FOCUS_SKILLS.map((group, i) => (
+          <li
+            key={group.name}
+            style={{ "--i": i } as CSSProperties}
+            className="bg-paper-grain border-t border-ink pb-8 md:sticky md:top-[calc(var(--head-h)+1rem+var(--i)*3.25rem)] md:min-h-[55svh]"
+          >
+            <h3 className="flex min-h-[3.25rem] items-center font-display text-h3 text-ink">{group.name}</h3>
+            <p className="text-small text-ink-soft">{group.note}</p>
+            <ul role="list" className="mt-6 grid gap-x-10 sm:grid-cols-2">
+              {group.skills.map((skill) => (
+                <li key={skill} className="border-b border-rule py-2 text-lead text-ink">
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </PageSection>
   )
 }

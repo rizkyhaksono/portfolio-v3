@@ -23,6 +23,7 @@ export async function getMonkeyTypeStats(): Promise<MonkeyTypeStats | null> {
         Accept: "application/json",
       },
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) {
@@ -53,6 +54,7 @@ export async function getMonkeyTypePersonalBests(): Promise<MonkeyTypePersonalBe
         Accept: "application/json",
       },
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) {

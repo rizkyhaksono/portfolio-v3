@@ -8,21 +8,18 @@ const config = {
 	theme: {
 		fontFamily: {
 			sans: [
-				'var(--font-sans)',
-				...fontFamily.sans
-			],
-			display: [
-				'var(--font-display)',
-				...fontFamily.sans
+				'var(--font-serif)',
+				...fontFamily.serif
 			],
 			serif: [
 				'var(--font-serif)',
 				...fontFamily.serif
 			],
-			mono: [
-				'var(--font-mono)',
-				...fontFamily.mono
-			]
+			display: [
+				'var(--font-display)',
+				...fontFamily.serif
+			],
+			mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 		},
 		container: {
 			center: true,
@@ -65,13 +62,33 @@ const config = {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
-				}
+				},
+				ink: 'hsl(var(--ink) / <alpha-value>)',
+				'ink-soft': 'hsl(var(--ink-soft) / <alpha-value>)',
+				paper: 'hsl(var(--paper) / <alpha-value>)',
+				tint: 'hsl(var(--tint) / <alpha-value>)',
+				rule: 'hsl(var(--rule) / <alpha-value>)',
+				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)'
 			},
-			// Square design language: every named radius collapses to 0 so cards,
-			// buttons, inputs, and panels are sharp-cornered. `full` is kept for
-			// circular elements (avatars, status dots, icon bubbles).
+			// Fluid 375 -> 1280px. Italic/balance live on the elements, not here.
+			fontSize: {
+				xs: ['0.8125rem', { lineHeight: '1.35' }],
+				caption: ['0.8125rem', { lineHeight: '1.35' }],
+				small: ['0.875rem', { lineHeight: '1.45' }],
+				body: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.6' }],
+				prose: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.65' }],
+				lead: ['clamp(1.25rem, 1.1982rem + 0.221vw, 1.375rem)', { lineHeight: '1.4' }],
+				h4: ['1.125rem', { lineHeight: '1.3' }],
+				h3: ['clamp(1.375rem, 1.3232rem + 0.221vw, 1.5rem)', { lineHeight: '1.25' }],
+				h2: ['clamp(1.75rem, 1.4392rem + 1.326vw, 2.5rem)', { lineHeight: '1.1' }],
+				h1: ['clamp(2.5rem, 1.8785rem + 2.6519vw, 4rem)', { lineHeight: '1.02' }],
+				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.92', fontWeight: '360' }],
+				numeral: ['clamp(2.75rem, 2.0249rem + 3.0939vw, 4.5rem)', { lineHeight: '1' }]
+			},
+			// Radius 0 everywhere; `full` only for radio dots.
 			borderRadius: {
 				none: '0px',
+				DEFAULT: '0px',
 				sm: '0px',
 				md: '0px',
 				lg: '0px',
@@ -81,22 +98,6 @@ const config = {
 				full: '9999px'
 			},
 			keyframes: {
-				marquee: {
-					from: {
-						transform: 'translateX(0)'
-					},
-					to: {
-						transform: 'translateX(calc(-100% - var(--gap)))'
-					}
-				},
-				'marquee-vertical': {
-					from: {
-						transform: 'translateY(0)'
-					},
-					to: {
-						transform: 'translateY(calc(-100% - var(--gap)))'
-					}
-				},
 				'accordion-down': {
 					from: {
 						height: '0'
@@ -112,54 +113,11 @@ const config = {
 					to: {
 						height: '0'
 					}
-				},
-				orbit: {
-					'0%': {
-						transform: 'rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg)'
-					},
-					'100%': {
-						transform: 'rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)'
-					}
-				},
-				gradient: {
-					to: {
-						backgroundPosition: 'var(--bg-size) 0'
-					}
-				},
-				'shiny-text': {
-					'0%, 90%, 100%': {
-						'background-position': 'calc(-100% - var(--shiny-width)) 0'
-					},
-					'30%, 60%': {
-						'background-position': 'calc(100% + var(--shiny-width)) 0'
-					}
-				},
-				scroll: {
-					to: {
-						transform: 'translate(calc(-50% - 0.5rem))'
-					}
-				},
-				'fade-in-up': {
-					'0%': {
-						opacity: '0',
-						transform: 'translateY(10px)'
-					},
-					'100%': {
-						opacity: '1',
-						transform: 'translateY(0)'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
-				orbit: 'orbit calc(var(--duration)*1s) linear infinite',
-				marquee: 'marquee var(--duration) linear infinite',
-				'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
-				gradient: 'gradient 8s linear infinite',
-				'shiny-text': 'shiny-text 8s infinite',
-				scroll: 'scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite',
-				'fade-in-up': 'fade-in-up 0.5s ease-out both'
+				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
 		}
 	},

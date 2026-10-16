@@ -15,6 +15,7 @@ export async function getBlogData(): Promise<BlogItem[]> {
       next: {
         revalidate: 60,
       },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (response?.status !== 200) return [] as BlogItem[];

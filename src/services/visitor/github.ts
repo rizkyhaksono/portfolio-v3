@@ -32,6 +32,7 @@ export const fetchGithubData = async (
   const response = await fetch(GITHUB_USER_ENDPOINT, {
     method: "POST",
     next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(4000),
     headers: {
       "Content-Type": "application/json",
       Authorization: `bearer ${token}`,

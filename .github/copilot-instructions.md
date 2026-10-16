@@ -1,21 +1,21 @@
 # GitHub Copilot Instructions
 
 > Canonical cross-agent instructions: [`AGENTS.md`](../AGENTS.md)  
-> UI design system: [`docs/ui/README.md`](../docs/ui/README.md)
+> UI design system (source of truth): [`docs/ui/README.md`](../docs/ui/README.md)
 
 You are an expert full-stack TypeScript engineer working on this Next.js project. Produce production-ready code that follows modern Next.js App Router patterns and best practices.
 
 ## Tech Stack
 
-- **Next.js 15+** (App Router) + React 19
+- **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Testing**: Vitest + React Testing Library + MSW
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
+- **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
 - **Package Manager**: bun
 
 ## Architectural Guidelines
 
-1. Prefer [`AGENTS.md`](../AGENTS.md) as the shared source of truth across AI platforms.
+1. Prefer [`AGENTS.md`](../AGENTS.md) as the shared source of truth across AI platforms, and [`docs/ui/`](../docs/ui/README.md) for anything visual.
 2. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files that require state, hooks, interactivity, or browser APIs.
 3. **Component Organization:**
    - Pages and layouts go in `app/`.
@@ -23,30 +23,28 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
    - Feature-specific code goes in `components/[feature]/` or `app/_components/`.
 4. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid using `any` completely.
 5. **Styling (Tailwind & shadcn/ui):**
-   - Rely solely on Tailwind utility classes.
+   - Rely on Tailwind utility classes and the ink / paper tokens.
    - Use the `cn()` utility from `@/lib/utils` for conditional class merging.
    - Ensure a mobile-first responsive design.
 6. **Code Quality:** Keep functions small. Abstract complex logic into hooks or utility functions in `lib/`. Avoid superfluous comments. Let the variable and function names self-document the code.
 
-## UI Layout Consistency (mandatory)
+## UI rules (mandatory)
 
-Monochrome, square, hairline borders.
+[`docs/ui/`](../docs/ui/README.md) is the source of truth for UI; [`AGENTS.md`](../AGENTS.md) carries the full summary (token table, page patterns table, event rules). The old monochrome / grayscale rules, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono and `MacWindow` panels are retired. Do not bring them back.
 
-- Docs: [`docs/ui/README.md`](../docs/ui/README.md)
-- Tokens: `src/lib/design-system.ts`
-- Rule: `.cursor/rules/ui-layout-consistency.mdc`
+- **Ink and paper.** One cobalt ink (`ink` #1E3C9E) printed on cream paper (`paper` #F3ECDC), plus `ink-soft`, `rule`, `rule-strong` and `tint`. Night print flips the same tokens to cream ink on night paper (#0D1433) through `<html class="dark">`. shadcn names (`background`, `foreground`, `muted`, `border`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes. Status is shape plus word, never colour.
+- **Literata.** One family, roman and italic. Italic for h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals. Roman for body, nav, buttons, labels, table heads, tags, form values. System mono only for code, slugs, keys, raw JSON and kbd.
+- **Three surfaces.** Frame: 1px `rule` hairline on paper (`Card`, `Surface variant="solid"`). Inset: `tint` ground for nested rows and code (`Surface variant="inset"`). Lift: paper, 1px ink, `shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only. Radius 0. No gradients, glass, blur, glows or soft shadows.
+- **Page patterns.** Every route uses one: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found ([`docs/ui/page-shell.md`](../docs/ui/page-shell.md)). The shell is `BaseLayout` with running head, Contents sheet and colophon; no sidebars.
+- **Motion.** Tier 0: native scroll and sticky layouts. Tier 1: CSS scroll-driven home wordscroll and article reading hairline, nothing else. Otherwise response motion on input only. Banned: parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up on sections, hover lifts, Lenis, GSAP, `motion`.
+- **Copy.** Sentence case. No `uppercase`, letter-spacing, all-caps eyebrows, middle-dot meta strings, mono small labels or "→" on links. Numbers only for real sequences.
+- **Umami.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track="nav-click" data-track-item="..."`. Kebab-case names, enum values, never PII.
+- **Grep gate.** Both commands must print nothing for the paths you touched (`$PHASE_PATHS`):
 
-Use only:
-
-- **solid** — `Card`, `FeatureCard`, `Surface` for content
-- **glass** — `MacWindow` for window chrome only
-- **inset** — `Surface variant="inset"` for nested rows
-
-Page recipe: `BaseLayout` → `PageBody` → `SectionHeading` → content.
-
-Do not create glass content cards (`bg-white/5`, `backdrop-blur-md`, lift shadows) or add extra `px-*` inside BaseLayout. Prefer `PageSection` for section spacing.
-
-Platform shells (visitor / user / admin / auth): [`docs/ui/platforms.md`](../docs/ui/platforms.md).
+```bash
+grep -rnE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
+grep -rnE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
+```
 
 ## Behavior
 
@@ -54,4 +52,4 @@ Platform shells (visitor / user / admin / auth): [`docs/ui/platforms.md`](../doc
 - Read/update `prd/feature.md` and `prd/progress.md` for tracked work.
 - Prioritize making code accessible (ARIA roles, keyboard navigation).
 - Ensure error handling is robust (use early returns to fail fast).
-- Run `npx tsc --noEmit` before claiming completion.
+- Run `bunx tsc --noEmit` and the grep gate before claiming completion.

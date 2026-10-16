@@ -1,6 +1,5 @@
 import Link from "next/link"
 import BaseLayout from "@/components/layout/base-layout"
-import SidebarMain from "@/components/layout/sidebar-main"
 import Typography from "@/components/ui/typography"
 import { MacWindow } from "@/components/ui/mac-window"
 import { PageBody } from "@/components/ui/page-body"
@@ -211,7 +210,7 @@ export default async function StatsPage() {
   if (npm) overviewStats.push({ label: "npm Downloads", value: formatDownloads(npm.totalDownloadsLastMonth) })
 
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout>
       <PageBody width="wide">
         <StatsContent
           overviewStats={overviewStats}

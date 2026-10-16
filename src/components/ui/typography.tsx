@@ -5,91 +5,64 @@ const Typography = () => {
   return null;
 };
 
-const TypographyH1 = ({ children, className, ...props }: any) => {
+const TypographyH1 = ({ children, className, ...props }: React.ComponentProps<"h1">) => {
   return (
-    <h1
-      className={cn(
-        "scroll-m-20 font-display text-4xl font-bold tracking-tight lg:text-5xl",
-        className
-      )}
-      {...props}
-    >
+    <h1 className={cn("scroll-m-20 font-display text-h1 text-balance", className)} {...props}>
       {children}
     </h1>
   );
 };
 Typography.H1 = TypographyH1;
 
-const TypographyH2 = ({ children, className, ...props }: any) => {
+const TypographyH2 = ({ children, className, ...props }: React.ComponentProps<"h2">) => {
   return (
-    <h2
-      className={cn(
-        "scroll-m-20 font-display border-b pb-2 text-3xl font-bold tracking-tight first:mt-0",
-        className
-      )}
-      {...props}
-    >
+    <h2 className={cn("scroll-m-20 border-b border-rule pb-2 font-display text-h2 text-balance first:mt-0", className)} {...props}>
       {children}
     </h2>
   );
 };
 Typography.H2 = TypographyH2;
 
-const TypographyH3 = ({ children, className, ...props }: any) => {
+const TypographyH3 = ({ children, className, ...props }: React.ComponentProps<"h3">) => {
   return (
-    <h3
-      className={cn(
-        "mt-8 scroll-m-20 font-display text-2xl font-bold tracking-tight",
-        className
-      )}
-      {...props}
-    >
+    <h3 className={cn("mt-8 scroll-m-20 font-display text-h3", className)} {...props}>
       {children}
     </h3>
   );
 };
 Typography.H3 = TypographyH3;
 
-const TypographyH4 = ({ children, className, ...props }: any) => {
+const TypographyH4 = ({ children, className, ...props }: React.ComponentProps<"h4">) => {
   return (
-    <h4
-      className={cn(
-        "scroll-m-20 font-display text-xl font-bold tracking-tight",
-        className
-      )}
-      {...props}
-    >
+    <h4 className={cn("scroll-m-20 font-display text-h4", className)} {...props}>
       {children}
     </h4>
   );
 };
 Typography.H4 = TypographyH4;
 
-// Serif-italic accent word rendered in the accent colour (e.g. "built from *your* docs").
-const TypographyEm = ({ children, className, ...props }: any) => {
+// Emphasis switches face (italic in roman text, roman inside italic headings) via globals.css, never colour.
+const TypographyEm = ({ children, className, ...props }: React.ComponentProps<"em">) => {
   return (
-    <em className={cn("font-serif italic text-primary", className)} {...props}>
+    <em className={className} {...props}>
       {children}
     </em>
   );
 };
 Typography.Em = TypographyEm;
 
-const TypographyP = ({ children, className, ...props }: any) => {
+const TypographyP = ({ children, className, ...props }: React.ComponentProps<"div">) => {
   return (
-    <div className={cn("leading-7", className)} {...props}>
+    <div className={cn("text-body", className)} {...props}>
       {children}
     </div>
   );
 };
 Typography.P = TypographyP;
 
-const TypographyBlockquote = ({ children, className, ...props }: any) => {
+const TypographyBlockquote = ({ children, className, ...props }: React.ComponentProps<"blockquote">) => {
   return (
-    <blockquote
-      className={cn("mt-6 border-l-2 pl-6 italic", className)}
-      {...props}
-    >
+    <blockquote className={cn("mt-6 border-l border-ink pl-5 font-display text-lead", className)} {...props}>
       {children}
     </blockquote>
   );

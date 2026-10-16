@@ -8,7 +8,8 @@ export const getReadStats = async (): Promise<{
   data: any;
 }> => {
   const response = await fetch(`${STATS_ENDPOINT}/last_7_days`, {
-    next: { revalidate: 60 },
+    next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(4000),
     method: "GET",
     headers: {
       Authorization: `Basic ${process.env.WAKATIME_API_KEY}`,
@@ -36,7 +37,7 @@ export const getReadStats = async (): Promise<{
   const human_readable_total =
     getData?.data?.human_readable_total_including_other_language;
 
-  const languages = getData?.data?.languages?.slice(0, 3);
+  const languages = getData?.data?.languages;
   const editors = getData?.data?.editors;
 
   return {

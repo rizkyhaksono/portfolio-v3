@@ -18,7 +18,7 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-[hsl(var(--scrim,var(--ink)/.35))] data-[state]:[animation-duration:var(--dur-sheet)] data-[state]:[animation-timing-function:var(--ease-print)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -36,7 +36,8 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        // Centred by inset + auto margins (not translate) so the 4px enter offset is the only transform.
+        "fixed inset-0 z-50 m-auto grid h-fit w-[calc(100%-2rem)] max-w-lg gap-4 border border-ink bg-paper p-6 text-ink shadow-[3px_3px_0_hsl(var(--ink))] data-[state]:[animation-duration:var(--dur-sheet)] data-[state]:[animation-timing-function:var(--ease-print)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-1 data-[state=open]:slide-in-from-bottom-1",
         className
       )}
       {...props}
@@ -79,7 +80,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn("text-lg font-semibold", className)}
+    className={cn("font-display text-h3", className)}
     {...props}
   />
 ))

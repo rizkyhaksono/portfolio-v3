@@ -9,12 +9,12 @@ You are an expert full-stack TypeScript engineer working with Next.js. Produce p
 
 ## Tech Stack Guidelines
 
-- **Next.js 15+** (App Router) + React 19
+- **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
-- **Testing**: Vitest + React Testing Library + MSW
-- **Styling**: Tailwind CSS + shadcn/ui (when applicable)
-- **Package Manager**: npm
-- **UI layout**: See `.cursor/rules/ui-layout-consistency.mdc` — solid / glass / inset surfaces only; use `PageBody`, `PageSection`, `Surface`, `MacWindow`, `SectionHeading`
+- **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
+- **Package Manager**: bun
+- **UI**: `docs/ui/` is the source of truth, summarised in `.cursor/rules/ui-layout-consistency.mdc` — one cobalt ink on cream paper, Literata, radius 0, three surfaces (frame, inset, lift), one page pattern per route, grep gate at 0
 
 Focus on: separation of concerns, strict typing, accessibility, performance, and comprehensive testing.
 
@@ -202,10 +202,9 @@ export const createUser = async (params: CreateUserParams): Promise<User> => {
 
 ## Testing Strategy
 
-### Unit Testing (Vitest)
+### Unit Testing (Jest)
 
 - **Never mock internal code** - only mock external dependencies
-- Use MSW for API mocking when needed
 - Test utilities, repositories, and business logic
 - Mock external services (APIs, databases, file systems)
 
@@ -672,10 +671,10 @@ export function Example({ ...props }: ExampleProps) {
 
 ### UI Component Guidelines
 
-- **Always use shadcn/ui** for base UI components
-- **Add new shadcn components** using: `pnpm dlx shadcn@latest add <component>`
-- **Extend shadcn components** rather than creating from scratch
-- **Use Tailwind CSS** for custom styling and layout
+- **Use the shared primitives** in `src/components/ui/` (shadcn-based, restyled to ink and paper)
+- **Add new shadcn components** using `bunx shadcn@latest add <component>`, then strip rounded corners, shadows, blur and palette colours so they match `docs/ui/`
+- **Restyle in place** rather than forking a second version of a primitive
+- **Use Tailwind CSS** with the ink / paper tokens for custom styling and layout
 - **Follow shadcn patterns** for component composition
 - **Prefer controlled components** with proper state management
 
@@ -683,11 +682,10 @@ export function Example({ ...props }: ExampleProps) {
 
 ```typescript
 // __tests__/example.test.ts
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-// Mock external dependencies only
-vi.mock('external-library');
+// Mock external dependencies only (Jest globals)
+jest.mock('external-library');
 
 describe('Example', () => {
   it('should render correctly', () => {
@@ -700,107 +698,17 @@ describe('Example', () => {
 
 ```bash
 # Development
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
+bun run dev               # Start development server
+bun run build --webpack   # Production build (next build --webpack)
+bun run start             # Start production server on :3001
 
 # Quality
-pnpm typecheck    # TypeScript check
-pnpm lint         # ESLint
-pnpm test         # Run tests
-pnpm test:watch   # Watch mode tests
-
-# Database
-pnpm db:generate  # Generate migrations
-pnpm db:migrate   # Run migrations
-pnpm db:seed      # Seed database
+bunx tsc --noEmit         # TypeScript check
+bun run lint              # ESLint
+bun run test              # Jest unit tests
+bun run test:watch        # Jest watch mode
+bun run test:e2e          # Playwright e2e
 
 # UI Components
-pnpm dlx shadcn@latest add <component>  # Add shadcn/ui component
-```
-vi.mock('external-library');
-
-describe('Example', () => {
-  it('should render correctly', () => {
-    // test implementation
-  });
-});
-```
-
-## Commands
-
-```bash
-# Development
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm start        # Start production server
-
-# Quality
-pnpm typecheck    # TypeScript check
-pnpm lint         # ESLint
-pnpm test         # Run tests
-pnpm test:watch   # Watch mode tests
-
-# Database
-pnpm db:generate  # Generate migrations
-pnpm db:migrate   # Run migrations
-pnpm db:seed      # Seed database
-
-
-- Use type-safe ORMs (Drizzle, Prisma, etc.)
-- Define schemas with proper relationships and constraints
-- Infer types from schema definitions
-- Write repository-style helpers to isolate queries
-- Implement proper migrations
-
-### Data Access Patterns
-
-- Keep database queries in dedicated modules
-- Avoid N+1 queries; use joins and CTEs
-- Implement pagination for list endpoints
-- Use select projections to limit payload size
-
-## Authentication & Authorization
-
-- Implement server-side auth checks
-- Never trust client-side auth flags
-- Use middleware for route protection
-- Store user data securely with proper encryption
-
-## Testing Strategy
-
-### Unit Testing (Vitest)
-
-- **Never mock internal code** - only mock external dependencies
-- Use MSW for API mocking when needed
-- Test utilities, repositories, and business logic
-- Mock external services (APIs, databases, file systems)
-
-### Component Testing (React Testing Library)
-
-- Test interactive components with proper accessibility
-- Ensure loading and error states are covered
-- Test user interactions and state changes
-- Use data-testid sparingly; prefer semantic queries
-
-### Integration Testing
-
-- Test API endpoints with real database connections
-- Use test databases with proper cleanup
-- Test authentication flows end-to-end
-- Mock external services consistently
-
-### Test Structure
-
-```typescript
-// Example test structure
-describe("Feature", () => {
-  describe("when condition", () => {
-    it("should expected behavior", async () => {
-      // Arrange
-      // Act
-      // Assert
-    });
-  });
-});
+bunx shadcn@latest add <component>  # Add a shadcn/ui component, then restyle it to docs/ui
 ```

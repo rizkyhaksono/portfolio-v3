@@ -1,79 +1,39 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Theme Toggle', () => {
-  test('should toggle between light and dark themes', async ({ page }) => {
+test.describe('Theme', () => {
+  test.use({ colorScheme: 'light', viewport: { width: 1280, height: 800 } });
+
+  test('head toggle flips paper and night print and remembers it', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    const html = page.locator('html');
+    const toggle = page.getByRole('banner').getByRole('button', { name: 'Night theme' });
 
-    const expandButton = page.locator('button').filter({ hasText: /more|collapse/i }).or(
-      page.locator('button').last()
-    );
+    await expect(html).not.toHaveClass(/\bdark\b/);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
 
-    try {
-      await expandButton.click({ timeout: 2000 });
-      await page.waitForTimeout(500);
-    } catch (e) {
-      console.log('Navbar might already be expanded or theme toggle is directly accessible');
-    }
-    const themeButton = page.locator('button[aria-label*="theme" i]').or(
-      page.getByRole('button').filter({ hasText: /theme|dark|light/i })
-    ).first();
+    await toggle.click();
+    await expect(html).toHaveClass(/\bdark\b/);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
 
-    if (await themeButton.count() > 0) {
-      await themeButton.click();
-      await page.waitForTimeout(300);
-      const newTheme = await page.locator('html').getAttribute('class');
-      expect(newTheme).toBeDefined();
-    } else {
-      console.log('Theme toggle button not found in expected locations');
-      await expect(page).toHaveTitle(/portfolio/i);
-    }
-  });
-
-  test('should persist theme preference', async ({ page, context }) => {
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    try {
-      const expandButton = page.locator('button').last();
-      await expandButton.click({ timeout: 1000 });
-      await page.waitForTimeout(300);
-
-      const themeButton = page.locator('button[aria-label*="theme" i]').first();
-      if (await themeButton.count() > 0) {
-        await themeButton.click();
-        await page.waitForTimeout(300);
-      }
-    } catch (e) {
-      console.log('Could not toggle theme, testing basic persistence');
-    }
-
-    const themeInStorage = await page.evaluate(() => {
-      return localStorage.getItem('theme');
-    });
     await page.reload();
-    await page.waitForLoadState('networkidle');
+    await expect(html).toHaveClass(/\bdark\b/);
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
 
-    const themeAfterReload = await page.evaluate(() => {
-      return localStorage.getItem('theme');
-    });
-
-    if (themeInStorage) {
-      expect(themeAfterReload).toBe(themeInStorage);
-    }
+    await page.getByRole('banner').getByRole('button', { name: 'Night theme' }).click();
+    await expect(html).not.toHaveClass(/\bdark\b/);
   });
 
-  test('should have system theme preference option', async ({ page }) => {
+  test('Contents sheet offers Paper, Night and System', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.getByRole('button', { name: 'Contents' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Contents' });
+    const html = page.locator('html');
 
-    const htmlElement = page.locator('html');
-    await expect(htmlElement).toBeVisible();
-
-    const colorScheme = await page.evaluate(() => {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    });
-
-    expect(colorScheme).toBeDefined();
+    await expect(sheet.getByRole('radio', { name: 'System' })).toBeChecked();
+    await sheet.getByRole('radio', { name: 'Night' }).click();
+    await expect(html).toHaveClass(/\bdark\b/);
+    await sheet.getByRole('radio', { name: 'Paper' }).click();
+    await expect(html).not.toHaveClass(/\bdark\b/);
   });
 });

@@ -42,3 +42,5 @@ next-env.d.ts
 # docker compose
 docker-compose*.yml
 docker-compose*.yaml
+# engraving sources (scans are never committed)
+art-src/

@@ -1,86 +1,107 @@
 ---
-description: UI layout & surface design system for Portfolio v3. Enforce consistent boxes, sections, and page shells.
-globs: ["src/**/*.{tsx,ts,css}", "tailwind.config.ts"]
+description: One-ink UI system for Portfolio v3 (cobalt ink on cream paper). Enforce tokens, surfaces, page patterns, motion and analytics rules.
+globs: ["src/**/*.{tsx,ts,css}", "content/**/*.{md,mdx}", "tailwind.config.ts"]
 alwaysApply: true
 ---
 
-# UI Layout & Surface Consistency
+# UI system: one ink on paper
 
-Portfolio v3 uses a **monochrome, square, hairline-border** design language. Keep every new UI on this system.
+`docs/ui/` is the source of truth. This rule summarises it; when they disagree, `docs/ui/` wins.
 
-## Tokens (source of truth)
+The whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules and a Hollar engraving band. Dark mode ("Night print") is the same sheet reversed: cream ink on night paper. Hierarchy comes from size, italic against roman, and rules.
 
-- CSS variables in `src/app/globals.css` (semantic colors only: `background`, `foreground`, `card`, `border`, `muted`, `primary`, …)
-- Radius: all named radii collapse to `0` in `tailwind.config.ts` (square). Keep `rounded-full` only for avatars/dots.
-- Shared class tokens: `src/lib/design-system.ts` (`SURFACE`, `PAGE_WIDTH`, `SECTION_SPACING`)
+The old monochrome / grayscale language, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and glass surfaces are retired. Never reintroduce them.
 
-**Never** use raw palette classes like `neutral-*`, `text-black`, hex hovers (`#262626`, `#D9D9D9`), or `border-white/10` glass stacks on content cards.
+## Tokens
 
-## Three surface dialects only
+Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed in `tailwind.config.ts`.
 
-| Variant | Use for | Primitive |
+| Class | Paper | Night | Role |
+|---|---|---|---|
+| `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
+| `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `ink-soft` | #445BAA | #A9B5E3 | Secondary text (paper or tint only) |
+| `rule` | #BFC6DE | #2C3870 | Decorative hairlines |
+| `rule-strong` | #6476B2 | #7383C4 | Control boundaries |
+| `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
+
+- shadcn names map onto these (`background`/`card`/`popover` = paper, `foreground`/`primary`/`ring`/`destructive` = ink, `muted`/`secondary`/`accent` = tint, `muted-foreground` = ink-soft, `border` = rule, `input` = rule-strong).
+- **Never**: palette colours (`blue-500`, `neutral-*`, `zinc-*`, ...), hex in class names, `white` / `black`, opacity on text (`text-foreground/70`), `dark:` variants. Tokens flip on `<html class="dark">`.
+- Status, errors and destructive actions are shape plus word (8px square filled / outline / dashed, SVG cross, explicit verb). No red, green or amber.
+
+## Type
+
+- Literata only, roman and italic, via `next/font/google` (`--font-serif`, `--font-display`). `font-synthesis: none`.
+- Italic: h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals.
+- Roman: body, prose, nav, buttons, labels (14/600), table heads (13/600 ink-soft), tags (13), form values.
+- System mono (`ui-monospace, ...`) only for code, slugs, keys, raw JSON, WPM passage, kbd. `font-mono` class only in code-block and kbd files.
+- Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences. Links underline 1px, 2px on hover. `tabular-nums` in ledgers, tables, figures.
+
+## Three surfaces only
+
+| Surface | Code | Use for |
 |---|---|---|
-| **solid** | Content boxes, lists, feature/platform cards | `Card`, `FeatureCard`, `Surface variant="solid"` |
-| **glass** | Window chrome only (title bar + frosted shell) | `MacWindow`, `Surface variant="glass"` / `glass-static` |
-| **inset** | Nested rows, sidebar blocks, status cells | `Surface variant="inset"` |
+| **Frame** | `Card`, `Surface variant="solid"` (`rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card |
+| **Inset** | `Surface variant="inset"` (`bg-muted`) | Nested rows, code specimens, hover rows |
+| **Lift** | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command, toasts, tracker drag |
 
-### Forbidden on content cards
+- `glass` / `glass-static` are retired aliases of frame. Do not use them.
+- Radius 0 everywhere; the radio dot is the only circle.
+- No gradients, glass, `backdrop-blur`, glows, `shadow-sm`..`shadow-2xl`, hover lifts. Hover = rule turns ink or row takes `bg-tint`.
+- Lines: hairline 1px rule; strong 1px ink; active 2px ink underline; double rule only on page heads and above the colophon; dotted leaders; dashed = draft or archived.
 
-Do **not** invent glass content cards:
+## Shell and page patterns
 
+`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the Contents sheet, `main#main` and the colophon with the engraving band. No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
+
+| Pattern | Component | Routes |
+|---|---|---|
+| Ledger | `ui/ledger.tsx` | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Credentials, admin lists |
+| Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
+| Plates | `ui/plate-figure.tsx` | Covers, project shots, portrait, OCR specimen |
+| Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
+| Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
+| Board | Ruled columns of index cards | `/tracker` |
+| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
+| Admin | Ruled spine, `--admin-rail` | `/admin/dashboard/*` |
+| Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` |
+| Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
+| Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
+
+- Widths via `PageBody` (`PAGE_WIDTH`: `default`, `prose`, `article`, `wide`, `ledger`). Section rhythm via `PageSection` (`mt-16 sm:mt-24`). Titles via `SectionHeading` (no `marker`).
+- Charts are server SVG (`InkChart`, `InkHeatmap`, `HatchBar`). Never add recharts.
+- Fields are baseline only (`border-0 border-b border-input`). Buttons: `bg-ink text-paper`, never a `Button` inside a `Link` (use `asChild`).
+
+## Motion
+
+- Tier 0 (no JS): native scroll, sticky layouts, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (never `scroll-padding-top` on `html`: it scrolls the page whenever focus lands in the sticky head). `overflow-x: clip` on `html` and `main` only; never on `body`; never `overflow: hidden` / `auto` or `content-visibility` on a sticky ancestor.
+- Tier 1 (CSS, `@supports (animation-timeline: view())` + no-preference): home wordscroll and article reading hairline. Nothing else is scroll-linked.
+- Response motion only: underline, `active:translate-y-px`, tab underline, accordion, dialog and sheet fade + 4px, toasts, tracker drag.
+- **Banned:** parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, pulse skeletons, fade-up / reveal on sections, `BlurFade`, Lenis, GSAP, `motion` / framer-motion. Nothing autoplays.
+- Reduced motion: durations .01ms, wordscroll fully inked, sticky stays.
+
+## Umami events
+
+- `data-umami-event` only on `<button>` and external `target="_blank"` links. On an internal `<a>` the tracker calls `preventDefault` and reloads the page.
+- Internal links: `data-track="nav-click" data-track-item="blog"`; the delegated listener in `deferred-client-utilities.tsx` forwards them. In code use `track()` from `src/lib/analytics.ts`.
+- Kebab-case, 50 characters or fewer, enum values only, one event per element, never PII. Event table in `docs/ui/components.md`.
+
+## Grep gate
+
+Both must print nothing for the paths you touched (`$PHASE_PATHS`; final run `src content`). Never add a new hit; make touched files pass.
+
+```bash
+grep -rnE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
+grep -rnE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
 ```
-border-white/10 bg-white/5 backdrop-blur-md hover:shadow-xl hover:-translate-y-1
-```
-
-Use solid + `hover:border-foreground/20` instead.
-
-## Page shell recipe (visitor / user)
-
-```
-BaseLayout(sidebar?, rightSidebar?)
-  └─ PageBody width="default" | "prose" | "article" | "wide"
-       └─ SectionHeading (as="h1" on page routes)
-       └─ MacWindow? (tools / lists) OR Card / FeatureCard / Surface rows
-```
-
-- Prefer `PageSection` for home/page blocks (`mt-10` + optional `SectionHeading`).
-- Prefer `PageBody` for width — do **not** stack extra `px-4 lg:px-0` inside BaseLayout (container already pads).
-- Do not invent `max-w-8xl` (undefined). Use `PAGE_WIDTH` presets.
-
-## Heading & micro-UI
-
-- Section titles: always `SectionHeading` (eyebrow + display title + optional serif italic accent).
-- Labels/tags: `Eyebrow`, `Chip`.
-- Stat rows: `StatStrip`.
-
-## Media / list cards
-
-Blog and project cards share the solid Card pattern:
-
-- `hover:border-foreground/20` (not `hover:border-primary/40` + lift shadows)
-- Footer: `p-4 … border-t border-border`
-- Do not restate `border border-border bg-card shadow-sm` on Card (already defaults)
-
-## MacWindow
-
-- Default body pad: `p-4 sm:p-6`
-- Drag-and-drop pages (tracker): `backdrop={false}` — do **not** copy-paste Mac chrome markup
-- Glass is for chrome only; put solid cards *inside* the window
-
-## Admin shell
-
-Admin keeps its own sidebar/header layout, but still uses solid `Card` / `Surface` / `SectionHeading` — no third card dialect (`border-border/50` raw divs → `Surface` or `Card`).
-
-## Outliers (do not copy)
-
-- `/signal` — standalone marketing experiment
-- `terminal-overlay` — intentional dark terminal chrome
 
 ## Checklist before shipping UI
 
-- [ ] Used `Card` / `FeatureCard` / `Surface` / `MacWindow` — no ad-hoc bordered box
-- [ ] No glass classes on content cards
-- [ ] No extra horizontal padding inside BaseLayout
-- [ ] Width via `PageBody` when a max-width is needed
-- [ ] Section titles via `SectionHeading`
-- [ ] Colors from semantic tokens only
+- [ ] Route uses one page pattern
+- [ ] Ink / paper tokens only; no hex, palette colours, `white` / `black`, `dark:`
+- [ ] Only frame, inset or lift
+- [ ] Literata roles respected; mono only for machine text
+- [ ] No banned motion; reduced motion works
+- [ ] Umami attributes follow the button / external-link rule
+- [ ] Accessible: skip link, `aria-current`, 44px targets under 768px, chart text alternatives, no horizontal scroll at 375px
+- [ ] Grep gate prints nothing

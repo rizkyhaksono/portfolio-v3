@@ -6,7 +6,6 @@ import type { MDXComponents } from "mdx/types"
 import { Chip } from "@/components/ui/chip"
 import { SectionHeading } from "@/components/ui/section-heading"
 import BaseLayout from "@/components/layout/base-layout"
-import SidebarMain from "@/components/layout/sidebar-main"
 import { PageBody } from "@/components/ui/page-body"
 import { cn } from "@/lib/utils"
 
@@ -23,7 +22,7 @@ export default function ChangelogPage() {
   }
 
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout>
       <PageBody width="article" className="pt-4">
         <SectionHeading
           className="mb-8"

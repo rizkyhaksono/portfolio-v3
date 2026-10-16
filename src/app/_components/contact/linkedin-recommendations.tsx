@@ -1,35 +1,21 @@
-"use client"
+import { PageSection } from "@/components/ui/page-section"
+import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
+import { DEFERRED_SECTION } from "../deferred"
 
-import { LinkedinRecommendation } from "@/commons/types/linkedin"
-import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards"
-import { SectionHeading } from "@/components/ui/section-heading"
-
-interface LinkedinRecommendationsProps {
-  recommendations: LinkedinRecommendation[]
-}
-
-export default function LinkedinRecommendations({ recommendations }: LinkedinRecommendationsProps) {
-  if (!recommendations || recommendations.length === 0) {
-    return null
-  }
-
-  const formattedRecommendations = recommendations.map((rec) => ({
-    quote: rec.message,
-    name: rec.name,
-    title: "",
-    image: rec.image,
-  }))
+/** Three recommendations from LinkedIn as italic pull quotes. Static markup. */
+export default async function RecommendationsSection() {
+  const { data } = await getLinkedinRecommendations()
+  const quotes = (data ?? []).filter((rec) => rec.message?.trim()).slice(0, 3)
+  if (quotes.length === 0) return null
 
   return (
-    <div className="my-10">
-      <SectionHeading
-        eyebrow="Testimonials"
-        title="What people say"
-        accent="about me"
-        description="Testimonials from colleagues and professionals I've worked with on LinkedIn."
-        className="mb-6"
-      />
-      <InfiniteMovingCards items={formattedRecommendations} direction="left" speed="normal" pauseOnHover={false} />
-    </div>
+    <PageSection id="recommendations" heading={{ title: "Recommendations" }} className={DEFERRED_SECTION} contentClassName="mt-6 space-y-10">
+      {quotes.map((rec) => (
+        <figure key={rec.id} className="max-w-[62ch] border-l border-ink pl-5">
+          <blockquote className="font-display text-prose text-ink">{rec.message.trim()}</blockquote>
+          <figcaption className="mt-3 text-small text-ink-soft">{rec.name}, on LinkedIn</figcaption>
+        </figure>
+      ))}
+    </PageSection>
   )
 }

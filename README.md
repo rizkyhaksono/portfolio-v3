@@ -298,53 +298,6 @@ Health check endpoint to verify server status.
 }
 ```
 
-#### GET `/api/spotify`
-
-Fetch current Spotify playback information (requires Spotify API setup).
-
-**Response:**
-
-```json
-{
-  "isPlaying": true,
-  "title": "Song Name",
-  "artist": "Artist Name",
-  "album": "Album Name",
-  "albumArt": "https://...",
-  "url": "https://open.spotify.com/track/..."
-}
-```
-
-**Setup Required:**
-
-- Spotify app from [Developer Dashboard](https://developer.spotify.com/dashboard)
-- Environment variables (runtime on Azure App Service **and** local `.env`):
-  - `SPOTIFY_CLIENT_ID`
-  - `SPOTIFY_CLIENT_SECRET`
-  - `SPOTIFY_REFRESH_TOKEN` (OAuth refresh token with scopes `user-read-currently-playing` and `user-read-recently-played`)
-- Full setup guide: [docs/SPOTIFY_SETUP.md](docs/SPOTIFY_SETUP.md)
-- Helper script: `node scripts/spotify-get-refresh-token.mjs`
-
-#### GET `/api/weather`
-
-Fetch weather information (requires weather API setup).
-
-**Response:**
-
-```json
-{
-  "temperature": 25,
-  "condition": "Partly Cloudy",
-  "humidity": 65,
-  "windSpeed": 12,
-  "location": "City Name"
-}
-```
-
-**Setup Required:**
-
-- Add weather API credentials to environment variables
-
 ## 📁 Service Layer
 
 The service layer is organized by role/context:
@@ -354,8 +307,6 @@ The service layer is organized by role/context:
 Public-facing services:
 
 - **ping.ts** - Server health check
-- **spotify.ts** - Spotify integration
-- **weather.ts** - Weather data fetching
 
 ### `/src/services/user/`
 
@@ -445,7 +396,7 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create custom styles in `globals.css` only when necessary
 - Leverage Shadcn/ui components for consistency
 - Use CSS modules for scoped styles if needed: `styles.module.css`
-- **UI layout system:** monochrome, square, hairline borders — see [`docs/ui/README.md`](./docs/ui/README.md) and `src/lib/design-system.ts` (solid / glass / inset surfaces only)
+- **UI system ("Lautan Pasir"):** one cobalt ink (#1E3C9E) printed on cream paper (#F3ECDC), Literata only, radius 0, hairline rules, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
 
 ### Error Handling
 

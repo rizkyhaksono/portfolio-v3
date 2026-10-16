@@ -1,10 +1,12 @@
 # PRD — UI Layout Consistency
 
+> **2026-10-17:** the monochrome / grayscale language described in §1–3, §5.2 and §8 is superseded by §9 (one-ink redesign). [`docs/ui/`](../docs/ui/README.md) is the source of truth for UI.
+
 ## 1. Overview
-Unify Portfolio v3 UI so all boxes, sections, and page shells share one monochrome square design language. Encode the system in shared primitives and AI agent rules so future changes stay consistent.
+Unify Portfolio v3 UI so all boxes, sections, and page shells share one design language (since 2026-10-17: one cobalt ink on cream paper, see §9). Encode the system in shared primitives and AI agent rules so future changes stay consistent.
 
 ## 2. System Goals
-- One surface scale: solid (content), glass (window chrome), inset (nested rows)
+- Three surfaces: frame (content), inset (nested rows), lift (floating layers only); glass is retired
 - Shared page recipe: BaseLayout → PageBody → SectionHeading → content
 - Eliminate ad-hoc glass cards, double padding, and undefined max-widths
 - Document rules for Cursor, Claude, Gemini, and Copilot
@@ -50,7 +52,7 @@ Promote visitor-facing title from “AI Engineer” to **Senior AI Engineer**. K
 - Downloader platform selector: square `Button` (`default` / `outline`, `size="sm"`) — no `rounded-full` pills
 - Pokémon type tags and Star Wars `#id` overlay: square, not pills
 - Ask-resume sample prompts: square `Button` outline chips
-- Keep circular: avatars, status dots, Mac traffic lights, progress bars, switch thumbs, mobile FAB, spinners
+- Keep circular: superseded by §9 (radius 0 everywhere; the radio dot is the only circle)
 
 ### 5.3 Mobile
 - Downloader: stack URL + Download (`flex-col sm:flex-row`); Download `w-full sm:w-auto`
@@ -97,10 +99,8 @@ Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
 - Remove backend execution endpoint and Piston/Paiza configuration
 - Fall back to the default tool when an obsolete compiler URL is opened
 
-### 8.2 Dark palette
-- Use the up2dul.dev grayscale hierarchy as visual reference
-- Dark background `#161616`, card/popover `#1b1b1b`, muted surfaces `#202020`
-- Keep semantic tokens, square corners, and hairline borders
+### 8.2 Dark palette (superseded by §9.2 Night print)
+- The grayscale dark hierarchy is retired; dark mode is the same sheet reversed (cream ink on night paper)
 
 ### 8.3 Stats and system status
 - Place system health directly below overview metrics
@@ -109,5 +109,33 @@ Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
 
 ### 8.4 Square controls and toast
 - Make scroll-to-top, toast surfaces/actions, AI controls, and clap controls square
-- Keep avatars, status dots, spinners, progress indicators, radio controls, and switch thumbs circular
+- Circular exceptions are superseded by §9 (only the radio dot stays round)
 - Standardize notifications on Sonner and remove unused Radix toast state
+
+---
+
+## 9. Track — One-ink redesign, "Lautan Pasir" (2026-10-17)
+
+Redesign every page as one printed publication: one cobalt ink on cream paper, riso grain, Literata italic headings, radius 0, hairline rules, and a Wenceslaus Hollar engraving band (*Landscape with a Rider*, 1650, Rijksmuseum, public domain). Delivered in three phases: P1 shell, home, tokens, Umami foundation and production fixes; P2 visitor pages; P3 `/ai`, profile, auth and admin. Full spec: [`docs/ui/`](../docs/ui/README.md).
+
+### 9.1 Tokens and type
+- Six tokens as HSL triples in `src/app/globals.css`, exposed as Tailwind colours: `paper` #F3ECDC, `ink` #1E3C9E, `ink-soft`, `rule`, `rule-strong`, `tint`. shadcn names map onto them; `--radius: 0rem`.
+- Literata (roman and italic) via `next/font/google`; Instrument Serif, Bricolage Grotesque, Inter and JetBrains Mono removed. System mono for machine text only.
+
+### 9.2 Night print
+- Same tokens flipped on `<html class="dark">`: cream ink on night paper #0D1433. No `dark:` classes. Default theme follows the system.
+
+### 9.3 Surfaces and patterns
+- Three surfaces: frame, inset, lift (lift = 1px ink and a `3px 3px 0` ink shadow on floating layers only). No gradients, glass, blur or soft shadows.
+- Page patterns: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found.
+- `BaseLayout` becomes running head + Contents sheet + colophon; sidebars and `MacWindow` panels retire.
+
+### 9.4 Motion
+- Tier 0 native scroll and sticky layouts; tier 1 CSS scroll-driven home wordscroll and article reading hairline only. Parallax, marquees, typing effects, page transitions, fade-up sections, Lenis, GSAP and `motion` are banned.
+
+### 9.5 Analytics
+- Umami `data-umami-event` only on buttons and external `target="_blank"` links; internal links use `data-track`. Kebab-case events, no PII.
+
+### 9.6 Governance
+- Agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, Copilot, `.cursor/rules/*.mdc`) and `docs/ui/` rewritten so agents stop reverting to monochrome. `docs/ui/` is the source of truth.
+- Grep gate (two commands in `docs/ui/README.md`) must print nothing on each phase's paths; the final run over `src` and `content` must be 0.

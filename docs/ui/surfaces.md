@@ -1,68 +1,60 @@
-# Surfaces
+# Surfaces: frame, inset, lift
 
-Portfolio v3 allows **exactly three** surface dialects. Do not invent blends.
+There are exactly three surfaces. Each one is something a printer could make on one sheet with one ink. Do not blend them and do not invent a fourth.
 
-## Dialect matrix
-
-| Variant | Visual | Primitive | Use for |
+| Surface | Looks like | Code | Use for |
 |---|---|---|---|
-| **solid** | `border-border bg-card shadow-sm` | `Card`, `FeatureCard`, `Surface variant="solid"` | Content boxes, lists, feature/platform cards, media cards |
-| **glass** | `border-border/60 bg-background/40 backdrop-blur-sm` | `Surface variant="glass"` | Exceptional translucent chrome only |
-| **glass-static** | glass without blur | `Surface variant="glass-static"` | Static translucent chrome when a filter would break positioning |
-| **inset** | `border-border/40 bg-secondary/20` | `Surface variant="inset"` | Nested rows, sidebar blocks, status cells |
+| **Frame** | 1px `rule` hairline on the paper, transparent ground, radius 0, no shadow | `Card`, `Surface variant="solid"` (`SURFACE.solid` = `rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card, plates |
+| **Inset** | `tint` ground, no border needed | `Surface variant="inset"` (`SURFACE.inset` = `bg-muted`) | Nested rows, code specimens, hover rows, inline status cells |
+| **Lift** | `paper` ground, 1px `ink` border, hard offset ink shadow `3px 3px 0` | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` inside the floating primitives | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command, Sonner toasts, the tracker card being dragged |
 
-## Solid (default content)
+`Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases that render as a frame. Do not use them in new code.
+
+## Frame
 
 ```tsx
 import { Card, CardContent } from "@/components/ui/card"
 import { Surface } from "@/components/ui/surface"
-import { FeatureCard } from "@/components/ui/bento"
 
-<Card className="hover:border-foreground/20">…</Card>
-<Surface variant="solid" padding="compact">…</Surface>
-<FeatureCard title="…" description="…">…</FeatureCard>
+<Card>...</Card>
+<Surface padding="compact">...</Surface>
 ```
 
-Hover standard for interactive solid cards: `hover:border-foreground/20`.  
-Do **not** restate `border border-border bg-card shadow-sm` on `Card` — already defaults.
+- Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet, a plate).
+- Interactive frames show hover with the rule turning ink (`hover:border-ink`) or the row taking `bg-tint`. Never with a shadow or a lift.
+- Do not restate `border border-border bg-card` on `Card`; it is the default.
+- Page heads and the colophon use the double rule (1px ink, 3px gap, 1px rule), not a frame.
 
-## Glass (exceptional chrome only)
+## Inset
 
 ```tsx
-import { Surface } from "@/components/ui/surface"
-
-<Surface variant="glass">{/* exceptional translucent chrome */}</Surface>
+<Surface variant="inset" className="px-4 py-3">...</Surface>
 ```
 
-Use glass sparingly for translucent chrome. `MacWindow` is a legacy-named, solid editorial panel and no longer controls glass or backdrop behavior. Never make ordinary content cards glass.
+- Tint is a ground, not a colour. Text on tint is `ink` or `ink-soft` only.
+- Code is an inset specimen: server `<pre>`, `bg-tint`, system mono 13.5px, `tabIndex={0}`, no syntax colours.
 
-## Inset (nested)
+## Lift
 
-```tsx
-<Surface variant="inset" className="flex items-center justify-between px-4 py-3">
-  …
-</Surface>
-```
+- Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/app/layout.tsx`. Feature code should not add it by hand.
+- The scrim behind a modal is ink at low opacity. No `backdrop-blur`, ever.
+- Lift is the only shadow in the system. `shadow-sm` through `shadow-2xl`, glows and coloured shadows are banned.
 
-Use for visitor-panel blocks, status rows, metric pills inside a larger solid/glass parent.
+## Forbidden
 
-## Forbidden glass content stack
+| Avoid | Use instead |
+|---|---|
+| `bg-white/5`, `border-white/10`, `backdrop-blur-*`, translucent cards | Frame |
+| `shadow-sm`, `shadow-lg`, `hover:shadow-xl`, `hover:-translate-y-1` | Frame with `hover:border-ink` or `bg-tint` row |
+| Gradient fills, glows, coloured borders | Rules in ink or rule |
+| `rounded-*` on anything | Radius 0 (radio dot excepted) |
+| Window chrome, traffic lights, terminal title bars on content | A plain frame or no box at all |
+| Filled cards on a filled card | One surface per level |
 
-```
-border-white/10 dark:border-white/5
-bg-white/5 dark:bg-neutral-900/40
-backdrop-blur-md
-hover:shadow-xl hover:-translate-y-1
-```
-
-Replace with solid + `hover:border-foreground/20`.
-
-## Padding guide
+## Padding
 
 | Context | Padding |
 |---|---|
-| Default Card Header/Content | `p-6` / `p-6 pt-0` |
-| Compact rows / education / feedback | `p-4` (`Surface padding="compact"`) |
-| Platform / cozier cards | `p-5` (`padding="cozy"`) |
-| MacWindow body | `py-4 sm:py-5` (override only when needed) |
-| Media card footer | `p-4` + `border-t border-border` |
+| Card header and content | `SURFACE_PADDING.default` |
+| Compact rows, feedback, education | `padding="compact"` |
+| Form slips, profile card | `padding="cozy"` |

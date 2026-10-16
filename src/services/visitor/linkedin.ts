@@ -25,6 +25,7 @@ export async function getLinkedinRecommendations(): Promise<LinkedinRecommendati
     const response = await fetch(`${API_URL}/v3/linkedin/recommendations`, {
       method: "GET",
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) {
@@ -50,6 +51,7 @@ export async function getLinkedinCertifications(page: number = 1, limit: number 
     const response = await fetch(`${API_URL}/v3/linkedin/certifications?page=${page}&limit=${limit}`, {
       method: "GET",
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
 
     if (!response.ok) {

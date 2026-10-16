@@ -15,6 +15,7 @@ export async function getOnsiteBlogPosts(): Promise<OnsiteBlogPost[]> {
   try {
     const response = await fetch(`${API_URL}/v3/blog/?publishedOnly=true`, {
       cache: "no-store",
+      signal: AbortSignal.timeout(4000),
     });
     if (!response.ok) return [];
     const json = await response.json();

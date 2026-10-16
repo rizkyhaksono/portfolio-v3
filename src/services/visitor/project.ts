@@ -21,7 +21,8 @@ export const getAllProject = async () => {
     .select("*")
     .order("created_at", {
       ascending: false,
-    });
+    })
+    .abortSignal(AbortSignal.timeout(4000));
 
   return data as projectType[];
 };

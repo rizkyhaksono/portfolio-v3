@@ -3,6 +3,7 @@
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
+import { X } from "lucide-react"
 import {
   Controller,
   ControllerProps,
@@ -157,9 +158,10 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-[0.8rem] font-medium text-destructive", className)}
+      className={cn("flex items-start gap-1.5 font-display text-small text-ink", className)}
       {...props}
     >
+      {error && <X className="mt-[0.2em] size-4 shrink-0" strokeWidth={1.5} aria-hidden />}
       {body}
     </p>
   )

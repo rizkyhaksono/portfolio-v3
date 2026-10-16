@@ -3,10 +3,7 @@ import { forwardRef, type HTMLAttributes } from "react"
 import { cn } from "@/lib/utils"
 import { SURFACE } from "@/lib/design-system"
 
-/**
- * Default solid content box. Do not override with glass classes
- * (`bg-white/5`, `backdrop-blur-md`, `border-white/10`).
- */
+/** Frame surface: 1px rule hairline on the paper itself. No fill, no shadow. */
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
   <div ref={ref} className={cn(SURFACE.solid, className)} {...props} />
 ))
@@ -20,13 +17,13 @@ CardHeader.displayName = "CardHeader"
 
 /** Title text inside a CardHeader. */
 const CardTitle = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("font-semibold leading-none tracking-tight", className)} {...props} />
+  <div ref={ref} className={cn("font-display text-h4 text-ink", className)} {...props} />
 ))
 CardTitle.displayName = "CardTitle"
 
 /** Muted description text inside a CardHeader. */
 const CardDescription = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
+  <div ref={ref} className={cn("text-small text-ink-soft", className)} {...props} />
 ))
 CardDescription.displayName = "CardDescription"
 

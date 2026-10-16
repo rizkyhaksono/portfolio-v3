@@ -1,113 +1,41 @@
-import {
-  Wrench,
-  BarChart2,
-  CatIcon,
-  Coffee,
-  Home,
-  MessageSquare,
-  LucideIcon,
-  BookOpen,
-  Rss,
-  HomeIcon,
-  LogIn,
-  User,
-  KanbanSquare,
-} from "lucide-react";
+// The only nav source: running head, Contents, colophon, command palette and terminal overlay read it.
 
-type Menu = {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-};
+export type NavArea = "head" | "contents" | "colophon"
 
-export type SidebarMenu = {
-  groupLabel: string;
-  menus: Menu[];
-};
+export interface NavSection {
+  href: string
+  label: string
+  /** One roman line under the italic label in Contents. */
+  note: string
+  /** Running head: `md` shows from 768px, `lg` from 1024px; absent means Contents, colophon and ⌘K only. */
+  head?: "md" | "lg"
+  column: "read" | "try" | "site"
+}
 
-export const publicDashboardMenu = [
-  {
-    groupLabel: "",
-    menus: [
-      {
-        href: "/",
-        label: "Home",
-        icon: Home,
-      },
-      {
-        href: "/project",
-        label: "Project",
-        icon: Coffee,
-      },
-      {
-        href: "/blog",
-        label: "Blog",
-        icon: Rss,
-      },
-    ],
-  },
-  {
-    groupLabel: "Application",
-    menus: [
-      {
-        href: "/ai",
-        label: "Etan AI",
-        icon: CatIcon,
-      },
-      {
-        href: "/chat",
-        label: "Chat",
-        icon: MessageSquare,
-      },
-      {
-        href: "/tracker",
-        label: "Tracker",
-        icon: KanbanSquare,
-      },
-    ],
-  },
-  {
-    groupLabel: "Playground",
-    menus: [
-      {
-        href: "/tools",
-        label: "Tools",
-        icon: Wrench,
-      },
-      {
-        href: "/roadmap",
-        label: "Roadmap",
-        icon: BookOpen,
-      },
-      {
-        href: "/stats",
-        label: "Stats",
-        icon: BarChart2,
-      },
-    ],
-  },
-];
+export const NAV_SECTIONS: readonly NavSection[] = [
+  { href: "/project", label: "Projects", note: "Systems I have built and shipped.", head: "md", column: "read" },
+  { href: "/blog", label: "Writing", note: "Essays and notes on AI and engineering.", head: "md", column: "read" },
+  { href: "/ai", label: "Etan AI", note: "Ask my résumé, read a document, match a job.", head: "md", column: "try" },
+  { href: "/chat", label: "Chat", note: "A public room for leaving a message.", head: "lg", column: "try" },
+  { href: "/tracker", label: "Tracker", note: "A public board of what I am working on.", head: "lg", column: "try" },
+  { href: "/roadmap", label: "Roadmap", note: "Learning paths, from first principles up.", head: "lg", column: "read" },
+  { href: "/tools", label: "Tools", note: "Quizzes, a typing test and small utilities.", head: "lg", column: "try" },
+  { href: "/stats", label: "Stats", note: "Readers, coding time and live API health.", head: "lg", column: "site" },
+  { href: "/certificates", label: "Credentials", note: "Certificates and courses on record.", column: "read" },
+  { href: "/changelog", label: "Changelog", note: "What changed on this site, and when.", column: "site" },
+]
 
-export const userProfileMenu = [
-  {
-    groupLabel: "",
-    menus: [
-      {
-        href: "/profile",
-        label: "My Profile",
-        icon: User,
-      },
-    ],
-  },
-];
+export const LEGAL_LINKS = [
+  { href: "/legal/privacy", label: "Privacy" },
+  { href: "/legal/terms", label: "Terms" },
+] as const
 
-export const mainNavData = (isHaveToken: boolean) => [
-  { href: "/", icon: HomeIcon, label: "Home" },
-  { href: "/project", icon: Coffee, label: "Project" },
-  { href: "/blog", icon: Rss, label: "Blog" },
-  {
-    href: isHaveToken ? "/profile" : "/auth",
-    icon: isHaveToken ? User : LogIn,
-    label: isHaveToken ? "Profile" : "Login",
-  },
-];
+export const isCurrentPath = (pathname: string, href: string) =>
+  pathname === href || pathname.startsWith(`${href}/`)
+
+/** `data-track` attributes for an internal nav link; the delegated listener sends `nav-click { item, area }`. */
+export const navTrack = (href: string, area: NavArea) => ({
+  "data-track": "nav-click",
+  "data-track-item": href.slice(1).replaceAll("/", "-") || "home",
+  "data-track-area": area,
+})

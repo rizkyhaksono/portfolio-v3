@@ -1,72 +1,67 @@
-# Platform Shells
+# Platform shells
 
-How each route group should compose layout and surfaces.
+Every route group prints in the same ink on the same paper. Groups differ in shell and pattern, never in palette.
 
 ## Visitor (public portfolio)
 
-**Routes:** `/`, `/blog`, `/project`, `/certificates`, `/tools`, `/tracker`, `/status`, `/stats`, `/chat`, `/roadmap`, …
+**Routes:** `/`, `/blog`, `/project`, `/certificates`, `/changelog`, `/roadmap`, `/tools`, `/tracker`, `/stats`, `/chat`, `/legal/*`
 
-**Shell:** `BaseLayout` + usually `SidebarMain`; some pages also mount `RightSidebarWindow` / `VisitorPanel`.
+**Shell:** `BaseLayout` with the running head, Contents sheet and colophon. No sidebars.
 
-**Surfaces:**
-
-- Page title → `SectionHeading as="h1"`
-- Tools / boards / lists → use the legacy-named `MacWindow` editorial panel
-- Content tiles → solid `Card` / `FeatureCard` / `Surface`
-- Nested rows (status, leetcode pills) → `Surface variant="inset"`
-
-**Examples:**
-
-| Page | Pattern |
+| Route | Pattern |
 |---|---|
-| Home sections | `PageSection` + solid rows |
-| Blog / Project index | Editorial panel/rows + media Cards |
-| Stats | `PageBody width="wide"` + `MacWindow` + solid PlatformCards |
-| Tracker | `MacWindow` + board |
-| Status | `MacWindow` + inset service rows |
+| `/` | Masthead stage (`bleed`) then the home story, see [page-shell.md](./page-shell.md) |
+| `/blog`, `/certificates`, `/changelog`, `/project` index | Ledger (projects add three featured Plates rows) |
+| `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
+| `/roadmap` | Ledger |
+| `/tools` | Cabinet |
+| `/tracker` | Board |
+| `/stats` | Figures |
+| `/chat` | Correspondence, `footer="compact"` |
 
-## User (authenticated)
+`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/ai`). Do not rebuild them. `/status` gains the `#status` hash in P2, when /stats gets its `id="status"` strip.
 
-**Routes:** `/profile`, `/ai`, …
+## User (signed in)
 
-**Shell:** `BaseLayout` + left sidebar.
+**Routes:** `/ai`, `/profile`, `/profile/edit`
 
-**Surfaces:** solid `Card` for profile header/content. No glass content cards. Prefer `PageBody` without inventing `max-w-8xl`.
+**Shell:** `BaseLayout`. `/ai` uses `footer="compact"`.
+
+| Route | Pattern |
+|---|---|
+| `/ai` | Cabinet with Correspondence for chat; tabs in `?tab=` |
+| `/profile`, `/profile/edit` | Profile card |
 
 ## Admin
 
 **Routes:** `/admin/dashboard/*`
 
-**Shell:** Admin expandable sidebar + top header (not `BaseLayout`). Main area uses `p-4 sm:p-5` offset layout.
+**Shell:** its own ruled spine (`--admin-rail`) with an inverted active row, not `BaseLayout`. No command palette, terminal or feedback widget.
 
-**Surfaces:** still solid only — `Card` / `Surface variant="solid"`. Page headers may use `SectionHeading` / `Eyebrow`. Do not invent a third dialect (`border-border/50` raw divs → `Surface` or `Card`).
+**Patterns:** Figures for the dashboard and analytics, Ledger for lists, frame form slips for editing, Correspondence for feedback, Profile card for settings. Same tokens, same three surfaces.
 
 ## Auth
 
 **Routes:** `/auth/*`, `/admin/auth/login`
 
-**Shell:** Pass-through / centered form. Often a solid `Card` with constrained `max-w-sm` / `max-w-md` / `max-w-3xl`.
+**Shell:** `layout/auth-shell.tsx`, split or narrow. A frame form slip with baseline fields. No gradients, stock photos, heavy shadows or coloured checks.
 
-**Surfaces:** solid Card. Heavier shadows are acceptable here but must not leak into visitor UI.
+## Outliers
 
-## Standalone / outliers
+| Item | Guidance |
+|---|---|
+| Terminal overlay | Own layout, same ink and paper |
+| OG and certificate images (`/api/og`, `/api/certificate`) | Always printed on paper colours; the only place hex values are allowed in code |
 
-| Route | Status | Guidance |
-|---|---|---|
-| `/legal/*` | Often no BaseLayout | Prefer joining BaseLayout or a documented standalone shell |
-| `/changelog` | Sticky custom header | Same |
-| `/signal` | Intentional dark marketing | Do not copy patterns elsewhere |
-| Terminal overlay | Dark chrome | Keep isolated |
+## Agent instruction files
 
-## Cross-platform agent docs
-
-All AI platforms share the same UI rules. Entry points:
+All AI platforms share the same UI rules, and this folder is their source of truth.
 
 | Platform | File |
 |---|---|
 | All agents | [`AGENTS.md`](../../AGENTS.md) |
 | Claude | [`CLAUDE.md`](../../CLAUDE.md) |
-| Cursor | [`.cursorrules`](../../.cursorrules) + `.cursor/rules/` |
-| Gemini | [`.geminirules`](../../.geminirules) |
+| Cursor | [`.cursorrules`](../../.cursorrules) and `.cursor/rules/` |
+| Gemini | [`.geminirules`](../../.geminirules), [`GEMINI.md`](../../GEMINI.md) |
 | Copilot | [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md) |
 | UI docs | This folder (`docs/ui/`) |

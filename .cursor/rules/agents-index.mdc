@@ -21,7 +21,7 @@ Human-readable design system (required reading for UI work):
 
 - `docs/ui/README.md` — index
 - `docs/ui/design-system.md` — tokens
-- `docs/ui/surfaces.md` — solid / glass / inset
+- `docs/ui/surfaces.md` — frame / inset / lift
 - `docs/ui/page-shell.md` — BaseLayout recipes
 - `docs/ui/components.md` — primitive catalog
 - `docs/ui/platforms.md` — visitor / user / admin / auth

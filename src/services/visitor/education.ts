@@ -16,7 +16,8 @@ export const getAllEducation = async () => {
     .select("*")
     .order("created_at", {
       ascending: true
-    });
+    })
+    .abortSignal(AbortSignal.timeout(4000));
 
   return data as educationType[];
 }

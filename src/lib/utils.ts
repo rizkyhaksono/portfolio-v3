@@ -1,5 +1,10 @@
 import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
+
+// The fontSize keys in tailwind.config.ts; unregistered, twMerge reads `text-caption` as a colour and drops it.
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": [{ text: ["caption", "small", "body", "prose", "lead", "h4", "h3", "h2", "h1", "display", "numeral"] }] } },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

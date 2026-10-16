@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
-import SidebarMain from "@/components/layout/sidebar-main"
 
 export const dynamic = "force-dynamic"
 
@@ -50,7 +49,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout sidebar={<SidebarMain />}>
+    <BaseLayout>
       {children}
     </BaseLayout>
   )

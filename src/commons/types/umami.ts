@@ -4,6 +4,7 @@ export interface UmamiStats {
   visits: number;
   bounces: number;
   totaltime: number;
+  /** Change versus the previous period of equal length (current − previous). */
   comparison?: {
     pageviews: number;
     visitors: number;

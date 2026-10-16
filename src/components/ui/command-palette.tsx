@@ -15,16 +15,10 @@ import {
   CommandShortcut,
 } from "@/components/ui/command"
 import {
-  Home,
   Coffee,
   Rss,
-  MessageSquare,
-  Wrench,
   BookOpen,
-  CatIcon,
-  Award,
   FileText,
-  Activity,
   Sun,
   Moon,
   Monitor,
@@ -32,31 +26,13 @@ import {
   Linkedin,
   Mail,
   Link as LinkIcon,
-  Search,
   FileCode,
 } from "lucide-react"
 import { toast } from "sonner"
 import type { SearchDoc, SearchDocType } from "@/lib/search-index"
+import { NAV_SECTIONS } from "@/commons/constants/navigation-menu"
 
-type NavItem = {
-  label: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  keywords?: string
-}
-
-const navItems: NavItem[] = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Projects", href: "/project", icon: Coffee },
-  { label: "Blog", href: "/blog", icon: Rss },
-  { label: "Chat", href: "/chat", icon: MessageSquare },
-  { label: "Tools", href: "/tools", icon: Wrench },
-  { label: "Roadmap", href: "/roadmap", icon: BookOpen },
-  { label: "Certificates", href: "/certificates", icon: Award },
-  { label: "Changelog", href: "/changelog", icon: FileText },
-  { label: "Signal", href: "/signal", icon: Activity },
-  { label: "Etan AI", href: "/ai", icon: CatIcon },
-]
+const navItems = [{ href: "/", label: "Home" }, ...NAV_SECTIONS]
 
 const typeIcon: Record<SearchDocType, React.ComponentType<{ className?: string }>> = {
   blog: Rss,
@@ -72,8 +48,13 @@ const typeLabel: Record<SearchDocType, string> = {
   changelog: "Changelog",
 }
 
-export function CommandPalette() {
-  const [open, setOpen] = React.useState(false)
+interface CommandPaletteProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+/** Controlled by DeferredClientUtilities, which owns ⌘K and the search buttons. */
+export function CommandPalette({ open, onOpenChange: setOpen }: Readonly<CommandPaletteProps>) {
   const [query, setQuery] = React.useState("")
   const [docs, setDocs] = React.useState<SearchDoc[] | null>(null)
   const [loading, setLoading] = React.useState(false)
@@ -101,17 +82,6 @@ export function CommandPalette() {
   }, [docs])
 
   React.useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if ((event.key === "k" || event.key === "K") && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        setOpen((value) => !value)
-      }
-    }
-    document.addEventListener("keydown", handler)
-    return () => document.removeEventListener("keydown", handler)
-  }, [])
-
-  React.useEffect(() => {
     if (!open || docs || loading) return
     setLoading(true)
     fetch("/api/search-index")
@@ -121,10 +91,13 @@ export function CommandPalette() {
       .finally(() => setLoading(false))
   }, [open, docs, loading])
 
-  const runCommand = React.useCallback((callback: () => void) => {
-    setOpen(false)
-    setTimeout(callback, 50)
-  }, [])
+  const runCommand = React.useCallback(
+    (callback: () => void) => {
+      setOpen(false)
+      setTimeout(callback, 50)
+    },
+    [setOpen],
+  )
 
   const results: Array<SearchResult & SearchDoc> = React.useMemo(() => {
     if (!searchEngine || !query.trim()) return []
@@ -195,19 +168,15 @@ export function CommandPalette() {
         )}
 
         <CommandGroup heading="Navigation">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            return (
-              <CommandItem
-                key={item.href}
-                value={`${item.label} ${item.keywords ?? ""}`}
-                onSelect={() => runCommand(() => router.push(item.href))}
-              >
-                <Icon />
-                <span>{item.label}</span>
-              </CommandItem>
-            )
-          })}
+          {navItems.map((item) => (
+            <CommandItem
+              key={item.href}
+              value={`${item.label} ${item.href}`}
+              onSelect={() => runCommand(() => router.push(item.href))}
+            >
+              <span>{item.label}</span>
+            </CommandItem>
+          ))}
         </CommandGroup>
 
         <CommandSeparator />
@@ -215,11 +184,11 @@ export function CommandPalette() {
         <CommandGroup heading="Theme">
           <CommandItem value="theme light" onSelect={() => runCommand(() => setTheme("light"))}>
             <Sun />
-            <span>Light mode</span>
+            <span>Paper theme</span>
           </CommandItem>
           <CommandItem value="theme dark" onSelect={() => runCommand(() => setTheme("dark"))}>
             <Moon />
-            <span>Dark mode</span>
+            <span>Night theme</span>
           </CommandItem>
           <CommandItem value="theme system" onSelect={() => runCommand(() => setTheme("system"))}>
             <Monitor />
@@ -269,34 +238,5 @@ export function CommandPalette() {
         </CommandGroup>
       </CommandList>
     </CommandDialog>
-  )
-}
-
-export function CommandPaletteTrigger() {
-  const [isMac, setIsMac] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsMac(typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform))
-  }, [])
-
-  const dispatchToggle = () => {
-    document.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "k", metaKey: true, ctrlKey: true, bubbles: true }),
-    )
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={dispatchToggle}
-      aria-label="Open command palette"
-      className="inline-flex items-center gap-2 rounded-md border bg-muted/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted"
-    >
-      <Search className="h-3.5 w-3.5" />
-      <span>Search…</span>
-      <kbd className="pointer-events-none ml-2 hidden select-none items-center gap-1 rounded border bg-background px-1.5 py-0.5 font-mono text-[10px] font-medium sm:inline-flex">
-        {isMac ? "⌘" : "Ctrl"} K
-      </kbd>
-    </button>
   )
 }

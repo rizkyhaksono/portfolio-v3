@@ -1,49 +1,33 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import Script from "next/script"
-import localFont from "next/font/local"
+import { Literata } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { Toaster } from "sonner"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
-import ScrollToTop from "@/components/ui/scroll-to-top"
-import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
+import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
+import { PRINT_HEX } from "@/lib/print-hex"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
-// Type system, SELF-HOSTED (next/font/local) so the build never hits the network:
-// Inter (body), Bricolage Grotesque (display headings), Instrument Serif (italic
-// accent words), JetBrains Mono (uppercase labels/chips). Files in ./fonts.
-const fontSans = localFont({
-  src: "./fonts/inter-latin-wght-normal.woff2",
-  variable: "--font-sans",
-  display: "swap",
-  weight: "100 900",
-})
-const fontDisplay = localFont({
-  src: "./fonts/bricolage-grotesque-latin-wght-normal.woff2",
-  variable: "--font-display",
-  display: "swap",
-  weight: "200 800",
-})
-const fontSerif = localFont({
-  src: [
-    { path: "./fonts/instrument-serif-latin-400-normal.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/instrument-serif-latin-400-italic.woff2", weight: "400", style: "italic" },
-  ],
+// Literata only. Two instances so roman and italic each get their own fallback metrics.
+const fontSerif = Literata({
+  subsets: ["latin"],
+  style: "normal",
   variable: "--font-serif",
   display: "swap",
+  adjustFontFallback: true,
 })
-const fontMono = localFont({
-  src: "./fonts/jetbrains-mono-latin-wght-normal.woff2",
-  variable: "--font-mono",
+const fontDisplay = Literata({
+  subsets: ["latin"],
+  style: "italic",
+  variable: "--font-display",
   display: "swap",
-  weight: "100 800",
+  adjustFontFallback: true,
 })
-
-const fontVariables = cn(fontSans.variable, fontDisplay.variable, fontSerif.variable, fontMono.variable)
 
 const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC
 const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
@@ -82,13 +66,20 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: PRINT_HEX.paper },
+    { media: "(prefers-color-scheme: dark)", color: PRINT_HEX.night },
+  ],
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSerif.variable, fontDisplay.variable)} suppressHydrationWarning>
       <head>
         <JsonLd />
         {umamiEnabled && (
@@ -107,20 +98,20 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className={cn("bg-background font-sans antialiased mx-auto", fontVariables)}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <body className="font-sans antialiased">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          <DeferredClientUtilities />
-          <ScrollToTop />
+          <UmamiRecorder />
           <Toaster
             position="top-right"
             theme="system"
             toastOptions={{
               classNames: {
-                toast: "!rounded-none !border-border !bg-popover !text-popover-foreground",
-                actionButton: "!rounded-none",
-                cancelButton: "!rounded-none",
-                closeButton: "!rounded-none",
+                toast: "!rounded-none !border !border-ink !bg-paper !text-ink !shadow-[3px_3px_0_hsl(var(--ink))] !font-sans",
+                description: "!text-ink-soft",
+                actionButton: "!rounded-none !bg-ink !text-paper",
+                cancelButton: "!rounded-none !bg-tint !text-ink",
+                closeButton: "!rounded-none !border-ink !bg-paper !text-ink",
               },
             }}
           />

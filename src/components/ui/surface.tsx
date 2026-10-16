@@ -7,9 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 import { SURFACE, SURFACE_PADDING } from "@/lib/design-system"
 
-/**
- * CVA variants for the three surface dialects (solid / glass / inset).
- */
+/** Frame (`solid`) and inset surfaces. `glass` variants are retired aliases of the frame. */
 const surfaceVariants = cva("", {
   variants: {
     variant: {
@@ -35,10 +33,7 @@ export interface SurfaceProps
   extends HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof surfaceVariants> {}
 
-/**
- * Canonical content box. Prefer this (or Card / FeatureCard / MacWindow) over
- * ad-hoc bordered divs. Variants map to the three allowed surface dialects.
- */
+/** Canonical content box. Prefer this (or Card) over ad-hoc bordered divs. */
 export const Surface = forwardRef<HTMLDivElement, SurfaceProps>(
   ({ className, variant, padding, ...props }, ref) => (
     <div ref={ref} className={cn(surfaceVariants({ variant, padding }), className)} {...props} />

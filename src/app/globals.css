@@ -1,96 +1,98 @@
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
-  /* Monochrome design language: pure grayscale, near-black on white, square (radius 0),
-     hairline borders. No accent hue. Values are HSL triples (no hsl() wrapper). */
+  /* One ink on one paper. HSL triples (no hsl() wrapper) so every shadcn part re-inks. */
+  :root{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;--ws-ghost:.6;--head-h:3.25rem;
+  --background:var(--paper);--foreground:var(--ink);--card:var(--paper);--card-foreground:var(--ink);--popover:var(--paper);--popover-foreground:var(--ink);--primary:var(--ink);--primary-foreground:var(--paper);--secondary:var(--tint);--secondary-foreground:var(--ink);--muted:var(--tint);--muted-foreground:var(--ink-soft);--accent:var(--tint);--accent-foreground:var(--ink);--destructive:var(--ink);--destructive-foreground:var(--paper);--border:var(--rule);--input:var(--rule-strong);--ring:var(--ink);--radius:0rem;
+  --chart-1:var(--ink);--chart-2:var(--ink-soft);--chart-3:var(--rule-strong);--chart-4:var(--rule);--chart-5:var(--tint); /* keep until the admin charts move to InkChart in P3 */
+  --dur-press:120ms;--dur-ui:180ms;--dur-sheet:240ms;--ease-print:cubic-bezier(.2,0,0,1);--scrim:var(--ink) / .35}
+  .dark{--paper:229 59% 12.5%;--ink:41 48% 88%;--ink-soft:227 51% 77.6%;--rule:229 44% 30.6%;--rule-strong:228 41% 61%;--tint:227 65% 24.7%;--plate-alpha:.85;--ws-ghost:.38;--scrim:var(--paper) / .7}
+  @media (max-width:767px){:root{--head-h:3rem}}
+
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 0 0% 10%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 25%;
-    --radius: 0rem;
-    --chart-1: 0 0% 25%;
-    --chart-2: 0 0% 45%;
-    --chart-3: 0 0% 60%;
-    --chart-4: 0 0% 72%;
-    --chart-5: 0 0% 82%;
+    color-scheme: light;
   }
-
   .dark {
-    --background: 0 0% 8.6%;
-    --foreground: 0 0% 96.1%;
-    --card: 0 0% 10.6%;
-    --card-foreground: 0 0% 96.1%;
-    --popover: 0 0% 10.6%;
-    --popover-foreground: 0 0% 96.1%;
-    --primary: 0 0% 96.1%;
-    --primary-foreground: 0 0% 14.9%;
-    --secondary: 0 0% 12.5%;
-    --secondary-foreground: 0 0% 96.1%;
-    --muted: 0 0% 12.5%;
-    --muted-foreground: 0 0% 50.6%;
-    --accent: 0 0% 12.5%;
-    --accent-foreground: 0 0% 96.1%;
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 14.1%;
-    --input: 0 0% 16.1%;
-    --ring: 0 0% 45.1%;
-    --chart-1: 0 0% 78%;
-    --chart-2: 0 0% 62%;
-    --chart-3: 0 0% 50%;
-    --chart-4: 0 0% 38%;
-    --chart-5: 0 0% 28%;
+    color-scheme: dark;
   }
 
-  .theme {
-    --animate-meteor: meteor 5s linear infinite;
-    --animate-blink-cursor: blink-cursor 1.2s step-end infinite;
-    --animate-grid: grid 15s linear infinite;
-  }
-}
-
-/* Sonner owns its radius token, so enforce the shared square language at its portal. */
-[data-sonner-toast],
-[data-sonner-toast] [data-button],
-[data-sonner-toast] [data-close-button] {
-  border-radius: 0 !important;
-}
-
-@layer base {
   * {
     @apply border-border;
   }
 
+  html {
+    overflow-x: clip;
+    font-synthesis: none;
+  }
+
+  /* Anchor offset on targets, not scroll-padding on html: the padded band would cover the sticky head,
+     so every focus landing in it (Tab, Radix focus return) scrolled the page. */
+  [id] {
+    scroll-margin-top: calc(var(--head-h) + 1rem);
+  }
+
+  /* Never on body: a clipping body would break every sticky stage. */
+  main {
+    overflow-x: clip;
+  }
+
+  /* Radix locks body with overflow:hidden; with html clipped, body would become the sticky
+     scrollport and the running head would jump off screen. Lock the root instead. */
+  html:has(> body[data-scroll-locked]) {
+    overflow: hidden;
+  }
+  html body[data-scroll-locked] {
+    overflow: visible !important;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body,
+  .bg-paper-grain {
+    background-color: hsl(var(--background));
+    background-image: url("../assets/paper/grain-light.webp");
+    background-size: 128px 128px;
+  }
+  .dark body,
+  .dark .bg-paper-grain {
+    background-image: url("../assets/paper/grain-dark.webp");
+  }
+
   body {
-    @apply bg-background text-foreground;
+    color: hsl(var(--foreground));
   }
 
-  /* Admin uses the same square editorial language as the public site. */
-  .admin-shell [class*="rounded-"] {
-    border-radius: 0;
+  ::selection {
+    background-color: hsl(var(--ink));
+    color: hsl(var(--paper));
   }
-}
 
-/* Custom scrollbar — thin, square, monochrome. Track transparent so it reads clean. */
-@layer base {
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .font-display {
+    font-style: italic;
+    font-weight: 420;
+  }
+
+  /* Literata roman and italic are separate families, so emphasis must switch family (no synthesis). */
+  em,
+  i,
+  cite {
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+  :is(.font-display, .prose h2, .prose h3, .prose blockquote) :is(em, i, cite) {
+    font-family: var(--font-serif);
+    font-style: normal;
+  }
+
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
@@ -105,7 +107,7 @@
   ::-webkit-scrollbar-thumb {
     background-color: hsl(var(--border));
     border: 3px solid transparent;
-    background-clip: padding-box; /* inset thumb, no rounding = square */
+    background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--muted-foreground));
@@ -115,40 +117,266 @@
   }
 }
 
-@theme inline {
-  @keyframes meteor {
-    0% {
-      transform: rotate(var(--angle)) translateX(0);
-      opacity: 1;
-    }
+@tailwind components;
 
-    70% {
-      opacity: 1;
-    }
+/* Unlayered on purpose: always emitted (no content purge), still overridden by utilities below. */
 
-    100% {
-      transform: rotate(var(--angle)) translateX(-500px);
-      opacity: 0;
+/* Photo duotone: grey image, screen the dark colour into the shadows, multiply the light one into the highlights. */
+.plate {
+  position: relative;
+  isolation: isolate;
+  background-color: hsl(var(--paper));
+}
+.plate img {
+  filter: grayscale(1);
+}
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.plate::before {
+  background-color: hsl(var(--ink));
+  mix-blend-mode: screen;
+}
+.plate::after {
+  background-color: hsl(var(--paper));
+  mix-blend-mode: multiply;
+}
+.dark .plate::before {
+  background-color: hsl(var(--paper));
+}
+.dark .plate::after {
+  background-color: hsl(var(--ink));
+}
+
+/* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
+.engraving {
+  background-color: hsl(var(--ink) / var(--plate-alpha));
+  -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
+  mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
+}
+@media (max-width: 767px) {
+  .engraving {
+    -webkit-mask-image: url("../assets/plates/hollar-band-800.webp");
+    mask-image: url("../assets/plates/hollar-band-800.webp");
+  }
+}
+
+/* Wordscroll: static and fully inked unless scroll timelines, motion and a tall enough viewport all exist. */
+.ws__stage {
+  min-height: calc(100svh - var(--head-h));
+}
+@keyframes ws-ink {
+  from {
+    opacity: var(--ws-ghost);
+    translate: 0.06em 0.04em;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  /* min-height, not range syntax: Lightning CSS rewrites (height > 560px) into a query browsers drop. */
+  @media (prefers-reduced-motion: no-preference) and (min-height: 561px) {
+    .ws {
+      height: 220svh;
+      view-timeline: --ws block;
+    }
+    .ws__stage {
+      position: sticky;
+      top: var(--head-h);
+    }
+    .ws__w {
+      display: inline-block;
+      animation: ws-ink auto linear both;
+      animation-timeline: --ws;
     }
   }
-
-  @keyframes blink-cursor {
-    0%,
-    49% {
-      opacity: 1;
-    }
-
-    50%,
-    100% {
-      opacity: 0;
+  @media (prefers-reduced-motion: no-preference) and (min-height: 561px) and (max-width: 767px) {
+    .ws {
+      height: 180svh;
     }
   }
-  @keyframes grid {
-    0% {
-      transform: translateY(-50%);
-    }
-    100% {
-      transform: translateY(0);
-    }
+}
+
+/* Ink speckle: pinholes where the ink did not take. Below-fold numerals ≥48px, inverted blocks, the 404 line. */
+.speckle {
+  --speckle: url("data:image/webp;base64,UklGRsoCAABXRUJQVlA4TL0CAAAvf8AfEA8QEfMfgo50W48kJbCwWQCRJqY0VS4BE7PXgNb8aMwyMXMJKEsnusHSwpr4Rxc6u8gY/q75838fqrNhBxH9V9i2bUOl85SCTfRhpckmRuxWGKFizx7jDLbOMZel2ZECv1AAngyApRRVjC4kOgADia4HlQEc3OqUDq57F945YS79AM3nLFwA7PNkwjwD5wAKkZj442UN5j2QAL+Bop8AjCM6gMn41oqJiWYCKYAz8ARUIOMNPldpn2OEQsWG0teAtvu3c/19QEOHMVkpSxyuUGA6oVYyfiMtEhXbf8mlOAYfGoFuweDZ9HkGGQagYBN4GTDSeCQ2YLyxo7FbJtBt0XA8KbSH7oYEZtyTKHrwGo5QgQLHDdCkCGmBlypXEJipL9bMiCxQO0hBrjOqis/hwg5U8qGvKTtb9qJkYG+7DJVds9JwE3YnFC1dw9EMfleQaLUCBdidWJOVCMnuNFHHdX3saSALmAHMoXBFU2GsGeZU2DHgCpZr/4DGqKFuggQj6VMmcBWkACkI/6cAE0xOMN8AUpcTmA9BvwxgmEGk2OCcDWSRvAxygABwJwJ6JKlJEVQJvc8yoaGgUxFQK9gj+qssPxdoMMAFqMcAikNqbE/woa2fqxQwMylWmuXvc1PxcoGfZSooCA7wOgIjSfreBSCu1+4C0Qd0bChEgs+xYbYSIwb/IUwunCCnRSo+pAsEdZuZSSiZqqMipNI5pTKsYAsa0ikXx7A1ZaCe61b+YG8lk7EgVjTwLrcF2gShD7eFAqBfCAoqQABU48sr3KZqmQKNTnUGmATwLTBe1YFMxnhkACaoADYF6IHtZj6FAvh8dEoSeqZDgDuCZtoCUscGW7aOkSiNQgEUKAAOCIAExrpiPJV+sRKJHTAAbGEwHgPtRSRi+fcyIi2zAHuQnjzC5+R9Qac/QjbkCgA=");
+  -webkit-mask: var(--speckle) 0 0 / 128px 128px repeat;
+  mask: var(--speckle) 0 0 / 128px 128px repeat;
+}
+
+.bg-hatch {
+  background-image: repeating-linear-gradient(135deg, hsl(var(--ink)) 0 1px, transparent 1px 5px);
+}
+
+.prose {
+  @apply text-prose;
+  max-width: 66ch;
+  color: hsl(var(--foreground));
+}
+.prose > * + * {
+  margin-top: 1em;
+}
+.prose :is(h2, h3) {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 420;
+  text-wrap: balance;
+}
+.prose h2 {
+  @apply text-h3;
+  margin-top: 2.25em;
+}
+.prose h3 {
+  @apply text-h4;
+  margin-top: 2em;
+}
+.prose h4 {
+  font-weight: 600;
+  margin-top: 1.75em;
+}
+.prose :is(h2, h3, h4) + * {
+  margin-top: 0.6em;
+}
+.prose strong {
+  font-weight: 600;
+}
+.prose a {
+  color: hsl(var(--ink));
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose blockquote {
+  border-left: 1px solid hsl(var(--ink));
+  padding-left: 1.25rem;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.375rem;
+  line-height: 1.4;
+}
+.prose ul {
+  list-style: none;
+  padding-left: 1.25em;
+}
+.prose ul > li {
+  position: relative;
+}
+.prose ul > li::before {
+  content: "\2013";
+  position: absolute;
+  left: -1.25em;
+}
+.prose ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+  font-variant-numeric: tabular-nums;
+}
+.prose li + li {
+  margin-top: 0.4em;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+}
+.prose :is(th, td) {
+  padding: 0.5em 0.75em 0.5em 0;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.prose th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  border-bottom: 1px solid hsl(var(--ink));
+}
+.prose td {
+  border-bottom: 1px solid hsl(var(--rule));
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+  padding: 3px;
+  border: 1px solid hsl(var(--ink));
+}
+.prose figcaption {
+  margin-top: 0.5em;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.8125rem;
+  color: hsl(var(--muted-foreground));
+}
+.prose code {
+  font-family: theme("fontFamily.mono");
+  font-size: 0.85em;
+  background-color: hsl(var(--tint));
+  padding: 0.1em 0.3em;
+}
+.prose pre {
+  overflow-x: auto;
+  padding: 1rem;
+  background-color: hsl(var(--tint));
+  font-size: 0.84375rem;
+  line-height: 1.55;
+}
+.prose pre code {
+  padding: 0;
+  background: none;
+  font-size: inherit;
+}
+.prose hr {
+  width: 40px;
+  height: 14px;
+  margin: 2.5em auto;
+  border: 0;
+  background-color: hsl(var(--ink));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpath d='M20 2l4 5-4 5-4-5zM2 7q7-3 12 0-5 3-12 0zm36 0q-7-3-12 0 5 3 12 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpath d='M20 2l4 5-4 5-4-5zM2 7q7-3 12 0-5 3-12 0zm36 0q-7-3-12 0 5 3 12 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.prose--chat {
+  @apply text-body;
+  max-width: none;
+}
+.prose--chat > * + * {
+  margin-top: 0.75em;
+}
+.prose--chat :is(h2, h3) {
+  @apply text-h4;
+  margin-top: 1.25em;
+}
+
+@tailwind utilities;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
+}
+
+@media print {
+  .dark{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;color-scheme:light}
+  body { background: none; }
+  nav, [role="dialog"], .engraving, [data-print-hide] { display: none !important; }
+  .ws { height: auto !important; }
+  .ws__stage { position: static !important; min-height: 0; }
+  .ws__w { animation: none !important; }
+  main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; overflow-wrap: anywhere; }
+  pre, blockquote, figure, img, tr { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
 }

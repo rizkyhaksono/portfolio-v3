@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { submitFeedback, type FeedbackCategory } from "@/services/visitor/feedback"
-import { MessageSquarePlus, Loader2 } from "lucide-react"
+import { MessageSquarePlus } from "lucide-react"
 
 export default function FeedbackWidget() {
   const [open, setOpen] = useState(false)
@@ -42,22 +42,23 @@ export default function FeedbackWidget() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
         aria-label="Send feedback"
-        className="fixed bottom-5 left-5 z-40 flex items-center gap-2 rounded-none border border-border/60 bg-card/95 px-3 py-2 text-xs font-medium text-muted-foreground shadow-lg backdrop-blur transition-colors hover:border-primary/40 hover:text-foreground supports-[backdrop-filter]:bg-card/80 print:hidden"
+        className="fixed bottom-4 left-4 z-40 inline-flex h-11 items-center gap-2 border border-ink bg-paper px-3 text-small font-semibold text-ink shadow-[3px_3px_0_hsl(var(--ink))] hover:bg-tint active:translate-y-px print:hidden md:h-9"
       >
-        <MessageSquarePlus className="h-4 w-4" />
+        <MessageSquarePlus className="size-4" strokeWidth={1.5} aria-hidden />
         <span className="hidden sm:inline">Feedback</span>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Feedback &amp; suggestions</DialogTitle>
+            <DialogTitle>Feedback and suggestions</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <Select value={category} onValueChange={(v) => setCategory(v as FeedbackCategory)}>
-              <SelectTrigger>
+              <SelectTrigger aria-label="Category">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -67,6 +68,7 @@ export default function FeedbackWidget() {
               </SelectContent>
             </Select>
             <Textarea
+              aria-label="Message"
               autoFocus
               placeholder="What should I build or write next? Found something broken?"
               value={message}
@@ -75,6 +77,7 @@ export default function FeedbackWidget() {
               onChange={(e) => setMessage(e.target.value)}
             />
             <Input
+              aria-label="Email, optional"
               type="email"
               placeholder="Email (optional, if you want a reply)"
               value={email}
@@ -84,8 +87,8 @@ export default function FeedbackWidget() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={submit} disabled={sending || !message.trim()} className="gap-2">
-              {sending && <Loader2 className="h-4 w-4 animate-spin" />} Send
+            <Button onClick={submit} disabled={sending || !message.trim()} aria-busy={sending}>
+              {sending ? "Sending…" : "Send"}
             </Button>
           </DialogFooter>
         </DialogContent>
