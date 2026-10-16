@@ -1,6 +1,6 @@
 # Portfolio v3 - Progress Tracker
 
-*Last Updated: 2026-10-02 (SEO canonical domain natee.my.id)*
+*Last Updated: 2026-10-17 (redesign phase 1, tasks D+E)*
 
 ---
 
@@ -22,6 +22,7 @@
 - **PR #25 quality remediation**: ✅ COMPLETED — Copilot review comments and introduced DeepSource issues addressed
 - **SEO canonical domain**: ✅ COMPLETED (code) — `getSiteUrl()` + all crawler signals default to `https://natee.my.id`; **deploy:** rotate `DOMAIN` secret in GitHub/Azure and submit GSC sitemap (manual)
 - **Runtime cleanup and dark UI refinement**: ✅ COMPLETED — compiler removed, dark palette refined, system status promoted, square controls/toasts enforced
+- **Redesign P1 D+E (AI fix web, security/privacy)**: ✅ COMPLETED (code, not deployed) — AI proxies guarded (502/413/timeouts), OCR client downscale + HEIC, inline AI errors + `ai-error` event, server code blocks; Umami tracker gated + `umamiBeforeSend` token scrub, recorder gated/sampled, `chat_user` writes removed, logout revokes the API session, forgot/reset hidden, image hosts allow-listed
 
 ---
 

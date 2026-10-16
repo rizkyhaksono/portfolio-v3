@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 export default function ProfileLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <BaseLayout sidebar={<SidebarMain />}>
-      {children}
+      <div data-private>{children}</div>
     </BaseLayout>
   )
 }

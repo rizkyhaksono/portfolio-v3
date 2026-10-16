@@ -11,12 +11,12 @@ import { authLogin } from "@/services/visitor/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { storeCookie } from "@/app/actions/actions"
-import Link from "next/link"
 import Typography from "@/components/ui/typography"
 import { Eyebrow } from "@/components/ui/eyebrow"
 import { FcGoogle } from "react-icons/fc"
 import { Mail, Lock, Loader2, Check } from "lucide-react"
 import { useState } from "react"
+import { safeRedirect } from "@/lib/utils"
 
 const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground"
 
@@ -52,18 +52,8 @@ export default function LoginForm() {
         // Handle successful login
         if (response?.status === "200" && response?.token) {
           await storeCookie("NATEE_V3_TOKEN", response.token)
-
-          // Also store user info for chat (if available)
-          if (globalThis.window !== undefined) {
-            const userInfo = {
-              id: response.userId || response.user?.id || "",
-              name: response.userName || response.user?.name || values.email.split("@")[0],
-              accessToken: response.token,
-            }
-            localStorage.setItem("chat_user", JSON.stringify(userInfo))
-          }
-
-          router.push("/")
+          // Read at submit time so /auth stays static (no useSearchParams Suspense bailout).
+          router.push(safeRedirect(new URLSearchParams(window.location.search).get("redirect")))
           return "Welcome back!"
         }
 
@@ -150,12 +140,7 @@ export default function LoginForm() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel htmlFor="password" className={MONO_LABEL}>Password</FormLabel>
-                      <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-foreground hover:underline">
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <FormLabel htmlFor="password" className={MONO_LABEL}>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

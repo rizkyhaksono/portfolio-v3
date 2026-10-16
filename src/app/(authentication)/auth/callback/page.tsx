@@ -32,18 +32,6 @@ function OAuthCallbackContent() {
         })
 
         if (response.ok) {
-          const userData = await response.json()
-
-          // Store user info for chat if needed
-          if (globalThis.window !== undefined && userData?.data) {
-            const userInfo = {
-              id: userData.data.id,
-              name: userData.data.name,
-              accessToken: token,
-            }
-            localStorage.setItem("chat_user", JSON.stringify(userInfo))
-          }
-
           toast.success("Successfully logged in!")
           router.push("/")
         } else {

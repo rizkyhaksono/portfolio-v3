@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn, safeRedirect } from '@/lib/utils'
 
 describe('cn utility function', () => {
   it('should merge class names correctly', () => {
@@ -38,5 +38,29 @@ describe('cn utility function', () => {
   it('should return empty string when no arguments provided', () => {
     const result = cn()
     expect(result).toBe('')
+  })
+})
+
+describe('safeRedirect', () => {
+  it('keeps same-origin paths', () => {
+    expect(safeRedirect('/ai')).toBe('/ai')
+    expect(safeRedirect('/blog/x?y=1')).toBe('/blog/x?y=1')
+  })
+
+  it('rejects external and protocol-relative targets', () => {
+    for (const bad of [
+      '//evil.com',
+      '/\\evil.com',
+      '/\t/evil.com',
+      '/\n/evil.com',
+      '/\r\n/evil.com',
+      'https://evil.com',
+      'ai',
+      '',
+      null,
+      undefined,
+    ]) {
+      expect(safeRedirect(bad)).toBe('/')
+    }
   })
 })

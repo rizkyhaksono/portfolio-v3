@@ -9,6 +9,7 @@ import { getMetadataBaseUrl } from "@/lib/site-url"
 import ScrollToTop from "@/components/ui/scroll-to-top"
 import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
+import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
@@ -43,6 +44,10 @@ const fontMono = localFont({
 })
 
 const fontVariables = cn(fontSans.variable, fontDisplay.variable, fontSerif.variable, fontMono.variable)
+
+const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
+const umamiEnabled = process.env.NODE_ENV === "production" && !!umamiSrc && !!umamiWebsiteId
 
 export const metadata: Metadata = {
   title: MetadataConstants.pageTitle,
@@ -86,22 +91,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <JsonLd />
-        <Script
-          defer
-          src={process.env.NEXT_PUBLIC_UMAMI_SRC ?? "https://cloud.umami.is/script.js"}
-          data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "4a749f88-f2ec-445e-830f-209ce5188c9d"}
-          strategy="afterInteractive"
-        />
-        {/* Umami session replay + heatmaps recorder. Enabled per-site in the Umami
-            dashboard (Website settings → Replays & Heatmaps); this only loads the
-            recorder script so the toggle there takes effect. */}
-        {process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC && (
-          <Script
-            defer
-            src={process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID ?? "4a749f88-f2ec-445e-830f-209ce5188c9d"}
-            strategy="afterInteractive"
-          />
+        {umamiEnabled && (
+          <>
+            <script dangerouslySetInnerHTML={{ __html: UMAMI_BEFORE_SEND }} />
+            <Script
+              defer
+              src={umamiSrc}
+              data-website-id={umamiWebsiteId}
+              data-domains="natee.my.id"
+              data-exclude-hash="true"
+              data-performance="true"
+              data-before-send="umamiBeforeSend"
+              strategy="afterInteractive"
+            />
+          </>
         )}
       </head>
       <body className={cn("bg-background font-sans antialiased mx-auto", fontVariables)}>

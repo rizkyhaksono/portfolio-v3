@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { track } from "@/lib/analytics"
 import { Target, Loader2, CheckCircle2, AlertTriangle, FileSearch } from "lucide-react"
 
 interface Source {
@@ -28,6 +29,7 @@ export default function JdMatcher() {
   const [jd, setJd] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<JdFitResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const analyze = async () => {
     const text = jd.trim()
@@ -38,6 +40,7 @@ export default function JdMatcher() {
     if (loading) return
     setLoading(true)
     setResult(null)
+    setError(null)
     try {
       const res = await fetch("/api/ai/jd-match", {
         method: "POST",
@@ -45,10 +48,16 @@ export default function JdMatcher() {
         body: JSON.stringify({ jobDescription: text }),
       })
       const json = await res.json().catch(() => null)
-      if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Failed (${res.status})`)
+      if (!res.ok || json?.status >= 400) {
+        const status = res.ok ? json.status : res.status
+        track("ai-error", { feature: "jd-match", status })
+        setError(json?.message || `Analysis failed (${status})`)
+        return
+      }
       setResult(json.data as JdFitResult)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Analysis failed.")
+    } catch {
+      track("ai-error", { feature: "jd-match", status: 0 })
+      setError("Could not reach Etan AI. Try again in a minute.")
     } finally {
       setLoading(false)
     }
@@ -77,6 +86,12 @@ export default function JdMatcher() {
           Analyze fit
         </Button>
       </div>
+
+      {error && (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
       {result && (
         <div className="space-y-4 rounded-xl border border-border/50 bg-background/60 p-4">

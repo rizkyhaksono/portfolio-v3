@@ -17,7 +17,7 @@ export interface LinkedinCertification {
   provider: string;
   issued: string; // ISO date string
   issuedDisplay: string; // e.g., "Nov 2025"
-  image: string;
+  image?: string;
   link: string;
 }
 

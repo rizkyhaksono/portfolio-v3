@@ -17,7 +17,7 @@ interface CertificatesPageProps {
 
 export default async function CertificatesPage({ searchParams }: CertificatesPageProps) {
   const params = await searchParams
-  const currentPage = parseInt(params.page || "1", 10)
+  const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10) || 1)
   const limit = 10
 
   let certifications: any[] = []

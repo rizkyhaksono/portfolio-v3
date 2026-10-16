@@ -45,12 +45,14 @@ export async function proxy(request: NextRequest, _response: NextResponse) {
     return NextResponse.redirect(login)
   }
 
-  // Logged-in users skip login/signup (allow password reset flows)
+  // Logged-in users skip login/signup (allow password reset flows). A `redirect` param means the
+  // app sent them here after a 401, so the cookie is stale and they must reach the form.
   const isAuthPublicPath = AUTH_PUBLIC_PATHS.some((p) => pathname.includes(p))
   if (
     pathname.startsWith("/auth") &&
     (nateeToken || hasSessionToken(request)) &&
-    !isAuthPublicPath
+    !isAuthPublicPath &&
+    !request.nextUrl.searchParams.has("redirect")
   ) {
     return NextResponse.redirect(new URL("/", request.url))
   }

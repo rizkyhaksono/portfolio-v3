@@ -92,7 +92,7 @@ export default function AIChatLocked() {
             </p>
           </div>
           <Button asChild className="w-full gap-2 rounded-none">
-            <Link href="/auth">
+            <Link href="/auth?redirect=/ai">
               <LogIn className="h-4 w-4" />
               Sign in
             </Link>

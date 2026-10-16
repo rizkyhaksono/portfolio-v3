@@ -4,11 +4,12 @@ import { useState, useRef } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { track } from "@/lib/analytics"
 import { Upload, Loader2, ScanText, FileJson, X } from "lucide-react"
 
 type Mode = "classify" | "extract"
-const ALLOWED = ["image/png", "image/jpeg", "image/webp"]
 const MAX_BYTES = 2 * 1024 * 1024
+const MAX_SIDE = 1600
 
 interface OcrResult {
   mode: Mode
@@ -16,7 +17,27 @@ interface OcrResult {
   parsed: unknown
 }
 
-function readAsDataUrl(file: File): Promise<string> {
+function encode(canvas: HTMLCanvasElement, type: string): Promise<Blob | null> {
+  return new Promise((resolve) => canvas.toBlob(resolve, type, 0.85))
+}
+
+// Phone photos (often HEIC, 3-12 MB) are decoded by the browser and re-encoded small before upload.
+async function downscale(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file)
+  const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height))
+  const canvas = document.createElement("canvas")
+  canvas.width = Math.round(bitmap.width * scale)
+  canvas.height = Math.round(bitmap.height * scale)
+  canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+  bitmap.close()
+  const webp = await encode(canvas, "image/webp")
+  // Older Safari cannot encode WebP and silently returns PNG, which is far larger.
+  const blob = webp?.type === "image/webp" ? webp : await encode(canvas, "image/jpeg")
+  if (!blob) throw new Error("Could not encode image")
+  return blob
+}
+
+function readAsDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const fr = new FileReader()
     fr.onload = () => resolve(String(fr.result))
@@ -32,24 +53,29 @@ export default function OcrDemo() {
   const [mode, setMode] = useState<Mode>("extract")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<OcrResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const onFile = async (file: File | undefined) => {
     if (!file) return
-    if (!ALLOWED.includes(file.type)) {
-      toast.error("Only PNG, JPEG, or WebP images are supported.")
+    let image: Blob
+    try {
+      image = await downscale(file)
+    } catch {
+      toast.error("This image format isn't supported by your browser. Try PNG, JPEG, or WebP.")
       return
     }
-    if (file.size > MAX_BYTES) {
-      toast.error("Image too large (max 2MB).")
+    if (image.size > MAX_BYTES) {
+      toast.error("Image too large even after resizing (max 2MB).")
       return
     }
     try {
-      const dataUrl = await readAsDataUrl(file)
+      const dataUrl = await readAsDataUrl(image)
       setPreview(dataUrl)
-      setMimeType(file.type)
+      setMimeType(image.type)
       setBase64(dataUrl.split(",")[1] ?? "")
       setResult(null)
+      setError(null)
     } catch {
       toast.error("Could not read the image.")
     }
@@ -60,6 +86,7 @@ export default function OcrDemo() {
     setMimeType("")
     setBase64("")
     setResult(null)
+    setError(null)
     if (inputRef.current) inputRef.current.value = ""
   }
 
@@ -67,6 +94,7 @@ export default function OcrDemo() {
     if (!base64 || loading) return
     setLoading(true)
     setResult(null)
+    setError(null)
     try {
       const res = await fetch("/api/ai/ocr", {
         method: "POST",
@@ -75,11 +103,15 @@ export default function OcrDemo() {
       })
       const json = await res.json().catch(() => null)
       if (!res.ok || json?.status >= 400) {
-        throw new Error(json?.message || `OCR failed (${res.status})`)
+        const status = res.ok ? json.status : res.status
+        track("ai-error", { feature: "ocr", status })
+        setError(json?.message || `OCR failed (${status})`)
+        return
       }
       setResult(json.data as OcrResult)
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "OCR failed.")
+    } catch {
+      track("ai-error", { feature: "ocr", status: 0 })
+      setError("Could not reach Etan AI. Try again in a minute.")
     } finally {
       setLoading(false)
     }
@@ -109,10 +141,10 @@ export default function OcrDemo() {
             >
               <Upload className="h-6 w-6" />
               <span className="text-sm">Click to upload a document image</span>
-              <span className="text-xs">PNG, JPEG, WebP · max 2MB</span>
+              <span className="text-xs">PNG, JPEG, WebP, HEIC · resized before upload</span>
             </button>
           )}
-          <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+          <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
 
           <div className="flex items-center gap-2">
             <div className="flex rounded-lg border border-border/60 p-0.5 text-sm">
@@ -131,6 +163,11 @@ export default function OcrDemo() {
               Analyze
             </Button>
           </div>
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Output */}

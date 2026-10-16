@@ -8,7 +8,7 @@ function LayoutContent({ children, user }: Readonly<{ children: React.ReactNode;
   const { isExpanded } = useSidebar()
 
   return (
-    <div className="admin-shell relative flex min-h-screen w-full flex-col bg-background">
+    <div data-private className="admin-shell relative flex min-h-screen w-full flex-col bg-background">
       <AdminExpandableSidebar user={user} />
       <AdminTopHeader />
       <main className={cn("flex-1 px-4 pb-10 pt-3 sm:px-6", isExpanded ? "sm:pl-[248px]" : "sm:pl-[88px]")}>

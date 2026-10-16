@@ -99,6 +99,7 @@ const MDXComponent = ({ children }: MarkdownRendererProps) => {
             quality={100}
           />
         ),
+        pre: ({ children }) => <>{children}</>,
         code: (props) => <CodeBlock {...props} />,
         blockquote: ({ className, ...props }) => (
           <blockquote

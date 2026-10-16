@@ -1,5 +1,7 @@
 "use server";
 
+import { cookies } from "next/headers";
+
 const authLogin = async (email: string, password: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/login`, {
     method: "POST",
@@ -29,10 +31,14 @@ const authSignup = async (email: string, password: string, name: string) => {
   return await response.json();
 };
 
+// Server-to-server call: the API's Lucia logout reads the session id from its `auth_session` cookie.
+// The token is read here, not passed in, so no client-callable action returns cookie values.
 const authLogout = async () => {
+  const token = (await cookies()).get("NATEE_V3_TOKEN")?.value
+  if (!token) return
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/logout`, {
     method: "POST",
-    credentials: "include",
+    headers: { Cookie: `auth_session=${token}` },
   })
   return await response.json();
 }

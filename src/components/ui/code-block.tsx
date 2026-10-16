@@ -1,116 +1,32 @@
-"use client";
+import type { ComponentPropsWithoutRef } from "react";
+import type { ExtraProps } from "react-markdown";
+import CopyButton from "./copy-button";
 
-import dynamic from "next/dynamic";
+type CodeBlockProps = ComponentPropsWithoutRef<"code"> & ExtraProps;
 
-import { useEffect, useState } from "react";
-import {
-  HiCheckCircle as CheckIcon,
-  HiOutlineClipboardCopy as CopyIcon,
-} from "react-icons/hi";
-import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
-import css from "react-syntax-highlighter/dist/cjs/languages/prism/css";
-import diff from "react-syntax-highlighter/dist/cjs/languages/prism/diff";
-import bash from "react-syntax-highlighter/dist/cjs/languages/prism/bash";
-import javascript from "react-syntax-highlighter/dist/cjs/languages/prism/javascript";
-import tsx from "react-syntax-highlighter/dist/cjs/languages/prism/tsx";
-import typescript from "react-syntax-highlighter/dist/cjs/languages/prism/typescript";
-import { a11yDark as themeColor } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import { useCopyToClipboard } from "usehooks-ts";
+// react-markdown 9 no longer passes `inline`: inline code has no language class and no newline.
+const CodeBlock = ({ className, children, node: _node, ...props }: CodeBlockProps) => {
+  const code = String(children ?? "");
 
-const languages = {
-  bash: "bash",
-  javascript: "javascript",
-  typescript: "typescript",
-  diff: "diff",
-  tsx: "tsx",
-  css: "css",
-};
+  if (!className?.includes("language-") && !code.includes("\n")) {
+    return (
+      <code className="rounded-none bg-muted px-1.5 py-0.5 font-mono text-[0.9em]" {...props}>
+        {children}
+      </code>
+    );
+  }
 
-SyntaxHighlighter.registerLanguage(languages.bash, bash);
-SyntaxHighlighter.registerLanguage(languages.javascript, javascript);
-SyntaxHighlighter.registerLanguage(languages.typescript, typescript);
-SyntaxHighlighter.registerLanguage(languages.diff, diff);
-SyntaxHighlighter.registerLanguage(languages.tsx, tsx);
-SyntaxHighlighter.registerLanguage(languages.css, css);
-
-interface CodeProps {
-  node?: any;
-  inline?: any;
-  className?: any;
-  children?: any;
-}
-
-const CodeBlock = ({
-  className = "",
-  children,
-  inline,
-  ...props
-}: CodeProps) => {
-  const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [value, copy] = useCopyToClipboard();
-  const match = /language-(\w+)/.exec(className || "");
-
-  const handleCopy = (code: string) => {
-    copy(code);
-    setIsCopied(true);
-  };
-
-  useEffect(() => {
-    if (isCopied) {
-      const timeout = setTimeout(() => {
-        setIsCopied(false);
-      }, 2000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [isCopied]);
-
+  const text = code.replace(/\n$/, "");
   return (
-    <>
-      {!inline ? (
-        <div className="relative">
-          <button
-            className="absolute right-3 top-3 rounded-none border border-neutral-700 p-2 hover:bg-neutral-800"
-            type="button"
-            aria-label="Copy to Clipboard"
-            onClick={() => handleCopy(children.toString())}
-            data-umami-event="Click Copy Code"
-          >
-            {!isCopied ? (
-              <CopyIcon size={18} className="text-neutral-400" />
-            ) : (
-              <CheckIcon size={18} className="text-green-600" />
-            )}
-          </button>
-
-          <SyntaxHighlighter
-            {...props}
-            style={themeColor}
-            customStyle={{
-              padding: "20px",
-              fontSize: "14px",
-              borderRadius: "0",
-              paddingRight: "50px",
-            }}
-            PreTag="div"
-            language={match ? match[1] : "javascript"}
-            wrapLongLines={true}
-          >
-            {String(children).replace(/\n$/, "")}
-          </SyntaxHighlighter>
-        </div>
-      ) : (
-        <code className="rounded-none bg-neutral-200 px-2 py-1 text-[14px] font-light text-sky-600 dark:bg-neutral-700 dark:text-sky-300">
-          {children}
+    <div className="relative my-6">
+      <pre className="overflow-x-auto rounded-none border bg-muted/50 p-5 pr-14 font-mono text-sm leading-relaxed">
+        <code className={className} {...props}>
+          {text}
         </code>
-      )}
-    </>
+      </pre>
+      <CopyButton text={text} />
+    </div>
   );
 };
 
-const LoadingPlaceholder = () => <div className="mb-12 mt-12 h-36 w-full" />;
-
-export default dynamic(() => Promise.resolve(CodeBlock), {
-  ssr: false,
-  loading: LoadingPlaceholder,
-});
+export default CodeBlock;

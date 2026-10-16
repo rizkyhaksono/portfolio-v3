@@ -11,16 +11,10 @@ export const dynamic = "force-dynamic"
 
 export default async function AIPage() {
   const valid = await isHaveValidToken()
-
-  // Chat is a signed-in feature: full Etan AI with saved history when authenticated,
-  // otherwise a skeleton preview behind a sign-in gate (no public access to the chat).
-  let chat
-  if (valid) {
-    const res = await getAIChat().catch(() => null)
-    chat = <AIChatApp initialSessions={res?.data ?? []} />
-  } else {
-    chat = <AIChatLocked />
-  }
+  const res = valid ? await getAIChat().catch(() => null) : null
+  // Chat is a signed-in feature; an expired session (401) gets the same sign-in gate as no cookie.
+  const loggedIn = valid && res?.status !== 401
+  const chat = loggedIn ? <AIChatApp initialSessions={res?.data ?? []} /> : <AIChatLocked />
 
   const docTool = (
     <MacWindow title="etan-ai ~ document" bodyClassName="p-3 sm:p-5">
@@ -30,7 +24,7 @@ export default async function AIPage() {
 
   return (
     <BlurFade delay={0.2} inView>
-      <AIHub chat={chat} docTool={docTool} loggedIn={valid} />
+      <AIHub chat={chat} docTool={docTool} loggedIn={loggedIn} />
     </BlurFade>
   )
 }

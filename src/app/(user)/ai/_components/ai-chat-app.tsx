@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
+import Link from "next/link"
 import { toast } from "sonner"
 import { renameAIChat, deleteAIChat } from "@/services/user/ai"
 import { Button } from "@/components/ui/button"
@@ -9,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import MDXComponent from "@/components/ui/mdx-components"
 import { cn } from "@/lib/utils"
+import { track } from "@/lib/analytics"
 import { Send, Plus, Bot, User, Loader2, MessageSquare, Sparkles, Clock, Pencil, Trash2 } from "lucide-react"
 import { MicButton, TtsToggle } from "./voice-controls"
 import { useSpeechSynthesis } from "./use-voice"
@@ -18,6 +20,7 @@ const RATE_WINDOW = 60 * 1000
 
 type Message = { id: string; msg: string; role: string; createdAt?: string }
 type Session = { id: string; title: string; createdAt?: string; messages: Message[] }
+type ChatError = { message: string; signIn?: boolean }
 
 export default function AIChatApp({ initialSessions }: { initialSessions: Session[] }) {
   const [sessions, setSessions] = useState<Session[]>(initialSessions ?? [])
@@ -28,6 +31,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
   const [timestamps, setTimestamps] = useState<number[]>([])
   const [now, setNow] = useState(() => 0)
   const [ttsOn, setTtsOn] = useState(false)
+  const [error, setError] = useState<ChatError | null>(null)
   const tts = useSpeechSynthesis()
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -55,6 +59,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
   const selectSession = useCallback((s: Session) => {
     setActiveChatId(s.id)
     setMessages(s.messages ?? [])
+    setError(null)
     setTimeout(() => inputRef.current?.focus(), 0)
   }, [])
 
@@ -62,6 +67,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
     setActiveChatId(undefined)
     setMessages([])
     setInput("")
+    setError(null)
     setTimeout(() => inputRef.current?.focus(), 0)
   }, [])
 
@@ -109,6 +115,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
     setInput("")
     setTimestamps((prev) => [...prev, sentAt])
     setLoading(true)
+    setError(null)
 
     let full = ""
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null
@@ -122,7 +129,8 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       const ct = res.headers.get("content-type") ?? ""
       if (!res.ok || ct.includes("application/json")) {
         const json = await res.json().catch(() => null)
-        throw new Error(json?.message || `AI request failed (${res.status})`)
+        const status: number = res.ok ? json?.status ?? res.status : res.status
+        throw Object.assign(new Error(json?.message || `AI request failed (${status})`), { status })
       }
 
       // Empty AI bubble that fills in as chunks stream in.
@@ -167,7 +175,18 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       setMessages((prev) => prev.filter((m) => m.id !== userMsg.id && m.id !== aiId))
       setInput(text)
       setTimestamps((prev) => prev.filter((t) => t !== sentAt))
-      toast.error(err instanceof Error ? err.message : "Failed to send message.")
+      const status = (err as { status?: number }).status ?? 0
+      track("ai-error", { feature: "chat", status })
+      if (status === 401) {
+        setError({ message: "Your session has ended. Sign in again.", signIn: true })
+      } else if (status === 404 && activeChatId) {
+        setSessions((prev) => prev.filter((s) => s.id !== activeChatId))
+        setActiveChatId(undefined)
+        setMessages([])
+        setError({ message: "This chat no longer exists. Send again to start a new chat." })
+      } else {
+        setError({ message: status && err instanceof Error ? err.message : "Could not reach Etan AI. Try again in a minute." })
+      }
     } finally {
       reader?.cancel().catch(() => {})
       setLoading(false)
@@ -254,7 +273,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
+        <div ref={scrollRef} data-private className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.length === 0 && !loading ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
               <div className="rounded-full bg-primary/10 p-4">
@@ -305,6 +324,20 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
             </div>
           )}
         </div>
+
+        {error && (
+          <p role="alert" className="border-t px-3 py-2 text-sm text-destructive">
+            {error.message}
+            {error.signIn && (
+              <>
+                {" "}
+                <Link href="/auth?redirect=/ai" className="font-medium underline underline-offset-4">
+                  Sign in
+                </Link>
+              </>
+            )}
+          </p>
+        )}
 
         {/* Input */}
         <form onSubmit={send} className="flex items-center gap-2 border-t p-3">

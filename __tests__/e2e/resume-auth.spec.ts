@@ -6,10 +6,12 @@ test.describe("Auth & public pages", () => {
     await expect(page).toHaveURL(/drive\.google\.com/);
   });
 
-  test("forgot password page loads", async ({ page }) => {
-    await page.goto("/auth/forgot-password");
-    await expect(page.getByRole("heading", { name: /forgot password/i })).toBeVisible();
-    await expect(page.getByPlaceholder("you@example.com")).toBeVisible();
+  test("password reset pages are hidden behind /auth", async ({ page }) => {
+    for (const path of ["/auth/forgot-password", "/auth/reset-password?token=x"]) {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/auth$/);
+    }
+    await expect(page.getByRole("link", { name: /forgot password/i })).toHaveCount(0);
   });
 
   test("blog page has onsite tab", async ({ page }) => {

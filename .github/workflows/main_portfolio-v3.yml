@@ -55,6 +55,8 @@ jobs:
           SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
           SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
         run: |
+          # The tracker has no fallback id any more; fail here instead of shipping without analytics.
+          : "${NEXT_PUBLIC_UMAMI_SRC:?secret not set}" "${NEXT_PUBLIC_UMAMI_WEBSITE_ID:?secret not set}"
           env | grep -E '^(DOMAIN|API_URL|NEXT_PUBLIC_|SUPABASE_|GH_READ_|DEVTO_|WAKATIME_|SPOTIFY_)' \
             | grep -v '=$' > "$RUNNER_TEMP/buildenv"
 

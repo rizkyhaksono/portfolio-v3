@@ -63,7 +63,9 @@ export async function getLinkedinCertifications(page: number = 1, limit: number 
       return { ...EMPTY_CERTIFICATIONS, page, limit };
     }
 
-    return JSON.parse(text);
+    const json: LinkedinCertificationsResponse = JSON.parse(text);
+    // Logos are base64 blobs (~211 KB a page) that would otherwise ride along in the RSC payload.
+    return { ...json, data: (json.data ?? []).map((cert) => ({ ...cert, image: undefined })) };
   } catch (error) {
     logNonCriticalError('Failed to fetch LinkedIn certifications:', error);
     return { ...EMPTY_CERTIFICATIONS, page, limit };

@@ -10,7 +10,8 @@ const getAIChat = async (): Promise<any> => {
     headers: await getAuthorizationHeader(),
     cache: "no-store",
   });
-  return await response.json();
+  const json = await response.json().catch(() => null);
+  return { ...json, status: response.status };
 };
 
 const getAIChatById = async (id: string) => {

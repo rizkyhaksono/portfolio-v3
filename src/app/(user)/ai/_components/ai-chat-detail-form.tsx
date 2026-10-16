@@ -67,7 +67,7 @@ export default function AIChatDetailForm({
   return (
     <div className="space-y-4">
       <Card>
-        <CardContent className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+        <CardContent data-private className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
           {messages.map((m) => (
             <div key={m.id} className="flex items-start gap-3">
               <Avatar className="h-8 w-8 border">

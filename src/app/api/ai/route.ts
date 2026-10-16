@@ -20,24 +20,38 @@ export async function POST(req: NextRequest) {
   }
 
   const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL
+  if (!apiUrl) {
+    return Response.json({ message: "AI service is not configured." }, { status: 503 })
+  }
 
-  const backendRes = await fetch(`${apiUrl}/v3/ai`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      text: body.text,
-      ...(body.chatId ? { chatId: body.chatId } : {}),
-    }),
-  })
+  // Time out only the wait for headers; the paced stream after that can legitimately run longer.
+  const headersTimeout = new AbortController()
+  const timer = setTimeout(() => headersTimeout.abort(), 90_000)
+  let backendRes: Response
+  try {
+    backendRes = await fetch(`${apiUrl}/v3/ai`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        text: body.text,
+        ...(body.chatId ? { chatId: body.chatId } : {}),
+      }),
+      signal: AbortSignal.any([req.signal, headersTimeout.signal]),
+    })
+  } catch {
+    return Response.json({ message: "Could not reach Etan AI. Try again in a minute." }, { status: 502 })
+  } finally {
+    clearTimeout(timer)
+  }
 
   const contentType = backendRes.headers.get("content-type") ?? ""
 
   // Errors (auth, rate limit, model failure) come back as JSON — forward as-is.
   if (!backendRes.ok || contentType.includes("application/json")) {
-    const text = await backendRes.text()
+    const text = await backendRes.text().catch(() => "")
     return new Response(text || JSON.stringify({ message: `AI request failed (${backendRes.status})` }), {
       status: backendRes.ok ? 200 : backendRes.status,
       headers: { "Content-Type": "application/json" },
