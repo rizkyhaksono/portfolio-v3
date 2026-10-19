@@ -35,4 +35,14 @@ describe('PlateFigure', () => {
     )
     expect(screen.getByText('A caption').className).not.toMatch(/italic/)
   })
+
+  it('rings the whole frame when a control inside is keyboard-focused, since the photo clips its own outline', () => {
+    const { container } = render(
+      <PlateFigure>
+        <button type="button">Open</button>
+      </PlateFigure>,
+    )
+    const frame = container.querySelector('[data-crop]')!.parentElement!
+    expect(frame.className).toContain('has-[:focus-visible]:outline-ring')
+  })
 })

@@ -28,11 +28,12 @@ function CropMarks() {
 }
 
 /** A figure framed like a drawing: 1px ink border, orange crop marks in the gutter, photos in grayscale, caption.
- * The frame is the plate's own, so an `img` inside never takes `.prose img`'s rule border as well. */
+ * The frame is the plate's own, so an `img` inside never takes `.prose img`'s rule border as well.
+ * The photo clips its own focus outline, so the frame draws it when a control inside is focused. */
 export function PlateFigure({ children, caption, className, tone = "photo" }: Readonly<PlateFigureProps>) {
   return (
     <figure className={className}>
-      <div className="relative border border-ink p-2">
+      <div className="relative border border-ink p-2 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
         <div className={cn("overflow-hidden [&_img]:block [&_img]:border-0", tone === "photo" && "plate")}>{children}</div>
         <CropMarks />
       </div>
