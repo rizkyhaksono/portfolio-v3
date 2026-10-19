@@ -31,9 +31,9 @@ function HeroPortrait({ className }: Readonly<{ className?: string }>) {
 }
 
 /**
- * Masthead stage: the h1 never animates; only the sentence inks itself. From lg the portrait is the LCP candidate
- * and the two columns sit centred in the stage. Below lg the portrait follows the stage, so the pinned stage never
- * outgrows the viewport; the name heads the stage and the sentence and links stand on its foot, next to the portrait.
+ * Masthead stage: the h1 never animates; only the sentence inks itself. The portrait is the LCP candidate.
+ * From lg it is the right column and the two columns sit centred in the stage. Below lg it follows the lead,
+ * capped in svh so the pinned stage still fits 375x812, and the sentence and links stand on the stage's foot.
  * The svh caps only bite below ~800px of height, so the stage still fits on 1280x600.
  */
 function Masthead() {
@@ -47,6 +47,7 @@ function Masthead() {
             Rizky Haksono
           </h1>
           <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+          <HeroPortrait className="mt-[min(2rem,4svh)] size-[min(24svh,20rem)] sm:size-[min(30svh,20rem)] lg:hidden" />
           <InkedSentence
             className="mt-auto max-w-[24ch] pt-[min(2rem,4svh)] text-h2 font-normal text-ink"
             text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
@@ -83,7 +84,6 @@ function SectionSkeleton({ className }: Readonly<{ className: string }>) {
 export default function Home() {
   return (
     <BaseLayout bleed={<Masthead />}>
-      <HeroPortrait className="lg:hidden mx-auto w-full max-w-[20rem]" />
       <AboutSection />
       <SkillSection />
       <Suspense fallback={<SectionSkeleton className="h-[48rem]" />}>

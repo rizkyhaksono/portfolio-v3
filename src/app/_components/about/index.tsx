@@ -6,8 +6,8 @@ export default function AboutSection() {
   return (
     <PageSection
       id="about"
-      // From lg it follows the full-height stage, whose own space above it is enough.
-      className="lg:mt-0"
+      // The stage's bottom padding already closes it, so a 3rem gap (wrapper padding plus mt-4 on phones) is enough.
+      className="mt-4 sm:mt-0"
       heading={{ title: "About" }}
       contentClassName="prose mt-6"
     >

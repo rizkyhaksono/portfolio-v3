@@ -68,11 +68,12 @@ test.describe('Navigation', () => {
     await expect(page.locator('.ws__stage').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeVisible();
   });
 
-  test('home portrait follows the stage on a phone without overflow', async ({ page }) => {
+  test('home portrait sits in the first screen on a phone without overflow', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    await expect(page.locator('.ws__stage').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeHidden();
-    await expect(page.locator('.ws ~ div').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeVisible();
+    const stage = page.locator('.ws__stage');
+    await expect(stage.getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeInViewport({ ratio: 1 });
+    await expect(stage.getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeInViewport({ ratio: 1 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
   });
 });
