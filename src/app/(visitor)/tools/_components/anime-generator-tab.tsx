@@ -8,9 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getAnimeImage, getAnimeQuote, type AnimeImageType, type AnimeQuote } from "@/services/visitor/anime"
 import { ToolError } from "./tool-status"
 
+// Waifu and neko are hidden on purpose (the owner's call in 55c7fa7); the service still serves them, so add them back here.
 const CATEGORIES: { id: AnimeImageType; name: string }[] = [
-  { id: "waifu", name: "Waifu" },
-  { id: "neko", name: "Neko" },
   { id: "cringe", name: "Cringe" },
   { id: "blush", name: "Blush" },
   { id: "dance", name: "Dance" },

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import "@testing-library/jest-dom"
 
@@ -24,13 +24,22 @@ describe("AnimeGeneratorTab images", () => {
     image.mockResolvedValue(png())
     render(<AnimeGeneratorTab />)
 
-    await userEvent.click(screen.getByRole("button", { name: "Neko" }))
+    await userEvent.click(screen.getByRole("button", { name: "Blush" }))
     await userEvent.click(screen.getByRole("button", { name: "Generate image" }))
 
-    expect(await screen.findByRole("img", { name: /neko/i })).toHaveAttribute("src", "blob:anime-1")
+    expect(await screen.findByRole("img", { name: /blush/i })).toHaveAttribute("src", "blob:anime-1")
     expect(image).toHaveBeenCalledTimes(1)
-    expect(image.mock.calls[0][0]).toBe("neko")
-    expect(screen.getByRole("link", { name: "Download" })).toHaveAttribute("download", "anime-neko.png")
+    expect(image.mock.calls[0][0]).toBe("blush")
+    expect(screen.getByRole("link", { name: "Download" })).toHaveAttribute("download", "anime-blush.png")
+  })
+
+  it("offers only cringe, blush and dance: waifu and neko stay hidden", () => {
+    render(<AnimeGeneratorTab />)
+
+    const group = screen.getByRole("group", { name: "Category" })
+    expect(within(group).getAllByRole("button").map((b) => b.textContent)).toEqual(["Cringe", "Blush", "Dance"])
+    expect(screen.queryByRole("button", { name: /waifu|neko/i })).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Cringe" })).toHaveAttribute("aria-pressed", "true")
   })
 
   it("tags the button for analytics with the category, never anything personal", async () => {

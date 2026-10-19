@@ -186,5 +186,5 @@ Total identity change after the owner rejected Lautan Pasir: the caldera logo wa
 - Code and docs complete on `redesign/phase-1`. Deploy is a push to `main`, after the build, local smoke and e2e checks.
 
 ### 10.10 Owner requests (2026-10-20)
-- The anime generator is back in `/tools` (`?tab=anime-generator`, group Play): five image categories and a quote tab, images in a colour `PlateFigure`, errors inline, `anime-generate` and `anime-quote` events. Source: `src/services/visitor/anime.ts` and `tools/_components/anime-generator-tab.tsx`.
+- The anime generator is back in `/tools` (`?tab=anime-generator`, group Play): three image categories (cringe, blush, dance; waifu and neko stay hidden as the owner left them) and a quote tab, images in a colour `PlateFigure`, errors inline, `anime-generate` and `anime-quote` events. Source: `src/services/visitor/anime.ts` and `tools/_components/anime-generator-tab.tsx`.
 - The site opens in Light on every first visit (see §10.2).
