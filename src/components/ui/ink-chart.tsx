@@ -146,9 +146,7 @@ export function InkChart({
             vectorEffect="non-scaling-stroke"
           />
           {points.map((p, i) => (
-            <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" fill="transparent">
-              <title>{describe(i)}</title>
-            </rect>
+            <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-ink/10" />
           ))}
         </svg>
       </div>

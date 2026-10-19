@@ -41,7 +41,7 @@ const Swatch = ({ level }: { level: number }) => (
 
 /**
  * Server-rendered one-ink year heatmap: five quartile levels (outline only → solid ink), a rule-strong
- * outline on every cell and a `<title>` per day. The scroller is `row-reverse`, so narrow screens
+ * outline on every cell and a `data-tip` per day. The scroller is `row-reverse`, so narrow screens
  * open on the newest weeks without a layout effect.
  */
 export function InkHeatmap({ weeks, label, unit = ["contribution", "contributions"], className }: Readonly<InkHeatmapProps>) {
@@ -87,9 +87,9 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
                         stroke="hsl(var(--rule-strong))"
                         strokeWidth={1}
                         shapeRendering="crispEdges"
-                      >
-                        <title>{`${count.toLocaleString("en")} ${count === 1 ? unit[0] : unit[1]} on ${formatDay(day.date, { day: "numeric", month: "short", year: "numeric" })}`}</title>
-                      </rect>
+                        className="hover:stroke-ink"
+                        data-tip={`${count.toLocaleString("en")} ${count === 1 ? unit[0] : unit[1]} on ${formatDay(day.date, { day: "numeric", month: "short", year: "numeric" })}`}
+                      />
                     )
                   })}
                 </g>

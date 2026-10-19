@@ -3,6 +3,7 @@ import Script from "next/script"
 import { Literata } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
+import { HoverTip } from "@/components/ui/hover-tip"
 import { Toaster } from "@/components/layout/toaster"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
@@ -106,6 +107,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
           <UmamiRecorder />
+          <HoverTip />
           <Toaster />
           {/* <div className="hidden sm:block">
             <SmoothCursor />

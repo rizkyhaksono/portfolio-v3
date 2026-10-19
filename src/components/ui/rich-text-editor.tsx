@@ -58,7 +58,7 @@ function Toolbar({ editor }: Readonly<{ editor: Editor }>) {
               <button
                 key={label}
                 type="button"
-                title={label}
+                data-tip={label}
                 aria-label={label}
                 aria-pressed={pressed}
                 disabled={!run(editor.can().chain().focus()).run()}

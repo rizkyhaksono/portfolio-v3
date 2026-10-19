@@ -26,7 +26,7 @@ export function ThemeToggle({ className }: Readonly<{ className?: string }>) {
       onClick={toggle}
       aria-label="Night theme"
       aria-pressed={mounted ? isNight : undefined}
-      title={mounted && isNight ? "Switch to paper" : "Switch to night"}
+      data-tip={mounted && isNight ? "Switch to paper" : "Switch to night"}
       className={cn(buttonVariants({ variant: "ghost", size: "icon" }), className)}
     >
       <Contrast strokeWidth={1.5} aria-hidden />

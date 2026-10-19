@@ -29,6 +29,7 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 - **Tag** (Chip and Badge merged). 1px `rule-strong`, 13px roman. Status is an 8px square, filled, outline or dashed, plus a word.
 - **Eyebrow.** An italic caption `<p>`, only when it adds information. Never all-caps, never mono.
 - **Table.** `th` 13px / 600 in ink-soft (sticky in admin), numbers right-aligned with `tabular-nums`, hover row `bg-tint`.
+- **Hover tips.** `data-tip="..."` on any element shows an instant lift tip (`ui/hover-tip.tsx`, mounted once in the root layout). SVG marks follow the cursor, other elements anchor below; touch shows it on tap. Never use the native `title` attribute: it waits about a second. The tip is `aria-hidden`, so keep an `aria-label` or text table beside it.
 - **Floating layers.** Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command and Sonner toasts use the lift surface and an ink scrim. No backdrop blur.
 - **Controls.** Square switch and checkbox, round radio dot (the only circle), static ruled skeleton with no pulse, square duotone avatar.
 - **Icons.** lucide only, stroke 1.5, 16px or 20px, functional only. `react-icons` and `@radix-ui/react-icons` are removed; do not add them back.
@@ -39,8 +40,8 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 
 All charts are server-rendered SVG in ink. Recharts is removed; do not add a chart library.
 
-- `InkChart`: 1.5px ink line, hatched area, dotted grid, italic tabular axes, a `<title>` per point, and a `<details>` table as the text alternative. `preserveAspectRatio="none"` with `vector-effect="non-scaling-stroke"`. Sessions as a dashed line.
-- `InkHeatmap`: five levels with a `rule-strong` outline and a `<title>` per cell.
+- `InkChart`: 1.5px ink line, hatched area, dotted grid, italic tabular axes, a `data-tip` per point, and a `<details>` table as the text alternative. `preserveAspectRatio="none"` with `vector-effect="non-scaling-stroke"`. Sessions as a dashed line.
+- `InkHeatmap`: five levels with a `rule-strong` outline and a `data-tip` per cell.
 - `HatchBar`: `repeating-linear-gradient(135deg, ...)` in CSS.
 
 ## Umami events
