@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
-import { Pre, CodeBlock } from "./code-block-client"
+import CodeBlock, { Pre } from "./code-block"
 import Link from "next/link"
 import {
   BookOpen,

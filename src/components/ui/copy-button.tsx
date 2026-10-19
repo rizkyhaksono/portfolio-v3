@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 
-export default function CopyButton({ text }: { text: string }) {
+interface CopyButtonProps {
+  text: string;
+  /** Fence language, sent as the event's `lang`. */
+  lang?: string;
+}
+
+/** Copies a code specimen. The word changes with the state, so it never relies on the icon alone. */
+export default function CopyButton({ text, lang }: Readonly<CopyButtonProps>) {
   const [copied, setCopied] = useState(false);
 
   const copy = () =>
@@ -15,15 +22,17 @@ export default function CopyButton({ text }: { text: string }) {
       })
       .catch(() => {});
 
+  const Icon = copied ? Check : Copy;
   return (
     <button
       type="button"
       onClick={copy}
-      aria-label={copied ? "Copied" : "Copy to clipboard"}
       data-umami-event="Click Copy Code"
-      className="absolute right-3 top-3 rounded-none border bg-background p-2 text-muted-foreground hover:text-foreground"
+      data-umami-event-lang={lang}
+      className="inline-flex items-center gap-1.5 text-caption text-ink underline-offset-[0.18em] hover:underline active:translate-y-px [@media(pointer:coarse)]:min-h-11"
     >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      <Icon className="size-4" strokeWidth={1.5} aria-hidden />
+      <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>
     </button>
   );
 }

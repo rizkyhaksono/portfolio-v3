@@ -1,7 +1,4 @@
-import {
-  ALL_TIME_SINCE_TODAY,
-  STATS_ENDPOINT,
-} from "@/commons/constants/watatime";
+import { STATS_ENDPOINT } from "@/commons/constants/watatime";
 
 export const getReadStats = async (): Promise<{
   status: number;
@@ -53,34 +50,5 @@ export const getReadStats = async (): Promise<{
       languages,
       editors,
     },
-  };
-};
-
-export const getALLTimeSinceToday = async (): Promise<{
-  status: number;
-  data: object;
-}> => {
-  const response = await fetch(ALL_TIME_SINCE_TODAY, {
-    method: "GET",
-    next: { revalidate: 3600 },
-    headers: {
-      Authorization: `Basic ${process.env.WAKATIME_API_KEY}`,
-    },
-  });
-
-  const status = response.status;
-
-  if (status >= 400) return { status, data: {} };
-
-  const getData = await response.json();
-
-  const data = {
-    text: getData?.data?.text,
-    total_seconds: getData?.data?.total_seconds,
-  };
-
-  return {
-    status,
-    data,
   };
 };

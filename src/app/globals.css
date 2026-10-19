@@ -51,15 +51,17 @@
     }
   }
 
+  /* The first layer is a flat 25% paper wash, not a visible gradient: it quiets the grain by a quarter
+     at every pixel density (resizing the tile only helps at 1x). */
   body,
   .bg-paper-grain {
     background-color: hsl(var(--background));
-    background-image: url("../assets/paper/grain-light.webp");
-    background-size: 128px 128px;
+    background-image: linear-gradient(hsl(var(--background) / 0.25) 0 0), url("../assets/paper/grain-light.webp");
+    background-size: auto, 128px 128px;
   }
   .dark body,
   .dark .bg-paper-grain {
-    background-image: url("../assets/paper/grain-dark.webp");
+    background-image: linear-gradient(hsl(var(--background) / 0.25) 0 0), url("../assets/paper/grain-dark.webp");
   }
 
   body {
@@ -223,6 +225,9 @@
 .prose > * + * {
   margin-top: 1em;
 }
+.prose > :first-child {
+  margin-top: 0;
+}
 .prose :is(h2, h3) {
   font-family: var(--font-display);
   font-style: italic;
@@ -336,7 +341,8 @@
   background: none;
   font-size: inherit;
 }
-.prose hr {
+.prose hr,
+.tail-piece {
   width: 40px;
   height: 14px;
   margin: 2.5em auto;
@@ -356,6 +362,59 @@
   @apply text-h4;
   margin-top: 1.25em;
 }
+
+/* ── Article shell (ui/article-shell.tsx) ─────────────────────────────── */
+
+/* Tail-piece: the fleuron of `.prose hr`, set once where the text ends. */
+.tail-piece {
+  margin-top: 3rem;
+}
+
+/* Rail: a disclosure below lg; from lg it stays open with no summary. Browsers without
+   ::details-content keep the summary, so the rail is never stuck shut. */
+@supports selector(::details-content) {
+  @media (min-width: 1024px) {
+    .article-rail > summary {
+      display: none;
+    }
+    .article-rail::details-content {
+      content-visibility: visible;
+    }
+  }
+}
+
+/* Reading hairline: inks the running head's rule as the page scrolls. Tier 1, so no JS fallback:
+   without scroll timelines or with reduced motion it is simply not there. */
+.reading-hairline {
+  display: none;
+}
+@keyframes reading-hairline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reading-hairline {
+      display: block;
+      position: fixed;
+      inset-inline: 0;
+      top: var(--head-h);
+      z-index: 40;
+      height: 2px;
+      background-color: hsl(var(--ink));
+      transform-origin: 0 50%;
+      pointer-events: none;
+      animation: reading-hairline auto linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+/* ── End article shell ────────────────────────────────────────────────── */
 
 @tailwind utilities;
 
@@ -380,3 +439,14 @@
   pre, blockquote, figure, img, tr { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
 }
+
+/* Printer's mark (seal / mark) — cached SVG masks painted with the current ink, so both themes share one file */
+.logo-mask {
+  display: block;
+  aspect-ratio: 1;
+  background-color: currentColor;
+  -webkit-mask: var(--logo-src) center / contain no-repeat;
+  mask: var(--logo-src) center / contain no-repeat;
+}
+.logo-mask--seal { --logo-src: url("/brand/seal-mask.svg"); }
+.logo-mask--mark { --logo-src: url("/brand/mark-mask.svg"); }

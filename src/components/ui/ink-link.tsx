@@ -42,7 +42,9 @@ export function InkLink({ href, external, event, eventData, className, children 
         {...prefixed("data-umami-event-", eventData)}
       >
         {children}
-        <span className="sr-only"> (opens in a new tab)</span>
+        {/* Not `sr-only`: an absolute box in an inline-flex link sits on the first letter (flex static position).
+            In flow it stays after the text; clip-path hides it whatever the positioning. */}
+        <span className="-mr-px inline-block size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"> (opens in a new tab)</span>
       </a>
     )
   }
