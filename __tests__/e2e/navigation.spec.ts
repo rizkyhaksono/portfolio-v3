@@ -61,4 +61,18 @@ test.describe('Navigation', () => {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });
+
+  test('home portrait sits in the stage on desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+    await expect(page.locator('.ws__stage').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeVisible();
+  });
+
+  test('home portrait follows the stage on a phone without overflow', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/');
+    await expect(page.locator('.ws__stage').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeHidden();
+    await expect(page.locator('.ws ~ div').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  });
 });

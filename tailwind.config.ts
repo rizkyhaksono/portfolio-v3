@@ -80,8 +80,8 @@ const config = {
 				h4: ['1.125rem', { lineHeight: '1.3', fontWeight: '600' }],
 				h3: ['clamp(1.375rem, 1.3232rem + 0.221vw, 1.5rem)', { lineHeight: '1.25', fontWeight: '600' }],
 				h2: ['clamp(1.75rem, 1.4392rem + 1.326vw, 2.5rem)', { lineHeight: '1.1', fontWeight: '600' }],
-				h1: ['clamp(2.5rem, 1.8785rem + 2.6519vw, 4rem)', { lineHeight: '1.02', fontWeight: '600' }],
-				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.95', fontWeight: '600' }],
+				h1: ['clamp(2.5rem, 1.8785rem + 2.6519vw, 4rem)', { lineHeight: '1.02', fontWeight: '600', letterSpacing: '-0.02em' }],
+				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.95', fontWeight: '600', letterSpacing: '-0.02em' }],
 				numeral: ['clamp(2.75rem, 2.0249rem + 3.0939vw, 4.5rem)', { lineHeight: '1' }]
 			},
 			// Radius 0 everywhere; `full` only for radio dots.
