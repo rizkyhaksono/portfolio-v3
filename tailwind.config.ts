@@ -8,18 +8,14 @@ const config = {
 	theme: {
 		fontFamily: {
 			sans: [
-				'var(--font-serif)',
-				...fontFamily.serif
-			],
-			serif: [
-				'var(--font-serif)',
-				...fontFamily.serif
+				'var(--font-sans)',
+				...fontFamily.sans
 			],
 			display: [
-				'var(--font-display)',
-				...fontFamily.serif
+				'var(--font-sans)',
+				...fontFamily.sans
 			],
-			mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
+			mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 		},
 		container: {
 			center: true,
@@ -73,7 +69,7 @@ const config = {
 				'mark-text': 'hsl(var(--mark-text) / <alpha-value>)',
 				'on-mark': 'hsl(var(--on-mark) / <alpha-value>)'
 			},
-			// Fluid 375 -> 1280px. Italic/balance live on the elements, not here.
+			// Fluid 375 -> 1280px. Balance lives on the elements, not here.
 			fontSize: {
 				xs: ['0.8125rem', { lineHeight: '1.35' }],
 				caption: ['0.8125rem', { lineHeight: '1.35' }],
@@ -85,7 +81,7 @@ const config = {
 				h3: ['clamp(1.375rem, 1.3232rem + 0.221vw, 1.5rem)', { lineHeight: '1.25' }],
 				h2: ['clamp(1.75rem, 1.4392rem + 1.326vw, 2.5rem)', { lineHeight: '1.1' }],
 				h1: ['clamp(2.5rem, 1.8785rem + 2.6519vw, 4rem)', { lineHeight: '1.02' }],
-				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.92', fontWeight: '360' }],
+				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.95', fontWeight: '600' }],
 				numeral: ['clamp(2.75rem, 2.0249rem + 3.0939vw, 4.5rem)', { lineHeight: '1' }]
 			},
 			// Radius 0 everywhere; `full` only for radio dots.

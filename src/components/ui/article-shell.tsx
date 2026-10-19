@@ -10,9 +10,9 @@ interface ArticleLink {
 }
 
 export interface ArticleShellProps {
-  /** Set as the page `h1`, display italic. */
+  /** Set as the page `h1`, display weight. */
   title: React.ReactNode
-  /** One italic lead line under the title. */
+  /** One lead line under the title. */
   standfirst?: React.ReactNode
   /** A sentence, never a middle-dot string: "Published 3 March 2026. Six minutes to read." */
   dateline?: React.ReactNode

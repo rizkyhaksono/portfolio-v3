@@ -45,7 +45,7 @@ export function ReadingNow({ className }: Readonly<{ className?: string }>) {
   }, [])
 
   return (
-    <p className={cn("min-h-[1.35em] text-caption italic tabular-nums text-muted-foreground", className)}>
+    <p className={cn("min-h-[1.35em] text-caption tabular-nums text-muted-foreground", className)}>
       {visitors > 0 &&
         `${visitors.toLocaleString("en")} ${visitors === 1 ? "person" : "people"} here in the last five minutes.`}
     </p>

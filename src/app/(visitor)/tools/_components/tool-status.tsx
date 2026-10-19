@@ -31,7 +31,7 @@ export function useToolData<T>(load: () => Promise<T>) {
   return { ...state, retry: () => setAttempt((n) => n + 1) }
 }
 
-/** Inline failure: an italic ink line behind a cross, and a retry when one helps. */
+/** Inline failure: an ink line behind a cross, and a retry when one helps. */
 export function ToolError({ children, onRetry }: Readonly<{ children: React.ReactNode; onRetry?: () => void }>) {
   return (
     <div role="alert" className="flex flex-col items-start gap-3 border border-ink p-4 sm:flex-row sm:items-center sm:justify-between">

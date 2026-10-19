@@ -5,7 +5,7 @@ interface EyebrowProps extends React.HTMLAttributes<HTMLParagraphElement> {
   marker?: React.ReactNode
 }
 
-/** Italic caption above a heading. Use only when it tells the reader something the heading does not. */
+/** Caption above a heading. Use only when it tells the reader something the heading does not. */
 export function Eyebrow({ marker, className, children, ...props }: Readonly<EyebrowProps>) {
   return (
     <p className={cn("font-display text-caption text-ink-soft", className)} {...props}>

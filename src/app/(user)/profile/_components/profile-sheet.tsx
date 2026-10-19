@@ -1,6 +1,6 @@
 interface ProfileSheetProps {
   title: React.ReactNode
-  /** One italic lead line under the title. */
+  /** One lead line under the title. */
   standfirst?: React.ReactNode
   /** Square duotone portrait beside the title. */
   portrait?: React.ReactNode

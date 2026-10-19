@@ -14,7 +14,7 @@ function textOf(node: ReactNode): string {
   return "";
 }
 
-/** Server specimen box: tint ground, system mono, no syntax colours; the copy button is the only island. */
+/** Server specimen box: tint ground, Plex Mono, no syntax colours; the copy button is the only island. */
 function Specimen({ text, lang, className }: Readonly<{ text: string; lang?: string; className?: string }>) {
   return (
     <div className="my-6 bg-tint">

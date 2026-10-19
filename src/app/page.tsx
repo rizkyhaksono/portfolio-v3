@@ -28,8 +28,7 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
 function Masthead() {
   return (
     <WordScroll className={cn(SHELL_WIDTH, "flex flex-col pt-10 sm:pt-[min(4rem,8svh)]")}>
-      {/* The bottom padding clears the italic descenders, which hang below a 0.92 line box. */}
-      <h1 className="pb-[0.14em] font-display text-display text-balance text-ink [font-size:min(clamp(3.5rem,1.0138rem_+_10.6077vw,9.5rem),19svh)]">
+      <h1 className="pb-0 font-display text-display text-balance text-ink [font-size:min(clamp(3.5rem,1.0138rem_+_10.6077vw,9.5rem),19svh)]">
         Rizky Haksono
       </h1>
       <p className="mt-2 font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>

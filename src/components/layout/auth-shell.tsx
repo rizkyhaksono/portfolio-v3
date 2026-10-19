@@ -8,7 +8,7 @@ interface AuthShellProps {
   /** `split`: a framed plate beside the form (visitor sign-in). `narrow`: one column (callback, admin). */
   variant?: "split" | "narrow"
   title: React.ReactNode
-  /** One italic lead line under the title. */
+  /** One lead line under the title. */
   standfirst?: React.ReactNode
   /** Under the form, behind a hairline: terms, a way back. */
   footer?: React.ReactNode

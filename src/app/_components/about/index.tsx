@@ -4,9 +4,6 @@ import { PlateFigure } from "@/components/ui/plate-figure"
 import { InkLink } from "@/components/ui/ink-link"
 import { PORTFOLIO_PDF_GOOGLE_DRIVE_URL, RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
 
-const DROP_CAP =
-  "first-letter:float-left first-letter:mr-2 first-letter:mt-[0.06em] first-letter:font-display first-letter:text-[5.6em] first-letter:italic first-letter:leading-[0.74] first-letter:text-ink"
-
 export default function AboutSection() {
   return (
     <PageSection
@@ -17,7 +14,7 @@ export default function AboutSection() {
       contentClassName="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_10rem] md:gap-12"
     >
       <div className="prose">
-        <p className={DROP_CAP}>
+        <p>
           My name is Muhammad Rizky Haksono, and I am a senior AI engineer at Sarana AI in Malang. I build production LLM
           systems: retrieval and embeddings, MCP integrations and cloud-native agents on AWS, with full-stack and cloud
           engineering underneath them.

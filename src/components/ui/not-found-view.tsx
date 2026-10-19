@@ -10,7 +10,7 @@ interface NotFoundViewProps {
   className?: string
 }
 
-/** Not found pattern: the seal, italic title, one standfirst, two ways back, and the riders cut from the plate. */
+/** Not found pattern: the seal, title, one standfirst, two ways back, and the riders cut from the plate. */
 export function NotFoundView({ title = "Page not found", children, className }: Readonly<NotFoundViewProps>) {
   return (
     <section className={cn("mx-auto grid w-full max-w-[60rem] items-center gap-10 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] md:py-24", className)}>

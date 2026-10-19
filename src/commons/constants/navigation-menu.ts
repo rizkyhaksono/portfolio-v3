@@ -5,7 +5,7 @@ export type NavArea = "head" | "menu" | "colophon"
 export interface NavSection {
   href: string
   label: string
-  /** One roman line under the italic label in Contents. */
+  /** One line under the label in Contents. */
   note: string
   /** Running head: `md` shows from 768px, `lg` from 1024px; absent means Contents, colophon and ⌘K only. */
   head?: "md" | "lg"

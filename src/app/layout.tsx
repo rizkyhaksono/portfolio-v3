@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
-import { Literata } from "next/font/google"
+import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { HoverTip } from "@/components/ui/hover-tip"
@@ -14,20 +14,19 @@ import { PRINT_HEX } from "@/lib/print-hex"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
-// Literata only. Two instances so roman and italic each get their own fallback metrics.
-const fontSerif = Literata({
+// Plex Sans is variable in next/font, so it takes no weight list. Plex Mono is static and stays off the preload list.
+const fontSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  style: "normal",
-  variable: "--font-serif",
+  variable: "--font-sans",
   display: "swap",
   adjustFontFallback: true,
 })
-const fontDisplay = Literata({
+const fontMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  style: "italic",
-  variable: "--font-display",
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
-  adjustFontFallback: true,
+  preload: false,
 })
 
 const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC
@@ -82,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSerif.variable, fontDisplay.variable)} suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSans.variable, fontMono.variable)} suppressHydrationWarning>
       <head>
         <JsonLd />
         {umamiEnabled && (

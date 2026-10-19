@@ -2,7 +2,7 @@ import { PageSection } from "@/components/ui/page-section"
 import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
 import { DEFERRED_SECTION } from "../deferred"
 
-/** Three recommendations from LinkedIn as italic pull quotes, set in two balanced columns from lg. Static markup. */
+/** Three recommendations from LinkedIn as pull quotes, set in two balanced columns from lg. Static markup. */
 export default async function RecommendationsSection() {
   const { data } = await getLinkedinRecommendations()
   const quotes = (data ?? []).filter((rec) => rec.message?.trim()).slice(0, 3)

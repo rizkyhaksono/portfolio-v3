@@ -4,8 +4,6 @@ import { Eyebrow } from "@/components/ui/eyebrow"
 interface SectionHeadingProps {
   eyebrow?: React.ReactNode
   title: React.ReactNode
-  /** Trailing words set roman inside the italic title. */
-  accent?: React.ReactNode
   description?: React.ReactNode
   align?: "left" | "center"
   as?: "h1" | "h2" | "h3"
@@ -16,11 +14,10 @@ interface SectionHeadingProps {
 
 const TITLE_SIZE = { h1: "text-h1", h2: "text-h2", h3: "text-h3" } as const
 
-/** Italic display heading with an optional caption above and a short description below. */
+/** Display heading with an optional caption above and a short description below. */
 export function SectionHeading({
   eyebrow,
   title,
-  accent,
   description,
   align = "left",
   as = "h2",
@@ -35,7 +32,6 @@ export function SectionHeading({
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <Tag className={cn("font-display text-balance text-ink", TITLE_SIZE[as], titleClassName)}>
         {title}
-        {accent && <> <em>{accent}</em></>}
       </Tag>
       {description && (
         <p className={cn("max-w-[60ch] text-body text-ink-soft", align === "center" && "mx-auto")}>

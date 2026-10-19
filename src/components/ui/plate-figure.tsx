@@ -5,7 +5,7 @@ interface PlateFigureProps {
   className?: string
 }
 
-/** A photo printed as a plate: double-rule frame (1px ink, 3px paper, 1px rule), duotone, italic caption. */
+/** A photo printed as a plate: double-rule frame (1px ink, 3px paper, 1px rule), duotone, caption. */
 export function PlateFigure({ children, caption, className }: Readonly<PlateFigureProps>) {
   return (
     <figure className={className}>
