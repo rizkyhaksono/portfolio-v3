@@ -22,7 +22,8 @@ function tokenBlocks(selector: string): Record<string, Triple>[] {
 
 const [root] = tokenBlocks(":root")
 const [darkBlock, printBlock] = tokenBlocks("\\.dark")
-const THEMES = { light: root, dark: { ...root, ...darkBlock } }
+const light = root
+const dark = { ...root, ...darkBlock }
 
 const rgb = ([h, s, l]: Triple) => {
   const a = (s / 100) * Math.min(l / 100, 1 - l / 100)
@@ -54,7 +55,7 @@ const FLOORS: [string, string, number][] = [
   ["on-mark", "mark", 4.5],
 ]
 
-describe.each(Object.entries(THEMES))("%s theme contrast", (_theme, tokens) => {
+describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, tokens) => {
   it.each(FLOORS)("%s on %s is at least %d:1", (fg, bg, floor) => {
     expect(tokens[fg]).toBeDefined()
     expect(tokens[bg]).toBeDefined()
@@ -64,14 +65,14 @@ describe.each(Object.entries(THEMES))("%s theme contrast", (_theme, tokens) => {
 
 describe("PRINT_HEX", () => {
   it.each([
-    ["paper", THEMES.light.paper],
-    ["ink", THEMES.light.ink],
-    ["inkSoft", THEMES.light["ink-soft"]],
-    ["rule", THEMES.light.rule],
-    ["mark", THEMES.light.mark],
-    ["night", THEMES.dark.paper],
-    ["nightInk", THEMES.dark.ink],
-    ["nightMark", THEMES.dark.mark],
+    ["paper", light.paper],
+    ["ink", light.ink],
+    ["inkSoft", light["ink-soft"]],
+    ["rule", light.rule],
+    ["mark", light.mark],
+    ["night", dark.paper],
+    ["nightInk", dark.ink],
+    ["nightMark", dark.mark],
   ] as const)("%s matches its token (±1 per channel)", (key, triple) => {
     expect(withinOne(PRINT_HEX[key], hex(triple))).toBe(true)
   })
@@ -82,7 +83,7 @@ describe("print block", () => {
     expect(printBlock).toBeDefined()
     for (const name of ["paper", "ink", "ink-soft", "rule", "rule-strong", "tint", "mark", "mark-text"]) {
       expect(printBlock[name]).toBeDefined()
-      expect(printBlock[name]).toEqual(THEMES.light[name])
+      expect(printBlock[name]).toEqual(light[name])
     }
   })
 })
