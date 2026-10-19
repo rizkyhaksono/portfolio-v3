@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { isSiteImage } from "@/lib/site-url"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -108,7 +109,7 @@ export default async function BlogPage() {
             {lead.image && (
               <PlateFigure>
                 <div className="relative aspect-[1000/420]">
-                  <Image src={lead.image} alt="" fill priority sizes="(min-width: 960px) 31rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
+                  <Image src={lead.image} alt="" fill priority unoptimized={isSiteImage(lead.image)} sizes="(min-width: 960px) 31rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
                 </div>
               </PlateFigure>
             )}

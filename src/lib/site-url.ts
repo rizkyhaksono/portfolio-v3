@@ -37,3 +37,11 @@ export function getMetadataBaseUrl(): URL {
   }
   return new URL(getSiteUrl())
 }
+
+/**
+ * Images this site serves itself (e.g. `/api/og` cards used as blog covers). They are already
+ * final PNGs, and the image optimizer only accepts allow-listed remote hosts, so render them as-is.
+ */
+export function isSiteImage(src: string): boolean {
+  return src.startsWith("/") || src.startsWith(`${CANONICAL_SITE_ORIGIN}/`) || src.startsWith(`${getSiteUrl()}/`)
+}

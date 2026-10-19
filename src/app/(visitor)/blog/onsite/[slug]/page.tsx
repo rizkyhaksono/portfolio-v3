@@ -9,7 +9,7 @@ import { ReaderCount } from "@/components/ui/reader-count"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import { dateline, minutesToRead } from "@/app/_components/blog/format"
-import { getSiteUrl } from "@/lib/site-url"
+import { getSiteUrl, isSiteImage } from "@/lib/site-url"
 import { getOnsiteBlogBySlug, getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
 import { getPathReads } from "@/services/visitor/umami"
 
@@ -82,7 +82,7 @@ export default async function OnsiteArticlePage({ params }: Props) {
         {post.coverImage && (
           // `.prose img` frames body images; the plate brings its own frame.
           <PlateFigure className="[&_img]:border-0 [&_img]:p-0">
-            <Image src={post.coverImage} alt="" width={1200} height={675} priority sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-video w-full object-cover" />
+            <Image src={post.coverImage} alt="" width={1200} height={675} priority unoptimized={isSiteImage(post.coverImage)} sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-video w-full object-cover" />
           </PlateFigure>
         )}
         {/* Nested `.prose` so the printed HTML gets the same block spacing as direct children. */}
