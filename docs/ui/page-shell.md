@@ -18,7 +18,7 @@ under 768px       [RH] wordmark, [menu icon]   (48px head, 44px targets)
 - The running head wordmark is the `mini` logo (32px) before "Rizky Haksono". The current nav item is underlined 2px in `mark` (`aria-current="page"`).
 - If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
 - Credentials and Changelog live in the colophon, the menu and the command palette.
-- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section in 26px display type, then a footer row with the theme radio (Light, Dark, System) and Account. No search field, no notes.
+- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section at the `h2` size (22 to 30px, weight 400), then a footer row with the theme radio (Light, Dark, System) and Account. No search field, no notes.
 - **Colophon** (`footer.tsx`): the double rule, the title block, three link columns (Read, Try, Site, with the legal links in Site), then the credit line "Set in IBM Plex Sans and IBM Plex Mono. Drawn in Malang, East Java." beside the "Send feedback" and "Back to top" controls.
 - `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon, command palette and terminal overlay all import it.
 

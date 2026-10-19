@@ -5,7 +5,7 @@ import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { ReaderCount } from "@/components/ui/reader-count"
-import { PAGE_WIDTH } from "@/lib/design-system"
+import { PAGE_WIDTH, SECTION_SPACING } from "@/lib/design-system"
 import { ProjectLinks, plateOf } from "./project-links"
 import { plainText } from "./safe-html"
 
@@ -85,7 +85,7 @@ export default async function ProjectPage() {
       )}
 
       {rest.length > 0 && (
-        <section aria-labelledby="more" className="mt-16">
+        <section aria-labelledby="more" className={SECTION_SPACING.section}>
           <h2 id="more" className="font-display text-h2 text-ink">
             {featured.length > 0 ? "More projects" : "All projects"}
           </h2>

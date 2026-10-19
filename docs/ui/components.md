@@ -35,7 +35,7 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 - **Controls.** Square switch and checkbox, round radio dot (the only circle), static ruled skeleton with no pulse, square grayscale avatar (`.plate`, no crop marks).
 - **Icons.** lucide only, stroke 1.5, 16px or 20px, functional only. `react-icons` and `@radix-ui/react-icons` are removed; do not add them back.
 - **Code.** Server `<pre>` specimen box (inset ground, Plex Mono 13.5px, `tabIndex={0}`), no syntax colours. The client `CopyButton` keeps the `Click Copy Code` event.
-- **Prose.** `.prose` in `globals.css` (no typography plugin): 66ch, `h2` and `h3` at weight 600, ink links, a 22px upright blockquote behind a 1px ink left rule, a plain 1px `hr`, en-dash bullets, ledger tables, framed images. `.prose--chat` for chat replies.
+- **Prose.** `.prose` in `globals.css` (no typography plugin): 66ch, `h2` at 1.25em and `h3` at 1.0625em of the body, both weight 600, ink links, an upright blockquote at the `lead` size behind a 1px ink left rule, a plain 1px `hr`, en-dash bullets, ledger tables, framed images. `.prose--chat` for chat replies.
 
 ## Plates
 
