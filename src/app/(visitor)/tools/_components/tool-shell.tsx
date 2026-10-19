@@ -14,6 +14,7 @@ const loading = () => <ToolSkeleton />
 // Only the open tool's code is fetched.
 const PokemonTab = dynamic(() => import("./pokemon-tab").then((m) => m.PokemonTab), { loading })
 const StarWarsTab = dynamic(() => import("./starwars-tab").then((m) => m.StarWarsTab), { loading })
+const AnimeGeneratorTab = dynamic(() => import("./anime-generator-tab").then((m) => m.AnimeGeneratorTab), { loading })
 const WpmTest = dynamic(() => import("./wpm/wpm-test"), { loading })
 const JapaneseQuizTab = dynamic(() => import("./japanese-quiz-tab").then((m) => m.JapaneseQuizTab), { loading })
 const IeltsTab = dynamic(() => import("./ielts-tab").then((m) => m.IeltsTab), { loading })
@@ -32,6 +33,7 @@ interface Tool {
 const TOOLS: Tool[] = [
   { id: "pokemon", name: "Pokédex", group: "Play", note: "Every Pokémon, with its types, base stats and abilities.", Panel: PokemonTab },
   { id: "starwars", name: "Star Wars", group: "Play", note: "Characters and starships from the films and series.", Panel: StarWarsTab },
+  { id: "anime-generator", name: "Anime generator", group: "Play", note: "A random anime image by mood, or a random anime quote.", Panel: AnimeGeneratorTab },
   { id: "wpm", name: "WPM test", group: "Play", note: "How many words a minute you type, and how cleanly.", Panel: WpmTest },
   { id: "japanese-quiz", name: "Japanese quiz", group: "Learn", note: "JLPT vocabulary from N5 to N1, as a word list or a ten-question quiz.", Panel: JapaneseQuizTab },
   { id: "ielts", name: "IELTS flashcards", group: "Learn", note: "Band 7 academic words for the writing and speaking papers.", Panel: IeltsTab },
@@ -98,7 +100,7 @@ export function ToolCabinet({ tab }: Readonly<{ tab: ToolTab | null }>) {
   )
 }
 
-/** Reads `?tab=`; unknown or retired tabs (the old anime generator) open the default tool. */
+/** Reads `?tab=`; an unknown tab opens the default tool. */
 export function ToolShell() {
   const param = useSearchParams().get("tab")
   const tab = TOOLS.some((t) => t.id === param) ? (param as ToolTab) : DEFAULT_TOOL

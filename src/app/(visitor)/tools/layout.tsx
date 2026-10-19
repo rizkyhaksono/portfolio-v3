@@ -6,7 +6,7 @@ import { getMetadataBaseUrl } from "@/lib/site-url"
 export const metadata: Metadata = {
   title: "Tools: Pokédex, JLPT quiz, typing test and more | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: "Small free tools: a Pokédex, a Star Wars archive, a Japanese JLPT quiz, IELTS flashcards, a typing test, a social media downloader, Indonesian postal codes and crypto prices.",
+  description: "Small free tools: a Pokédex, a Star Wars archive, a Japanese JLPT quiz, IELTS flashcards, a typing test, an anime image and quote generator, a social media downloader, Indonesian postal codes and crypto prices.",
   keywords: [
     ...MetadataConstants.keyword,
     "Japanese quiz",
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
     "tiktok downloader",
     "instagram downloader",
     "youtube downloader",
+    "anime generator",
     "wpm test",
     "typing speed test",
     "postal code lookup",

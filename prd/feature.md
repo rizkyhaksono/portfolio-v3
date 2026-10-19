@@ -126,7 +126,7 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 - Literata (roman and italic) via `next/font/google`; Instrument Serif, Bricolage Grotesque, Inter and JetBrains Mono removed. System mono for machine text only.
 
 ### 9.2 Night print
-- Same tokens flipped on `<html class="dark">`: cream ink on night paper #0D1433. No `dark:` classes. Default theme follows the system.
+- Same tokens flipped on `<html class="dark">`: cream ink on night paper #0D1433. No `dark:` classes. The default theme was the system until 2026-10-20; it is now Light (§10.2).
 
 ### 9.3 Surfaces and patterns
 - Three surfaces: frame, inset, lift (lift = 1px ink and a `3px 3px 0` ink shadow on floating layers only). No gradients, glass, blur or soft shadows.
@@ -146,7 +146,7 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 ### 9.7 Status (2026-10-19)
 - Phases 1–3 shipped on `redesign/phase-1`; every route uses a page pattern from `docs/ui/page-shell.md`.
 - Logo: printer's mark of the Tengger caldera (`docs/ui/README.md` → Brand).
-- Removed: Spotify and weather widgets, the anime tool, `/signal`, recharts, motion, gsap, ogl, react-icons, date-fns.
+- Removed: Spotify and weather widgets, the anime tool (restored 2026-10-20, §10.10), `/signal`, recharts, motion, gsap, ogl, react-icons, date-fns.
 
 ---
 
@@ -159,7 +159,7 @@ Total identity change after the owner rejected Lautan Pasir: the caldera logo wa
 - IBM Plex Sans (variable, normal style) and IBM Plex Mono (400 and 500) via `next/font/google`; Literata removed. No italic anywhere: `<em>`, `<i>` and `<cite>` are upright at weight 500, `<strong>` at 600. Headings are weight 600 on the size tokens.
 
 ### 10.2 Dark theme
-- The same tokens flipped on `<html class="dark">`. Themes are named Light, Dark and System; the print-metaphor labels are gone.
+- The same tokens flipped on `<html class="dark">`. Themes are named Light, Dark and System; the print-metaphor labels are gone. The default is Light (owner request, 2026-10-20): `ThemeProvider defaultTheme="light"` with `enableSystem` kept, so System is a choice and no longer the first-visit behaviour.
 
 ### 10.3 One orange
 - `mark` appears only on the focus ring, the active nav underline, the reading hairline, the crop marks on plates and the logo `mark` variant, the last chart point, and text selection. Primary buttons and links stay ink.
@@ -184,3 +184,7 @@ Total identity change after the owner rejected Lautan Pasir: the caldera logo wa
 
 ### 10.9 Status (2026-10-20)
 - Code and docs complete on `redesign/phase-1`. Deploy is a push to `main`, after the build, local smoke and e2e checks.
+
+### 10.10 Owner requests (2026-10-20)
+- The anime generator is back in `/tools` (`?tab=anime-generator`, group Play): five image categories and a quote tab, images in a colour `PlateFigure`, errors inline, `anime-generate` and `anime-quote` events. Source: `src/services/visitor/anime.ts` and `tools/_components/anime-generator-tab.tsx`.
+- The site opens in Light on every first visit (see §10.2).

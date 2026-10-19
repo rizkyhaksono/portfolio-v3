@@ -141,7 +141,7 @@ portfolio-v3/
 
 - **Portfolio Showcase** - Projects, skills, and professional experience
 - **Blog** - Technical writing with MDX support for rich content
-- **Light and dark themes** - The same sheet reversed, off-white ink on near-black paper; follows the system or a toggle
+- **Light and dark themes** - The same sheet reversed, off-white ink on near-black paper; the site opens in light, with a toggle and a System option
 - **Responsive Design** - Works seamlessly on all devices
 - **Performance** - Lightning-fast page loads with Next.js 16
 - **Drafting sheet design** - Black and white with one orange accent, IBM Plex, square corners, hairline rules, no animation library

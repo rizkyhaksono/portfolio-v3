@@ -265,4 +265,5 @@ export type ToolTab =
   | "postal-code"
   | "web3-crypto"
   | "pokemon"
-  | "starwars";
+  | "starwars"
+  | "anime-generator";

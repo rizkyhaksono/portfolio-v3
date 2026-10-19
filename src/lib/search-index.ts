@@ -35,6 +35,7 @@ const TOOL_TABS = [
   ["japanese-quiz", "Japanese quiz", "JLPT vocabulary practice."],
   ["ielts", "IELTS flashcards", "Vocabulary cards for the IELTS exam."],
   ["downloader", "Downloader", "Save TikTok, Instagram and Facebook videos."],
+  ["anime-generator", "Anime generator", "A random anime image by mood, or a random anime quote."],
   ["wpm", "Typing test", "Words per minute and accuracy."],
   ["postal-code", "Postal codes", "Indonesian postal codes by province, city, district and village."],
   ["web3-crypto", "Web3 crypto", "Coin prices, trending coins and price history charts."],

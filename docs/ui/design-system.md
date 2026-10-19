@@ -168,7 +168,7 @@ Not allowed: grain, speckle, engraving or illustration bands, duotone, fleuron, 
 
 ## Dark mode
 
-- Token flip on `<html class="dark">`, driven by next-themes. The default theme is System. The menu sheet offers Light, Dark and System; the running head toggle (from 1024px) flips Light and Dark (aria-label "Dark theme", pressed state set after mount); the command palette has "Light theme", "Dark theme" and "System theme".
+- Token flip on `<html class="dark">`, driven by next-themes. The default theme is Light, even where the system prefers dark; System is still offered and follows the OS. The menu sheet offers Light, Dark and System; the running head toggle (from 1024px) flips Light and Dark (aria-label "Dark theme", pressed state set after mount); the command palette has "Light theme", "Dark theme" and "System theme".
 - Do not write dark-variant classes. Every colour already flips through the tokens, and gate 1 bans `dark:`.
 - Photos stay grayscale in both themes. The mark pair has its own dark value (#FF6326) so the orange keeps its contrast on near-black.
 - `color-scheme` follows the theme. Viewport `themeColor` is paper by day and near-black at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.

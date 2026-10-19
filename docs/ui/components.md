@@ -86,6 +86,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `project-site`, `project-source` | Project rows and detail | `project` |
 | `roadmap-lesson-complete`, `video-play` | Roadmap | `course` / `lesson` |
 | `tool-open`, `chat-send`, `tracker-card-move`, `stats-profile-open` | Tools, chat, tracker, stats | `tool` / `reply` / `from`, `to` / `platform` |
+| `anime-generate`, `anime-quote` | Anime generator buttons in Tools | `category`: `waifu`, `neko`, `cringe`, `blush`, `dance` / none |
 | `ai-tab`, `ai-chat-send`, `ai-ocr-run`, `ai-jd-run`, `hirefit-share` | `/ai` | `tab` / `status` / `mode`, `status` / `band`, `status` |
 | `signin-start`, `signin-complete`, `signup-complete`, `profile-save` | Auth, profile | `method` / `status` |
 
