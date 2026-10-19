@@ -33,14 +33,17 @@ const rgb = ([h, s, l]: Triple) => {
   }
   return [channel(0), channel(8), channel(4)]
 }
-const luminance = (t: Triple) => {
-  const [r, g, b] = rgb(t).map((c) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4))
+const luminance = (c: number[]) => {
+  const [r, g, b] = c.map((v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
-const contrast = (a: Triple, b: Triple) => {
+const contrast = (a: number[], b: number[]) => {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
+/** Alpha of `--ws-ghost: hsl(var(--ink) / A)` in the first `selector{…}` block that sets it. */
+const ghostAlpha = (selector: string) =>
+  Number(css.match(new RegExp(`${selector}\\s*\\{[^}]*--ws-ghost:\\s*hsl\\(var\\(--ink\\)\\s*/\\s*([\\d.]+)\\)`))?.[1])
 const hex = (t: Triple) => "#" + rgb(t).map((c) => Math.round(c).toString(16).padStart(2, "0")).join("").toUpperCase()
 const withinOne = (a: string, b: string) =>
   [1, 3, 5].every((i) => Math.abs(parseInt(a.slice(i, i + 2), 16) - parseInt(b.slice(i, i + 2), 16)) <= 1)
@@ -59,7 +62,18 @@ describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, 
   it.each(FLOORS)("%s on %s is at least %d:1", (fg, bg, floor) => {
     expect(tokens[fg]).toBeDefined()
     expect(tokens[bg]).toBeDefined()
-    expect(contrast(tokens[fg], tokens[bg])).toBeGreaterThanOrEqual(floor)
+    expect(contrast(rgb(tokens[fg]), rgb(tokens[bg]))).toBeGreaterThanOrEqual(floor)
+  })
+})
+
+// The unscrolled hero sentence is 22px on a phone, so its ghost colour needs the 4.5:1 text floor.
+describe.each([["light", light, ":root"], ["dark", dark, "\\.dark"]] as const)("%s wordscroll ghost", (_theme, tokens, selector) => {
+  it("ink at the ghost alpha over paper is at least 4.5:1", () => {
+    const alpha = ghostAlpha(selector)
+    expect(alpha).toBeGreaterThan(0)
+    const paper = rgb(tokens.paper)
+    const ghost = rgb(tokens.ink).map((c, i) => c * alpha + paper[i] * (1 - alpha))
+    expect(contrast(ghost, paper)).toBeGreaterThanOrEqual(4.5)
   })
 })
 

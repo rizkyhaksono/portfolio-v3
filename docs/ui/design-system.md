@@ -33,7 +33,7 @@ shadcn names map onto the same tokens, so existing components keep working:
 
 `accent` stays tint on purpose, so a future `shadcn add` component cannot paint orange hover fills by accident. The orange has its own names.
 
-Other variables: `--ws-ghost` (the unfilled wordscroll colour: ink at .6 in light, .38 in dark), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--scrim` (the modal scrim: ink at .35 in light, paper at .7 in dark), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-ui` `cubic-bezier(.2,0,0,1)`.
+Other variables: `--ws-ghost` (the unfilled wordscroll colour: ink at .6 in light, .5 in dark), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--scrim` (the modal scrim: ink at .35 in light, paper at .7 in dark), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-ui` `cubic-bezier(.2,0,0,1)`.
 
 ### Where orange may appear
 
@@ -71,7 +71,7 @@ Rules that keep it that way:
 - `mark` fails 4.5:1 as small text on light paper. It is for marks and the focus ring, never for words.
 - Text never takes an opacity modifier (a slash opacity on a text colour fails gate 2). Use `text-ink-soft`.
 - Status is shape plus word, never colour. There is no red, green or amber anywhere.
-- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost`).
+- The wordscroll ghost word stays at 4.5:1 or better in both themes (`--ws-ghost`), since the hero sentence is 22px on a phone; `contrast.test.ts` guards it.
 
 ## Type: IBM Plex
 
