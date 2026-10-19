@@ -95,21 +95,22 @@ interface UserData {
   oauthAccounts?: { provider?: string; providerId?: string }[]
 }
 
-// Paper must print light even inside Night print, where the CSS tokens are flipped, hence the hex copies.
+// The CSS tokens flip with the active theme, so each half pins its own theme's colours through the hex copies.
 const PAPER: CSSProperties = { backgroundColor: PRINT_HEX.paper, color: PRINT_HEX.ink }
+const NIGHT: CSSProperties = { backgroundColor: PRINT_HEX.night, color: PRINT_HEX.nightInk }
 
-/** The mini mark printed in each theme's own ink: paper, night (the `.dark` token flip), or half of each. */
+/** The mini logo in each theme's own colours: light, dark, or half of each. */
 function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
   return (
     <span aria-hidden className="relative block size-16 shrink-0 border border-rule">
       {mode !== "dark" && (
         <span className="absolute inset-0 flex items-center justify-center" style={PAPER}>
-          <Logo className="size-10 text-current" />
+          <Logo variant="mini" className="size-10" />
         </span>
       )}
       {mode !== "light" && (
-        <span className={`dark absolute inset-0 flex items-center justify-center bg-paper text-ink ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`}>
-          <Logo className="size-10" />
+        <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={NIGHT}>
+          <Logo variant="mini" className="size-10" />
         </span>
       )}
     </span>

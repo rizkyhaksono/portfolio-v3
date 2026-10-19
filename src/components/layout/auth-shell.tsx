@@ -29,7 +29,7 @@ export function AuthShell({ variant = "split", title, standfirst, footer, childr
       )}
     >
       {split && (
-        // Sized to its content: stretched to the form's height it framed a void between seal and plate.
+        // Sized to its content: stretched to the form's height it framed a void between mark and plate.
         <figure className="hidden md:block md:self-start">
           <div className="border border-ink p-[3px]">
             <div className="flex flex-col gap-10 border border-rule p-8">

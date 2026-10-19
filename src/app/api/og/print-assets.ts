@@ -27,7 +27,7 @@ let assets: Promise<{ font: Buffer; seal: string }> | undefined
 export function loadPrintAssets() {
   assets ??= Promise.all([
     readFile(join(process.cwd(), "src/assets/fonts/literata-italic.ttf")),
-    readFile(join(process.cwd(), "public/brand/seal-light.svg")),
+    readFile(join(process.cwd(), "public/brand/og-mark.svg")),
   ])
     .then(([font, svg]) => ({ font: withoutVariations(font), seal: `data:image/svg+xml;base64,${svg.toString("base64")}` }))
     .catch((error: unknown) => {

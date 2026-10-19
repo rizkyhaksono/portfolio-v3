@@ -381,14 +381,3 @@
   pre, blockquote, figure, img, tr { break-inside: avoid; }
   h2, h3 { break-after: avoid; }
 }
-
-/* Printer's mark (seal / mark) — cached SVG masks painted with the current ink, so both themes share one file */
-.logo-mask {
-  display: block;
-  aspect-ratio: 1;
-  background-color: currentColor;
-  -webkit-mask: var(--logo-src) center / contain no-repeat;
-  mask: var(--logo-src) center / contain no-repeat;
-}
-.logo-mask--seal { --logo-src: url("/brand/seal-mask.svg"); }
-.logo-mask--mark { --logo-src: url("/brand/mark-mask.svg"); }
