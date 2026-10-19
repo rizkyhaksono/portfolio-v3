@@ -107,7 +107,7 @@ export default async function BlogPage() {
         <>
           <article className="grid gap-6 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-end md:gap-10">
             {lead.image && (
-              <PlateFigure>
+              <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
                 <div className="relative aspect-[1000/420]">
                   <Image src={lead.image} alt="" fill priority unoptimized={isSiteImage(lead.image)} sizes="(min-width: 960px) 31rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
                 </div>

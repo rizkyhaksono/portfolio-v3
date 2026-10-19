@@ -257,8 +257,7 @@
 .prose img {
   max-width: 100%;
   height: auto;
-  padding: 3px;
-  border: 1px solid hsl(var(--ink));
+  border: 1px solid hsl(var(--rule));
 }
 .prose figcaption {
   margin-top: 0.5em;
@@ -285,13 +284,10 @@
 }
 .prose hr,
 .tail-piece {
-  width: 40px;
-  height: 14px;
-  margin: 2.5em auto;
+  height: 0;
+  margin: 2.5em 0;
   border: 0;
-  background-color: hsl(var(--ink));
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpath d='M20 2l4 5-4 5-4-5zM2 7q7-3 12 0-5 3-12 0zm36 0q-7-3-12 0 5 3 12 0z'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 14'%3E%3Cpath d='M20 2l4 5-4 5-4-5zM2 7q7-3 12 0-5 3-12 0zm36 0q-7-3-12 0 5 3 12 0z'/%3E%3C/svg%3E") center / contain no-repeat;
+  border-top: 1px solid hsl(var(--rule));
 }
 .prose--chat {
   @apply text-body;
@@ -307,7 +303,7 @@
 
 /* ── Article shell (ui/article-shell.tsx) ─────────────────────────────── */
 
-/* Tail-piece: the fleuron of `.prose hr`, set once where the text ends. */
+/* Tail-piece: the `.prose hr` rule, set once where the text ends. */
 .tail-piece {
   margin-top: 3rem;
 }

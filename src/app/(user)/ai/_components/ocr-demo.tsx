@@ -135,7 +135,7 @@ export default function OcrDemo() {
 
         {preview ? (
           <div>
-            <PlateFigure caption="Your document, resized for upload.">
+            <PlateFigure tone="color" caption="Your document, resized for upload.">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={preview} alt="The document you uploaded" className="max-h-72 w-full object-contain" />
             </PlateFigure>

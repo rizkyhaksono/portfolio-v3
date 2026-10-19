@@ -144,7 +144,7 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
       </DialogHeader>
 
       {p.image && (
-        <PlateFigure className="mx-auto w-40">
+        <PlateFigure tone="color" className="mx-auto w-40">
           <div className="relative aspect-square w-full">
             <Image src={p.image} alt={p.name} fill sizes="160px" className="object-contain" unoptimized />
           </div>
