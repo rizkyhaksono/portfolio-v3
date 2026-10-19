@@ -37,7 +37,7 @@ const TOOL_TABS = [
   ["downloader", "Downloader", "Save TikTok, Instagram and Facebook videos."],
   ["wpm", "Typing test", "Words per minute and accuracy."],
   ["postal-code", "Postal codes", "Indonesian postal codes by province, city, district and village."],
-  ["web3-crypto", "Web3 crypto", "Coin prices and network gas fees."],
+  ["web3-crypto", "Web3 crypto", "Coin prices, trending coins and price history charts."],
 ] as const;
 
 function stripMdx(raw: string): string {

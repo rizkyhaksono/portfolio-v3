@@ -1,14 +1,15 @@
 "use client"
 
+import { useCallback, useState } from "react"
+import { InkChart } from "@/components/ui/ink-chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getCryptoPrice, getGasPrice, getTrendingCrypto } from "@/services/visitor/web3"
+import { getCryptoChart, getCryptoPrice, getTrendingCrypto } from "@/services/visitor/web3"
 import { ToolError, ToolLoading, useToolData } from "./tool-status"
 
 const COINS = "bitcoin,ethereum,binancecoin,cardano,solana,polkadot"
 const loadPrices = () => getCryptoPrice(COINS).then((res) => res.data)
 const loadTrending = () => getTrendingCrypto().then((res) => res.data.slice(0, 10))
-const loadGas = () => getGasPrice("ethereum").then((res) => res.data)
 
 const usd = (value: number, compact = false) =>
   new Intl.NumberFormat("en-US", {
@@ -35,7 +36,7 @@ export function Web3CryptoTab() {
       <TabsList>
         <TabsTrigger value="prices">Prices</TabsTrigger>
         <TabsTrigger value="trending">Trending</TabsTrigger>
-        <TabsTrigger value="gas">Gas</TabsTrigger>
+        <TabsTrigger value="chart">Chart</TabsTrigger>
       </TabsList>
       <TabsContent value="prices">
         <Prices />
@@ -43,8 +44,8 @@ export function Web3CryptoTab() {
       <TabsContent value="trending">
         <Trending />
       </TabsContent>
-      <TabsContent value="gas">
-        <Gas />
+      <TabsContent value="chart">
+        <Chart />
       </TabsContent>
     </Tabs>
   )
@@ -118,47 +119,83 @@ function Trending() {
   )
 }
 
-const gwei = (value: number) => (Number.isFinite(value) ? `${value.toLocaleString("en", { maximumFractionDigits: 2 })} Gwei` : "not reported")
+const CHART_COINS = [
+  ["bitcoin", "Bitcoin"],
+  ["ethereum", "Ethereum"],
+  ["solana", "Solana"],
+] as const
+const RANGES = [7, 30, 90] as const
 
-function Gas() {
-  const gas = useToolData(loadGas)
-  if (gas.status === "error") return <ToolError onRetry={gas.retry}>Gas prices did not load.</ToolError>
-  if (gas.status === "loading" || !gas.data) return <ToolLoading>Loading gas prices…</ToolLoading>
+type Point = { x: string; y: number }
 
-  const g = gas.data
-  const tiers = [
-    { label: "Slow", value: g.slow, note: "Cheapest. About ten minutes to confirm." },
-    { label: "Standard", value: g.standard, note: "About three minutes to confirm." },
-    { label: "Fast", value: g.fast, note: "Dearest. About thirty seconds to confirm." },
-  ]
-  const top = Math.max(1, ...tiers.map((t) => (Number.isFinite(t.value) ? t.value : 0)))
-  const network = g.network ? g.network.charAt(0).toUpperCase() + g.network.slice(1) : "Ethereum"
+// The API sends [timestamp, price] pairs; older builds sent { timestamp, price } objects.
+const toPoints = (prices: unknown[]): Point[] =>
+  prices
+    .map((p) => (Array.isArray(p) ? { t: Number(p[0]), y: Number(p[1]) } : { t: Number((p as { timestamp: number }).timestamp), y: Number((p as { price: number }).price) }))
+    .filter((p) => Number.isFinite(p.t) && Number.isFinite(p.y))
+    .map((p) => ({ x: new Date(p.t).toISOString().slice(0, 16).replace("T", " "), y: p.y }))
+
+const day = (x: string) => new Date(`${x.slice(0, 10)}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" })
+
+/** Price history as one ink line: pick a coin and a window; the sentence underneath says what happened. */
+function Chart() {
+  const [coin, setCoin] = useState<(typeof CHART_COINS)[number][0]>("bitcoin")
+  const [days, setDays] = useState<(typeof RANGES)[number]>(30)
+  const load = useCallback(() => getCryptoChart(coin, days).then((res) => toPoints(res.data.prices as unknown[])), [coin, days])
+  const chart = useToolData(load)
+  const name = CHART_COINS.find(([id]) => id === coin)?.[1] ?? coin
+
+  const points = chart.data ?? []
+  const first = points[0]
+  const last = points.at(-1)
+  const high = points.reduce<Point | undefined>((a, p) => (!a || p.y > a.y ? p : a), undefined)
+  const low = points.reduce<Point | undefined>((a, p) => (!a || p.y < a.y ? p : a), undefined)
+  const change = first && last ? ((last.y - first.y) / first.y) * 100 : NaN
+
+  const choice = (active: boolean) =>
+    `min-h-10 border px-3 text-small [@media(pointer:coarse)]:min-h-11 ${active ? "border-ink bg-ink text-paper" : "border-rule-strong text-ink hover:border-ink"}`
 
   return (
-    <div className="space-y-4">
-      <p className="font-display text-caption tabular-nums text-ink-soft">
-        {network}, block {g.lastBlock}. Base fee {gwei(g.baseFee)}.
-      </p>
-      <ul role="list" className="divide-y divide-rule border-y border-ink">
-        {tiers.map((tier) => (
-          <li key={tier.label} className="py-3">
-            <div className="flex items-baseline justify-between gap-4">
-              <span className="font-semibold text-ink">{tier.label}</span>
-              <span className="font-display text-h3 tabular-nums text-ink">{gwei(tier.value)}</span>
-            </div>
-            <span aria-hidden className="mt-2 block h-3 border border-rule-strong">
-              <span
-                className="bg-hatch block h-full border-r border-ink"
-                style={{ width: `${Number.isFinite(tier.value) ? (tier.value / top) * 100 : 0}%` }}
-              />
-            </span>
-            <p className="mt-1 text-caption text-ink-soft">{tier.note}</p>
-          </li>
-        ))}
-      </ul>
-      <p className="font-display text-caption text-ink-soft">
-        Gwei is a billionth of an ether. Confirmation times are typical, not promised.
-      </p>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div role="group" aria-label="Coin" className="flex flex-wrap gap-2">
+          {CHART_COINS.map(([id, label]) => (
+            <button key={id} type="button" aria-pressed={coin === id} className={choice(coin === id)} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div role="group" aria-label="Period" className="flex gap-2">
+          {RANGES.map((d) => (
+            <button key={d} type="button" aria-pressed={days === d} className={choice(days === d)} onClick={() => setDays(d)}>
+              {d} days
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {chart.status === "error" ? (
+        <ToolError onRetry={chart.retry}>The price history did not load.</ToolError>
+      ) : points.length < 2 ? (
+        <ToolLoading>Loading the price history…</ToolLoading>
+      ) : (
+        <>
+          <p className="max-w-[60ch] text-body text-ink">
+            {name} is {change >= 0 ? "up" : "down"} {Math.abs(change).toFixed(1)}% over the last {days} days, from {usd(first!.y)} to {usd(last!.y)}.
+            {high && low && ` Its high was ${usd(high.y)} on ${day(high.x)}; its low was ${usd(low.y)} on ${day(low.x)}.`}
+          </p>
+          <InkChart
+            points={points}
+            name="Price"
+            label={`${name} price in US dollars, last ${days} days`}
+            fromZero={false}
+            formatY={(y) => usd(y, y >= 10_000)}
+            height={220}
+            className={chart.status === "loading" ? "opacity-60" : undefined}
+          />
+          <p className="font-display text-caption text-ink-soft">In US dollars, from CoinGecko through this site's API. Not financial advice.</p>
+        </>
+      )}
     </div>
   )
 }

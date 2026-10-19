@@ -256,35 +256,6 @@ export interface TrendingCryptoResponse {
   data: TrendingCryptoApiItem[];
 }
 
-// Gas price types matching actual API response
-export interface GasPriceApiData {
-  network: string;
-  gasPrice: {
-    LastBlock: string;
-    SafeGasPrice: string;
-    ProposeGasPrice: string;
-    FastGasPrice: string;
-    suggestBaseFee: string;
-    gasUsedRatio: string;
-  };
-}
-
-export interface GasPrice {
-  network: string;
-  slow: number;
-  standard: number;
-  fast: number;
-  baseFee: number;
-  lastBlock: string;
-  unit: string;
-}
-
-export interface GasPriceResponse {
-  status: number;
-  message: string;
-  data: GasPriceApiData;
-}
-
 // Tools Tab Types
 export type ToolTab =
   | "japanese-quiz"

@@ -10,16 +10,6 @@ test.describe('Navigation', () => {
     await expect(page).toHaveTitle(/Rizky Haksono/);
   });
 
-  test('skip link is the first tab stop and jumps to main', async ({ page }) => {
-    await page.goto('/');
-    await page.keyboard.press('Tab');
-    const skip = page.getByRole('link', { name: 'Skip to content' });
-    await expect(skip).toBeFocused();
-    await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/#main$/);
-    await expect(page.locator('main#main')).toBeVisible();
-  });
-
   test('running head lists every section at 1440 and marks the current one', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');

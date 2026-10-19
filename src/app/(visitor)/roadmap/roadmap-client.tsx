@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRoadmapProgress } from "@/hooks/use-roadmap-progress"
 import type { RoadmapContent, RoadmapLevel } from "@/lib/mdx"
 import { courseTitle, minutesOf } from "./course-title"
@@ -49,10 +50,23 @@ function Certificate({ course, name, onName }: Readonly<{ course: string; name: 
   )
 }
 
-/** Every course as a ledger of its lessons, grouped by level. Progress and certificates live in this browser only. */
+/** Hatched progress rule: the share of lessons done in this browser. */
+function Progress({ done, total }: Readonly<{ done: number; total: number }>) {
+  return (
+    <span aria-hidden className="mt-3 block h-1.5 border border-rule-strong">
+      <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+    </span>
+  )
+}
+
+/** One course open at a time: pick it from the index of slips, read its lessons below. The choice lives in the URL hash. */
 export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   const { isLoaded, isModuleComplete, completedCount } = useRoadmapProgress()
   const [name, setName] = useState("")
+  const ids = courses.map(({ course }) => course)
+  const [open, setOpen] = useState(ids[0] ?? "")
+
+  const doneOf = (course: Course) => (isLoaded ? completedCount(course.course, course.lessons.map((lesson) => lesson.slug)) : 0)
 
   useEffect(() => {
     try {
@@ -61,6 +75,30 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
       // Storage blocked: the name lasts for this visit only.
     }
   }, [])
+
+  // Start on the hashed course (old #course links keep working), else the one in progress, else the first.
+  useEffect(() => {
+    const fromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1))
+      if (ids.includes(id)) setOpen(id)
+    }
+    if (window.location.hash) fromHash()
+    else if (isLoaded) {
+      const inProgress = courses.find((course) => {
+        const done = doneOf(course)
+        return done > 0 && done < course.lessons.length
+      })
+      if (inProgress) setOpen(inProgress.course)
+    }
+    window.addEventListener("hashchange", fromHash)
+    return () => window.removeEventListener("hashchange", fromHash)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded])
+
+  const choose = (id: string) => {
+    setOpen(id)
+    history.replaceState(null, "", `#${id}`)
+  }
 
   const saveName = (value: string) => {
     setName(value)
@@ -72,63 +110,78 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   }
 
   return (
-    <>
-      <nav aria-label="Courses" className="mt-6">
-        <ul role="list" className="flex flex-wrap gap-x-6 text-body">
-          {courses.map(({ course }) => (
-            <li key={course}>
-              <a href={`#${course}`} className="inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0">
-                {courseTitle(course)}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+    <Tabs value={open} onValueChange={choose} className="mt-8">
+      <TabsList aria-label="Courses" className="grid grid-cols-1 gap-0 border-b-0 border-t border-rule sm:grid-cols-2 lg:grid-cols-5">
+        {courses.map((course) => {
+          const done = doneOf(course)
+          const total = course.lessons.length
+          const minutes = course.lessons.reduce((sum, lesson) => sum + minutesOf(lesson.meta.duration), 0)
+          return (
+            <TabsTrigger
+              key={course.course}
+              value={course.course}
+              data-track="roadmap-course"
+              data-track-course={course.course}
+              className="block h-full whitespace-normal border-b border-r-0 border-rule px-4 py-4 text-left font-normal text-ink-soft hover:bg-tint hover:text-ink data-[state=active]:border-b-2 data-[state=active]:border-ink data-[state=active]:bg-tint data-[state=active]:text-ink sm:border-r lg:[&:nth-child(5n)]:border-r-0"
+            >
+              <span className="block font-display text-h4 text-ink">{courseTitle(course.course)}</span>
+              <span className="mt-1 block text-small tabular-nums">
+                {total} lessons{minutes > 0 && `, about ${minutes} minutes`}
+              </span>
+              <Progress done={done} total={total} />
+              <span className="mt-1.5 block min-h-[1.35em] font-display text-caption tabular-nums">
+                {done === 0 ? "Not started" : done === total ? "Completed" : `${done} of ${total} done`}
+              </span>
+            </TabsTrigger>
+          )
+        })}
+      </TabsList>
 
-      {courses.map(({ course, lessons }) => {
-        const done = isLoaded ? completedCount(course, lessons.map((lesson) => lesson.slug)) : 0
+      {courses.map((course) => {
+        const { course: id, lessons } = course
+        const done = doneOf(course)
         const minutes = lessons.reduce((total, lesson) => total + minutesOf(lesson.meta.duration), 0)
 
         return (
-          <section key={course} id={course} aria-labelledby={`${course}-title`} className="mt-16">
-            <h2 id={`${course}-title`} className="font-display text-h2 text-balance text-ink">
-              {courseTitle(course)}
-            </h2>
-            <p className="mt-2 max-w-[60ch] text-body text-ink-soft">
-              From beginner to advanced in {lessons.length} lessons{minutes > 0 && `, about ${minutes} minutes of reading`}.
-            </p>
-            <p className="mt-1 min-h-[1.35em] font-display text-caption tabular-nums text-ink-soft">
-              {done > 0 && `${done} of ${lessons.length} lessons done.`}
-            </p>
+          <TabsContent key={id} value={id} className="mt-12 focus-visible:outline-none">
+            <section aria-labelledby={`${id}-title`}>
+              <h2 id={`${id}-title`} className="font-display text-h2 text-balance text-ink">
+                {courseTitle(id)}
+              </h2>
+              <p className="mt-2 max-w-[60ch] text-body text-ink-soft">
+                From beginner to advanced in {lessons.length} lessons{minutes > 0 && `, about ${minutes} minutes of reading`}.
+                {done > 0 && done < lessons.length && ` You have finished ${done}.`}
+              </p>
 
-            {LEVELS.map(([level, label]) => {
-              const rows = lessons.filter((lesson) => (lesson.meta.level ?? "beginner") === level)
-              if (rows.length === 0) return null
-              return (
-                <LedgerList key={level} marker={<h3>{label}</h3>} className="mt-6 md:grid-cols-[10rem_minmax(0,1fr)]">
-                  {rows.map(({ slug, meta }) => (
-                    <LedgerRow key={slug} titleAs="h4" title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
-                      <p>{meta.description}</p>
-                      {isLoaded && isModuleComplete(course, slug) && (
-                        <p className="mt-1 flex items-center gap-1.5 text-ink">
-                          <Tick />
-                          Done
-                        </p>
-                      )}
-                    </LedgerRow>
-                  ))}
-                </LedgerList>
-              )
-            })}
+              {LEVELS.map(([level, label]) => {
+                const rows = lessons.filter((lesson) => (lesson.meta.level ?? "beginner") === level)
+                if (rows.length === 0) return null
+                return (
+                  <LedgerList key={level} marker={<h3>{label}</h3>} className="mt-6 md:grid-cols-[10rem_minmax(0,1fr)]">
+                    {rows.map(({ slug, meta }) => (
+                      <LedgerRow key={slug} titleAs="h4" title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
+                        <p>{meta.description}</p>
+                        {isLoaded && isModuleComplete(id, slug) && (
+                          <p className="mt-1 flex items-center gap-1.5 text-ink">
+                            <Tick />
+                            Done
+                          </p>
+                        )}
+                      </LedgerRow>
+                    ))}
+                  </LedgerList>
+                )
+              })}
 
-            {done === lessons.length ? (
-              <Certificate course={course} name={name} onName={saveName} />
-            ) : (
-              <p className="mt-6 text-small text-ink-soft">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
-            )}
-          </section>
+              {done === lessons.length ? (
+                <Certificate course={id} name={name} onName={saveName} />
+              ) : (
+                <p className="mt-6 text-small text-ink-soft">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
+              )}
+            </section>
+          </TabsContent>
         )
       })}
-    </>
+    </Tabs>
   )
 }

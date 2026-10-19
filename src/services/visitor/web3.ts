@@ -3,8 +3,6 @@ import type {
   CryptoPrice,
   CryptoChartResponse,
   TrendingCryptoResponse,
-  GasPriceResponse,
-  GasPrice,
 } from "@/commons/types/tools";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -121,32 +119,6 @@ export async function getTrendingCrypto(): Promise<{ status: number; message: st
       sparkline: item.data?.sparkline || "",
     };
   });
-
-  return {
-    status: rawResponse.status,
-    message: rawResponse.message,
-    data: transformedData,
-  };
-}
-
-export async function getGasPrice(network: string = "ethereum"): Promise<{ status: number; message: string; data: GasPrice }> {
-  const response = await fetch(`${API_URL}/v3/web3/web3/gas?network=${encodeURIComponent(network)}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to fetch gas prices");
-
-  const rawResponse: GasPriceResponse = await response.json();
-
-  const gasData = rawResponse.data.gasPrice;
-  const transformedData: GasPrice = {
-    network: rawResponse.data.network,
-    slow: Number.parseFloat(gasData.SafeGasPrice),
-    standard: Number.parseFloat(gasData.ProposeGasPrice),
-    fast: Number.parseFloat(gasData.FastGasPrice),
-    baseFee: Number.parseFloat(gasData.suggestBaseFee),
-    lastBlock: gasData.LastBlock,
-    unit: "Gwei",
-  };
 
   return {
     status: rawResponse.status,

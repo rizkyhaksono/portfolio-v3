@@ -123,7 +123,7 @@ Unmigrated files may still fail the gate until their phase. When you touch one, 
 1. Read `prd/feature.md` → `prd/progress.md` → `docs/ui/` → existing patterns in code.
 2. Prefer shared primitives over ad-hoc bordered `div`s.
 3. Validate input at boundaries; fail fast; map errors cleanly.
-4. Keep UI accessible (skip link, `aria-current`, labels, keyboard navigation, 44px targets on mobile, chart text alternatives).
+4. Keep UI accessible (`aria-current`, labels, keyboard navigation, 44px targets on mobile, chart text alternatives).
 5. Update `prd/progress.md` when a task is done.
 6. Before claiming completion: `bunx tsc --noEmit`, `bun run test`, the grep gate on your paths, and `bun run build --webpack` for anything that touches routes or config.
 

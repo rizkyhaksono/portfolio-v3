@@ -80,7 +80,7 @@ Content counts read "Read by 1,204 people in the last 30 days." and hide below 1
 
 ## Accessibility floor
 
-Skip link, `aria-current` on the current nav item, 44px targets under 768px, state by shape and word, text alternatives for every chart, no horizontal scroll at 375px, `<html lang="en">`.
+`aria-current` on the current nav item, 44px targets under 768px, state by shape and word, text alternatives for every chart, no horizontal scroll at 375px, `<html lang="en">`.
 
 ## Outliers
 

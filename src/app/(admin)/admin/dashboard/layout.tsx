@@ -28,12 +28,6 @@ export default async function AdminDashboardLayout({ children }: Readonly<{ chil
   // data-private: Umami's block selector keeps the admin out of session replays.
   return (
     <div data-private className="min-h-screen [--admin-rail:15rem]">
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:border focus:border-ink focus:bg-paper focus:px-4 focus:py-2 focus:text-ink"
-      >
-        Skip to content
-      </a>
       <AdminSpine user={user} />
       <div className="md:pl-[var(--admin-rail)]">
         <AdminTopHeader user={user} />

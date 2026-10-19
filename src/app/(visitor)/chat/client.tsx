@@ -171,10 +171,12 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     return { stream: flat, byId }
   }, [initialMessages])
 
-  // The page scrolls natively; bring a newly arrived message into view, never on first load.
-  const shown = useRef(stream.length)
+  // Only the letters column scrolls: open at the newest message and follow new ones as they arrive.
+  const listRef = useRef<HTMLDivElement>(null)
+  const shown = useRef(0)
   useEffect(() => {
-    if (stream.length > shown.current) newestRef.current?.scrollIntoView({ block: "nearest" })
+    const list = listRef.current
+    if (list && stream.length !== shown.current) list.scrollTop = list.scrollHeight
     shown.current = stream.length
   }, [stream.length])
 
@@ -253,23 +255,26 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
       : "Write a message"
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-x-6 py-3">
-        {stream.length > 3 && <InkLink href="#chat-newest" className="inline-flex min-h-11 items-center md:min-h-0">Go to the newest message</InkLink>}
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-6 py-2">
+        <p className="font-display text-caption tabular-nums text-ink-soft">
+          {stream.length === 1 ? "1 message" : `${stream.length} messages`}
+        </p>
         <Button variant="ghost" size="sm" className="ml-auto px-0" disabled={isPending} onClick={() => startTransition(() => router.refresh())}>
           {isPending ? "Updating…" : "Refresh"}
         </Button>
       </div>
 
+      <div ref={listRef} tabIndex={0} aria-label="Messages" className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-rule">
       {stream.length === 0 ? (
-        <p className="border-t border-rule py-10 font-display text-lead text-ink-soft">No messages yet. Yours could be the first.</p>
+        <p className="py-10 font-display text-lead text-ink-soft">No messages yet. Yours could be the first.</p>
       ) : (
-        <ol role="list" className="divide-y divide-rule border-t border-rule">
+        <ol role="list" className="divide-y divide-rule">
           {stream.map((m, index) => {
             const isMine = currentUser?.id === m.userId
             const newest = index === stream.length - 1
             return (
-              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined} className="scroll-mb-56 py-5">
+              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined} className="py-5">
                 <Letter
                   message={m}
                   quoted={m.replyToId ? byId.get(m.replyToId) ?? null : null}
@@ -284,9 +289,10 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
           })}
         </ol>
       )}
+      </div>
 
       {currentUser ? (
-        <form onSubmit={handleSendMessage} className="sticky bottom-0 z-10 border-t border-ink bg-paper-grain pb-4 pt-3">
+        <form onSubmit={handleSendMessage} className="shrink-0 border-t border-ink pb-4 pt-3">
           <div className="flex items-baseline justify-between gap-4">
             <Label htmlFor="chat-message" className="truncate">
               {composerLabel}
@@ -318,7 +324,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
           </p>
         </form>
       ) : (
-        <p className="border-t border-ink pt-4 text-body text-ink">
+        <p className="shrink-0 border-t border-ink py-4 text-body text-ink">
           <InkLink href="/auth?redirect=/chat">Sign in</InkLink> to write a message or reply to one.
         </p>
       )}

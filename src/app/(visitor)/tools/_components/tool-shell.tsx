@@ -37,7 +37,7 @@ const TOOLS: Tool[] = [
   { id: "ielts", name: "IELTS flashcards", group: "Learn", note: "Band 7 academic words for the writing and speaking papers.", Panel: IeltsTab },
   { id: "downloader", name: "Downloader", group: "Utilities", note: "Save a video or post from TikTok, Instagram, YouTube, X or Facebook.", Panel: DownloaderTab },
   { id: "postal-code", name: "Postal code", group: "Utilities", note: "Indonesian postal codes by place, or the places behind a postal code.", Panel: PostalCodeTab },
-  { id: "web3-crypto", name: "Web3 crypto", group: "Utilities", note: "Coin prices, what is trending, and Ethereum gas.", Panel: Web3CryptoTab },
+  { id: "web3-crypto", name: "Web3 crypto", group: "Utilities", note: "Coin prices, what is trending, and a price chart.", Panel: Web3CryptoTab },
 ]
 
 const GROUPS = ["Play", "Learn", "Utilities"]

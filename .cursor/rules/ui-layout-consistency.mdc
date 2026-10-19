@@ -103,5 +103,5 @@ grep -rnE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|rin
 - [ ] Literata roles respected; mono only for machine text
 - [ ] No banned motion; reduced motion works
 - [ ] Umami attributes follow the button / external-link rule
-- [ ] Accessible: skip link, `aria-current`, 44px targets under 768px, chart text alternatives, no horizontal scroll at 375px
+- [ ] Accessible: `aria-current`, 44px targets under 768px, chart text alternatives, no horizontal scroll at 375px
 - [ ] Grep gate prints nothing

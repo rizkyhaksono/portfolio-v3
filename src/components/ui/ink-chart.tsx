@@ -18,6 +18,10 @@ interface InkChartProps {
   compact?: boolean
   height?: number
   formatX?: (x: string) => string
+  /** Number format for the scale, titles and table (defaults to plain grouped numbers). */
+  formatY?: (y: number) => string
+  /** Prices and other series far from zero: scale between the series' own low and high instead of from zero. */
+  fromZero?: boolean
   className?: string
 }
 
@@ -52,19 +56,26 @@ export function InkChart({
   compact = false,
   height,
   formatX = formatChartDate,
+  formatY = formatNumber,
+  fromZero = true,
   className,
 }: Readonly<InkChartProps>) {
   if (points.length === 0) return null
 
   const n = points.length
-  const top = niceCeil(Math.max(1, ...points.map((p) => p.y), ...(dashed ?? []).map((p) => p.y)))
+  const ys = [...points.map((p) => p.y), ...(dashed ?? []).map((p) => p.y)]
+  const lowest = Math.min(...ys)
+  const highest = Math.max(...ys)
+  const pad = (highest - lowest) * 0.08 || Math.abs(highest) * 0.01 || 1
+  const bottom = fromZero ? 0 : lowest - pad
+  const top = fromZero ? niceCeil(Math.max(1, highest)) : highest + pad
   const px = (i: number) => (n > 1 ? (i / (n - 1)) * 100 : 50)
-  const py = (y: number) => 100 - (y / top) * 100
+  const py = (y: number) => 100 - ((y - bottom) / (top - bottom)) * 100
   const line = (series: InkChartPoint[]) => series.map((p, i) => `${px(i).toFixed(2)},${py(p.y).toFixed(2)}`).join(" ")
   const area = `polygon(0% 100%, ${points.map((p, i) => `${px(i).toFixed(2)}% ${py(p.y).toFixed(2)}%`).join(", ")}, 100% 100%)`
   const describe = (i: number) =>
-    `${formatX(points[i].x)}: ${formatNumber(points[i].y)} ${name.toLowerCase()}` +
-    (dashed?.[i] ? `, ${formatNumber(dashed[i].y)} ${dashedName.toLowerCase()}` : "")
+    `${formatX(points[i].x)}: ${formatY(points[i].y)} ${name.toLowerCase()}` +
+    (dashed?.[i] ? `, ${formatY(dashed[i].y)} ${dashedName.toLowerCase()}` : "")
 
   // Compact charts keep the figures for screen readers only; full ones show them in a disclosure.
   const table = (className: string) => (
@@ -81,8 +92,8 @@ export function InkChart({
         {points.map((p, i) => (
           <tr key={p.x} className="border-b border-rule hover:bg-tint">
             <th scope="row" className="py-1 text-left font-normal">{formatX(p.x)}</th>
-            <td className="py-1 text-right">{formatNumber(p.y)}</td>
-            {dashed && <td className="py-1 text-right">{formatNumber(dashed[i]?.y ?? 0)}</td>}
+            <td className="py-1 text-right">{formatY(p.y)}</td>
+            {dashed && <td className="py-1 text-right">{formatY(dashed[i]?.y ?? 0)}</td>}
           </tr>
         ))}
       </tbody>
@@ -97,8 +108,13 @@ export function InkChart({
             <div aria-hidden className="absolute inset-x-0 top-0 border-t border-dotted border-rule-strong" />
             <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-dotted border-rule-strong" />
             <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption italic tabular-nums text-muted-foreground">
-              {formatNumber(top)}
+              {formatY(fromZero ? top : highest)}
             </span>
+            {!fromZero && (
+              <span aria-hidden className="absolute bottom-1 left-0 z-10 bg-background pr-1 text-caption italic tabular-nums text-muted-foreground">
+                {formatY(lowest)}
+              </span>
+            )}
           </>
         )}
         <div aria-hidden className="bg-hatch absolute inset-0" style={{ clipPath: area }} />

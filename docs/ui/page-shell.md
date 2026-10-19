@@ -6,7 +6,6 @@
 1024px and up
   Running head (sticky, 52px, paper + grain, 1px rule below):
     Rizky Haksono   Projects Writing Etan AI Chat Tracker Roadmap Tools Stats   [Search ⌘K] [theme] [Account]
-  Skip to content
   Bleed slot (home masthead only)
   main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
   Double rule
