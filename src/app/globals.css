@@ -113,13 +113,6 @@
   filter: grayscale(1);
 }
 
-/* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
-.engraving {
-  background-color: hsl(var(--ink));
-  -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-  mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-}
-
 /* Wordscroll: static and fully inked unless scroll timelines, motion and a tall enough viewport all exist. */
 .ws__stage {
   min-height: calc(100svh - var(--head-h));
@@ -369,7 +362,7 @@
 @media print {
   .dark{--paper:60 11.1% 96.5%;--ink:0 0% 7.8%;--ink-soft:60 2.8% 35.1%;--rule:60 6.7% 85.3%;--rule-strong:60 2.5% 52.9%;--tint:60 10% 92.2%;--mark:18.6 100% 50%;--mark-text:18.1 100% 37.6%;color-scheme:light}
   body { background: none; }
-  nav, [role="dialog"], .engraving, [data-print-hide] { display: none !important; }
+  nav, [role="dialog"], [data-print-hide] { display: none !important; }
   .ws { height: auto !important; }
   .ws__stage { position: static !important; min-height: 0; }
   .ws__w { animation: none !important; }

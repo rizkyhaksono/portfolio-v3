@@ -1,11 +1,10 @@
 import Link from "next/link"
 
-import { Engraving } from "@/components/ui/engraving"
 import { Logo } from "@/components/ui/logo"
 import { cn } from "@/lib/utils"
 
 interface AuthShellProps {
-  /** `split`: a framed plate beside the form (visitor sign-in). `narrow`: one column (callback, admin). */
+  /** `split`: a framed mark beside the form (visitor sign-in). `narrow`: one column (callback, admin). */
   variant?: "split" | "narrow"
   title: React.ReactNode
   /** One lead line under the title. */
@@ -29,18 +28,11 @@ export function AuthShell({ variant = "split", title, standfirst, footer, childr
       )}
     >
       {split && (
-        // Sized to its content: stretched to the form's height it framed a void between mark and plate.
-        <figure className="hidden md:block md:self-start">
-          <div className="border border-ink p-[3px]">
-            <div className="flex flex-col gap-10 border border-rule p-8">
-              <Logo variant="mark" className="w-28" />
-              <Engraving crop="riders" />
-            </div>
+        <div className="hidden border border-ink p-[3px] md:block md:self-start">
+          <div className="flex justify-center border border-rule p-8">
+            <Logo variant="mark" className="w-56" />
           </div>
-          <figcaption className="mt-2 font-display text-caption text-ink-soft">
-            A rider on a country road, after Wenceslaus Hollar, 1650.
-          </figcaption>
-        </figure>
+        </div>
       )}
 
       <div className="flex min-w-0 flex-col">
