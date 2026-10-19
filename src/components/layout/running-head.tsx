@@ -13,7 +13,7 @@ export const SHELL_WIDTH = "mx-auto w-full max-w-[76rem] px-[clamp(20px,4vw,48px
 /** Sticky running head: wordmark, sections, search, theme, account; Contents below 1024px. */
 export function RunningHead() {
   return (
-    <header data-print-hide className="bg-paper-grain sticky top-0 z-40 border-b border-rule">
+    <header data-print-hide className="bg-paper sticky top-0 z-40 border-b border-rule">
       <div className={cn(SHELL_WIDTH, "flex h-[var(--head-h)] items-center gap-4 xl:gap-6")}>
         <Link
           href="/"

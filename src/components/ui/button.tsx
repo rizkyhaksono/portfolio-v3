@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 // One ink: solid, outline, or underline. Destructive is an outline with a cross and a verb, never red.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-print)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-rule-strong disabled:text-ink-soft [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-ui)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-rule-strong disabled:text-ink-soft [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {

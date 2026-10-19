@@ -1,11 +1,11 @@
 @tailwind base;
 
 @layer base {
-  /* One ink on one paper. HSL triples (no hsl() wrapper) so every shadcn part re-inks. */
-  :root{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;--ws-ghost:hsl(var(--ink) / .6);--head-h:3.25rem;
-  --background:var(--paper);--foreground:var(--ink);--card:var(--paper);--card-foreground:var(--ink);--popover:var(--paper);--popover-foreground:var(--ink);--primary:var(--ink);--primary-foreground:var(--paper);--secondary:var(--tint);--secondary-foreground:var(--ink);--muted:var(--tint);--muted-foreground:var(--ink-soft);--accent:var(--tint);--accent-foreground:var(--ink);--destructive:var(--ink);--destructive-foreground:var(--paper);--border:var(--rule);--input:var(--rule-strong);--ring:var(--ink);--radius:0rem;
-  --dur-press:120ms;--dur-ui:180ms;--dur-sheet:240ms;--ease-print:cubic-bezier(.2,0,0,1);--scrim:var(--ink) / .35}
-  .dark{--paper:229 59% 12.5%;--ink:41 48% 88%;--ink-soft:227 51% 77.6%;--rule:229 44% 30.6%;--rule-strong:228 41% 61%;--tint:227 65% 24.7%;--plate-alpha:.85;--ws-ghost:hsl(var(--ink-soft) / .7);--scrim:var(--paper) / .7}
+  /* Near-black ink on off-white paper, plus one orange mark. HSL triples (no hsl() wrapper) so every shadcn part re-inks. */
+  :root{--paper:60 11.1% 96.5%;--ink:0 0% 7.8%;--ink-soft:60 2.8% 35.1%;--rule:60 6.7% 85.3%;--rule-strong:60 2.5% 52.9%;--tint:60 10% 92.2%;--mark:18.6 100% 50%;--mark-text:18.1 100% 37.6%;--on-mark:0 0% 7.8%;--ws-ghost:hsl(var(--ink) / .6);--head-h:3.25rem;
+  --background:var(--paper);--foreground:var(--ink);--card:var(--paper);--card-foreground:var(--ink);--popover:var(--paper);--popover-foreground:var(--ink);--primary:var(--ink);--primary-foreground:var(--paper);--secondary:var(--tint);--secondary-foreground:var(--ink);--muted:var(--tint);--muted-foreground:var(--ink-soft);--accent:var(--tint);--accent-foreground:var(--ink);--destructive:var(--ink);--destructive-foreground:var(--paper);--border:var(--rule);--input:var(--rule-strong);--ring:var(--mark);--radius:0rem;
+  --dur-press:120ms;--dur-ui:180ms;--dur-sheet:240ms;--ease-ui:cubic-bezier(.2,0,0,1);--scrim:var(--ink) / .35}
+  .dark{--paper:0 0% 7.8%;--ink:60 13.3% 94.1%;--ink-soft:60 3.7% 62.5%;--rule:60 4.1% 19.2%;--rule-strong:60 2.6% 44.7%;--tint:60 3.3% 11.8%;--mark:16.9 100% 57.5%;--mark-text:17.1 100% 63.5%;--on-mark:0 0% 7.8%;--ws-ghost:hsl(var(--ink) / .38);--scrim:var(--paper) / .7}
   @media (max-width:767px){:root{--head-h:3rem}}
 
   :root {
@@ -50,26 +50,14 @@
     }
   }
 
-  /* The first layer is a flat 25% paper wash, not a visible gradient: it quiets the grain by a quarter
-     at every pixel density (resizing the tile only helps at 1x). */
-  body,
-  .bg-paper-grain {
-    background-color: hsl(var(--background));
-    background-image: linear-gradient(hsl(var(--background) / 0.25) 0 0), url("../assets/paper/grain-light.webp");
-    background-size: auto, 128px 128px;
-  }
-  .dark body,
-  .dark .bg-paper-grain {
-    background-image: linear-gradient(hsl(var(--background) / 0.25) 0 0), url("../assets/paper/grain-dark.webp");
-  }
-
   body {
+    background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
 
   ::selection {
-    background-color: hsl(var(--ink));
-    color: hsl(var(--paper));
+    background-color: hsl(var(--mark));
+    color: hsl(var(--on-mark));
   }
 
   :focus-visible {
@@ -122,21 +110,18 @@
 
 /* Unlayered on purpose: always emitted (no content purge), still overridden by utilities below. */
 
-/* Photo duotone: a gradient map through the theme's tokens (SVG filters in ui/plate-filters.tsx, root layout). */
+/* Photos print in greyscale in both themes. */
 .plate {
   position: relative;
   background-color: hsl(var(--paper));
 }
 .plate img {
-  filter: url(#plate-paper);
-}
-.dark .plate img {
-  filter: url(#plate-night);
+  filter: grayscale(1);
 }
 
 /* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
 .engraving {
-  background-color: hsl(var(--ink) / var(--plate-alpha));
+  background-color: hsl(var(--ink));
   -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
   mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
 }
@@ -149,11 +134,9 @@
 @keyframes ws-ink {
   from {
     color: var(--ws-ghost);
-    translate: 0.06em 0.04em;
   }
   to {
     color: hsl(var(--ink));
-    translate: 0 0;
   }
 }
 @supports (animation-timeline: view()) {
@@ -178,13 +161,6 @@
       height: 150svh;
     }
   }
-}
-
-/* Ink speckle: pinholes where the ink did not take. Below-fold numerals ≥48px, inverted blocks, the 404 line. */
-.speckle {
-  --speckle: url("data:image/webp;base64,UklGRsoCAABXRUJQVlA4TL0CAAAvf8AfEA8QEfMfgo50W48kJbCwWQCRJqY0VS4BE7PXgNb8aMwyMXMJKEsnusHSwpr4Rxc6u8gY/q75838fqrNhBxH9V9i2bUOl85SCTfRhpckmRuxWGKFizx7jDLbOMZel2ZECv1AAngyApRRVjC4kOgADia4HlQEc3OqUDq57F945YS79AM3nLFwA7PNkwjwD5wAKkZj442UN5j2QAL+Bop8AjCM6gMn41oqJiWYCKYAz8ARUIOMNPldpn2OEQsWG0teAtvu3c/19QEOHMVkpSxyuUGA6oVYyfiMtEhXbf8mlOAYfGoFuweDZ9HkGGQagYBN4GTDSeCQ2YLyxo7FbJtBt0XA8KbSH7oYEZtyTKHrwGo5QgQLHDdCkCGmBlypXEJipL9bMiCxQO0hBrjOqis/hwg5U8qGvKTtb9qJkYG+7DJVds9JwE3YnFC1dw9EMfleQaLUCBdidWJOVCMnuNFHHdX3saSALmAHMoXBFU2GsGeZU2DHgCpZr/4DGqKFuggQj6VMmcBWkACkI/6cAE0xOMN8AUpcTmA9BvwxgmEGk2OCcDWSRvAxygABwJwJ6JKlJEVQJvc8yoaGgUxFQK9gj+qssPxdoMMAFqMcAikNqbE/woa2fqxQwMylWmuXvc1PxcoGfZSooCA7wOgIjSfreBSCu1+4C0Qd0bChEgs+xYbYSIwb/IUwunCCnRSo+pAsEdZuZSSiZqqMipNI5pTKsYAsa0ikXx7A1ZaCe61b+YG8lk7EgVjTwLrcF2gShD7eFAqBfCAoqQABU48sr3KZqmQKNTnUGmATwLTBe1YFMxnhkACaoADYF6IHtZj6FAvh8dEoSeqZDgDuCZtoCUscGW7aOkSiNQgEUKAAOCIAExrpiPJV+sRKJHTAAbGEwHgPtRSRi+fcyIi2zAHuQnjzC5+R9Qac/QjbkCgA=");
-  -webkit-mask: var(--speckle) 0 0 / 128px 128px repeat;
-  mask: var(--speckle) 0 0 / 128px 128px repeat;
 }
 
 .bg-hatch {
@@ -383,7 +359,7 @@
       top: var(--head-h);
       z-index: 40;
       height: 2px;
-      background-color: hsl(var(--ink));
+      background-color: hsl(var(--mark));
       transform-origin: 0 50%;
       pointer-events: none;
       animation: reading-hairline auto linear both;
@@ -407,7 +383,7 @@
 }
 
 @media print {
-  .dark{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;color-scheme:light}
+  .dark{--paper:60 11.1% 96.5%;--ink:0 0% 7.8%;--ink-soft:60 2.8% 35.1%;--rule:60 6.7% 85.3%;--rule-strong:60 2.5% 52.9%;--tint:60 10% 92.2%;--mark:18.6 100% 50%;--mark-text:18.1 100% 37.6%;color-scheme:light}
   body { background: none; }
   nav, [role="dialog"], .engraving, [data-print-hide] { display: none !important; }
   .ws { height: auto !important; }

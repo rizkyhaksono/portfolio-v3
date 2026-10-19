@@ -11,7 +11,6 @@ import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
 import { PRINT_HEX } from "@/lib/print-hex"
-import { PlateFilters } from "@/components/ui/plate-filters"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
@@ -103,7 +102,6 @@ export default function RootLayout({
         )}
       </head>
       <body className="font-sans antialiased">
-        <PlateFilters />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
           <UmamiRecorder />

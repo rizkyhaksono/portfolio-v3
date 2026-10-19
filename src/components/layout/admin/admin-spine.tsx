@@ -159,7 +159,7 @@ function Masthead() {
 /** Desktop spine: fixed to the left edge, `--admin-rail` wide, ruled in ink. */
 export function AdminSpine({ user }: Readonly<{ user?: AdminUser }>) {
   return (
-    <aside className="bg-paper-grain fixed inset-y-0 left-0 z-40 hidden w-[var(--admin-rail)] flex-col border-r border-ink md:flex">
+    <aside className="bg-paper fixed inset-y-0 left-0 z-40 hidden w-[var(--admin-rail)] flex-col border-r border-ink md:flex">
       <Masthead />
       <div className="flex-1 overflow-y-auto">
         <SpineNav />

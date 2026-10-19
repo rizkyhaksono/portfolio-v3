@@ -16,7 +16,7 @@ export function NavLinks() {
           <Link
             href={href}
             aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-            className="inline-flex min-h-11 items-center whitespace-nowrap text-[15px] text-ink decoration-1 underline-offset-[0.35em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
+            className="inline-flex min-h-11 items-center whitespace-nowrap text-[15px] text-ink decoration-1 underline-offset-[0.35em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-mark aria-[current=page]:decoration-2"
             {...navTrack(href, "head")}
           >
             {label}

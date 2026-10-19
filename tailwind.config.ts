@@ -68,7 +68,10 @@ const config = {
 				paper: 'hsl(var(--paper) / <alpha-value>)',
 				tint: 'hsl(var(--tint) / <alpha-value>)',
 				rule: 'hsl(var(--rule) / <alpha-value>)',
-				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)'
+				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)',
+				mark: 'hsl(var(--mark) / <alpha-value>)',
+				'mark-text': 'hsl(var(--mark-text) / <alpha-value>)',
+				'on-mark': 'hsl(var(--on-mark) / <alpha-value>)'
 			},
 			// Fluid 375 -> 1280px. Italic/balance live on the elements, not here.
 			fontSize: {

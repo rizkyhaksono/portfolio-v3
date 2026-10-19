@@ -149,6 +149,12 @@ export function InkChart({
             <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-ink/10" />
           ))}
         </svg>
+        {/* An HTML square, not an SVG rect: the stretched viewBox would draw a rect as a flat bar. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute size-0.5 -translate-x-1/2 -translate-y-1/2 bg-mark"
+          style={{ left: `${px(n - 1)}%`, top: `${py(points[n - 1].y)}%` }}
+        />
       </div>
 
       {compact ? (
