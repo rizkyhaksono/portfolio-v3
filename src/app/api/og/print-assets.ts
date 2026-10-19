@@ -4,32 +4,33 @@ import { PRINT_HEX } from "@/lib/print-hex"
 
 export const RULE_HEX = PRINT_HEX.rule
 
-/**
- * Satori's font parser throws on a variable font's `fvar` table. Renaming that one table tag in memory
- * makes it skip the variations and draw the default instance (opsz 12, wght 400); the file stays upstream.
- */
-export function withoutVariations(font: Buffer) {
-  const out = Buffer.from(font)
-  for (let record = 12; record < 12 + out.readUInt16BE(4) * 16; record += 16) {
-    if (out.toString("latin1", record, record + 4) === "fvar") out.write("_var", record, "latin1")
-  }
-  return out
+type PrintAssets = {
+  fonts: { name: "IBM Plex Sans"; data: Buffer; weight: 400 | 600; style: "normal" }[]
+  mark: string
 }
 
-let assets: Promise<{ font: Buffer; seal: string }> | undefined
+let assets: Promise<PrintAssets> | undefined
 
 /**
- * Literata italic (OFL, src/assets/fonts/OFL.txt) and the printer's mark for the OG and certificate images,
- * read once per process. Plain cwd paths: webpack rewrites `new URL(..., import.meta.url)` into a
- * /_next/static URL that readFile rejects. next.config.ts traces the font into the standalone build;
- * the Dockerfile copies public/.
+ * IBM Plex Sans 400 and 600 (OFL, src/assets/fonts/OFL.txt) and the RH mark for the OG and certificate images,
+ * read once per process. Satori reads WOFF, not WOFF2, and draws only a variable font's default instance, hence
+ * static files. Plain cwd paths: webpack rewrites `new URL(..., import.meta.url)` into a /_next/static URL that
+ * readFile rejects. next.config.ts traces the fonts into the standalone build; the Dockerfile copies public/.
  */
 export function loadPrintAssets() {
+  const read = (path: string) => readFile(join(process.cwd(), path))
   assets ??= Promise.all([
-    readFile(join(process.cwd(), "src/assets/fonts/literata-italic.ttf")),
-    readFile(join(process.cwd(), "public/brand/og-mark.svg")),
+    read("src/assets/fonts/ibm-plex-sans-latin-400-normal.woff"),
+    read("src/assets/fonts/ibm-plex-sans-latin-600-normal.woff"),
+    read("public/brand/og-mark.svg"),
   ])
-    .then(([font, svg]) => ({ font: withoutVariations(font), seal: `data:image/svg+xml;base64,${svg.toString("base64")}` }))
+    .then(([regular, semibold, svg]): PrintAssets => ({
+      fonts: [
+        { name: "IBM Plex Sans", data: regular, weight: 400, style: "normal" },
+        { name: "IBM Plex Sans", data: semibold, weight: 600, style: "normal" },
+      ],
+      mark: `data:image/svg+xml;base64,${svg.toString("base64")}`,
+    }))
     .catch((error: unknown) => {
       // Do not cache the failure: the next request tries again.
       assets = undefined

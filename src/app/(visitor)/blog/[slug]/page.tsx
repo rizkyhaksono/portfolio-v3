@@ -13,7 +13,7 @@ import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import BlogLetters from "@/app/_components/blog/blog-letters"
 import { dateline } from "@/app/_components/blog/format"
-import { getSiteUrl } from "@/lib/site-url"
+import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
 import { getBlogData, getBlogDetail, getComments } from "@/services/visitor/blog"
 import { getPathReads } from "@/services/visitor/umami"
 
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Article not found" }
 
   const url = `${getSiteUrl()}/blog/${post.slug}`
-  const image = post.cover_image || `/api/og?type=blog&title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.description ?? "")}`
+  const image = post.cover_image || ogImageUrl({ type: "blog", title: post.title, subtitle: post.description ?? "" })
 
   return {
     title: `${post.title} | Writing`,

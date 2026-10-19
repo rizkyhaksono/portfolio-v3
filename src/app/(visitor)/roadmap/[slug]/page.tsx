@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { compileMDX } from "next-mdx-remote/rsc"
 import remarkGfm from "remark-gfm"
 import { getAllRoadmapLessons, getRoadmapIndex, getRoadmapLessonBySlug } from "@/lib/mdx"
+import { ogImageUrl } from "@/lib/site-url"
 import { ArticleShell } from "@/components/ui/article-shell"
 import { InkLink } from "@/components/ui/ink-link"
 import { YouTubeFacade } from "@/components/ui/youtube-facade"
@@ -87,7 +88,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!lesson) return { title: "Lesson not found" }
 
   const { meta } = lesson
-  const ogImage = meta.illustration ?? `/api/og?type=roadmap&title=${encodeURIComponent(meta.title)}&subtitle=${encodeURIComponent(meta.description ?? "")}`
+  const ogImage = meta.illustration ?? ogImageUrl({ type: "roadmap", title: meta.title, subtitle: meta.description ?? "" })
 
   return {
     title: `${meta.title} | Roadmap`,

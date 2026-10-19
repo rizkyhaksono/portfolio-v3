@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { MetadataConstants } from "@/commons/constants/metadata";
 import { getAllProject } from "@/services/visitor/project";
-import { getMetadataBaseUrl, getSiteUrl } from "@/lib/site-url";
+import { getMetadataBaseUrl, getSiteUrl, ogImageUrl } from "@/lib/site-url";
 import { plainText } from "../safe-html";
 
 type Props = {
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const cleanDescription = plainText(project.description).slice(0, 160);
-  const ogImage = project.image ?? `/api/og?type=project&title=${encodeURIComponent(project.title)}&subtitle=${encodeURIComponent(cleanDescription)}`;
+  const ogImage = project.image ?? ogImageUrl({ type: "project", title: project.title, subtitle: cleanDescription });
   const pageUrl = `${getSiteUrl()}/project/${id}`;
 
   return {

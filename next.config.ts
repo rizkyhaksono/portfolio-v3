@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
 
+const PRINT_FONTS = [
+  './src/assets/fonts/ibm-plex-sans-latin-400-normal.woff',
+  './src/assets/fonts/ibm-plex-sans-latin-600-normal.woff',
+]
+
 const nextConfig: NextConfig = {
   // Standalone output is required by the Docker image (Dockerfile copies .next/standalone).
   // Disabled on Windows only, where it triggers an EBUSY file-lock during local builds.
@@ -21,10 +26,10 @@ const nextConfig: NextConfig = {
   },
   // Keeps the TypeScript compiler (pulled in by tracing) out of the standalone image.
   outputFileTracingExcludes: { '*': ['node_modules/typescript/**'] },
-  // print-assets.ts reads this font from disk at runtime, which tracing cannot see.
+  // print-assets.ts reads these fonts from disk at runtime, which tracing cannot see (public/ is copied by the Dockerfile).
   outputFileTracingIncludes: {
-    '/api/og': ['./src/assets/fonts/literata-italic.ttf'],
-    '/api/certificate': ['./src/assets/fonts/literata-italic.ttf'],
+    '/api/og': PRINT_FONTS,
+    '/api/certificate': PRINT_FONTS,
   },
   compress: true,
   poweredByHeader: false,

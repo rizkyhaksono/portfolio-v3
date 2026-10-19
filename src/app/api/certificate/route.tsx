@@ -3,7 +3,7 @@ import { NextRequest } from "next/server"
 import { PRINT_HEX } from "@/lib/print-hex"
 import { loadPrintAssets, RULE_HEX } from "../og/print-assets"
 
-// Node, not edge: the font and the seal are files read from disk.
+// Node, not edge: the fonts and the mark are files read from disk.
 export const runtime = "nodejs"
 
 const ISSUED = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "Asia/Jakarta" })
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const name = (searchParams.get("name") ?? "").trim().slice(0, 48) || "A reader"
 
   try {
-    const { font, seal } = await loadPrintAssets()
+    const { fonts, mark } = await loadPrintAssets()
     const line = { display: "flex", fontSize: 26, color: PRINT_HEX.inkSoft, textAlign: "center" } as const
 
     return new ImageResponse(
@@ -34,8 +34,7 @@ export async function GET(req: NextRequest) {
             padding: 40,
             backgroundColor: PRINT_HEX.paper,
             color: PRINT_HEX.ink,
-            fontFamily: "Literata",
-            fontStyle: "italic",
+            fontFamily: "IBM Plex Sans",
           }}
         >
           {/* Double-rule frame: ink outside, a 3px gap, a hairline inside. */}
@@ -51,8 +50,8 @@ export async function GET(req: NextRequest) {
               }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={seal} width={104} height={104} alt="" />
-              <div style={{ display: "flex", marginTop: 16, fontSize: 56, lineHeight: 1.15 }}>Certificate of completion</div>
+              <img src={mark} width={117} height={104} alt="" />
+              <div style={{ display: "flex", marginTop: 16, fontSize: 52, fontWeight: 600, lineHeight: 1.15, letterSpacing: -1 }}>Certificate of completion</div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, fontSize: 22, color: PRINT_HEX.inkSoft }}>
                 <div style={{ display: "flex", width: 12, height: 12, border: `1.5px solid ${PRINT_HEX.inkSoft}` }} />
                 Self-attested
@@ -65,7 +64,8 @@ export async function GET(req: NextRequest) {
                   marginTop: 12,
                   padding: "0 24px 10px",
                   maxWidth: "90%",
-                  fontSize: name.length > 32 ? 36 : 52,
+                  fontSize: name.length > 32 ? 34 : 48,
+                  fontWeight: 600,
                   lineHeight: 1.15,
                   textAlign: "center",
                   borderBottom: `1px solid ${PRINT_HEX.ink}`,
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
                 {name}
               </div>
               <div style={{ ...line, marginTop: 18 }}>worked through every lesson of the roadmap</div>
-              <div style={{ display: "flex", marginTop: 8, fontSize: 42, textAlign: "center" }}>{course}</div>
+              <div style={{ display: "flex", marginTop: 8, fontSize: 40, fontWeight: 600, textAlign: "center" }}>{course}</div>
               <div style={{ ...line, marginTop: 18, fontSize: 20 }}>
                 Marked complete by the reader on natee.my.id. No exam, and nobody checked the work.
               </div>
@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
       {
         width: 1200,
         height: 800,
-        fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
+        fonts,
       },
     )
   } catch (error) {

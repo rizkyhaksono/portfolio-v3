@@ -9,7 +9,7 @@ import { ReaderCount } from "@/components/ui/reader-count"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import { dateline, minutesToRead } from "@/app/_components/blog/format"
-import { getSiteUrl, isSiteImage } from "@/lib/site-url"
+import { getSiteUrl, isSiteImage, ogImageUrl } from "@/lib/site-url"
 import { getOnsiteBlogBySlug, getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
 import { getPathReads } from "@/services/visitor/umami"
 
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) return { title: "Article not found" }
 
   const url = `${getSiteUrl()}/blog/onsite/${post.slug}`
-  const image = post.coverImage || `/api/og?type=blog&title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.description ?? "")}`
+  const image = post.coverImage || ogImageUrl({ type: "blog", title: post.title, subtitle: post.description ?? "" })
 
   return {
     title: `${post.title} | Writing`,

@@ -7,6 +7,7 @@ import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRoadmapProgress } from "@/hooks/use-roadmap-progress"
 import type { RoadmapContent, RoadmapLevel } from "@/lib/mdx"
+import { ogImageUrl } from "@/lib/site-url"
 import { courseTitle, minutesOf } from "./course-title"
 
 interface Course {
@@ -37,7 +38,7 @@ function Tick() {
 
 /** Shown once every lesson of the course is done in this browser. */
 function Certificate({ course, name, onName }: Readonly<{ course: string; name: string; onName: (name: string) => void }>) {
-  const href = `/api/certificate?course=${encodeURIComponent(course)}&name=${encodeURIComponent(name.trim())}`
+  const href = ogImageUrl({ course, name: name.trim() }, "/api/certificate")
   return (
     <div className="mt-6 border-t border-ink pt-4">
       <p className="flex items-center gap-2 font-display text-h4 text-ink">
