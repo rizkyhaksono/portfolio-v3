@@ -199,8 +199,7 @@
 .prose blockquote {
   border-left: 1px solid hsl(var(--ink));
   padding-left: 1.25rem;
-  font-size: 1.375rem;
-  line-height: 1.4;
+  @apply text-lead;
 }
 .prose ul {
   list-style: none;
@@ -239,7 +238,7 @@
   white-space: nowrap;
 }
 .prose th {
-  font-size: 0.8125rem;
+  @apply text-caption;
   font-weight: 600;
   color: hsl(var(--muted-foreground));
   border-bottom: 1px solid hsl(var(--ink));
@@ -254,7 +253,7 @@
 }
 .prose figcaption {
   margin-top: 0.5em;
-  font-size: 0.8125rem;
+  @apply text-caption;
   color: hsl(var(--muted-foreground));
 }
 .prose code {

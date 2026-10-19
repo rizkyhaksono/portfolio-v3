@@ -90,7 +90,7 @@ The OG and certificate images are drawn by satori, which reads static fonts only
 ### Weight and emphasis
 
 - Headings are weight 600. The weight rides on the `text-h1` to `text-h4` and `text-display` size tokens in `tailwind.config.ts`, so a caption that uses `font-display` stays 400. `display` and `h1` also set letter-spacing -0.02em.
-- Body, prose and captions are 400. Labels are 14px / 600, table heads 13px / 600 in ink-soft, tags 13px.
+- Body, prose and captions are 400. Labels are 14px / 600, table heads 12px / 600 in ink-soft, tags 12px.
 - **There is no italic.** `<em>`, `<i>` and `<cite>` render upright at weight 500, and `<strong>` and `<b>` at 600 (set once in `globals.css`). Emphasis is weight, not slant. The TipTap italic mark stays in the rich-text editor so authored content keeps its meaning.
 
 ### Scale
@@ -99,19 +99,19 @@ Fluid between 375px and 1280px, defined as `fontSize` keys in `tailwind.config.t
 
 | Key | Size / leading | Notes |
 |---|---|---|
-| `caption`, `xs` | 13 / 1.35 | Captions, eyebrows, datelines; `xs` is 13px |
-| `small` | 14 / 1.45 | |
-| `body` | 16 to 17 / 1.6 | |
-| `prose` | 17 to 19 / 1.65 | 66ch measure |
-| `lead` | 20 to 22 / 1.4 | One standfirst per page |
-| `h4` | 18 / 1.3 | Weight 600 |
-| `h3` | 22 to 24 / 1.25 | Weight 600 |
-| `h2` | 28 to 40 / 1.1 | Weight 600 |
-| `h1` | 40 to 64 / 1.02 | Weight 600, -0.02em |
-| `display` | 56 to 152 / 0.95 | Weight 600, -0.02em; the home masthead |
-| `numeral` | 44 to 72 / 1 | Stat numerals; add `tabular-nums` on the element |
+| `caption`, `xs` | 12 / 1.4 | Captions, eyebrows, datelines; `xs` is 12px |
+| `small` | 13 / 1.45 | |
+| `body` | 15 to 16 / 1.6 | |
+| `prose` | 16 to 17 / 1.65 | 66ch measure |
+| `lead` | 17 to 19 / 1.45 | One standfirst per page; also the `.prose` blockquote |
+| `h4` | 16 / 1.35 | Weight 600 |
+| `h3` | 18 to 20 / 1.3 | Weight 600 |
+| `h2` | 22 to 30 / 1.15 | Weight 600 |
+| `h1` | 30 to 44 / 1.08 | Weight 600, -0.02em |
+| `display` | 44 to 104 / 0.95 | Weight 600, -0.02em; the home masthead, which is capped at 15svh, and from 1024px sized to its column (`min(10.5cqi,14svh)`) |
+| `numeral` | 32 to 48 / 1 | Stat numerals; add `tabular-nums` on the element |
 
-Text balancing (`text-balance`, `text-pretty`) lives on the elements, not in the scale. Spacing uses a 4px base. Section rhythm is 96px desktop, 64px mobile (`SECTION_SPACING.section = 'mt-16 sm:mt-24'`).
+Text balancing (`text-balance`, `text-pretty`) lives on the elements, not in the scale. Spacing uses a 4px base. Section rhythm is 64px desktop, 48px mobile (`SECTION_SPACING.section = 'mt-12 sm:mt-16'`), with 12px from a section heading to its content (`sectionGap`).
 
 ### Type rules
 
@@ -171,7 +171,7 @@ Not allowed: grain, speckle, engraving or illustration bands, duotone, fleuron, 
 - Token flip on `<html class="dark">`, driven by next-themes. The default theme is Light, even where the system prefers dark; System is still offered and follows the OS. The menu sheet offers Light, Dark and System; the running head toggle (from 1024px) flips Light and Dark (aria-label "Dark theme", pressed state set after mount); the command palette has "Light theme", "Dark theme" and "System theme".
 - Do not write dark-variant classes. Every colour already flips through the tokens, and gate 1 bans `dark:`.
 - Photos stay grayscale in both themes. The mark pair has its own dark value (#FF6326) so the orange keeps its contrast on near-black.
-- `color-scheme` follows the theme. Viewport `themeColor` is paper by day and near-black at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
+- `color-scheme` follows the theme. Viewport `themeColor` follows the OS `prefers-color-scheme` (paper for light, near-black for dark), not the site theme, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
 - OG and certificate images are always drawn on the light paper colours, with ink text and orange only on the crop marks.
 
 ## Print
@@ -188,5 +188,5 @@ import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/des
 |---|---|---|
 | `SURFACE` | `solid` (frame), `inset`; `glass` and `glassNoBlur` are retired aliases of `solid` | Surface classes, see [surfaces.md](./surfaces.md) |
 | `SURFACE_PADDING` | `default`, `compact`, `cozy` | Inner padding |
-| `SECTION_SPACING` | `section` (`mt-16 sm:mt-24`), `sectionGap` | Section rhythm |
+| `SECTION_SPACING` | `section` (`mt-12 sm:mt-16`), `sectionGap` (`mt-3`) | Section rhythm |
 | `PAGE_WIDTH` | `default`, `prose`, `article`, `wide`, `ledger` (`max-w-[60rem]`) | Width presets for page wrappers |

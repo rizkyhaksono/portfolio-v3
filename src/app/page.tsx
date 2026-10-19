@@ -33,7 +33,7 @@ function HeroPortrait({ className }: Readonly<{ className?: string }>) {
 /**
  * Masthead stage: the h1 never animates; only the sentence fills in word by word. The portrait is the LCP candidate.
  * From lg it is the right column and the two columns sit centred in the stage. Below lg it follows the lead,
- * capped in svh so the pinned stage still fits 375x812, and the sentence and links stand on the stage's foot.
+ * capped in svh so the pinned stage still fits 375x667, and the sentence and links stand on the stage's foot.
  * The svh caps only bite below ~800px of height, so the stage still fits on 1280x600.
  */
 function Masthead() {
@@ -41,9 +41,9 @@ function Masthead() {
     <WordScroll className={cn(SHELL_WIDTH, "flex flex-col py-10 sm:py-[min(4rem,8svh)] lg:justify-center")}>
       <div className="flex grow flex-col lg:grid lg:grow-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:gap-12">
         {/* From lg the name is sized to its column (cqi) so it holds one line, and its cap height meets the
-            portrait's frame (-0.15em); the sentence and links then stand on the frame's foot. */}
+            portrait's frame (-0.145em); the sentence and links then stand on the frame's foot. */}
         <div className="flex grow flex-col lg:[container-type:inline-size]">
-          <h1 className="pb-0 font-display text-display text-balance text-ink [font-size:min(clamp(3.5rem,1.0138rem_+_10.6077vw,9.5rem),19svh)] lg:-mt-[0.15em] lg:[font-size:min(14.5cqi,19svh)]">
+          <h1 className="pb-0 font-display text-display text-balance text-ink [font-size:min(clamp(2.75rem,1.1961rem_+_6.6298vw,6.5rem),15svh)] lg:-mt-[0.145em] lg:[font-size:min(10.5cqi,14svh)]">
             Rizky Haksono
           </h1>
           <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>

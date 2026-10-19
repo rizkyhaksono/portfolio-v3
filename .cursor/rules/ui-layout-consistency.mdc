@@ -75,7 +75,7 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 | Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-- Widths via the `PAGE_WIDTH` presets in `src/lib/design-system.ts` (`default`, `prose`, `article`, `wide`, `ledger`). Section rhythm via `PageSection` (`mt-16 sm:mt-24`). Titles via `SectionHeading` (no `marker`).
+- Widths via the `PAGE_WIDTH` presets in `src/lib/design-system.ts` (`default`, `prose`, `article`, `wide`, `ledger`). Section rhythm via `PageSection` (`mt-12 sm:mt-16`). Titles via `SectionHeading` (no `marker`).
 - Charts are server SVG (`InkChart`, `InkHeatmap`, `HatchBar`). Never add recharts.
 - Photos use `PlateFigure`: 1px ink frame, four orange crop marks, grayscale (`tone="color"` for site OG covers, the OCR upload and sprites). Avatars use `.plate` with no marks. Logo only through `<Logo variant="mini" | "mark" | "tile">`.
 - Ornaments are plain 1px rules (`hr`, `.tail-piece`). No fleuron, grain, speckle, engraving or duotone.

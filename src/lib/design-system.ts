@@ -26,8 +26,8 @@ export const SURFACE_PADDING = {
 
 /** Section spacing used by PageSection / home blocks. */
 export const SECTION_SPACING = {
-  section: "mt-16 sm:mt-24",
-  sectionGap: "mt-4",
+  section: "mt-12 sm:mt-16",
+  sectionGap: "mt-3",
 } as const
 
 /**

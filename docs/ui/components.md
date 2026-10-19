@@ -27,9 +27,9 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 - **InkLink** (server). Underlined 1px, 2px on hover, no arrow. `external` adds `target="_blank"`, `rel`, the sr-only "(opens in a new tab)", and `data-umami-event={event ?? 'outbound-click'}` with `data-umami-event-host`.
 - **Fields** (input, textarea, select). Baseline only: `border-0 border-b border-input`, 16px text, 2px ink baseline on focus, label above. Errors: ink text with an SVG cross, wired with `aria-describedby`.
 - **Tabs.** Bottom rule; the active tab gets a 2px ink underline. State lives in the URL (`?tab=`).
-- **Tag** (Chip and Badge merged). 1px `rule-strong`, 13px. Status is an 8px square, filled, outline or dashed, plus a word.
+- **Tag** (Chip and Badge merged). 1px `rule-strong`, 12px. Status is an 8px square, filled, outline or dashed, plus a word.
 - **Eyebrow.** A caption `<p>` (`text-caption text-ink-soft`), only when it adds information. Never all-caps, never mono.
-- **Table.** `th` 13px / 600 in ink-soft (sticky in admin), numbers right-aligned with `tabular-nums`, hover row `bg-tint`.
+- **Table.** `th` 12px / 600 in ink-soft (sticky in admin), numbers right-aligned with `tabular-nums`, hover row `bg-tint`.
 - **Hover tips.** `data-tip="..."` on any element shows an instant lift tip (`ui/hover-tip.tsx`, mounted once in the root layout). SVG marks follow the cursor, other elements anchor below; touch shows it on tap. Never use the native `title` attribute: it waits about a second. The tip is `aria-hidden`, so keep an `aria-label` or text table beside it.
 - **Floating layers.** Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command and Sonner toasts use the lift surface and an ink scrim. No backdrop blur.
 - **Controls.** Square switch and checkbox, round radio dot (the only circle), static ruled skeleton with no pulse, square grayscale avatar (`.plate`, no crop marks).

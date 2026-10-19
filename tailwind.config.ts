@@ -71,18 +71,18 @@ const config = {
 			},
 			// Fluid 375 -> 1280px. Balance lives on the elements, not here.
 			fontSize: {
-				xs: ['0.8125rem', { lineHeight: '1.35' }],
-				caption: ['0.8125rem', { lineHeight: '1.35' }],
-				small: ['0.875rem', { lineHeight: '1.45' }],
-				body: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.6' }],
-				prose: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.65' }],
-				lead: ['clamp(1.25rem, 1.1982rem + 0.221vw, 1.375rem)', { lineHeight: '1.4' }],
-				h4: ['1.125rem', { lineHeight: '1.3', fontWeight: '600' }],
-				h3: ['clamp(1.375rem, 1.3232rem + 0.221vw, 1.5rem)', { lineHeight: '1.25', fontWeight: '600' }],
-				h2: ['clamp(1.75rem, 1.4392rem + 1.326vw, 2.5rem)', { lineHeight: '1.1', fontWeight: '600' }],
-				h1: ['clamp(2.5rem, 1.8785rem + 2.6519vw, 4rem)', { lineHeight: '1.02', fontWeight: '600', letterSpacing: '-0.02em' }],
-				display: ['clamp(3.5rem, 1.0138rem + 10.6077vw, 9.5rem)', { lineHeight: '0.95', fontWeight: '600', letterSpacing: '-0.02em' }],
-				numeral: ['clamp(2.75rem, 2.0249rem + 3.0939vw, 4.5rem)', { lineHeight: '1' }]
+				xs: ['0.75rem', { lineHeight: '1.4' }],
+				caption: ['0.75rem', { lineHeight: '1.4' }],
+				small: ['0.8125rem', { lineHeight: '1.45' }],
+				body: ['clamp(0.9375rem, 0.9116rem + 0.1105vw, 1rem)', { lineHeight: '1.6' }],
+				prose: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.65' }],
+				lead: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.45' }],
+				h4: ['1rem', { lineHeight: '1.35', fontWeight: '600' }],
+				h3: ['clamp(1.125rem, 1.0732rem + 0.221vw, 1.25rem)', { lineHeight: '1.3', fontWeight: '600' }],
+				h2: ['clamp(1.375rem, 1.1678rem + 0.884vw, 1.875rem)', { lineHeight: '1.15', fontWeight: '600' }],
+				h1: ['clamp(1.875rem, 1.5124rem + 1.547vw, 2.75rem)', { lineHeight: '1.08', fontWeight: '600', letterSpacing: '-0.02em' }],
+				display: ['clamp(2.75rem, 1.1961rem + 6.6298vw, 6.5rem)', { lineHeight: '0.95', fontWeight: '600', letterSpacing: '-0.02em' }],
+				numeral: ['clamp(2rem, 1.5856rem + 1.768vw, 3rem)', { lineHeight: '1' }]
 			},
 			// Radius 0 everywhere; `full` only for radio dots.
 			borderRadius: {

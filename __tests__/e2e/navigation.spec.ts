@@ -76,4 +76,11 @@ test.describe('Navigation', () => {
     await expect(stage.getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeInViewport({ ratio: 1 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
   });
+
+  test('home hero fits the first screen of a short phone', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/');
+    await expect(page.locator('.ws__stage').getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeInViewport({ ratio: 1 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+  });
 });
