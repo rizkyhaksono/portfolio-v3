@@ -96,7 +96,7 @@ const sections = [
           them.
         </p>
         <p>
-          Your browser&rsquo;s local storage keeps a few settings that never leave your device: the paper or night theme,
+          Your browser&rsquo;s local storage keeps a few settings that never leave your device: the light or dark theme,
           your roadmap progress and the name for its certificate, and when you last used the contact form. Embedded YouTube
           videos load from YouTube only after you press play.
         </p>

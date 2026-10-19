@@ -21,7 +21,7 @@ export function ContactForm() {
   const [token, setToken] = useState("")
   const [status, setStatus] = useState<Status>({ kind: "idle" })
   const sending = useRef(false)
-  // The site theme, not the OS one: Night on a light OS must still get the dark widget.
+  // The site theme, not the OS one: Dark on a light OS must still get the dark widget.
   const { resolvedTheme } = useTheme()
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {

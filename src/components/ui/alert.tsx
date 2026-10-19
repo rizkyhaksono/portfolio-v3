@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// A ruled note on the paper. `destructive` is a strong ink rule; the title word carries the meaning, never colour.
+// A ruled note. `destructive` is a strong ink rule; the title word carries the meaning, never colour.
 const alertVariants = cva(
   "relative w-full border px-4 py-3 text-small text-ink [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-[0.9rem] [&>svg]:size-4 [&>svg]:text-ink [&>svg~*]:pl-7",
   {

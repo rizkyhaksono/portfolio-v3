@@ -31,7 +31,7 @@ function HeroPortrait({ className }: Readonly<{ className?: string }>) {
 }
 
 /**
- * Masthead stage: the h1 never animates; only the sentence inks itself. The portrait is the LCP candidate.
+ * Masthead stage: the h1 never animates; only the sentence fills in word by word. The portrait is the LCP candidate.
  * From lg it is the right column and the two columns sit centred in the stage. Below lg it follows the lead,
  * capped in svh so the pinned stage still fits 375x812, and the sentence and links stand on the stage's foot.
  * The svh caps only bite below ~800px of height, so the stage still fits on 1280x600.

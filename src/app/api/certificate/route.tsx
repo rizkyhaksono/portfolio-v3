@@ -14,7 +14,7 @@ function courseTitle(id: string) {
   return (words.charAt(0).toUpperCase() + words.slice(1)).replace(/\bmcp\b/gi, "MCP")
 }
 
-// Always printed on paper; the old `theme` parameter is accepted and ignored.
+// Always the light sheet; the old `theme` parameter is accepted and ignored.
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const course = courseTitle((searchParams.get("course") ?? "").slice(0, 40))

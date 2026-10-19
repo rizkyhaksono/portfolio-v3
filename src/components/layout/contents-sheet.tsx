@@ -11,8 +11,8 @@ import { NAV_SECTIONS, isCurrentPath, navTrack } from "@/commons/constants/navig
 import { track } from "@/lib/analytics"
 
 const THEMES = [
-  { value: "light", label: "Paper" },
-  { value: "dark", label: "Night" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
 ] as const
 

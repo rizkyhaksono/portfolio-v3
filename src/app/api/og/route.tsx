@@ -55,7 +55,7 @@ export async function GET(request: Request) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {/* The double rule under every printed page head: ink, a 3px gap, a hairline. */}
+            {/* The double rule under every page head: ink, a 3px gap, a hairline. */}
             <div style={{ display: "flex", height: 5, borderTop: `1px solid ${PRINT_HEX.ink}`, borderBottom: `1px solid ${RULE_HEX}` }} />
             <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, fontSize: 24, color: PRINT_HEX.inkSoft }}>
               <span>{section}</span>

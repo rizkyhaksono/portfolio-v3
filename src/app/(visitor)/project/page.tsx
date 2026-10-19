@@ -35,7 +35,7 @@ export default async function ProjectPage() {
   const featured = selectFeaturedProjects(projects)
   const featuredIds = new Set(featured.map((project) => project.id))
   const rest = projects.filter((project) => !featuredIds.has(project.id))
-  // The first featured plate is the LCP image on phones, so it must not wait as a lazy image.
+  // The first featured cover is the LCP image on phones, so it must not wait as a lazy image.
   const leadPlateId = featured.find((project) => plateOf(project))?.id
 
   return (

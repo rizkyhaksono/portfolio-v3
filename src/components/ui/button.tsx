@@ -11,7 +11,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Disabled is a dashed empty slot in tokens, not a faded fill (opacity greys the ink in Night print).
+        // Disabled is a dashed empty slot in tokens, not a faded fill (opacity greys the ink in the dark theme).
         default: "bg-primary text-primary-foreground hover:bg-primary/90 disabled:border disabled:bg-tint",
         destructive:
           "border border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground",

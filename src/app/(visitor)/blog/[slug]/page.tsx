@@ -99,7 +99,7 @@ export default async function BlogArticlePage({ params }: Props) {
               from readers.
             </p>
             <p>
-              First printed on{" "}
+              First published on{" "}
               <InkLink href={post.url} external>
                 DEV Community
               </InkLink>
@@ -110,7 +110,7 @@ export default async function BlogArticlePage({ params }: Props) {
         footer={<BlogLetters comments={comments} url={post.url} />}
       >
         {post.cover_image && (
-          // `.prose img` frames body images; the plate brings its own frame.
+          // `.prose img` frames body images; the figure brings its own frame.
           <PlateFigure className="[&_img]:border-0 [&_img]:p-0">
             <Image src={post.cover_image} alt="" width={1000} height={420} priority sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-[1000/420] w-full object-cover" />
           </PlateFigure>

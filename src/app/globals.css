@@ -104,7 +104,7 @@
 
 /* Unlayered on purpose: always emitted (no content purge), still overridden by utilities below. */
 
-/* Photos print in greyscale in both themes. */
+/* Photos show in greyscale in both themes. */
 .plate {
   position: relative;
   background-color: hsl(var(--paper));
@@ -117,7 +117,7 @@
 .ws__stage {
   min-height: calc(100svh - var(--head-h));
 }
-/* The ghost is a colour, not opacity: faded cream over night paper reads as neutral grey. */
+/* The ghost is a colour, not opacity: faded off-white over the dark paper reads as neutral grey. */
 @keyframes ws-ink {
   from {
     color: var(--ws-ghost);

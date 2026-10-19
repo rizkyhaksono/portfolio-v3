@@ -160,10 +160,10 @@ export function CommandPalette({ open, onOpenChange: setOpen, onCloseAutoFocus }
 
         <CommandGroup heading="Theme">
           <CommandItem value="theme light" onSelect={() => runCommand(() => setTheme("light"))}>
-            <span>Paper theme</span>
+            <span>Light theme</span>
           </CommandItem>
           <CommandItem value="theme dark" onSelect={() => runCommand(() => setTheme("dark"))}>
-            <span>Night theme</span>
+            <span>Dark theme</span>
           </CommandItem>
           <CommandItem value="theme system" onSelect={() => runCommand(() => setTheme("system"))}>
             <span>System theme</span>

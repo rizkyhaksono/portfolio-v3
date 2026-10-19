@@ -46,7 +46,7 @@ const GROUPS: Tool[][] = [
   ],
 ]
 
-/** Inset toolbar; a pressed tool prints inverted (ink ground) and says so with aria-pressed. */
+/** Inset toolbar; a pressed tool is inverted (ink ground) and says so with aria-pressed. */
 function Toolbar({ editor }: Readonly<{ editor: Editor }>) {
   return (
     <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-rule bg-tint p-1">

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 // The sheet pulls in Radix Dialog, RadioGroup and next-themes (~25 KB gz); load it on first open, not with every page.
 const ContentsSheet = dynamic(() => import("./contents-sheet").then((module) => module.ContentsSheet), { ssr: false })
 
-/** The menu button in the running head (below 1024px): two printed rules, no label on screen. */
+/** The menu button in the running head (below 1024px): two rules, no label on screen. */
 export function ContentsTrigger({ className }: Readonly<{ className?: string }>) {
   const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)

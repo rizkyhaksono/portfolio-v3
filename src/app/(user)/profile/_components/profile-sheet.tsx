@@ -2,9 +2,9 @@ interface ProfileSheetProps {
   title: React.ReactNode
   /** One lead line under the title. */
   standfirst?: React.ReactNode
-  /** Square duotone portrait beside the title. */
+  /** Square portrait beside the title. */
   portrait?: React.ReactNode
-  /** A plate above the head (the cover). */
+  /** The cover image above the head. */
   cover?: React.ReactNode
   children: React.ReactNode
 }

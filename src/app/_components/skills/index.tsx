@@ -25,8 +25,8 @@ const FOCUS_SKILLS = [
 ] as const
 
 /**
- * Stacking deck from 768px: each plate sticks a header strip (3.25rem) lower than the last, so earlier
- * headers stay visible as the next plate slides over. Below 768px it is a plain ruled list.
+ * Stacking deck from 768px: each card sticks a header strip (3.25rem) lower than the last, so earlier
+ * headers stay visible as the next card slides over. Below 768px it is a plain ruled list.
  */
 export default function SkillSection() {
   return (

@@ -80,12 +80,12 @@ export default async function OnsiteArticlePage({ params }: Props) {
         }
       >
         {post.coverImage && (
-          // `.prose img` frames body images; the plate brings its own frame.
+          // `.prose img` frames body images; the figure brings its own frame.
           <PlateFigure tone={isSiteImage(post.coverImage) ? "color" : "photo"} className="[&_img]:border-0 [&_img]:p-0">
             <Image src={post.coverImage} alt="" width={1200} height={675} priority unoptimized={isSiteImage(post.coverImage)} sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-video w-full object-cover" />
           </PlateFigure>
         )}
-        {/* Nested `.prose` so the printed HTML gets the same block spacing as direct children. */}
+        {/* Nested `.prose` so the rendered HTML gets the same block spacing as direct children. */}
         <div className="prose" dangerouslySetInnerHTML={{ __html: content }} />
       </ArticleShell>
     </>

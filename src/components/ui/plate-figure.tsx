@@ -28,7 +28,7 @@ function CropMarks() {
 }
 
 /** A figure framed like a drawing: 1px ink border, orange crop marks in the gutter, photos in grayscale, caption.
- * The frame is the plate's own, so an `img` inside never takes `.prose img`'s rule border as well.
+ * The frame is the figure's own, so an `img` inside never takes `.prose img`'s rule border as well.
  * The photo clips its own focus outline, so the frame draws it when a control inside is focused. */
 export function PlateFigure({ children, caption, className, tone = "photo" }: Readonly<PlateFigureProps>) {
   return (

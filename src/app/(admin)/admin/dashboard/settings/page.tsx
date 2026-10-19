@@ -61,8 +61,8 @@ const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: strin
 ]
 
 const THEMES = [
-  { value: "light", label: "Paper" },
-  { value: "dark", label: "Night" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
 ] as const
 
