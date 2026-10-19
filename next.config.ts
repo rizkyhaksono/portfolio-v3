@@ -13,12 +13,19 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       { source: '/signal', destination: '/', permanent: true },
-      { source: '/status', destination: '/stats', permanent: true },
+      { source: '/status', destination: '/stats#status', permanent: true },
       { source: '/playground', destination: '/ai', permanent: true },
+      { source: '/admin', destination: '/admin/dashboard', permanent: true },
+      { source: '/admin/auth', destination: '/admin/auth/login', permanent: true },
     ]
   },
   // Keeps the TypeScript compiler (pulled in by tracing) out of the standalone image.
   outputFileTracingExcludes: { '*': ['node_modules/typescript/**'] },
+  // print-assets.ts reads this font from disk at runtime, which tracing cannot see.
+  outputFileTracingIncludes: {
+    '/api/og': ['./src/assets/fonts/literata-italic.ttf'],
+    '/api/certificate': ['./src/assets/fonts/literata-italic.ttf'],
+  },
   compress: true,
   poweredByHeader: false,
   images: {
@@ -49,8 +56,8 @@ const nextConfig: NextConfig = {
     unoptimized: false,
   },
   experimental: {
-    // lucide-react, date-fns, react-icons/* and the P3 chart library are already in the default list.
-    optimizePackageImports: ["date-fns-tz", "@radix-ui/react-icons"],
+    // Profile covers go up to 5 MB (the API's own cap) plus multipart overhead; the 1 MB default refused them.
+    serverActions: { bodySizeLimit: "6mb" },
   },
 }
 

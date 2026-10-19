@@ -1,5 +1,5 @@
 ---
-title: "Multi-Tool Orchestration"
+title: "Multi-tool orchestration"
 description: "Chain multiple MCP tools, handle errors, and design composable tool APIs"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,12 +9,6 @@ duration: "32 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Multi-Tool Orchestration
 
 A single tool answers one question. Real agents solve problems by chaining several tools together: search a codebase, read the matching file, run a linter, then open a pull request. On the MCP side you never write that control flow yourself — the LLM decides the sequence. Your job is to expose tools that are small, predictable, well-described, and safe to combine in any order the model chooses. This lesson shows how to design a tool surface that an agent can compose reliably, validate inputs, return chainable output, and surface errors the model can actually recover from.
 
@@ -142,7 +136,7 @@ server.tool("open_pr", "Open a pull request.", { branch: z.string() }, async ({ 
   </TabsContent>
 </Tabs>
 
-<Card className="my-6">
+<Card>
   <CardHeader>
     <CardTitle>Rule of thumb</CardTitle>
   </CardHeader>
@@ -190,7 +184,7 @@ server.tool(
 
 ## Common Pitfalls
 
-<Accordion type="single" collapsible className="my-6">
+<Accordion type="single" collapsible>
   <AccordionItem value="one">
     <AccordionTrigger>Throwing on user-recoverable errors</AccordionTrigger>
     <AccordionContent>
@@ -232,6 +226,6 @@ server.tool(
 
 ## Next Steps
 
-<NextLesson title="Production Deployment" description="Docker and health checks." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
+<NextLesson title="Production deployment" description="Docker and health checks." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
 
 <Resources resources={[{"title":"MCP Tools Concept","href":"https://modelcontextprotocol.io/docs/concepts/tools"},{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Specification","href":"https://modelcontextprotocol.io/specification"},{"title":"Zod Documentation","href":"https://zod.dev"}]} />

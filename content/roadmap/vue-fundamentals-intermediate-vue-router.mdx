@@ -10,12 +10,6 @@ order: 6
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Vue Router
-
 Vue Router is the official client-side routing library for Vue. It maps URLs to components so a single-page application can render different views, keep the browser address bar in sync, support the back/forward buttons, and let users deep-link or bookmark any screen — all without a full page reload. Once your app grows past a couple of screens, hand-rolling this with `v-if` becomes unmanageable, and Vue Router gives you dynamic segments, nested layouts, code-splitting, and route-level access control out of the box.
 
 <LearningObjectives objectives={["Create a router with createRouter and wire it into your app", "Define dynamic and nested routes and read their params", "Navigate declaratively and programmatically with RouterLink and useRouter", "Lazy-load route components to shrink the initial bundle", "Protect routes with navigation guards and route meta fields"]} />
@@ -69,8 +63,8 @@ In your root component you render the matched view with `<RouterView>` and link 
 
 ### History modes
 
-<Tabs defaultValue="html5" className="my-6">
-  <TabsList className="grid w-full grid-cols-2">
+<Tabs defaultValue="html5">
+  <TabsList>
     <TabsTrigger value="html5">HTML5 (recommended)</TabsTrigger>
     <TabsTrigger value="hash">Hash</TabsTrigger>
   </TabsList>
@@ -232,8 +226,8 @@ router.beforeEach((to) => {
 
 Guards come in three scopes. Reach for the narrowest one that fits.
 
-<Tabs defaultValue="global" className="my-6">
-  <TabsList className="grid w-full grid-cols-3">
+<Tabs defaultValue="global">
+  <TabsList>
     <TabsTrigger value="global">Global</TabsTrigger>
     <TabsTrigger value="route">Per-route</TabsTrigger>
     <TabsTrigger value="component">In-component</TabsTrigger>
@@ -292,7 +286,7 @@ const router = createRouter({
 
 ## Common Pitfalls
 
-<Accordion type="single" collapsible className="my-6">
+<Accordion type="single" collapsible>
   <AccordionItem value="p1">
     <AccordionTrigger>Params are always strings</AccordionTrigger>
     <AccordionContent>`route.params.id` is `"42"`, never the number `42`. Convert with `Number(route.params.id)` before comparing to numeric IDs, or a strict `===` check will silently fail.</AccordionContent>
@@ -315,6 +309,6 @@ const router = createRouter({
 
 ## Next Steps
 
-<NextLesson title="Vue Performance Optimization" description="Optimize renders." href="/roadmap/vue-fundamentals-advanced-performance-optimization" />
+<NextLesson title="Vue performance optimization" description="Optimize renders." href="/roadmap/vue-fundamentals-advanced-performance-optimization" />
 
 <Resources resources={[{"title":"Vue Router Docs","href":"https://router.vuejs.org/"},{"title":"Navigation Guards","href":"https://router.vuejs.org/guide/advanced/navigation-guards.html"},{"title":"Dynamic Route Matching","href":"https://router.vuejs.org/guide/essentials/dynamic-matching.html"},{"title":"Lazy Loading Routes","href":"https://router.vuejs.org/guide/advanced/lazy-loading.html"}]} />

@@ -2,260 +2,74 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { FcGoogle } from "react-icons/fc"
-import { ArrowLeft, Loader2, Lock, Mail, Shield } from "lucide-react"
-import { toast } from "sonner"
-import {
-  loginWithCredentials,
-  getCurrentUserWithToken,
-  getOAuthLoginUrl,
-} from "@/services/admin/auth-service"
+import { FormAlert } from "@/app/(authentication)/auth/_components/form-alert"
+import { GoogleButton } from "@/app/(authentication)/auth/_components/google-button"
+import { loginWithCredentials, getCurrentUserWithToken } from "@/services/admin/auth-service"
 
-interface OAuthProviderConfig {
-  name: string
-  icon: React.ComponentType<{ className?: string }>
-  provider: string
-  className: string
-}
+const UNREACHABLE = "The account server is not answering. Try again in a minute."
 
-interface CredentialFieldProps {
-  id: string
-  label: string
-  type: "email" | "password"
-  placeholder: string
-  value: string
-  autoComplete: string
-  disabled: boolean
-  icon: React.ComponentType<{ className?: string }>
-  onChange: (value: string) => void
-}
-
-// Admin sign-in is Google-only by design (smaller OAuth attack surface).
-const oauthProviders: OAuthProviderConfig[] = [
-  {
-    name: "Google",
-    icon: FcGoogle,
-    provider: "google",
-    className: "hover:bg-muted/80",
-  },
-]
-
-/** Introduces the protected admin sign-in area. */
-function AdminLoginHeader() {
-  return (
-    <div className="mb-6 flex flex-col gap-1">
-      <div className="mb-1 flex items-center gap-2">
-        <span className="inline-flex h-9 w-9 items-center justify-center border border-border bg-muted text-primary">
-          <Shield className="h-5 w-5" />
-        </span>
-        <Eyebrow>Admin</Eyebrow>
-      </div>
-      <h1 className="font-display text-2xl font-bold tracking-tight">Sign in</h1>
-      <p className="text-sm text-muted-foreground">
-        Manage projects, blog, and portfolio content.
-      </p>
-    </div>
-  )
-}
-
-/** Renders a labeled credential input with a leading icon. */
-function CredentialField({
-  id,
-  label,
-  type,
-  placeholder,
-  value,
-  autoComplete,
-  disabled,
-  icon: Icon,
-  onChange,
-}: Readonly<CredentialFieldProps>) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{label}</Label>
-      <div className="relative">
-        <Icon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          id={id}
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="h-11 bg-background pl-10"
-          required
-          disabled={disabled}
-          autoComplete={autoComplete}
-        />
-      </div>
-    </div>
-  )
-}
-
-interface CredentialsFormProps {
-  email: string
-  password: string
-  isLoading: boolean
-  onEmailChange: (value: string) => void
-  onPasswordChange: (value: string) => void
-  onSubmit: (event: React.FormEvent) => void
-}
-
-/** Collects and submits the administrator's email credentials. */
-function CredentialsForm({
-  email,
-  password,
-  isLoading,
-  onEmailChange,
-  onPasswordChange,
-  onSubmit,
-}: Readonly<CredentialsFormProps>) {
-  const submitLabel = isLoading ? (
-    <>
-      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      Signing in...
-    </>
-  ) : (
-    "Sign in to dashboard"
-  )
-
-  return (
-    <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-4">
-      <CredentialField
-        id="admin-email"
-        label="Email"
-        type="email"
-        placeholder="admin@example.com"
-        value={email}
-        onChange={onEmailChange}
-        disabled={isLoading}
-        autoComplete="email"
-        icon={Mail}
-      />
-      <CredentialField
-        id="admin-password"
-        label="Password"
-        type="password"
-        placeholder="••••••••"
-        value={password}
-        onChange={onPasswordChange}
-        disabled={isLoading}
-        autoComplete="current-password"
-        icon={Lock}
-      />
-      <Button type="submit" className="mt-1 h-11 w-full font-medium" disabled={isLoading}>
-        {submitLabel}
-      </Button>
-    </form>
-  )
-}
-
-/** Separates credential login from the available OAuth providers. */
-function LoginDivider() {
-  return (
-    <div className="relative my-6">
-      <div className="absolute inset-0 flex items-center" aria-hidden="true">
-        <span className="w-full border-t border-border" />
-      </div>
-      <div className="relative flex justify-center text-xs uppercase tracking-wide">
-        <span className="bg-card px-3 text-muted-foreground">Or continue with</span>
-      </div>
-    </div>
-  )
-}
-
+// Admin sign-in is email or Google only by design (smaller OAuth attack surface).
 export function AdminLoginForm() {
   const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<string>()
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
+    setPending(true)
+    setError(undefined)
 
     try {
-      const data = await loginWithCredentials({ email, password })
+      const { token } = await loginWithCredentials({
+        email: String(data.get("email")),
+        password: String(data.get("password")),
+      })
+      if (!token) throw new Error("The server did not open a session. Try again.")
 
-      if (!data.token) {
-        throw new Error("No authentication token received")
-      }
-
-      const userData = await getCurrentUserWithToken(data.token)
-      const userRole = userData.data?.role
-
-      if (userRole !== "ADMIN") {
-        throw new Error("Access denied. Admin privileges required.")
-      }
+      const user = await getCurrentUserWithToken(token)
+      if (user.data?.role !== "ADMIN") throw new Error("This account is not an administrator.")
 
       // 7-day lifetime + SameSite=Lax; Secure whenever served over HTTPS (prod).
-      const cookieExpiry = 60 * 60 * 24 * 7
       const secure = globalThis.location?.protocol === "https:" ? "; Secure" : ""
-      const attrs = `; path=/; max-age=${cookieExpiry}; SameSite=Lax${secure}`
-      document.cookie = `NATEE_V3_TOKEN=${data.token}${attrs}`
+      const attrs = `; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${secure}`
+      document.cookie = `NATEE_V3_TOKEN=${token}${attrs}`
       document.cookie = `ADMIN_SUPABASE_AUTH_COOKIE=true${attrs}`
-
-      toast.success("Login successful!")
       router.push("/admin/dashboard")
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Invalid credentials. Please try again."
-      toast.error("Login Failed", { description: errorMessage })
-    } finally {
-      setIsLoading(false)
+    } catch (err) {
+      // fetch rejects with a TypeError when the API is unreachable; its message is not for people.
+      setError(err instanceof Error && !(err instanceof TypeError) ? err.message : UNREACHABLE)
+      setPending(false)
     }
   }
 
-  const handleOAuthLogin = (provider: string) => {
-    sessionStorage.setItem("admin_oauth_return", "/admin/dashboard")
-    globalThis.location.href = getOAuthLoginUrl(provider)
-  }
-
   return (
-    <Card className="overflow-hidden border border-border bg-card shadow-none">
-      <CardContent className="p-0">
-        <div className="flex flex-col p-6 sm:p-8">
-          <Link
-            href="/"
-            className="mb-6 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to portfolio
-          </Link>
-
-          <AdminLoginHeader />
-          <CredentialsForm
-            email={email}
-            password={password}
-            isLoading={isLoading}
-            onEmailChange={setEmail}
-            onPasswordChange={setPassword}
-            onSubmit={handleEmailLogin}
-          />
-          <LoginDivider />
-
-          <div className="grid gap-2">
-            {oauthProviders.map((provider) => (
-              <Button
-                key={provider.provider}
-                variant="outline"
-                type="button"
-                onClick={() => handleOAuthLogin(provider.provider)}
-                className={`h-10 w-full transition-colors ${provider.className}`}
-                disabled={isLoading}
-              >
-                <provider.icon className="mr-2 h-4 w-4 shrink-0" />
-                <span className="truncate">Continue with {provider.name}</span>
-              </Button>
-            ))}
-          </div>
+    <div className="flex flex-col gap-8">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-6" aria-busy={pending}>
+        <div className="space-y-2">
+          <Label htmlFor="admin-email">Email</Label>
+          <Input id="admin-email" name="email" type="email" autoComplete="email" required disabled={pending} />
         </div>
-      </CardContent>
-    </Card>
+        <div className="space-y-2">
+          <Label htmlFor="admin-password">Password</Label>
+          <Input id="admin-password" name="password" type="password" autoComplete="current-password" required disabled={pending} />
+        </div>
+
+        <FormAlert>{error}</FormAlert>
+
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? "Signing in…" : "Sign in to the dashboard"}
+        </Button>
+      </form>
+
+      <p className="flex items-center gap-4 font-display text-caption text-ink-soft before:h-px before:flex-1 before:bg-rule before:content-[''] after:h-px after:flex-1 after:bg-rule after:content-['']">
+        or
+      </p>
+
+      <GoogleButton returnTo="/admin/dashboard" disabled={pending} />
+    </div>
   )
 }

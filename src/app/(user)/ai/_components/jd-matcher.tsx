@@ -1,14 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { InkLink } from "@/components/ui/ink-link"
 import { track } from "@/lib/analytics"
-import { Target, Loader2, CheckCircle2, AlertTriangle, FileSearch } from "lucide-react"
+import { ErrorNote } from "./error-note"
 
 interface Source {
   sourceType: string
@@ -25,22 +24,68 @@ interface JdFitResult {
   sources: Source[]
 }
 
+type ShareState = "idle" | "copied" | "failed"
+
+const MIN_LENGTH = 20
+const SHARE_LABEL: Record<ShareState, string> = { idle: "Share result", copied: "Link copied", failed: "Could not share" }
+
+const bandOf = (score: number) => (score >= 70 ? "strong" : score >= 40 ? "partial" : "weak")
+const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+/** 0 to 100 ruler: hatched up to the score, ticks every ten, a 2px ink mark at the score. The numeral carries the value. */
+function FitRuler({ score }: Readonly<{ score: number }>) {
+  return (
+    <div aria-hidden className="mt-4">
+      <div className="relative h-6 border-b border-ink">
+        <div className="bg-hatch absolute inset-y-0 left-0" style={{ width: `${score}%` }} />
+        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between">
+          {Array.from({ length: 11 }, (_, i) => (
+            <span key={i} className={i % 5 === 0 ? "h-3 w-px bg-ink" : "h-1.5 w-px bg-ink"} />
+          ))}
+        </div>
+        <span className="absolute inset-y-0 w-0.5 bg-ink" style={{ left: `calc(${score}% - ${score / 50}px)` }} />
+      </div>
+      <div className="mt-1 flex justify-between font-display text-caption tabular-nums text-ink-soft">
+        <span>0</span>
+        <span>50</span>
+        <span>100</span>
+      </div>
+    </div>
+  )
+}
+
+function TagList({ title, items }: Readonly<{ title: string; items: string[] }>) {
+  if (items.length === 0) return null
+  return (
+    <div>
+      <h3 className="text-small font-semibold text-ink">{title}</h3>
+      <ul role="list" className="mt-2 flex flex-wrap gap-1.5">
+        {items.map((item, i) => (
+          <li key={i}>
+            <Badge variant="outline">{item}</Badge>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 export default function JdMatcher() {
   const [jd, setJd] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<JdFitResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [share, setShare] = useState<ShareState>("idle")
+
+  const score = result ? Math.max(0, Math.min(100, Math.round(result.fitScore))) : 0
 
   const analyze = async () => {
     const text = jd.trim()
-    if (text.length < 20) {
-      toast.error("Paste a longer job description (20+ characters).")
-      return
-    }
-    if (loading) return
+    if (text.length < MIN_LENGTH || loading) return
     setLoading(true)
     setResult(null)
     setError(null)
+    setShare("idle")
     try {
       const res = await fetch("/api/ai/jd-match", {
         method: "POST",
@@ -51,122 +96,129 @@ export default function JdMatcher() {
       if (!res.ok || json?.status >= 400) {
         const status = res.ok ? json.status : res.status
         track("ai-error", { feature: "jd-match", status })
+        track("ai-jd-run", { band: "none", status: status === 429 ? "limited" : "error" })
         setError(json?.message || `Analysis failed (${status})`)
         return
       }
-      setResult(json.data as JdFitResult)
+      const data = json.data as JdFitResult
+      setResult(data)
+      track("ai-jd-run", { band: bandOf(data.fitScore), status: "ok" })
     } catch {
       track("ai-error", { feature: "jd-match", status: 0 })
+      track("ai-jd-run", { band: "none", status: "error" })
       setError("Could not reach Etan AI. Try again in a minute.")
     } finally {
       setLoading(false)
     }
   }
 
-  const scoreColor = (s: number) => (s >= 70 ? "text-green-500" : s >= 40 ? "text-amber-500" : "text-red-500")
-  const barColor = (s: number) => (s >= 70 ? "bg-green-500" : s >= 40 ? "bg-amber-500" : "bg-red-500")
+  // Shares the score and verdict with a link to the tool, never the job description itself.
+  const shareResult = async () => {
+    if (!result) return
+    const band = bandOf(score)
+    const text = `Rizky Haksono scored ${score} out of 100 for a role I checked with Etan AI${result.verdict ? ` (${result.verdict})` : ""}.`
+    const url = `${window.location.origin}/ai?tab=hirefit`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Hire fit", text, url })
+        track("hirefit-share", { band, status: "shared" })
+      } else {
+        await navigator.clipboard.writeText(`${text} ${url}`)
+        setShare("copied")
+        track("hirefit-share", { band, status: "copied" })
+      }
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return
+      setShare("failed")
+      track("hirefit-share", { band, status: "error" })
+    }
+  }
+
+  const short = jd.trim().length < MIN_LENGTH
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Paste a job description — I&apos;ll analyze how Rizky fits, grounded in his real experience.
+    <div className="max-w-[66ch] space-y-5">
+      <p className="text-body text-ink-soft">
+        Paste a job description. Etan weighs it against Rizky&apos;s real experience and says where he fits and where he
+        does not.
       </p>
-      <Textarea
-        value={jd}
-        onChange={(e) => setJd(e.target.value)}
-        rows={6}
-        maxLength={6000}
-        placeholder="Paste the job description here…"
-        className="resize-none"
-        disabled={loading}
-      />
-      <div className="flex justify-end">
-        <Button onClick={analyze} disabled={loading || jd.trim().length < 20} className="gap-2">
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Target className="h-4 w-4" />}
-          Analyze fit
-        </Button>
-      </div>
-
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
+      <div>
+        <Label htmlFor="ai-jd">Job description</Label>
+        <Textarea
+          id="ai-jd"
+          value={jd}
+          onChange={(e) => setJd(e.target.value)}
+          rows={6}
+          maxLength={6000}
+          placeholder="Paste the posting here"
+          className="resize-y"
+          disabled={loading}
+          aria-describedby="ai-jd-hint"
+        />
+        <p id="ai-jd-hint" className="mt-1 font-display text-caption text-ink-soft">
+          At least {MIN_LENGTH} characters, up to 6,000.
         </p>
-      )}
+      </div>
+      <Button onClick={analyze} disabled={loading || short} aria-busy={loading}>
+        {loading ? "Checking…" : "Check the fit"}
+      </Button>
+
+      {error && <ErrorNote>{error}</ErrorNote>}
 
       {result && (
-        <div className="space-y-4 rounded-xl border border-border/50 bg-background/60 p-4">
-          <div className="flex items-center gap-4">
-            <div className={cn("shrink-0 text-4xl font-bold", scoreColor(result.fitScore))}>
-              {result.fitScore}
-              <span className="text-lg text-muted-foreground">/100</span>
-            </div>
-            <div className="min-w-0 flex-1">
-              {result.verdict && <Badge variant="secondary" className="mb-1.5">{result.verdict}</Badge>}
-              <div className="h-2 overflow-hidden rounded-full bg-muted">
-                <div className={cn("h-full rounded-full transition-all", barColor(result.fitScore))} style={{ width: `${result.fitScore}%` }} />
-              </div>
-            </div>
+        <section aria-labelledby="ai-fit-title" className="space-y-6 border-t border-ink pt-6">
+          <div>
+            <h2 id="ai-fit-title" className="text-small font-semibold text-ink">
+              Fit score
+            </h2>
+            <p className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="font-display text-numeral tabular-nums text-ink">{score}</span>
+              <span className="font-display text-lead text-ink-soft">out of 100</span>
+            </p>
+            {result.verdict && <p className="mt-1 font-display text-lead text-ink">{result.verdict}</p>}
+            <FitRuler score={score} />
           </div>
 
-          {result.summary && <p className="text-sm leading-relaxed">{result.summary}</p>}
+          {result.summary && <p className="text-body text-ink">{result.summary}</p>}
 
-          {result.matchingSkills.length > 0 && (
-            <div>
-              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-500" /> Matching skills
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {result.matchingSkills.map((s, i) => (
-                  <Badge key={i} variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">{s}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {result.matchingProjects.length > 0 && (
-            <div>
-              <p className="mb-1.5 text-xs font-medium text-muted-foreground">Relevant experience</p>
-              <div className="flex flex-wrap gap-1.5">
-                {result.matchingProjects.map((p, i) => (
-                  <Badge key={i} variant="outline">{p}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
+          <TagList title="Matching skills" items={result.matchingSkills} />
+          <TagList title="Relevant experience" items={result.matchingProjects} />
 
           {result.gaps.length > 0 && (
             <div>
-              <p className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                <AlertTriangle className="h-3.5 w-3.5 text-amber-500" /> Gaps
-              </p>
-              <ul className="list-disc space-y-0.5 pl-5 text-sm text-muted-foreground">
-                {result.gaps.map((g, i) => (
-                  <li key={i}>{g}</li>
-                ))}
-              </ul>
+              <h3 className="text-small font-semibold text-ink">Gaps</h3>
+              <div className="prose prose--chat mt-2">
+                <ul>
+                  {result.gaps.map((g, i) => (
+                    <li key={i}>{g}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 
           {result.sources.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-3">
-              <span className="flex items-center gap-1 text-[11px] font-medium text-muted-foreground">
-                <FileSearch className="h-3 w-3" /> Sources
-              </span>
-              {result.sources.map((src, i) => {
-                const chip = (
-                  <Badge variant="secondary" className="px-1.5 py-0 text-[11px] font-normal capitalize">
-                    {src.sourceType} · {Math.round(src.score * 100)}%
-                  </Badge>
-                )
-                return src.sourceType === "project" ? (
-                  <Link key={i} href={`/project/${src.sourceId}`} className="hover:opacity-80">{chip}</Link>
-                ) : (
-                  <span key={i}>{chip}</span>
-                )
-              })}
+            <div>
+              <h3 className="text-small font-semibold text-ink">Drawn from</h3>
+              <ul role="list" className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-small tabular-nums text-ink">
+                {result.sources.map((src, i) => {
+                  const label = `${sentence(src.sourceType)}, ${Math.round(src.score * 100)}% match`
+                  return (
+                    <li key={i}>
+                      {src.sourceType === "project" ? <InkLink href={`/project/${encodeURIComponent(src.sourceId)}`}>{label}</InkLink> : label}
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           )}
-        </div>
+
+          <div className="border-t border-rule pt-4">
+            <Button variant="outline" onClick={shareResult}>
+              <span aria-live="polite">{SHARE_LABEL[share]}</span>
+            </Button>
+          </div>
+        </section>
       )}
     </div>
   )

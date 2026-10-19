@@ -1,5 +1,5 @@
 ---
-title: "JWT Authentication"
+title: "JWT authentication"
 description: "Implement secure authentication with JSON Web Tokens and middleware guards"
 course: "express-fundamentals"
 category: "backend"
@@ -9,14 +9,6 @@ duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
-
-## JWT Authentication in Express
 
 Most REST APIs are **stateless**: the server keeps no session in memory between requests. A JSON Web Token (JWT) solves the "who is this user?" problem by handing the client a signed, self-contained credential after login. On every subsequent request the client sends that token, and the server verifies the signature to trust the claims inside it — no database lookup and no shared session store required. This makes JWTs a natural fit for horizontally scaled Express services, mobile back ends, and any API consumed by a SPA. In this lesson you'll build the full flow: hashing passwords, issuing tokens on login, guarding routes with middleware, and layering role-based access on top.
 
@@ -135,7 +127,7 @@ app.delete("/api/users/:id", requireAuth, requireRole("admin"), handler)
 
 Short-lived access tokens limit the damage of a leak, but forcing a re-login every 15 minutes is poor UX. The standard fix is a long-lived **refresh token** stored in an httpOnly cookie, exchanged for a fresh access token when the old one expires.
 
-<Tabs defaultValue="issue" className="my-6">
+<Tabs defaultValue="issue">
   <TabsList>
     <TabsTrigger value="issue">Issue Both</TabsTrigger>
     <TabsTrigger value="refresh">Refresh Endpoint</TabsTrigger>
@@ -178,7 +170,7 @@ res
 
 ### Common Pitfalls
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="storage">
     <AccordionTrigger>Storing tokens in localStorage</AccordionTrigger>
     <AccordionContent>
@@ -207,10 +199,8 @@ res
 
 <Tip title="Verify the algorithm explicitly">Always pass `{ algorithms: ["HS256"] }` to `jwt.verify` in production so an attacker cannot downgrade the signature check.</Tip>
 
----
-
 ## Next Steps
 
-<NextLesson title="Database Integration" description="Connect Express to PostgreSQL with Prisma." href="/roadmap/express-fundamentals-intermediate-database-integration" />
+<NextLesson title="Database integration" description="Connect Express to PostgreSQL with Prisma." href="/roadmap/express-fundamentals-intermediate-database-integration" />
 
 <Resources resources={[{"title":"jsonwebtoken (npm)","href":"https://www.npmjs.com/package/jsonwebtoken"},{"title":"bcryptjs (npm)","href":"https://www.npmjs.com/package/bcryptjs"},{"title":"RFC 7519 — JSON Web Token","href":"https://datatracker.ietf.org/doc/html/rfc7519"},{"title":"OWASP JWT Cheat Sheet","href":"https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html"}]} />

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export const metadata: Metadata = {
   title: "Chat | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: MetadataConstants.description,
+  description: "A public chat on natee.my.id. Say hello, ask a question, or answer someone.",
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
   authors: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: MetadataConstants.ogPersonTitle,
     images: MetadataConstants.profile,
-    url: MetadataConstants.openGraph.url,
+    url: `${MetadataConstants.openGraph.url}/chat`,
     siteName: MetadataConstants.openGraph.siteName,
     locale: MetadataConstants.openGraph.locale,
     type: "website",

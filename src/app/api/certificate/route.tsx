@@ -1,28 +1,28 @@
 import { ImageResponse } from "next/og"
 import { NextRequest } from "next/server"
+import { PRINT_HEX } from "@/lib/print-hex"
+import { loadPrintAssets, RULE_HEX } from "../og/print-assets"
 
-export const runtime = "edge"
+// Node, not edge: the font and the seal are files read from disk.
+export const runtime = "nodejs"
 
+const ISSUED = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "Asia/Jakarta" })
+
+/** "mcp-fundamentals" -> "MCP fundamentals". Sentence case; the one acronym among the course ids keeps its capitals. */
+function courseTitle(id: string) {
+  const words = id.replace(/[-_]+/g, " ").trim() || "development course"
+  return (words.charAt(0).toUpperCase() + words.slice(1)).replace(/\bmcp\b/gi, "MCP")
+}
+
+// Always printed on paper; the old `theme` parameter is accepted and ignored.
 export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const course = courseTitle((searchParams.get("course") ?? "").slice(0, 40))
+  const name = (searchParams.get("name") ?? "").trim().slice(0, 48) || "A reader"
+
   try {
-    const { searchParams } = new URL(req.url)
-    const course = searchParams.get("course") || "Development Course"
-    const theme = searchParams.get("theme") || "light"
-    const recipientName = (searchParams.get("name") || "").trim() || "Anonymous Student"
-
-    // Parse course title
-    const courseTitle = course
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
-
-    const isDark = theme === "dark"
-
-    // Colors based on theme
-    const bg = isDark ? "#09090b" : "#ffffff"
-    const textMain = isDark ? "#ffffff" : "#09090b"
-    const textMuted = isDark ? "#a1a1aa" : "#71717a"
-    const primary = isDark ? "#10b981" : "#059669" // Emerald-ish accent
+    const { font, seal } = await loadPrintAssets()
+    const line = { display: "flex", fontSize: 26, color: PRINT_HEX.inkSoft, textAlign: "center" } as const
 
     return new ImageResponse(
       (
@@ -31,192 +31,68 @@ export async function GET(req: NextRequest) {
             height: "100%",
             width: "100%",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: bg,
-            fontFamily: "sans-serif",
-            padding: "40px",
+            padding: 40,
+            backgroundColor: PRINT_HEX.paper,
+            color: PRINT_HEX.ink,
+            fontFamily: "Literata",
+            fontStyle: "italic",
           }}
         >
-          {/* Outer Border */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              border: `8px solid ${textMain}`,
-              width: "100%",
-              height: "100%",
-              padding: "60px",
-              position: "relative",
-              boxSizing: "border-box",
-            }}
-          >
-            {/* Corner Ornaments */}
-            <div
-              style={{
-                position: "absolute",
-                top: 20,
-                left: 20,
-                width: 40,
-                height: 40,
-                borderTop: `6px solid ${primary}`,
-                borderLeft: `6px solid ${primary}`,
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: 20,
-                right: 20,
-                width: 40,
-                height: 40,
-                borderTop: `6px solid ${primary}`,
-                borderRight: `6px solid ${primary}`,
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                bottom: 20,
-                left: 20,
-                width: 40,
-                height: 40,
-                borderBottom: `6px solid ${primary}`,
-                borderLeft: `6px solid ${primary}`,
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                bottom: 20,
-                right: 20,
-                width: 40,
-                height: 40,
-                borderBottom: `6px solid ${primary}`,
-                borderRight: `6px solid ${primary}`,
-              }}
-            />
-
+          {/* Double-rule frame: ink outside, a 3px gap, a hairline inside. */}
+          <div style={{ display: "flex", flex: 1, padding: 3, border: `1px solid ${PRINT_HEX.ink}` }}>
             <div
               style={{
                 display: "flex",
-                fontSize: 64,
-                fontWeight: "900",
-                letterSpacing: "0.2em",
-                color: textMain,
-                textTransform: "uppercase",
-                marginBottom: "10px",
+                flex: 1,
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "40px 72px 36px",
+                border: `1px solid ${RULE_HEX}`,
               }}
             >
-              CERTIFICATE
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 24,
-                fontWeight: "600",
-                color: primary,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                marginBottom: "60px",
-              }}
-            >
-              OF COMPLETION
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 22,
-                color: textMuted,
-                marginBottom: "20px",
-                textAlign: "center",
-              }}
-            >
-              This certificate is proudly presented to
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 52,
-                fontWeight: "bold",
-                color: textMain,
-                marginBottom: "24px",
-                paddingBottom: "10px",
-                textAlign: "center",
-                maxWidth: "85%",
-                lineHeight: 1.2,
-                borderBottom: `3px solid ${primary}`,
-              }}
-            >
-              {recipientName}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 22,
-                color: textMuted,
-                marginBottom: "20px",
-                textAlign: "center",
-              }}
-            >
-              for successfully completing the course
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 44,
-                fontWeight: "bold",
-                color: primary,
-                marginBottom: "30px",
-                textAlign: "center",
-                maxWidth: "85%",
-                lineHeight: 1.2,
-              }}
-            >
-              {courseTitle}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                fontSize: 20,
-                color: textMuted,
-                marginBottom: "80px",
-                textAlign: "center",
-                maxWidth: "75%",
-                lineHeight: 1.5,
-              }}
-            >
-              Demonstrating practical proficiency and understanding of the core concepts, methodologies, and technical implementations associated with the course track.
-            </div>
-
-            {/* Footer */}
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "space-between",
-                paddingTop: "30px",
-                marginTop: "auto",
-                borderTop: `2px solid ${textMuted}40`,
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: 28, fontWeight: "bold", color: textMain }}>Rizky Haksono</span>
-                <span style={{ fontSize: 16, color: textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "6px" }}>Lead Instructor</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={seal} width={104} height={104} alt="" />
+              <div style={{ display: "flex", marginTop: 16, fontSize: 56, lineHeight: 1.15 }}>Certificate of completion</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 8, fontSize: 22, color: PRINT_HEX.inkSoft }}>
+                <div style={{ display: "flex", width: 12, height: 12, border: `1.5px solid ${PRINT_HEX.inkSoft}` }} />
+                Self-attested
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                <span style={{ fontSize: 22, color: textMain, fontFamily: "monospace" }}>ID: {courseTitle.replace(/\s+/g, "").toUpperCase()}-2026</span>
-                <span style={{ fontSize: 18, color: primary, fontWeight: "bold", marginTop: "8px", letterSpacing: "0.1em" }}>VERIFIED ✓</span>
+              <div style={{ ...line, marginTop: 28 }}>This records that</div>
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 12,
+                  padding: "0 24px 10px",
+                  maxWidth: "90%",
+                  fontSize: name.length > 32 ? 36 : 52,
+                  lineHeight: 1.15,
+                  textAlign: "center",
+                  borderBottom: `1px solid ${PRINT_HEX.ink}`,
+                }}
+              >
+                {name}
+              </div>
+              <div style={{ ...line, marginTop: 18 }}>worked through every lesson of the roadmap</div>
+              <div style={{ display: "flex", marginTop: 8, fontSize: 42, textAlign: "center" }}>{course}</div>
+              <div style={{ ...line, marginTop: 18, fontSize: 20 }}>
+                Marked complete by the reader on natee.my.id. No exam, and nobody checked the work.
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  marginTop: "auto",
+                  paddingTop: 18,
+                  fontSize: 22,
+                  color: PRINT_HEX.inkSoft,
+                  borderTop: `1px solid ${RULE_HEX}`,
+                }}
+              >
+                <span>Rizky Haksono, who wrote the roadmap</span>
+                <span>Issued {ISSUED.format(new Date())}</span>
               </div>
             </div>
           </div>
@@ -225,11 +101,11 @@ export async function GET(req: NextRequest) {
       {
         width: 1200,
         height: 800,
+        fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
       },
     )
-  } catch {
-    return new Response(`Failed to generate image`, {
-      status: 500,
-    })
+  } catch (error) {
+    console.error("certificate image failed", error)
+    return new Response("Failed to generate image", { status: 500 })
   }
 }

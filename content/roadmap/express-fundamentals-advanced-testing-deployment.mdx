@@ -1,5 +1,5 @@
 ---
-title: "Testing & Deployment"
+title: "Testing and deployment"
 description: "Integration tests with Supertest, CI/CD pipelines, and production deployment"
 course: "express-fundamentals"
 category: "backend"
@@ -9,14 +9,6 @@ duration: "28 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
-
-## Testing & Deployment
 
 An Express API is only production-ready when a machine can prove it works and ship it without a human clicking through routes. This lesson closes the loop: you will write **integration tests** that exercise your real HTTP layer with Supertest, isolate flaky external calls with mocks, package the app as a small, reproducible **Docker image**, and wire a **GitHub Actions** pipeline that lints, tests, and builds on every push. These are the same guardrails that let teams deploy dozens of times a day without fear.
 
@@ -255,7 +247,14 @@ jobs:
 
 The pipeline follows a clear gate order — lint catches style and obvious mistakes cheaply, tests verify behavior, and only then do you build the deployable image.
 
-<Card><CardHeader><CardTitle>CI gate order</CardTitle></CardHeader><CardContent>Install (cached) → Lint → Test (against a real service container) → Build image → tag by commit SHA. Deploy from the exact image that passed CI — never rebuild separately for production.</CardContent></Card>
+The gates, in order:
+
+1. Install (cached).
+2. Lint.
+3. Test, against a real service container.
+4. Build the image and tag it with the commit SHA.
+
+Deploy the exact image that passed CI. Never rebuild separately for production.
 
 ## Production Readiness
 
@@ -279,7 +278,7 @@ process.on("SIGTERM", () => {
 
 ## Common Pitfalls
 
-<Accordion type="multiple" className="not-prose">
+<Accordion type="multiple">
   <AccordionItem value="port">
     <AccordionTrigger>Hard-coding the port</AccordionTrigger>
     <AccordionContent>Cloud platforms inject the port via `process.env.PORT`. Read it with a fallback (`process.env.PORT || 3000`) or the platform's health check will hit the wrong port and mark the container unhealthy.</AccordionContent>
@@ -299,11 +298,9 @@ process.on("SIGTERM", () => {
 </Accordion>
 
 <Alert>
-  <AlertTitle>You've completed Express Fundamentals</AlertTitle>
+  <AlertTitle>You've completed Express fundamentals</AlertTitle>
   <AlertDescription>You can now design routes and middleware, secure APIs with JWT, integrate a database, cache and scale, split into services, and ship with tested, automated pipelines. The natural next step is production observability — structured logging, metrics, and tracing.</AlertDescription>
 </Alert>
-
----
 
 ## Next Steps
 

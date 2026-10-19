@@ -1,99 +1,22 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
-import { Wrench } from "lucide-react"
-import { getJLPTLevels } from "@/services/visitor/japanese"
-import type { ToolTab, JLPTLevel } from "@/commons/types/tools"
-import { JapaneseQuizTab } from "./_components/japanese-quiz-tab"
-import { IeltsTab } from "./_components/ielts-tab"
-import { AnimeGeneratorTab } from "./_components/anime-generator-tab"
-import { DownloaderTab } from "./_components/downloader-tab"
-import { WpmTab } from "./_components/wpm-tab"
-import { PostalCodeTab } from "./_components/postal-code-tab"
-import { Web3CryptoTab } from "./_components/web3-crypto-tab"
-import { PokemonTab } from "./_components/pokemon-tab"
-import { StarWarsTab } from "./_components/starwars-tab"
-import ToolsBrowser from "./_components/tools-browser"
-import { MacWindow } from "@/components/ui/mac-window"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { logNonCriticalError } from "@/lib/logging"
+import { Suspense } from "react"
 
-export const dynamic = "force-dynamic"
+import { ToolCabinet, ToolShell } from "./_components/tool-shell"
 
-const TOOL_TABS: ToolTab[] = [
-  "pokemon",
-  "starwars",
-  "japanese-quiz",
-  "ielts",
-  "anime-generator",
-  "downloader",
-  "wpm",
-  "postal-code",
-  "web3-crypto",
-]
-
-interface ToolsPageProps {
-  searchParams: Promise<{
-    tab?: string
-  }>
-}
-
-export default async function ToolsPage({ searchParams }: Readonly<ToolsPageProps>) {
-  const params = await searchParams
-  const activeTab: ToolTab = TOOL_TABS.includes(params?.tab as ToolTab)
-    ? (params.tab as ToolTab)
-    : "pokemon"
-
-  let jlptLevels: JLPTLevel[] = []
-  try {
-    const response = await getJLPTLevels()
-    jlptLevels = response.levels
-  } catch (error) {
-    logNonCriticalError("Failed to fetch JLPT levels:", error)
-  }
-
+// Static: the open tool comes from `?tab=` on the client, so the page itself reads no request data.
+export default function ToolsPage() {
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="space-y-6">
-        {/* Header */}
-        <SectionHeading
-          as="h1"
-          align="center"
-          eyebrow={
-            <>
-              <Wrench className="h-3.5 w-3.5" />
-              Toolbox
-            </>
-          }
-          title="Tools"
-          accent="& toys"
-          description="A growing collection of tools — explore, build, and have fun."
-        />
+    <div>
+      <header className="pb-8">
+        <h1 className="font-display text-h1 text-balance text-ink">Tools</h1>
+        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
+          Small things built to learn an API or to practise something: two archives, two language drills, a typing test, a downloader and a few lookups.
+        </p>
+      </header>
+      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
-        {/* Sidebar nav + active tool content */}
-        <MacWindow title="~/tools" bodyClassName="p-3 sm:p-5">
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <aside className="min-w-0 lg:w-60 lg:shrink-0">
-            <div className="rounded-xl border border-border bg-card/40 p-3 lg:sticky lg:top-20">
-              <ToolsBrowser activeTab={activeTab} />
-            </div>
-          </aside>
-
-          <div className="min-w-0 flex-1">
-            <Tabs value={activeTab} className="w-full">
-              <TabsContent value="pokemon" className="mt-0"><PokemonTab /></TabsContent>
-              <TabsContent value="starwars" className="mt-0"><StarWarsTab /></TabsContent>
-              <TabsContent value="japanese-quiz" className="mt-0"><JapaneseQuizTab initialLevels={jlptLevels} /></TabsContent>
-              <TabsContent value="ielts" className="mt-0"><IeltsTab /></TabsContent>
-              <TabsContent value="anime-generator" className="mt-0"><AnimeGeneratorTab /></TabsContent>
-              <TabsContent value="downloader" className="mt-0"><DownloaderTab /></TabsContent>
-              <TabsContent value="wpm" className="mt-0"><WpmTab /></TabsContent>
-              <TabsContent value="postal-code" className="mt-0"><PostalCodeTab /></TabsContent>
-              <TabsContent value="web3-crypto" className="mt-0"><Web3CryptoTab /></TabsContent>
-            </Tabs>
-          </div>
-        </div>
-        </MacWindow>
-      </div>
-    </BlurFade>
+      <Suspense fallback={<ToolCabinet tab={null} />}>
+        <ToolShell />
+      </Suspense>
+    </div>
   )
 }

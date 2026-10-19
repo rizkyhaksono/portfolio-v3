@@ -11,25 +11,20 @@ video: "https://www.youtube.com/embed/VnvRFRk_51k"
 illustration: "https://images.unsplash.com/photo-1620121692029-d088224ddc74?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { BookOpen, Lightbulb, Target, Server } from "lucide-react"
-
 ## Introduction to Kubernetes (K8s)
 
 **Kubernetes** (often abbreviated as **K8s**) is an open-source container orchestration platform originally designed by Google. It automates the deployment, scaling, and management of containerized applications (like Docker containers).
 
 When your application grows and you need to run hundreds of containers across dozens of physical or virtual machines, managing them manually becomes impossible. That's where Kubernetes shines.
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Target className="h-5 w-5" />
-      Learning Objectives
+    <CardTitle>
+      Learning objectives
     </CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2">
+    <ul>
       <li>Understand the purpose of container orchestration.</li>
       <li>Identify the components of a Kubernetes Cluster (Master vs Worker Nodes).</li>
       <li>Grasp the concept of a Pod, the smallest deployable unit.</li>
@@ -57,9 +52,8 @@ Worker nodes are the actual workhorses where your application containers run.
 - **kubelet**: An agent running on each node ensuring that containers are running in a Pod.
 - **kube-proxy**: Maintains network rules on nodes allowing communication to your Pods from network sessions.
 
-<Alert className="my-6">
-  <Server className="h-4 w-4" />
-  <AlertTitle>What is a Node?</AlertTitle>
+<Alert>
+  <AlertTitle>What is a node?</AlertTitle>
   <AlertDescription>A **Node** is just a machine. It could be a physical hardware server in a datacenter, or a virtual machine (VM) in a cloud provider like AWS EC2 or Google Compute Engine.</AlertDescription>
 </Alert>
 
@@ -72,14 +66,13 @@ A **Pod** is the smallest and most basic deployable object in Kubernetes. It rep
 - A Pod usually contains **one** container.
 - However, it can contain **multiple** containers that are tightly coupled and share the same network namespace and storage volumes.
 
-<Card className="my-6 border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-800">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
-      <BookOpen className="h-5 w-5" />
-      Analogy Time
+    <CardTitle>
+      Analogy time
     </CardTitle>
   </CardHeader>
-  <CardContent className="text-blue-800 dark:text-blue-200">
+  <CardContent>
     
       If your application container (Docker) is a <strong>whale</strong>, then the <strong>Pod</strong> is the protective cage or tank surrounding it that gets transported across the ocean. Kubernetes manages the Pods, not the raw container
       directly.

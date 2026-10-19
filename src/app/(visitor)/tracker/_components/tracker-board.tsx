@@ -1,19 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
+import { useState, type FormEvent } from "react"
+import dynamic from "next/dynamic"
 import { toast } from "sonner"
-import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
+import type { DropResult } from "@hello-pangea/dnd"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
-import { Plus, Lock, Trash2, Bug, BookmarkCheck, CircleDot, ChevronUp, ChevronDown, Equal, Loader2 } from "lucide-react"
 import {
   TRACKER_COLUMNS,
   type TrackerStatus,
@@ -22,50 +16,55 @@ import {
   updateTrackerTaskClient,
   deleteTrackerTaskClient,
 } from "@/services/visitor/tracker"
+import { COLUMN_LABEL, EMPTY_FORM, PRIORITIES, TYPE_LABEL } from "./tracker-labels"
 
-const TYPE_META: Record<string, { icon: typeof Bug; className: string }> = {
-  task: { icon: BookmarkCheck, className: "text-sky-500" },
-  bug: { icon: Bug, className: "text-red-500" },
-  story: { icon: CircleDot, className: "text-green-500" },
-}
-const PRIORITY_META: Record<string, { icon: typeof ChevronUp; className: string }> = {
-  high: { icon: ChevronUp, className: "text-red-500" },
-  medium: { icon: Equal, className: "text-amber-500" },
-  low: { icon: ChevronDown, className: "text-blue-500" },
+const DndBoard = dynamic(() => import("./tracker-dnd"))
+const DndList = dynamic(() => import("./tracker-dnd").then((module) => module.DndList))
+const TrackerDialogs = dynamic(() => import("./tracker-dialogs"))
+
+const LIST_CLASS = "mt-3 flex flex-col gap-3"
+
+const cards = (count: number) => `${count} ${count === 1 ? "card" : "cards"}`
+
+interface TaskCardProps {
+  task: TrackerTask
+  lifted?: boolean
+  canDelete: boolean
+  onDelete: (task: TrackerTask) => void
 }
 
-function TaskCard({ task, canDelete, onDelete }: { task: TrackerTask; canDelete: boolean; onDelete: (t: TrackerTask) => void }) {
-  const TypeIcon = (TYPE_META[task.type] ?? TYPE_META.task).icon
-  const typeClass = (TYPE_META[task.type] ?? TYPE_META.task).className
-  const PriIcon = (PRIORITY_META[task.priority] ?? PRIORITY_META.medium).icon
-  const priClass = (PRIORITY_META[task.priority] ?? PRIORITY_META.medium).className
+/** An index card: title, then the key, type and priority as one sentence. */
+function TaskCard({ task, lifted, canDelete, onDelete }: Readonly<TaskCardProps>) {
+  const author = task.createdByName ?? "Someone"
+  const priority = PRIORITIES.includes(task.priority) ? task.priority : "medium"
 
   return (
-    <div className="group rounded-lg border border-border/60 bg-card p-3 shadow-sm transition-shadow hover:shadow-md">
-      <p className="mb-2 text-sm leading-snug">{task.title}</p>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <TypeIcon className={cn("h-4 w-4", typeClass)} />
-          <span className="font-mono">{task.key}</span>
-          <PriIcon className={cn("h-4 w-4", priClass)} />
-        </div>
-        <div className="flex items-center gap-1.5">
-          {canDelete && (
-            <button
-              onClick={() => onDelete(task)}
-              className="opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
-              aria-label="Delete card"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          )}
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={task.createdByAvatar ?? undefined} alt={task.createdByName ?? ""} referrerPolicy="no-referrer" />
-            <AvatarFallback className="text-[10px]">{(task.createdByName ?? "?").charAt(0).toUpperCase()}</AvatarFallback>
+    <article className={cn("group border bg-paper p-3", lifted ? "border-ink shadow-[3px_3px_0_hsl(var(--ink))]" : "border-rule")}>
+      <h3 className="text-body text-ink">{task.title}</h3>
+      <p className="mt-1 text-small text-ink-soft">
+        <code>{task.key}</code>. {TYPE_LABEL[task.type] ?? "Task"}, {priority} priority.
+      </p>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <span className="flex min-w-0 items-center gap-2 text-small text-ink-soft">
+          <Avatar className="size-6">
+            <AvatarImage src={task.createdByAvatar ?? undefined} alt="" referrerPolicy="no-referrer" />
+            <AvatarFallback className="text-xs">{author.charAt(0)}</AvatarFallback>
           </Avatar>
-        </div>
+          <span className="truncate">{author}</span>
+        </span>
+        {canDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onDelete(task)}
+            aria-label={`Delete card ${task.key}`}
+            className="h-8 px-1 text-ink-soft [@media(hover:hover)]:opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
+          >
+            Delete
+          </Button>
+        )}
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -75,12 +74,12 @@ interface Props {
   isAdmin: boolean
 }
 
-export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: Props) {
+export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: Readonly<Props>) {
   const [tasks, setTasks] = useState<TrackerTask[]>(initialTasks)
-  const [addOpen, setAddOpen] = useState(false)
-  const [addStatus, setAddStatus] = useState<TrackerStatus>("todo")
-  const [form, setForm] = useState({ title: "", description: "", type: "task", priority: "medium" })
+  const [addStatus, setAddStatus] = useState<TrackerStatus | null>(null)
+  const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<TrackerTask | null>(null)
 
   const canEdit = !!currentUserId
   const ownsTask = (t: TrackerTask) => !!currentUserId && (t.createdById === currentUserId || isAdmin)
@@ -91,7 +90,7 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: P
     if (!destination) return
     if (source.droppableId === destination.droppableId && source.index === destination.index) return
 
-    // Guard: only the card's owner (or admin) may move it — the server enforces this too.
+    // Only the card's owner (or admin) may move it; the server enforces this too.
     const moving = tasks.find((t) => t.id === draggableId)
     if (!moving || !ownsTask(moving)) return
 
@@ -107,20 +106,22 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: P
 
     const snapshot = tasks
     setTasks((prev) => prev.map((t) => (t.id === draggableId ? { ...t, status: newStatus, order: newOrder } : t)))
-    updateTrackerTaskClient(draggableId, { status: newStatus, order: newOrder }).catch((err) => {
-      setTasks(snapshot)
-      toast.error(err instanceof Error ? err.message : "Could not move card.")
-    })
+    updateTrackerTaskClient(draggableId, { status: newStatus, order: newOrder })
+      .then(() => track("tracker-card-move", { from: source.droppableId, to: newStatus }))
+      .catch((err) => {
+        setTasks(snapshot)
+        toast.error(err instanceof Error ? err.message : "The card could not be moved.")
+      })
   }
 
   const openAdd = (status: TrackerStatus) => {
+    setForm(EMPTY_FORM)
     setAddStatus(status)
-    setForm({ title: "", description: "", type: "task", priority: "medium" })
-    setAddOpen(true)
   }
 
-  const submitAdd = async () => {
-    if (!form.title.trim()) return
+  const submitAdd = async (event: FormEvent) => {
+    event.preventDefault()
+    if (!form.title.trim() || !addStatus) return
     setSaving(true)
     try {
       const created = await createTrackerTaskClient({
@@ -131,145 +132,86 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: P
         priority: form.priority,
       })
       setTasks((prev) => [created, ...prev])
-      setAddOpen(false)
-      toast.success("Card added")
+      setAddStatus(null)
+      toast.success("Card added.")
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not add card.")
+      toast.error(err instanceof Error ? err.message : "The card could not be added.")
     } finally {
       setSaving(false)
     }
   }
 
-  const onDelete = async (task: TrackerTask) => {
-    if (!window.confirm(`Delete "${task.title}"?`)) return
+  const confirmDelete = async () => {
+    const task = pendingDelete
+    if (!task) return
+    setPendingDelete(null)
     const snapshot = tasks
     setTasks((prev) => prev.filter((t) => t.id !== task.id))
     try {
       await deleteTrackerTaskClient(task.id)
-      toast.success("Card deleted")
+      toast.success("Card deleted.")
     } catch (err) {
       setTasks(snapshot)
-      toast.error(err instanceof Error ? err.message : "Could not delete card.")
+      toast.error(err instanceof Error ? err.message : "The card could not be deleted.")
     }
   }
 
+  const renderCard = (task: TrackerTask, lifted = false) => (
+    <TaskCard task={task} lifted={lifted} canDelete={ownsTask(task)} onDelete={setPendingDelete} />
+  )
+
+  const board = (
+    <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
+      {TRACKER_COLUMNS.map(({ id }) => {
+        const items = column(id)
+        return (
+          <section key={id} aria-labelledby={`column-${id}`} className="border-t border-ink pt-3">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id={`column-${id}`} className="font-display text-h4 text-ink">
+                {COLUMN_LABEL[id]}
+              </h2>
+              <p className="text-small tabular-nums text-ink-soft">{cards(items.length)}</p>
+            </div>
+            {canEdit ? (
+              // The empty list keeps its height: it is the drop target.
+              <DndList id={id} items={items} className={cn(LIST_CLASS, "min-h-20 transition-colors")} canDrag={ownsTask} renderCard={renderCard} />
+            ) : items.length > 0 ? (
+              <ol role="list" className={LIST_CLASS}>
+                {items.map((task) => (
+                  <li key={task.id}>{renderCard(task)}</li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-3 font-display text-caption text-ink-soft">Nothing here yet.</p>
+            )}
+            {canEdit && (
+              <Button variant="ghost" size="sm" onClick={() => openAdd(id)} aria-label={`Add a card to ${COLUMN_LABEL[id]}`} className="mt-3 px-0">
+                Add a card
+              </Button>
+            )}
+          </section>
+        )
+      })}
+    </div>
+  )
+
   return (
     <>
-      {!canEdit && (
-        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-muted/30 px-4 py-2.5 text-sm">
-          <span className="flex items-center gap-2 text-muted-foreground">
-            <Lock className="h-4 w-4" /> Read-only — sign in to add &amp; move cards.
-          </span>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/auth">Sign in</Link>
-          </Button>
-        </div>
+      {canEdit ? <DndBoard onDragEnd={onDragEnd}>{board}</DndBoard> : board}
+
+      {canEdit && (
+        <TrackerDialogs
+          addStatus={addStatus}
+          onCloseAdd={() => setAddStatus(null)}
+          form={form}
+          setForm={setForm}
+          saving={saving}
+          onSubmitAdd={submitAdd}
+          pendingDelete={pendingDelete}
+          onCloseDelete={() => setPendingDelete(null)}
+          onConfirmDelete={confirmDelete}
+        />
       )}
-
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {TRACKER_COLUMNS.map((col) => {
-            const items = column(col.id)
-            return (
-              <div key={col.id} className="flex flex-col rounded-xl bg-muted/40 p-2">
-                <div className="flex items-center justify-between px-2 py-1.5">
-                  <Eyebrow>{col.label}</Eyebrow>
-                  <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{items.length}</span>
-                </div>
-
-                <Droppable droppableId={col.id} isDropDisabled={!canEdit}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={cn(
-                        "flex min-h-[80px] flex-1 flex-col gap-2 rounded-lg p-1 transition-colors",
-                        snapshot.isDraggingOver && "bg-primary/5",
-                      )}
-                    >
-                      {items.map((task, index) => {
-                        const owns = ownsTask(task)
-                        return (
-                          <Draggable key={task.id} draggableId={task.id} index={index} isDragDisabled={!owns}>
-                            {(dp, ds) => (
-                              <div
-                                ref={dp.innerRef}
-                                {...dp.draggableProps}
-                                {...dp.dragHandleProps}
-                                className={cn(ds.isDragging && "rotate-1", owns ? "cursor-grab active:cursor-grabbing" : "cursor-default")}
-                              >
-                                <TaskCard task={task} canDelete={owns} onDelete={onDelete} />
-                              </div>
-                            )}
-                          </Draggable>
-                        )
-                      })}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-
-                {canEdit && (
-                  <button
-                    onClick={() => openAdd(col.id)}
-                    className="mt-1 flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Add card
-                  </button>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      </DragDropContext>
-
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>New card</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <Input
-              autoFocus
-              placeholder="What needs doing?"
-              value={form.title}
-              maxLength={140}
-              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            />
-            <Textarea
-              placeholder="Description (optional)"
-              value={form.description}
-              maxLength={2000}
-              rows={3}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <Select value={form.type} onValueChange={(v) => setForm((f) => ({ ...f, type: v }))}>
-                <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="task">Task</SelectItem>
-                  <SelectItem value="bug">Bug</SelectItem>
-                  <SelectItem value="story">Story</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={form.priority} onValueChange={(v) => setForm((f) => ({ ...f, priority: v }))}>
-                <SelectTrigger><SelectValue placeholder="Priority" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={submitAdd} disabled={saving || !form.title.trim()} className="gap-2">
-              {saving && <Loader2 className="h-4 w-4 animate-spin" />} Add card
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }

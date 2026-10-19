@@ -10,10 +10,6 @@ order: 6
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
 ## Routing in Single-Page Apps
 
 A React app renders a single HTML document, so navigation between "pages" happens entirely in the browser. **React Router** is the de-facto library for mapping URLs to components, keeping the address bar in sync with what the user sees, and fetching the data each screen needs. From v6.4 onward it ships a **data router** API (`createBrowserRouter`) that co-locates routing, data loading, mutations, and error handling — the same foundation that powers React Router v7. Getting this layer right is what separates a jarring, flicker-prone app from one that feels instant and predictable.
@@ -74,7 +70,7 @@ Never use a plain `<a href>` for internal links — it triggers a full-page relo
 
     <NavLink
       to="/dashboard"
-      className={({ isActive }) => (isActive ? "font-bold text-blue-600" : "text-gray-600")}
+      className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
     >
       Dashboard
     </NavLink>
@@ -330,9 +326,9 @@ const router = createBrowserRouter([
 
 ## Best Practices
 
-<Card className="mt-6">
+<Card>
   <CardHeader>
-    <CardTitle>✅ Routing checklist</CardTitle>
+    <CardTitle>Routing checklist</CardTitle>
   </CardHeader>
   <CardContent>
     1. **One root layout** with shared chrome and a single `errorElement`. 2. **Load data in loaders**, mutate in actions — keep components focused on rendering. 3. **Throw `Response` objects** for expected failures like 404s. 4. **Guard on the server side** with loader redirects for anything truly private. 5. **Lazy-load heavy routes** to shrink the initial bundle. 6. **Give every dynamic screen a `*` fallback** and a real 404.
@@ -341,7 +337,7 @@ const router = createBrowserRouter([
 
 ## Next Steps
 
-<NextLesson title="Performance Optimization" description="Memoization and code splitting." href="/roadmap/react-fundamentals-advanced-performance-optimization" />
+<NextLesson title="Performance optimization" description="Memoization and code splitting." href="/roadmap/react-fundamentals-advanced-performance-optimization" />
 
 <Resources
   resources={[

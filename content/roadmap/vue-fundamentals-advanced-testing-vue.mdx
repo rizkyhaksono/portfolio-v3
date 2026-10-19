@@ -1,5 +1,5 @@
 ---
-title: "Testing Vue Applications"
+title: "Testing Vue applications"
 description: "Component testing with Vitest, Vue Test Utils, and E2E with Playwright"
 course: "vue-fundamentals"
 category: "frontend"
@@ -9,12 +9,6 @@ duration: "26 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Testing Vue
 
 A Vue app that ships without tests is a liability: every refactor becomes a gamble and every bug fix risks reopening two older ones. A healthy Vue test suite is layered. **Unit and component tests** run in milliseconds against a simulated DOM and cover the vast majority of your logic and rendering. A thin layer of **end-to-end (E2E) tests** drives a real browser to prove that critical user journeys — logging in, checking out, submitting a form — actually work when everything is wired together. In the Vue ecosystem the standard tools are **Vitest** (a Vite-native test runner), **Vue Test Utils** (the official component-mounting library), and **Playwright** for E2E. This lesson shows how they fit together.
 
@@ -276,12 +270,10 @@ test('user can log in and reach the dashboard', async ({ page }) => {
 
 <Warning>Do not import `.vue` files without the `@vitejs/plugin-vue` transform registered — Vitest will fail to parse the single-file component and throw a cryptic syntax error on the `<template>` block.</Warning>
 
----
-
 ## Next Steps
 
 You have now covered the full Vue fundamentals path — from reactivity and the Composition API through Pinia, routing, performance, SSR with Nuxt, and a layered testing strategy. Revisit the roadmap to pick your next course or reinforce an earlier lesson.
 
-<NextLesson title="Back to the Roadmap" description="Explore other courses and continue building your engineering path." href="/roadmap" />
+<NextLesson title="Back to the roadmap" description="Explore other courses and continue building your engineering path." href="/roadmap" />
 
 <Resources resources={[{"title":"Vue Test Utils","href":"https://test-utils.vuejs.org/"},{"title":"Vitest","href":"https://vitest.dev/"},{"title":"Testing Pinia Stores","href":"https://pinia.vuejs.org/cookbook/testing.html"},{"title":"Playwright","href":"https://playwright.dev/docs/intro"}]} />

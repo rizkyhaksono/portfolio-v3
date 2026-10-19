@@ -4,16 +4,16 @@
 
 Tokens are HSL triples in `src/app/globals.css` so every shadcn part re-inks from two values. `:root` is the paper print; `<html class="dark">` is Night print.
 
-| Token | Tailwind class | Paper (light) | Night (dark) | Role |
+| Token | Tailwind class | Paper hex (light) | Night hex (dark) | Role |
 |---|---|---|---|---|
-| `--paper` | `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
-| `--ink` | `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `--ink-soft` | `ink-soft` | #445BAA | #A9B5E3 | Secondary text, on paper or tint only |
-| `--rule` | `rule` | #BFC6DE | #2C3870 | Decorative hairlines only |
-| `--rule-strong` | `rule-strong` | #6476B2 | #7383C4 | Control boundaries (3:1 or better) |
-| `--tint` | `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
+| `--paper` | `paper` | F3ECDC | 0D1433 | Page, card, text on solid ink |
+| `--ink` | `ink` | 1E3C9E | EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `--ink-soft` | `ink-soft` | 445BAA | A9B5E3 | Secondary text, on paper or tint only |
+| `--rule` | `rule` | BFC6DE | 2C3870 | Decorative hairlines only |
+| `--rule-strong` | `rule-strong` | 6476B2 | 7383C4 | Control boundaries (3:1 or better) |
+| `--tint` | `tint` | E2E4EB | 162868 | Hover row, code ground, inset |
 
-The six Tailwind colours are defined as `hsl(var(--x) / <alpha-value>)`. Hex values above are rounded from the HSL triples.
+The six Tailwind colours are defined as `hsl(var(--x) / <alpha-value>)`. Hex values above are rounded from the HSL triples; the few copies code needs live in `src/lib/print-hex.ts`.
 
 shadcn names map onto the same ink, so existing components keep working:
 
@@ -27,9 +27,7 @@ shadcn names map onto the same ink, so existing components keep working:
 | `input` | rule-strong |
 | `--radius` | `0rem` |
 
-`--chart-1..5` stay mapped to ink, ink-soft, rule-strong, rule and tint only until recharts is removed in phase 3.
-
-Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted wordscroll opacity), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
+Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted wordscroll colour), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
 
 ### Contrast
 
@@ -47,9 +45,9 @@ Rules that keep it that way:
 
 - Never put `ink-soft` text on a fill of 12% ink or more.
 - Night print never uses full cobalt as a ground behind text.
-- Text never takes an opacity modifier (`text-foreground/70` fails the gate). Use `text-ink-soft`.
+- Text never takes an opacity modifier (a slash opacity on a text colour fails the gate). Use `text-ink-soft`.
 - Status is shape plus word, never colour. There is no red, green or amber anywhere.
-- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost` .6 paper, .38 night).
+- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost`: ink at .6 on paper, ink-soft at .7 at night, a colour so night print stays blue, not grey).
 
 ## Type: Literata
 
@@ -86,7 +84,7 @@ Spacing uses a 4px base. Section rhythm is 96px desktop, 64px mobile (`SECTION_S
 ### Type rules
 
 - `font-synthesis: none`. Never fake a weight or an italic.
-- No `uppercase`, no `tracking-[...]`, no small caps labels.
+- No upper-case text transform, no letter-spacing utilities, no small caps labels.
 - Headings are literal and sentence case ("Career", not "Where I've been").
 - Eyebrows only when they carry information, and then as an italic caption `<p>`, never all-caps.
 - No middle-dot meta strings. Datelines are sentences: "Published 3 March 2026, six minute read."
@@ -136,9 +134,9 @@ Photos use the `.plate` duotone. The engraving is a CSS mask painted with `hsl(v
 ## Night print (dark mode)
 
 - Token flip on `<html class="dark">`, driven by next-themes. Default theme is System; the Contents sheet offers Paper, Night and System.
-- Do not write `dark:` classes. Every colour already flips through the tokens; existing `dark:` classes are deleted as files are touched.
+- Do not write dark-variant classes. Every colour already flips through the tokens; existing ones are deleted as files are touched.
 - Engravings flip through `--plate-alpha`; photos keep the `.plate` duotone; the grain tile swaps.
-- `color-scheme` follows the theme. Viewport `themeColor` is #F3ECDC on paper and #0D1433 at night. The manifest uses #F3ECDC.
+- `color-scheme` follows the theme. Viewport `themeColor` is paper by day and night paper at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
 - OG and certificate images are always printed on paper.
 
 ## Print
@@ -156,4 +154,4 @@ import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/des
 | `SURFACE` | `solid` (frame), `inset`; `glass` and `glassNoBlur` are retired aliases of `solid` | Surface classes, see [surfaces.md](./surfaces.md) |
 | `SURFACE_PADDING` | `default`, `compact`, `cozy` | Inner padding |
 | `SECTION_SPACING` | `section` (`mt-16 sm:mt-24`), `sectionGap` | Section rhythm |
-| `PAGE_WIDTH` | `default`, `prose`, `article`, `wide`, `ledger` (`max-w-[60rem]`) | Width presets for `PageBody` |
+| `PAGE_WIDTH` | `default`, `prose`, `article`, `wide`, `ledger` (`max-w-[60rem]`) | Width presets for page wrappers |

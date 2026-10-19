@@ -1,5 +1,5 @@
 ---
-title: "Setting Up Vue Development Environment"
+title: "Setting up a Vue development environment"
 description: "Install Vue CLI, Vite, and configure your IDE for Vue.js development"
 course: "vue-fundamentals"
 category: "frontend"
@@ -11,33 +11,16 @@ video: "https://www.youtube.com/embed/YrxBCBibVo0"
 illustration: "https://images.unsplash.com/photo-1537884944318-390069bb8665?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Terminal, Download, CheckCircle2, AlertCircle, Folder, Settings } from "lucide-react"
-
-## Setting Up Your Vue Development Environment
-
 Before building Vue applications, you need to set up a proper development environment. This lesson covers all the tools you'll need.
 
-<Alert className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
-  <Download className="h-4 w-4 text-green-600" />
-  <AlertTitle className="text-green-700 dark:text-green-300">Prerequisites</AlertTitle>
-  <AlertDescription className="text-green-800 dark:text-green-200">
-    Make sure you have Node.js (v18+) installed. Visit{" "}
-    <a href="https://nodejs.org" className="underline font-medium">
-      nodejs.org
-    </a>{" "}
-    if you haven't already.
-  </AlertDescription>
+<Alert>
+  <AlertTitle>Prerequisites</AlertTitle>
+  <AlertDescription>Make sure you have Node.js (v18 or later) installed. Visit [nodejs.org](https://nodejs.org) if you haven't already.</AlertDescription>
 </Alert>
-
----
 
 ## Creating a Vue Project
 
-### Option 1: Using Vite (Recommended) ⚡
+### Option 1: Using Vite (Recommended)
 
 Vite is the recommended way to scaffold Vue projects. It's created by Evan You, the creator of Vue.
 
@@ -49,59 +32,18 @@ npm create vue@latest
 npm create vite@latest my-vue-app -- --template vue-ts
 ```
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Terminal className="h-5 w-5" />
-      Interactive Setup
-    </CardTitle>
-    <CardDescription>The create-vue wizard will ask you several questions:</CardDescription>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-3 font-mono text-sm">
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Project name:</span>
-        <span className="text-green-600">my-vue-project</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add TypeScript?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add JSX Support?</span>
-        <span className="text-yellow-600">No</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add Vue Router?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add Pinia for state management?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add Vitest for Unit Testing?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add ESLint for code quality?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="text-muted-foreground">✔</span>
-        <span>Add Prettier for formatting?</span>
-        <span className="text-green-600">Yes</span>
-      </div>
-    </div>
-  </CardContent>
-</Card>
+The create-vue wizard asks several questions. A typical set of answers:
+
+```text
+✔ Project name: my-vue-project
+✔ Add TypeScript? Yes
+✔ Add JSX Support? No
+✔ Add Vue Router? Yes
+✔ Add Pinia for state management? Yes
+✔ Add Vitest for Unit Testing? Yes
+✔ Add ESLint for code quality? Yes
+✔ Add Prettier for formatting? Yes
+```
 
 After setup, run these commands:
 
@@ -111,15 +53,7 @@ npm install
 npm run dev
 ```
 
-<Alert className="my-6">
-  <CheckCircle2 className="h-4 w-4 text-green-600" />
-  <AlertTitle>Success!</AlertTitle>
-  <AlertDescription>
-    Your Vue app is now running at <code className="font-mono bg-muted px-1.5 py-0.5 rounded">http://localhost:5173</code>
-  </AlertDescription>
-</Alert>
-
----
+<InfoCard title="It runs">Your Vue app is now running at `http://localhost:5173`.</InfoCard>
 
 ### Option 2: Using Nuxt (Full-Stack)
 
@@ -132,60 +66,16 @@ npm install
 npm run dev
 ```
 
----
-
 ## IDE Setup
 
 ### VS Code Extensions
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Settings className="h-5 w-5" />
-      Recommended Extensions
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="space-y-4">
-      <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
-        <div className="flex-shrink-0 w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white font-bold">Vue</div>
-        <div>
-          <h4 className="font-semibold">Vue - Official (Volar)</h4>
-          <p className="text-sm text-muted-foreground">Essential extension for Vue.js development with TypeScript support</p>
-          <code className="text-xs bg-background px-1.5 py-0.5 rounded mt-1 inline-block">Vue.volar</code>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
-        <div className="flex-shrink-0 w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold">TS</div>
-        <div>
-          <h4 className="font-semibold">TypeScript Vue Plugin</h4>
-          <p className="text-sm text-muted-foreground">Enhanced TypeScript support for Vue SFCs</p>
-          <code className="text-xs bg-background px-1.5 py-0.5 rounded mt-1 inline-block">Vue.vscode-typescript-vue-plugin</code>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
-        <div className="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white font-bold">ES</div>
-        <div>
-          <h4 className="font-semibold">ESLint</h4>
-          <p className="text-sm text-muted-foreground">Integrates ESLint into VS Code for code quality</p>
-          <code className="text-xs bg-background px-1.5 py-0.5 rounded mt-1 inline-block">dbaeumer.vscode-eslint</code>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
-        <div className="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold">P</div>
-        <div>
-          <h4 className="font-semibold">Prettier</h4>
-          <p className="text-sm text-muted-foreground">Code formatter supporting Vue SFC files</p>
-          <code className="text-xs bg-background px-1.5 py-0.5 rounded mt-1 inline-block">esbenp.prettier-vscode</code>
-        </div>
-      </div>
-    </div>
-
-  </CardContent>
-</Card>
+| Extension | What it does | ID |
+| --- | --- | --- |
+| Vue - Official (Volar) | Essential extension for Vue.js development with TypeScript support | `Vue.volar` |
+| TypeScript Vue Plugin | Enhanced TypeScript support for Vue SFCs | `Vue.vscode-typescript-vue-plugin` |
+| ESLint | Integrates ESLint into VS Code for code quality | `dbaeumer.vscode-eslint` |
+| Prettier | Code formatter supporting Vue SFC files | `esbenp.prettier-vscode` |
 
 ### VS Code Settings
 
@@ -207,11 +97,9 @@ Add these settings to your `.vscode/settings.json`:
 }
 ```
 
----
-
 ## Essential Configuration Files
 
-<Accordion type="multiple" className="w-full not-prose my-6">
+<Accordion type="multiple">
   <AccordionItem value="vite">
     <AccordionTrigger>vite.config.ts</AccordionTrigger>
     <AccordionContent>
@@ -288,41 +176,18 @@ Add these settings to your `.vscode/settings.json`:
   </AccordionItem>
 </Accordion>
 
----
-
 ## Common Commands
 
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="space-y-3">
-      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-        <code className="font-mono text-sm">npm run dev</code>
-        <span className="text-sm text-muted-foreground">Start dev server</span>
-      </div>
-      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-        <code className="font-mono text-sm">npm run build</code>
-        <span className="text-sm text-muted-foreground">Build for production</span>
-      </div>
-      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-        <code className="font-mono text-sm">npm run preview</code>
-        <span className="text-sm text-muted-foreground">Preview production build</span>
-      </div>
-      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-        <code className="font-mono text-sm">npm run test:unit</code>
-        <span className="text-sm text-muted-foreground">Run unit tests</span>
-      </div>
-      <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
-        <code className="font-mono text-sm">npm run lint</code>
-        <span className="text-sm text-muted-foreground">Lint and fix files</span>
-      </div>
-    </div>
-  </CardContent>
-</Card>
-
----
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Build for production |
+| `npm run preview` | Preview the production build |
+| `npm run test:unit` | Run unit tests |
+| `npm run lint` | Lint and fix files |
 
 ## Next Steps
 
-<NextLesson title="Template Syntax & Reactivity" description="Your Vue development environment is now set up! In the next lesson, we'll dive into Vue's template syntax and reactivity." href="/roadmap/vue-fundamentals-template-syntax" />
+<NextLesson title="Template syntax and reactivity" description="Your Vue development environment is now set up! In the next lesson, we'll dive into Vue's template syntax and reactivity." href="/roadmap/vue-fundamentals-template-syntax" />
 
 <Tip>Use Vue DevTools browser extension for debugging Vue applications. It provides component inspection, state management, and performance profiling.</Tip>

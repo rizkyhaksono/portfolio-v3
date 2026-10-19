@@ -1,19 +1,32 @@
 "use client"
 
-import { useState, useRef, useEffect, useCallback } from "react"
-import Link from "next/link"
+import { useState, useRef, useEffect } from "react"
+import ReactMarkdown, { type Components } from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
 import { renameAIChat, deleteAIChat } from "@/services/user/ai"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import MDXComponent from "@/components/ui/mdx-components"
+import { Label } from "@/components/ui/label"
+import { InkLink } from "@/components/ui/ink-link"
+import { Pre } from "@/components/ui/code-block"
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { cn } from "@/lib/utils"
 import { track } from "@/lib/analytics"
-import { Send, Plus, Bot, User, Loader2, MessageSquare, Sparkles, Clock, Pencil, Trash2 } from "lucide-react"
 import { MicButton, TtsToggle } from "./voice-controls"
 import { useSpeechSynthesis } from "./use-voice"
+import { ErrorNote } from "./error-note"
+import { setQuery } from "./set-query"
 
 const RATE_LIMIT = 10
 const RATE_WINDOW = 60 * 1000
@@ -21,99 +34,186 @@ const RATE_WINDOW = 60 * 1000
 type Message = { id: string; msg: string; role: string; createdAt?: string }
 type Session = { id: string; title: string; createdAt?: string; messages: Message[] }
 type ChatError = { message: string; signIn?: boolean }
+type PendingAction = { kind: "rename" | "delete"; session: Session }
+// `open` is separate so the dialog keeps its text while it fades out.
+type Pending = PendingAction & { open: boolean }
 
-export default function AIChatApp({ initialSessions }: { initialSessions: Session[] }) {
+const MARKDOWN: Components = {
+  pre: Pre,
+  a: ({ href = "", children }) => (
+    <InkLink href={href} external={/^https?:\/\//.test(href)}>
+      {children}
+    </InkLink>
+  ),
+}
+
+const sendStatus = (status: number) => (status === 401 ? "expired" : status === 429 ? "limited" : status === 404 ? "missing" : "error")
+
+function Letter({ m }: Readonly<{ m: Message }>) {
+  if (m.role === "user") {
+    return (
+      <div>
+        <p className="text-small font-semibold text-ink">You</p>
+        <p className="mt-1 whitespace-pre-wrap break-words text-body text-ink">{m.msg}</p>
+      </div>
+    )
+  }
+  return (
+    <div className="border-l border-ink pl-4">
+      <p className="text-small font-semibold text-ink">Etan</p>
+      {m.msg ? (
+        <div className="prose prose--chat mt-1 break-words">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN}>
+            {m.msg}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        <p className="mt-1 font-display text-caption text-ink-soft">Writing…</p>
+      )}
+    </div>
+  )
+}
+
+function SessionList({
+  sessions,
+  activeId,
+  onSelect,
+  onPending,
+}: Readonly<{ sessions: Session[]; activeId?: string; onSelect: (s: Session) => void; onPending: (p: PendingAction) => void }>) {
+  if (sessions.length === 0) {
+    return <p className="p-3 font-display text-caption text-ink-soft">No conversations yet. Your first message starts one.</p>
+  }
+  const action = "underline-offset-[0.18em] hover:underline [@media(pointer:coarse)]:min-h-11"
+  return (
+    <ul role="list" className="divide-y divide-rule border-b border-rule">
+      {sessions.map((s) => {
+        const count = s.messages?.length ?? 0
+        return (
+          <li key={s.id} className={cn("px-3 py-2.5", s.id === activeId && "bg-tint")}>
+            <button
+              type="button"
+              onClick={() => onSelect(s)}
+              aria-current={s.id === activeId || undefined}
+              className="block w-full truncate text-left text-small font-semibold text-ink underline-offset-[0.18em] hover:underline [@media(pointer:coarse)]:min-h-11"
+            >
+              {s.title || "Untitled conversation"}
+            </button>
+            <div className="mt-0.5 flex items-center gap-3 text-caption text-ink-soft">
+              <span className="font-display tabular-nums">
+                {count} {count === 1 ? "message" : "messages"}
+              </span>
+              <button type="button" onClick={() => onPending({ kind: "rename", session: s })} className={cn("ml-auto", action)}>
+                Rename<span className="sr-only"> {s.title || "Untitled conversation"}</span>
+              </button>
+              <button type="button" onClick={() => onPending({ kind: "delete", session: s })} className={action}>
+                Delete<span className="sr-only"> {s.title || "Untitled conversation"}</span>
+              </button>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+/** Correspondence: saved conversations beside a letters column, replies set behind a left rule. */
+export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{ initialSessions: Session[]; initialChatId?: string }>) {
+  const opened = initialSessions?.find((s) => s.id === initialChatId)
   const [sessions, setSessions] = useState<Session[]>(initialSessions ?? [])
-  const [activeChatId, setActiveChatId] = useState<string | undefined>()
-  const [messages, setMessages] = useState<Message[]>([])
+  const [activeChatId, setActiveChatId] = useState<string | undefined>(opened?.id)
+  const [messages, setMessages] = useState<Message[]>(opened?.messages ?? [])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
-  const [timestamps, setTimestamps] = useState<number[]>([])
-  const [now, setNow] = useState(() => 0)
+  const [sent, setSent] = useState<number[]>([])
+  const [now, setNow] = useState(0)
   const [ttsOn, setTtsOn] = useState(false)
-  const [error, setError] = useState<ChatError | null>(null)
+  const [error, setError] = useState<ChatError | null>(
+    initialChatId && !opened ? { message: "That chat no longer exists. Write below to start a new one." } : null,
+  )
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [pending, setPending] = useState<Pending | null>(null)
   const tts = useSpeechSynthesis()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Tick once per second only while rate-limited, to update the countdown.
-  const recent = timestamps.filter((t) => now - t < RATE_WINDOW)
+  const recent = sent.filter((t) => now - t < RATE_WINDOW)
   const remaining = Math.max(0, RATE_LIMIT - recent.length)
-  const cooldown = remaining > 0 || recent.length === 0
-    ? 0
-    : Math.ceil((RATE_WINDOW - (now - Math.min(...recent))) / 1000)
+  const reopensAt = remaining > 0 ? null : Math.min(...recent) + RATE_WINDOW
 
+  // Re-render once when the oldest message leaves the window, instead of ticking every second.
   useEffect(() => {
-    setNow(Date.now())
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [])
+    const live = sent.filter((t) => now - t < RATE_WINDOW)
+    if (live.length === 0) return
+    const id = window.setTimeout(() => setNow(Date.now()), Math.min(...live) + RATE_WINDOW - now)
+    return () => window.clearTimeout(id)
+  }, [sent, now])
 
-  // Scroll only the message container (never the window), instantly to avoid jank.
+  useEffect(() => setQuery("chat", activeChatId), [activeChatId])
+
+  // Scroll only the letters column (never the window), instantly to avoid jank.
   useEffect(() => {
     const el = scrollRef.current
     if (el) el.scrollTop = el.scrollHeight
   }, [messages, loading])
 
-  const selectSession = useCallback((s: Session) => {
+  const focusInput = () => setTimeout(() => inputRef.current?.focus(), 0)
+
+  const selectSession = (s: Session) => {
     setActiveChatId(s.id)
     setMessages(s.messages ?? [])
     setError(null)
-    setTimeout(() => inputRef.current?.focus(), 0)
-  }, [])
+    setSheetOpen(false)
+    focusInput()
+  }
 
-  const newChat = useCallback(() => {
+  const newChat = () => {
     setActiveChatId(undefined)
     setMessages([])
     setInput("")
     setError(null)
-    setTimeout(() => inputRef.current?.focus(), 0)
-  }, [])
+    setSheetOpen(false)
+    focusInput()
+  }
 
-  const handleRename = async (s: Session) => {
-    const name = window.prompt("Rename chat", s.title)?.trim()
+  const closePending = () => setPending((p) => p && { ...p, open: false })
+
+  const rename = async (s: Session, raw: FormDataEntryValue | null) => {
+    const name = String(raw ?? "").trim()
+    closePending()
     if (!name || name === s.title) return
     try {
       await renameAIChat(s.id, name)
       setSessions((prev) => prev.map((x) => (x.id === s.id ? { ...x, title: name } : x)))
       toast.success("Chat renamed")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to rename chat")
+    } catch {
+      toast.error("Could not rename the chat. Try again.")
     }
   }
 
-  const handleDelete = async (s: Session) => {
-    if (!window.confirm(`Delete "${s.title || "this chat"}"? This cannot be undone.`)) return
+  const remove = async (s: Session) => {
     try {
       await deleteAIChat(s.id)
       setSessions((prev) => prev.filter((x) => x.id !== s.id))
-      if (activeChatId === s.id) {
-        setActiveChatId(undefined)
-        setMessages([])
-      }
+      if (activeChatId === s.id) newChat()
       toast.success("Chat deleted")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete chat")
+    } catch {
+      toast.error("Could not delete the chat. Try again.")
     }
   }
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault()
     const text = input.trim()
-    if (!text || loading) return
-
-    if (remaining <= 0) {
-      toast.error(`Rate limit — wait ${cooldown}s before sending again.`)
-      return
-    }
+    if (!text || loading || remaining <= 0) return
 
     const sentAt = Date.now()
     const userMsg: Message = { id: `u-${sentAt}`, msg: text, role: "user" }
     const aiId = `m-${sentAt}`
     setMessages((prev) => [...prev, userMsg])
     setInput("")
-    setTimestamps((prev) => [...prev, sentAt])
+    setNow(sentAt)
+    setSent((prev) => [...prev.filter((t) => sentAt - t < RATE_WINDOW), sentAt])
     setLoading(true)
     setError(null)
 
@@ -133,7 +233,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
         throw Object.assign(new Error(json?.message || `AI request failed (${status})`), { status })
       }
 
-      // Empty AI bubble that fills in as chunks stream in.
+      // Empty reply that fills in as chunks stream in.
       setMessages((prev) => [...prev, { id: aiId, msg: "", role: "model" }])
 
       reader = res.body!.getReader()
@@ -151,6 +251,7 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
       const finalText = full.replace(/<!--chatId:[^>]*-->/, "").trim()
       setMessages((prev) => prev.map((m) => (m.id === aiId ? { ...m, msg: finalText } : m)))
       if (ttsOn) tts.speak(finalText)
+      track("ai-chat-send", { status: "ok" })
 
       const aiMsg: Message = { id: aiId, msg: finalText, role: "model" }
       const chatId = chatIdMatch?.[1] ?? activeChatId
@@ -159,24 +260,19 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
         setSessions((prev) => {
           const existing = prev.find((s) => s.id === chatId)
           if (existing) {
-            return prev.map((s) =>
-              s.id === chatId ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
-            )
+            return prev.map((s) => (s.id === chatId ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s))
           }
-          return [
-            { id: chatId, title: text.slice(0, 60), createdAt: new Date().toISOString(), messages: [userMsg, aiMsg] },
-            ...prev,
-          ]
+          return [{ id: chatId, title: text.slice(0, 60), createdAt: new Date().toISOString(), messages: [userMsg, aiMsg] }, ...prev]
         })
       }
     } catch (err) {
-      // Remove the optimistic messages so the user can retry cleanly, and roll back
-      // the consumed rate-limit slot since the request never succeeded.
+      // Remove the optimistic messages so the user can retry cleanly, and give back the rate-limit slot.
       setMessages((prev) => prev.filter((m) => m.id !== userMsg.id && m.id !== aiId))
       setInput(text)
-      setTimestamps((prev) => prev.filter((t) => t !== sentAt))
+      setSent((prev) => prev.filter((t) => t !== sentAt))
       const status = (err as { status?: number }).status ?? 0
       track("ai-error", { feature: "chat", status })
+      track("ai-chat-send", { status: sendStatus(status) })
       if (status === 401) {
         setError({ message: "Your session has ended. Sign in again.", signIn: true })
       } else if (status === 404 && activeChatId) {
@@ -193,173 +289,163 @@ export default function AIChatApp({ initialSessions }: { initialSessions: Sessio
     }
   }
 
+  const activeTitle = sessions.find((s) => s.id === activeChatId)?.title
+  const limitNote =
+    reopensAt !== null
+      ? `Ten messages a minute is the limit. You can send again at ${new Date(reopensAt).toLocaleTimeString("en-GB")}.`
+      : remaining < RATE_LIMIT
+        ? `${remaining} of ${RATE_LIMIT} messages left this minute.`
+        : null
+  const blocked = loading || remaining <= 0
+  const list = <SessionList sessions={sessions} activeId={activeChatId} onSelect={selectSession} onPending={(p) => setPending({ ...p, open: true })} />
+
   return (
-    <div className="flex h-[calc(100dvh-16rem)] min-h-[460px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm">
-      {/* mac window title bar */}
-      <div className="flex shrink-0 items-center gap-3 border-b bg-muted/40 px-4 py-2.5">
-        <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-full bg-red-400/90" />
-          <span className="h-3 w-3 rounded-full bg-yellow-400/90" />
-          <span className="h-3 w-3 rounded-full bg-green-400/90" />
-        </div>
-        <p className="flex-1 truncate text-center font-mono text-xs text-muted-foreground">etan-ai ~ chat</p>
-        <div className="w-[46px] shrink-0" aria-hidden />
-      </div>
-      <div className="flex min-h-0 flex-1">
-      {/* Sessions sidebar */}
-      <aside className="hidden w-64 shrink-0 flex-col border-r bg-muted/30 md:flex">
-        <div className="border-b p-3">
-          <Button onClick={newChat} className="w-full gap-2">
-            <Plus className="h-4 w-4" />
-            New Chat
+    <div
+      data-private
+      className="grid h-[calc(100dvh-14rem)] min-h-[30rem] grid-rows-[minmax(0,1fr)] border border-rule md:grid-cols-[16rem_minmax(0,1fr)]"
+    >
+      <aside aria-label="Conversations" className="hidden min-h-0 flex-col border-r border-rule md:flex">
+        <div className="flex items-center justify-between gap-2 border-b border-rule p-3">
+          <h2 className="font-display text-h4 text-ink">Conversations</h2>
+          <Button size="sm" variant="outline" onClick={newChat}>
+            New chat
           </Button>
         </div>
-        <div className="flex-1 space-y-1 overflow-y-auto p-2">
-          {sessions.length === 0 ? (
-            <p className="px-3 py-6 text-center text-xs text-muted-foreground">No conversations yet</p>
-          ) : (
-            sessions.map((s) => (
-              <div
-                key={s.id}
-                className={cn(
-                  "group/item flex items-center rounded-lg pr-1 transition-colors hover:bg-muted",
-                  activeChatId === s.id && "bg-muted",
-                )}
-              >
-                <button onClick={() => selectSession(s)} className="min-w-0 flex-1 rounded-lg p-2.5 text-left">
-                  <div className="flex items-center gap-2">
-                    <MessageSquare className="h-4 w-4 shrink-0 text-primary" />
-                    <span className="truncate text-sm font-medium">{s.title || "Conversation"}</span>
-                  </div>
-                  <span className="ml-6 block text-xs text-muted-foreground">{s.messages?.length ?? 0} messages</span>
-                </button>
-                <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/item:opacity-100">
-                  <button onClick={() => handleRename(s)} title="Rename" aria-label="Rename chat" className="rounded p-1.5 text-muted-foreground hover:bg-background hover:text-foreground">
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button onClick={() => handleDelete(s)} title="Delete" aria-label="Delete chat" className="rounded p-1.5 text-muted-foreground hover:bg-background hover:text-destructive">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">{list}</div>
       </aside>
 
-      {/* Conversation */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-3 border-b p-3">
-          <Avatar className="h-9 w-9 border bg-gradient-to-br from-violet-500/20 to-purple-500/20">
-            <AvatarFallback>
-              <Bot className="h-5 w-5 text-violet-500" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">Etan AI</p>
-            <p className="text-xs text-muted-foreground">Portfolio assistant</p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Badge variant="secondary" className="hidden gap-1 text-xs sm:flex">
-              <Clock className="h-3 w-3" />
-              {remaining}/{RATE_LIMIT}
-            </Badge>
-            <Button onClick={newChat} variant="ghost" size="sm" className="gap-1 md:hidden">
-              <Plus className="h-4 w-4" />
-              New
-            </Button>
-          </div>
+      <section aria-label="Conversation" className="flex min-h-0 min-w-0 flex-col">
+        <div className="flex items-center gap-2 border-b border-rule p-3">
+          <h2 className="min-w-0 flex-1 truncate font-display text-h4 text-ink">{activeTitle || "New conversation"}</h2>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button size="sm" variant="outline" className="md:hidden">
+                Conversations
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="flex flex-col gap-4 overflow-y-auto px-0" onCloseAutoFocus={(e) => e.preventDefault()}>
+              <div className="px-6">
+                <SheetTitle>Conversations</SheetTitle>
+                <SheetDescription className="sr-only">Open, rename or delete a saved conversation.</SheetDescription>
+                <Button className="mt-4" onClick={newChat}>
+                  New chat
+                </Button>
+              </div>
+              {list}
+            </SheetContent>
+          </Sheet>
+          <Button size="sm" variant="outline" className="md:hidden" onClick={newChat}>
+            New chat
+          </Button>
         </div>
 
-        {/* Messages */}
-        <div ref={scrollRef} data-private className="flex-1 space-y-4 overflow-y-auto p-4">
-          {messages.length === 0 && !loading ? (
-            <div className="flex h-full flex-col items-center justify-center gap-3 text-center text-muted-foreground">
-              <div className="rounded-full bg-primary/10 p-4">
-                <Sparkles className="h-7 w-7 text-primary" />
+        <div ref={scrollRef} aria-busy={loading} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+          <div className="max-w-[66ch] space-y-6">
+            {messages.length === 0 && !loading ? (
+              <div>
+                <h3 className="font-display text-h3 text-ink">Ask Etan anything</h3>
+                <p className="mt-2 max-w-[52ch] text-body text-ink-soft">
+                  Questions about Rizky&apos;s projects, skills or background are answered from his own records. Each
+                  conversation is saved to your account.
+                </p>
               </div>
-              <p className="font-medium text-foreground">Start a conversation</p>
-              <p className="max-w-sm text-sm">Ask Etan anything about Rizky&apos;s projects, skills, or background.</p>
-            </div>
-          ) : (
-            messages.map((m) => (
-              <div key={m.id} className={cn("flex gap-3", m.role === "user" ? "flex-row-reverse" : "flex-row")}>
-                <Avatar className="h-8 w-8 shrink-0 border">
-                  <AvatarFallback>
-                    {m.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4 text-violet-500" />}
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  className={cn(
-                    "max-w-[78%] rounded-2xl px-4 py-2.5 text-sm",
-                    m.role === "user"
-                      ? "rounded-tr-sm bg-primary text-primary-foreground"
-                      : "rounded-tl-sm bg-muted",
-                  )}
-                >
-                  {m.role === "user" ? (
-                    <p className="whitespace-pre-wrap">{m.msg}</p>
-                  ) : (
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <MDXComponent>{m.msg}</MDXComponent>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-
-          {loading && messages[messages.length - 1]?.role !== "model" && (
-            <div className="flex gap-3">
-              <Avatar className="h-8 w-8 shrink-0 border">
-                <AvatarFallback>
-                  <Bot className="h-4 w-4 text-violet-500" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex items-center gap-2 rounded-2xl rounded-tl-sm bg-muted px-4 py-3 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Etan is thinking…
-              </div>
-            </div>
-          )}
+            ) : (
+              messages.map((m) => <Letter key={m.id} m={m} />)
+            )}
+            {loading && messages[messages.length - 1]?.role !== "model" && (
+              <p className="border-l border-ink pl-4 font-display text-caption text-ink-soft">Etan is writing…</p>
+            )}
+          </div>
         </div>
 
         {error && (
-          <p role="alert" className="border-t px-3 py-2 text-sm text-destructive">
+          <ErrorNote className="border-t border-rule px-4 py-3">
             {error.message}
             {error.signIn && (
               <>
                 {" "}
-                <Link href="/auth?redirect=/ai" className="font-medium underline underline-offset-4">
-                  Sign in
-                </Link>
+                <InkLink href="/auth?redirect=/ai">Sign in</InkLink>
               </>
             )}
-          </p>
+          </ErrorNote>
         )}
 
-        {/* Input */}
-        <form onSubmit={send} className="flex items-center gap-2 border-t p-3">
+        <form onSubmit={send} className="border-t border-rule p-3 sm:p-4">
+          <Label htmlFor="ai-message">Your message</Label>
           <Input
+            id="ai-message"
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={remaining <= 0 ? `Rate limited — wait ${cooldown}s…` : "Say something…"}
-            disabled={loading || remaining <= 0}
-            className="h-11 rounded-none"
+            placeholder="Ask about a project, a skill or a role"
+            disabled={blocked}
             autoComplete="off"
+            aria-describedby={limitNote ? "ai-limit" : undefined}
           />
-          <MicButton onTranscript={(t) => setInput((p) => (p ? `${p} ${t}` : t))} disabled={loading || remaining <= 0} />
-          {tts.supported && (
-            <TtsToggle on={ttsOn} onToggle={() => { const n = !ttsOn; setTtsOn(n); if (!n) tts.cancel() }} />
-          )}
-          <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-none" disabled={loading || !input.trim() || remaining <= 0}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-          </Button>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <MicButton onTranscript={(t) => setInput((p) => (p ? `${p} ${t}` : t))} disabled={blocked} />
+            {tts.supported && (
+              <TtsToggle
+                on={ttsOn}
+                onToggle={() => {
+                  const next = !ttsOn
+                  setTtsOn(next)
+                  if (!next) tts.cancel()
+                }}
+              />
+            )}
+            {limitNote && (
+              <p id="ai-limit" className="font-display text-caption tabular-nums text-ink-soft">
+                {limitNote}
+              </p>
+            )}
+            <Button type="submit" className="ml-auto" disabled={blocked || !input.trim()}>
+              Send
+            </Button>
+          </div>
         </form>
-      </div>
-      </div>
+      </section>
+
+      <Dialog open={pending?.kind === "rename" && pending.open} onOpenChange={(open) => !open && closePending()}>
+        <DialogContent>
+          {pending?.kind === "rename" && (
+            <form
+              className="grid gap-4"
+              onSubmit={(e) => {
+                e.preventDefault()
+                rename(pending.session, new FormData(e.currentTarget).get("title"))
+              }}
+            >
+              <DialogTitle>Rename chat</DialogTitle>
+              <DialogDescription className="sr-only">Give this conversation a new name.</DialogDescription>
+              <div>
+                <Label htmlFor="ai-chat-title">Name</Label>
+                <Input id="ai-chat-title" name="title" defaultValue={pending.session.title} maxLength={80} autoFocus />
+              </div>
+              <DialogFooter>
+                <Button type="submit">Save name</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={pending?.kind === "delete" && pending.open} onOpenChange={(open) => !open && closePending()}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
+          <AlertDialogDescription>
+            &ldquo;{pending?.session.title || "Untitled conversation"}&rdquo; and its messages will be removed. This cannot be undone.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Button variant="destructive" onClick={() => pending && remove(pending.session)}>
+                Delete chat
+              </Button>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

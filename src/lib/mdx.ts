@@ -68,22 +68,6 @@ export function getAllChangelogs(): ChangelogContent[] {
   return changelogs
 }
 
-export function getChangelogBySlug(slug: string): ChangelogContent | null {
-  try {
-    const fullPath = path.join(contentDir, 'changelog', `${slug}.mdx`)
-    const fileContents = fs.readFileSync(fullPath, 'utf8')
-    const { data, content } = matter(fileContents)
-
-    return {
-      meta: data as ChangelogMeta,
-      content,
-      slug,
-    }
-  } catch {
-    return null
-  }
-}
-
 // Roadmap functions
 export function getAllRoadmapLessons(): RoadmapContent[] {
   const roadmapDir = path.join(contentDir, 'roadmap')
@@ -92,7 +76,8 @@ export function getAllRoadmapLessons(): RoadmapContent[] {
     return []
   }
 
-  const files = fs.readdirSync(roadmapDir)
+  // Sorted so course order does not depend on the file system's directory order.
+  const files = fs.readdirSync(roadmapDir).sort()
 
   const lessons = files
     .filter(file => file.endsWith('.mdx'))
@@ -114,6 +99,7 @@ export function getAllRoadmapLessons(): RoadmapContent[] {
 }
 
 export function getRoadmapLessonBySlug(slug: string): RoadmapContent | null {
+  if (!/^[a-z0-9-]+$/.test(slug)) return null
   try {
     const fullPath = path.join(contentDir, 'roadmap', `${slug}.mdx`)
     const fileContents = fs.readFileSync(fullPath, 'utf8')
@@ -129,20 +115,13 @@ export function getRoadmapLessonBySlug(slug: string): RoadmapContent | null {
   }
 }
 
-export function getRoadmapCourses() {
-  const lessons = getAllRoadmapLessons()
-  const courses = new Map<string, RoadmapContent[]>()
+/** Courses in first-lesson order with their lessons' slugs and front matter only, never the bodies. */
+export function getRoadmapIndex(): { course: string; lessons: Omit<RoadmapContent, 'content'>[] }[] {
+  const courses = new Map<string, Omit<RoadmapContent, 'content'>[]>()
 
-  lessons.forEach(lesson => {
-    const course = lesson.meta.course
-    if (!courses.has(course)) {
-      courses.set(course, [])
-    }
-    courses.get(course)!.push(lesson)
-  })
+  for (const { slug, meta } of getAllRoadmapLessons()) {
+    courses.set(meta.course, [...(courses.get(meta.course) ?? []), { slug, meta }])
+  }
 
-  return Array.from(courses.entries()).map(([course, lessons]) => ({
-    course,
-    lessons: lessons.sort((a, b) => a.meta.order - b.meta.order),
-  }))
+  return Array.from(courses, ([course, lessons]) => ({ course, lessons }))
 }

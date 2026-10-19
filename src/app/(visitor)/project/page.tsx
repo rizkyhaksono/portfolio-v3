@@ -1,10 +1,15 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import CardProject from "@/app/_components/project/card-project"
+import Image from "next/image"
 import { getAllProject } from "@/services/visitor/project"
-import { MacWindow } from "@/components/ui/mac-window"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { FeaturedProject } from "@/app/_components/project/featured-project"
+import { getPathReads } from "@/services/visitor/umami"
+import { InkLink } from "@/components/ui/ink-link"
+import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { PlateFigure } from "@/components/ui/plate-figure"
+import { ReaderCount } from "@/components/ui/reader-count"
+import { PAGE_WIDTH } from "@/lib/design-system"
+import { ProjectLinks, plateOf } from "./project-links"
+import { plainText } from "./safe-html"
+
+export const revalidate = 3600
 
 const FEATURED_PROJECTS = [
   ["info pangan jakarta", "info pangan"],
@@ -26,50 +31,75 @@ function selectFeaturedProjects<T extends { title: string }>(projects: T[]): T[]
 }
 
 export default async function ProjectPage() {
-  const projects = await getAllProject()
-  const featuredProjects = selectFeaturedProjects(projects ?? [])
-  const featuredIds = new Set(featuredProjects.map((project) => project.id))
-  const remainingProjects = (projects ?? []).filter((project) => !featuredIds.has(project.id))
+  const [projects, reads] = await Promise.all([getAllProject(), getPathReads()])
+  const featured = selectFeaturedProjects(projects)
+  const featuredIds = new Set(featured.map((project) => project.id))
+  const rest = projects.filter((project) => !featuredIds.has(project.id))
+  // The first featured plate is the LCP image on phones, so it must not wait as a lazy image.
+  const leadPlateId = featured.find((project) => plateOf(project))?.id
 
   return (
-    <BlurFade delay={0.25} inView>
-      <SectionHeading
-        as="h1"
-        eyebrow="Work"
-        title="Selected"
-        accent="projects"
-        description="A focused record of products, public systems, and engineering work I helped bring into production."
-        className="mb-8"
-      />
-      {featuredProjects.length > 0 ? (
-        <section className="mb-14">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <Eyebrow>Featured work</Eyebrow>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">Three projects that best represent my work on public information, industrial systems, and health technology.</p>
-            </div>
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-              Selected {String(featuredProjects.length).padStart(2, "0")}
-            </span>
-          </div>
-          <div>
-            {featuredProjects.map((project, index) => (
-              <FeaturedProject key={project.id} id={project.id} index={index + 1} title={project.title} description={project.description} image={project.image} href={project.url} />
-            ))}
+    <div className={PAGE_WIDTH.ledger}>
+      <header className="pb-8">
+        <h1 className="font-display text-h1 text-balance text-ink">Projects</h1>
+        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
+          Products, public systems and engineering work I helped bring into production.
+        </p>
+      </header>
+      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+
+      {projects.length === 0 && <p className="mt-8 text-body text-ink-soft">No projects are published yet.</p>}
+
+      {featured.length > 0 && (
+        <section aria-labelledby="featured" className="mt-12">
+          <h2 id="featured" className="font-display text-h2 text-ink">
+            Featured
+          </h2>
+          <div className="mt-6 border-t border-ink">
+            {featured.map((project) => {
+              const plate = plateOf(project)
+              return (
+                <article key={project.id} className="grid gap-6 border-b border-rule py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:gap-10">
+                  <div className="min-w-0">
+                    <h3 className="font-display text-h3 text-balance text-ink">
+                      <InkLink href={`/project/${project.id}`} className="no-underline hover:underline">
+                        {project.title}
+                      </InkLink>
+                    </h3>
+                    <p className="mt-3 line-clamp-4 text-body text-ink-soft">{plainText(project.description)}</p>
+                    <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-3" />
+                    <ProjectLinks project={project} className="mt-3" />
+                  </div>
+                  {plate && (
+                    <PlateFigure className="md:sticky md:top-[calc(var(--head-h)+1.5rem)] md:self-start">
+                      <div className="relative aspect-[16/10]">
+                        <Image src={plate} alt="" fill priority={project.id === leadPlateId} sizes="(min-width: 768px) 20rem, 100vw" className="object-cover object-top" />
+                      </div>
+                    </PlateFigure>
+                  )}
+                </article>
+              )
+            })}
           </div>
         </section>
-      ) : null}
-      <MacWindow title="~/projects">
-        {remainingProjects.length > 0 ? <Eyebrow className="mb-5">More projects</Eyebrow> : null}
-        <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-          {remainingProjects.map((project) => (
-            <CardProject key={project.id} id={project.id} title={project.title} description={project.description} href={project.url} source={project.source_code ?? ""} image={project.image ?? "/no-image.jpg"} />
-          ))}
-        </div>
-        {(!projects || projects.length === 0) && (
-          <p className="py-12 text-center text-sm text-muted-foreground">No projects to show yet.</p>
-        )}
-      </MacWindow>
-    </BlurFade>
+      )}
+
+      {rest.length > 0 && (
+        <section aria-labelledby="more" className="mt-16">
+          <h2 id="more" className="font-display text-h2 text-ink">
+            {featured.length > 0 ? "More projects" : "All projects"}
+          </h2>
+          <LedgerList className="mt-6">
+            {rest.map((project) => (
+              <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} meta={new Date(project.created_at).getFullYear() || null}>
+                <p className="line-clamp-2">{plainText(project.description)}</p>
+                <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
+                <ProjectLinks project={project} className="mt-1" />
+              </LedgerRow>
+            ))}
+          </LedgerList>
+        </section>
+      )}
+    </div>
   )
 }

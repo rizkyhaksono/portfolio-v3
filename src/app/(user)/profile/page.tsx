@@ -1,51 +1,101 @@
-import { getProfile } from "@/services/user/profile"
-import ProfileHeader from "./_components/profile-header"
-import { Suspense } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
+import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { PlateFigure } from "@/components/ui/plate-figure"
+import { loadProfile, ProfileUnavailable } from "./_components/load-profile"
+import { LogoutButton } from "./_components/logout-button"
+import { ProfileSheet } from "./_components/profile-sheet"
 
-export const dynamic = "force-dynamic"
-
-function ProfileSkeleton() {
+/** A definition row with a dotted leader running from the term to its value. */
+function Entry({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
   return (
-    <Card className="overflow-hidden">
-      <div className="h-32 bg-muted animate-pulse" />
-      <CardContent className="relative px-6 pb-6">
-        <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
-          <Skeleton className="h-24 w-24 rounded-full border-4 border-background" />
-          <div className="flex-1 space-y-2 sm:mb-2">
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-32" />
-          </div>
-        </div>
-        <div className="mt-6 space-y-4">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-        <div className="grid grid-cols-2 gap-3 mt-6">
-          <Skeleton className="h-16 rounded-lg" />
-          <Skeleton className="h-16 rounded-lg" />
-          <Skeleton className="h-16 rounded-lg col-span-2" />
-        </div>
-        <div className="flex gap-3 mt-6">
-          <Skeleton className="h-10 flex-1" />
-          <Skeleton className="h-10 flex-1" />
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-const ProfilePage = async () => {
-  const profile = await getProfile()
-
-  return (
-    <div className="mx-auto flex w-full flex-col gap-4">
-      <Suspense fallback={<ProfileSkeleton />}>
-        <ProfileHeader profile={profile.data} />
-      </Suspense>
+    <div className="flex items-baseline gap-3 py-2">
+      <dt className="flex flex-1 items-baseline gap-3 whitespace-nowrap text-small font-semibold text-ink-soft after:min-w-4 after:flex-1 after:border-b after:border-dotted after:border-rule-strong after:content-['']">
+        {term}
+      </dt>
+      <dd className="min-w-0 text-right text-body text-ink [overflow-wrap:anywhere]">{children}</dd>
     </div>
   )
 }
 
-export default ProfilePage
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("")
+
+const capitalise = (word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+
+function memberSince(iso: string) {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime())
+    ? null
+    : date.toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "Asia/Jakarta" })
+}
+
+export default async function ProfilePage() {
+  const profile = await loadProfile("/profile")
+  if (!profile) return <ProfileUnavailable />
+
+  const isAdmin = profile.isAdmin || profile.role === "ADMIN"
+  const portrait = profile.iconUrl || profile.avatarUrl
+  const since = memberSince(profile.createdAt)
+  const providers = profile.oauthAccounts?.map((account) => capitalise(account.provider)) ?? []
+
+  return (
+    <ProfileSheet
+      title={profile.name}
+      standfirst={profile.headline || undefined}
+      portrait={
+        <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
+          {portrait && <AvatarImage src={portrait} alt="" referrerPolicy="no-referrer" className="object-cover" />}
+          <AvatarFallback className="font-display text-h3">{initials(profile.name)}</AvatarFallback>
+        </Avatar>
+      }
+      cover={
+        profile.bannerUrl ? (
+          <PlateFigure>
+            <div className="relative aspect-[3/1]">
+              <Image src={profile.bannerUrl} alt="" fill unoptimized sizes="(min-width: 768px) 40rem, 100vw" className="object-cover" />
+            </div>
+          </PlateFigure>
+        ) : undefined
+      }
+    >
+      {profile.about ? (
+        <p className="max-w-[60ch] whitespace-pre-line text-body text-ink">{profile.about}</p>
+      ) : (
+        <p className="font-display text-body text-ink-soft">No bio yet. Add a few lines from the edit page.</p>
+      )}
+
+      <dl className="mt-8 flex flex-col">
+        <Entry term="Email">{profile.email}</Entry>
+        <Entry term="Email check">
+          <Badge variant="outline" status={profile.emailVerified ? "filled" : "dashed"}>
+            {profile.emailVerified ? "Verified" : "Not verified yet"}
+          </Badge>
+        </Entry>
+        <Entry term="Location">{profile.location || "Not set"}</Entry>
+        {since && <Entry term="Member since">{since}</Entry>}
+        <Entry term="Account">{isAdmin ? "Administrator" : "Member"}</Entry>
+        <Entry term="Connected accounts">{providers.length ? providers.join(", ") : "None"}</Entry>
+      </dl>
+
+      <div className="mt-10 flex flex-wrap gap-3 border-t border-rule pt-6">
+        <Button asChild>
+          <Link href="/profile/edit">Edit profile</Link>
+        </Button>
+        {isAdmin && (
+          <Button asChild variant="outline">
+            <Link href="/admin/dashboard">Admin dashboard</Link>
+          </Button>
+        )}
+        <LogoutButton />
+      </div>
+    </ProfileSheet>
+  )
+}

@@ -3,13 +3,14 @@ import Script from "next/script"
 import { Literata } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
-import { Toaster } from "sonner"
+import { Toaster } from "@/components/layout/toaster"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
 import { PRINT_HEX } from "@/lib/print-hex"
+import { PlateFilters } from "@/components/ui/plate-filters"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
@@ -99,22 +100,11 @@ export default function RootLayout({
         )}
       </head>
       <body className="font-sans antialiased">
+        <PlateFilters />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
           <UmamiRecorder />
-          <Toaster
-            position="top-right"
-            theme="system"
-            toastOptions={{
-              classNames: {
-                toast: "!rounded-none !border !border-ink !bg-paper !text-ink !shadow-[3px_3px_0_hsl(var(--ink))] !font-sans",
-                description: "!text-ink-soft",
-                actionButton: "!rounded-none !bg-ink !text-paper",
-                cancelButton: "!rounded-none !bg-tint !text-ink",
-                closeButton: "!rounded-none !border-ink !bg-paper !text-ink",
-              },
-            }}
-          />
+          <Toaster />
           {/* <div className="hidden sm:block">
             <SmoothCursor />
           </div> */}

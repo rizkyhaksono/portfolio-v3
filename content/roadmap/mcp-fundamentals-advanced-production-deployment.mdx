@@ -1,5 +1,5 @@
 ---
-title: "Production Deployment"
+title: "Production deployment"
 description: "Deploy MCP servers with Docker, health checks, and scaling strategies"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,10 +9,6 @@ duration: "28 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## Shipping MCP to Production
 
@@ -231,7 +227,7 @@ server {
 
 Because Streamable HTTP sessions are held in server memory, a request carrying an `Mcp-Session-Id` must land on the instance that created it. You have two production-grade options:
 
-<Card className="my-6">
+<Card>
   <CardHeader>
     <CardTitle>Session affinity vs. stateless mode</CardTitle>
   </CardHeader>
@@ -254,7 +250,7 @@ await transport.handleRequest(req, res, req.body)
 
 ## Common Pitfalls
 
-<Accordion type="single" collapsible className="my-6">
+<Accordion type="single" collapsible>
   <AccordionItem value="stdout">
     <AccordionTrigger>Logging to stdout on a stdio server</AccordionTrigger>
     <AccordionContent>
@@ -289,6 +285,6 @@ Pin base images by digest and scan them in CI. Validate all config at startup an
 
 ## Next Steps
 
-<NextLesson title="Security & Sandboxing" description="Scopes and validation." href="/roadmap/mcp-fundamentals-advanced-security-sandboxing" />
+<NextLesson title="Security and sandboxing" description="Scopes and validation." href="/roadmap/mcp-fundamentals-advanced-security-sandboxing" />
 
 <Resources resources={[{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Transports Specification","href":"https://modelcontextprotocol.io/docs/concepts/transports"},{"title":"Docker: Multi-stage builds","href":"https://docs.docker.com/build/building/multi-stage/"},{"title":"Kubernetes: Liveness & Readiness Probes","href":"https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"}]} />

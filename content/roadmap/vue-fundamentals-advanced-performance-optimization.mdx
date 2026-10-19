@@ -1,5 +1,5 @@
 ---
-title: "Vue Performance Optimization"
+title: "Vue performance optimization"
 description: "v-memo, async components, keep-alive, and bundle size optimization"
 course: "vue-fundamentals"
 category: "frontend"
@@ -9,12 +9,6 @@ duration: "28 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Vue Performance Optimization
 
 Vue's reactivity system and virtual DOM are fast by default, but as an application grows the difference between a smooth 60 fps interface and a janky one comes down to how much work Vue is asked to repeat. Large lists that re-render on every keystroke, heavy components loaded eagerly on the first paint, and a bundle that ships every route to every visitor are the three problems you will hit most often in production. This lesson covers the concrete tools Vue 3 gives you to fix each one: `v-memo` to skip re-rendering unchanged subtrees, `defineAsyncComponent` and route-level lazy loading to split code, `<KeepAlive>` to cache expensive component instances, and bundle analysis to find what is actually making your app slow.
 
@@ -268,8 +262,6 @@ function reload(next) {
 - Reserve `v-memo` for large lists with expensive rows, and always list every dependency it reads.
 - Scope `<KeepAlive>` with `include` and `max` so caching does not turn into an unbounded memory leak.
 - Re-run `rollup-plugin-visualizer` after adding any new dependency to catch bundle regressions early.
-
----
 
 ## Next Steps
 

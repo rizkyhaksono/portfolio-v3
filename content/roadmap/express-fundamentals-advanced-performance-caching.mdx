@@ -1,5 +1,5 @@
 ---
-title: "Performance & Caching"
+title: "Performance and caching"
 description: "Redis caching, compression, rate limiting, and response optimization"
 course: "express-fundamentals"
 category: "backend"
@@ -9,14 +9,6 @@ duration: "26 min"
 order: 7
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
-
-## Performance & Caching
 
 Once an Express API is correct, the next job is making it fast under load. Most read-heavy endpoints repeat the same expensive work — a database query, an aggregation, a third-party call — for thousands of identical requests. Caching stores the computed result close to the app so repeat requests skip that work entirely, cutting p95 latency from hundreds of milliseconds to single digits and taking pressure off your database. In this lesson you will add a Redis cache, compress responses, protect the API with rate limiting, and lean on HTTP caching headers — the same layered approach production APIs use.
 
@@ -87,7 +79,7 @@ app.get("/api/products", cache(120), async (req, res) => {
 })
 ```
 
-<Tabs defaultValue="aside" className="not-prose">
+<Tabs defaultValue="aside">
   <TabsList>
     <TabsTrigger value="aside">Cache-Aside</TabsTrigger>
     <TabsTrigger value="through">Write-Through</TabsTrigger>
@@ -179,7 +171,7 @@ app.get("/api/config", (req, res) => {
 
 ## Common Pitfalls
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="user-data">
     <AccordionTrigger>Caching user-specific responses under a shared key</AccordionTrigger>
     <AccordionContent>Keying only on the URL means user A can receive user B's cached data. Include the user or tenant id in the key (`cache:${userId}:${req.originalUrl}`) or skip the cache for authenticated, personalized routes.</AccordionContent>
@@ -200,10 +192,8 @@ app.get("/api/config", (req, res) => {
 
 <Warning>Only cache idempotent, safe methods (`GET`, `HEAD`). Never cache responses to `POST`, `PATCH`, or `DELETE` — they mutate state and their responses are request-specific.</Warning>
 
----
-
 ## Next Steps
 
-<NextLesson title="Microservices Architecture" description="Split services and communicate via HTTP." href="/roadmap/express-fundamentals-advanced-microservices" />
+<NextLesson title="Microservices architecture" description="Split services and communicate via HTTP." href="/roadmap/express-fundamentals-advanced-microservices" />
 
 <Resources resources={[{"title":"Redis Documentation","href":"https://redis.io/docs/"},{"title":"ioredis","href":"https://github.com/redis/ioredis"},{"title":"express-rate-limit","href":"https://express-rate-limit.mintlify.app/"},{"title":"MDN: Cache-Control","href":"https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control"}]} />

@@ -1,340 +1,246 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import Image from "next/image"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ProfileResponse } from "@/commons/types/profile"
+import { PlateFigure } from "@/components/ui/plate-figure"
+import { FormAlert } from "@/app/(authentication)/auth/_components/form-alert"
 import { updateProfile, uploadProfileBanner } from "@/app/actions/profile"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
-import { Mail, User, FileText, Briefcase, MapPin, ArrowLeft, Loader2, Save, X, ImageIcon, Upload } from "lucide-react"
-import Typography from "@/components/ui/typography"
+import type { ProfileData } from "@/commons/types/profile"
+import { track } from "@/lib/analytics"
 
-export function EditProfileForm({ profile }: Readonly<{ profile: ProfileResponse }>) {
+const MAX_COVER_BYTES = 5 * 1024 * 1024
+
+const formSchema = z.object({
+  name: z.string().trim().min(2, "Names have at least 2 characters.").max(50, "Keep the name to 50 characters."),
+  email: z.string().email("Enter an email address, like you@example.com."),
+  headline: z.string().max(100, "Keep the headline to 100 characters."),
+  location: z.string().max(100, "Keep the location to 100 characters."),
+  about: z.string().max(500, "Keep the bio to 500 characters."),
+  bannerUrl: z.string(),
+})
+
+type ProfileValues = z.infer<typeof formSchema>
+
+const count = (value: string, max: number) => `${value.length} of ${max} characters.`
+
+export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>) {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false)
-  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const coverInput = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
 
-  const formSchema = z.object({
-    name: z
-      .string()
-      .min(2, {
-        message: "Name must be at least 2 characters.",
-      })
-      .max(50, {
-        message: "Name must not exceed 50 characters.",
-      }),
-    email: z.string().email({
-      message: "Please enter a valid email address.",
-    }),
-    about: z
-      .string()
-      .max(500, {
-        message: "About section must not exceed 500 characters.",
-      })
-      .optional(),
-    headline: z
-      .string()
-      .max(100, {
-        message: "Headline must not exceed 100 characters.",
-      })
-      .optional(),
-    location: z
-      .string()
-      .max(100, {
-        message: "Location must not exceed 100 characters.",
-      })
-      .optional(),
-    bannerUrl: z.string().optional(),
-  })
-
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ProfileValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      name: "",
-      about: "",
-      headline: "",
-      location: "",
-      bannerUrl: "",
+      name: profile.name,
+      email: profile.email,
+      headline: profile.headline ?? "",
+      location: profile.location ?? "",
+      about: profile.about ?? "",
+      bannerUrl: profile.bannerUrl ?? "",
     },
   })
-
-  const { reset } = form
-
-  useEffect(() => {
-    if (profile) {
-      reset({
-        email: profile.data.email,
-        name: profile.data.name,
-        about: profile.data.about ?? "",
-        headline: profile.data.headline ?? "",
-        location: profile.data.location ?? "",
-        bannerUrl: profile.data.bannerUrl ?? "",
-      })
-    }
-  }, [profile, reset])
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
-    const formData = new FormData()
-    formData.append("email", values.email)
-    formData.append("name", values.name)
-    formData.append("about", values.about ?? "")
-    formData.append("headline", values.headline ?? "")
-    formData.append("location", values.location ?? "")
-    formData.append("bannerUrl", values.bannerUrl ?? "")
-
-    toast.promise(updateProfile(profile.data.id, formData), {
-      loading: "Updating profile...",
-      success: (res) => {
-        setIsSubmitting(false)
-        router.push("/profile")
-        return "Profile updated successfully!"
-      },
-      error: (err) => {
-        setIsSubmitting(false)
-        return "Failed to update profile. Please try again."
-      },
-    })
-  }
-
-  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setIsUploadingBanner(true)
-    const fd = new FormData()
-    fd.append("file", file)
-
-    try {
-      const res = await uploadProfileBanner(fd)
-      form.setValue("bannerUrl", res.bannerUrl, { shouldDirty: true })
-      toast.success("Cover image uploaded")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to upload cover image")
-    } finally {
-      setIsUploadingBanner(false)
-      if (bannerInputRef.current) bannerInputRef.current.value = ""
-    }
-  }
-
+  const { isSubmitting, isDirty, errors } = form.formState
   const bannerUrl = form.watch("bannerUrl")
+  const busy = isSubmitting || uploading
 
-  const handleCancel = () => {
-    if (form.formState.isDirty) {
-      if (globalThis.window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
-        router.push("/profile")
-      }
-    } else {
-      router.push("/profile")
+  const onSubmit = async (values: ProfileValues) => {
+    const data = new FormData()
+    for (const [key, value] of Object.entries(values)) data.append(key, value)
+
+    const result = await updateProfile(profile.id, data).catch(() => null)
+    track("profile-save", { status: result?.ok ? "ok" : "error" })
+    if (!result?.ok) {
+      form.setError("root", { message: result?.message ?? "Your changes were not saved. Try again in a minute." })
+      return
     }
+    router.push("/profile")
+  }
+
+  const uploadCover = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+    if (file.size > MAX_COVER_BYTES) {
+      form.setError("bannerUrl", { message: "That image is over 5 MB. Choose a smaller one." })
+      return
+    }
+
+    form.clearErrors("bannerUrl")
+    setUploading(true)
+    const data = new FormData()
+    data.append("file", file)
+    // The action's declared type drops `message`; the service sends it with every refusal.
+    const result: { bannerUrl: string; message?: string } | null = await uploadProfileBanner(data).catch(() => null)
+    setUploading(false)
+
+    if (!result?.bannerUrl) {
+      form.setError("bannerUrl", { message: result?.message ?? "The cover was not uploaded. Try again in a minute." })
+      return
+    }
+    // The API stores the cover on upload, so it is not an unsaved change.
+    form.setValue("bannerUrl", result.bannerUrl)
   }
 
   return (
-    <>
-      <Button variant="ghost" onClick={handleCancel} className="mb-6 -ml-2">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Profile
-      </Button>
-
-      <Card className="border-2">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Edit Profile</CardTitle>
-          <CardDescription>Update your personal information and public profile details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Cover Image Section */}
-              <div className="space-y-4">
-                <Typography.H4 className="text-lg font-semibold border-b pb-2">Cover Image</Typography.H4>
-
-                <div className="relative h-36 w-full overflow-hidden rounded-lg border bg-gradient-to-br from-primary/20 via-primary/10 to-secondary/20">
-                  {bannerUrl ? (
-                    <Image src={bannerUrl} alt="Cover preview" fill className="object-cover" unoptimized />
-                  ) : (
-                    <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground">
-                      <ImageIcon className="h-5 w-5" />
-                      No cover image
-                    </div>
-                  )}
-                  {isUploadingBanner && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                    </div>
-                  )}
-                </div>
-
-                <input
-                  ref={bannerInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/gif,image/webp"
-                  className="hidden"
-                  onChange={handleBannerChange}
-                />
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => bannerInputRef.current?.click()}
-                    disabled={isUploadingBanner || isSubmitting}
-                  >
-                    {isUploadingBanner ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                    {bannerUrl ? "Change Cover" : "Upload Cover"}
-                  </Button>
-                  {bannerUrl && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      onClick={() => form.setValue("bannerUrl", "", { shouldDirty: true })}
-                      disabled={isUploadingBanner || isSubmitting}
-                    >
-                      <X className="mr-2 h-4 w-4" />
-                      Remove
-                    </Button>
-                  )}
-                </div>
-                <FormDescription>Recommended a wide image. PNG, JPG, GIF or WebP, up to 5MB.</FormDescription>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-8" aria-busy={isSubmitting}>
+        <fieldset className="flex flex-col gap-3" aria-busy={uploading}>
+          <legend className="mb-3 text-sm font-semibold text-ink">Cover image</legend>
+          {bannerUrl ? (
+            <PlateFigure>
+              <div className="relative aspect-[3/1]">
+                <Image src={bannerUrl} alt="" fill unoptimized sizes="(min-width: 768px) 40rem, 100vw" className="object-cover" />
               </div>
+            </PlateFigure>
+          ) : (
+            <div className="flex aspect-[3/1] items-center justify-center border border-dashed border-rule-strong font-display text-caption text-ink-soft">
+              No cover yet.
+            </div>
+          )}
 
-              {/* Basic Information Section */}
-              <div className="space-y-4">
-                <Typography.H4 className="text-lg font-semibold border-b pb-2">Basic Information</Typography.H4>
+          <input ref={coverInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden onChange={uploadCover} />
+          <div className="flex flex-wrap gap-3">
+            <Button type="button" variant="outline" onClick={() => coverInput.current?.click()} disabled={busy}>
+              {uploading ? "Uploading…" : bannerUrl ? "Replace cover" : "Upload a cover"}
+            </Button>
+            {bannerUrl && (
+              <Button type="button" variant="ghost" onClick={() => form.setValue("bannerUrl", "", { shouldDirty: true })} disabled={busy}>
+                Remove cover
+              </Button>
+            )}
+          </div>
+          <p className="text-small text-ink-soft">
+            A wide image works best: PNG, JPG, GIF or WebP, up to 5 MB. A new cover is kept as soon as it uploads.
+          </p>
+          <FormAlert>{errors.bannerUrl?.message}</FormAlert>
+        </fieldset>
 
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        Full Name
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your full name" {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormDescription>This is your public display name. ({field.value?.length || 0}/50)</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input autoComplete="name" {...field} disabled={busy} />
+              </FormControl>
+              <FormDescription className="tabular-nums">{count(field.value, 50)}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Mail className="h-4 w-4" />
-                        Email Address
-                      </FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="your.email@example.com" {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormDescription>Your primary email address for account notifications</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" autoComplete="email" {...field} disabled={busy} />
+              </FormControl>
+              <FormDescription>Used to sign in.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-              {/* Professional Information Section */}
-              <div className="space-y-4">
-                <Typography.H4 className="text-lg font-semibold border-b pb-2">Professional Details</Typography.H4>
+        <FormField
+          control={form.control}
+          name="headline"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Headline</FormLabel>
+              <FormControl>
+                <Input {...field} disabled={busy} />
+              </FormControl>
+              <FormDescription className="tabular-nums">One line under your name. {count(field.value, 100)}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField
-                  control={form.control}
-                  name="headline"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Briefcase className="h-4 w-4" />
-                        Professional Headline
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Full Stack Developer | UI/UX Enthusiast" {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormDescription>A brief professional tagline. ({field.value?.length || 0}/100)</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input autoComplete="address-level2" placeholder="City, region" {...field} disabled={busy} />
+              </FormControl>
+              <FormDescription className="tabular-nums">{count(field.value, 100)}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        Location
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., San Francisco, CA" {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormDescription>Your current city or region. ({field.value?.length || 0}/100)</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+        <FormField
+          control={form.control}
+          name="about"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>About you</FormLabel>
+              <FormControl>
+                <Textarea className="min-h-32 resize-y" {...field} disabled={busy} />
+              </FormControl>
+              <FormDescription className="tabular-nums">{count(field.value, 500)}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-              {/* About Section */}
-              <div className="space-y-4">
-                <Typography.H4 className="text-lg font-semibold border-b pb-2">About You</Typography.H4>
+        <FormAlert>{errors.root?.message}</FormAlert>
 
-                <FormField
-                  control={form.control}
-                  name="about"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        Biography
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Tell visitors about yourself, your interests, and what you do..." className="min-h-[120px] resize-none" {...field} disabled={isSubmitting} />
-                      </FormControl>
-                      <FormDescription>A brief description about yourself. ({field.value?.length || 0}/500)</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex items-center justify-end gap-3 pt-6 border-t">
-                <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
-                  <X className="mr-2 h-4 w-4" />
+        <div className="flex flex-wrap justify-end gap-3 border-t border-rule pt-6">
+          {isDirty ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="outline" disabled={busy}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting || !form.formState.isDirty}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Leave without saving?</AlertDialogTitle>
+                  <AlertDialogDescription>Your changes on this page will be lost.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep editing</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => router.push("/profile")}>Discard changes</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Button asChild variant="outline">
+              <Link href="/profile">Cancel</Link>
+            </Button>
+          )}
+          <Button type="submit" disabled={busy || !isDirty}>
+            {isSubmitting ? "Saving…" : "Save changes"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }

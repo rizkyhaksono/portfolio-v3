@@ -1,5 +1,5 @@
 ---
-title: "Resources & Prompts"
+title: "Resources and prompts"
 description: "Expose data resources and reusable prompt templates through MCP servers"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,12 +9,6 @@ duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Resources and Prompts
 
 Tools let a model *do* things, but a capable MCP server also needs to *offer context* and *guide interactions*. That is what the other two primitives are for. **Resources** expose read-only data — files, database rows, API responses — that a client can pull into the model's context. **Prompts** are reusable, parameterised message templates that surface in the client UI (often as slash commands) so users trigger well-crafted interactions without retyping them. Getting these right is what turns a toy server into something a team actually integrates into Claude Desktop, an IDE, or a custom agent.
 
@@ -258,7 +252,7 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
 }))
 ```
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="completions">
     <AccordionTrigger>How do argument autocompletions work?</AccordionTrigger>
     <AccordionContent>
@@ -269,12 +263,12 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
 
 ## Best Practices & Common Pitfalls
 
-<Card className="my-6">
+<Card>
   <CardHeader>
     <CardTitle>Ship-ready checklist</CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc pl-5 space-y-1">
+    <ul>
       <li><strong>Keep resources read-only.</strong> If it writes, it is a tool, not a resource.</li>
       <li><strong>Always set an accurate <code>mimeType</code>.</strong> Clients rely on it to render or parse contents; use <code>application/json</code>, <code>text/markdown</code>, etc.</li>
       <li><strong>Validate template parameters.</strong> A <code>{"users://{userId}"}</code> read is untrusted input — reject unknown ids instead of leaking errors.</li>
@@ -288,10 +282,8 @@ server.setRequestHandler(GetPromptRequestSchema, async (req) => ({
 Never interpolate a resource URI straight into a filesystem path. `fileURLToPath` plus an allow-list of served directories prevents `file:///../../etc/passwd` style path traversal. Treat every incoming URI as hostile input.
 </Warning>
 
----
-
 ## Next Steps
 
-<NextLesson title="Multi-Tool Orchestration" description="Chain tools safely." href="/roadmap/mcp-fundamentals-intermediate-multi-tool-orchestration" />
+<NextLesson title="Multi-tool orchestration" description="Chain tools safely." href="/roadmap/mcp-fundamentals-intermediate-multi-tool-orchestration" />
 
 <Resources resources={[{"title":"MCP Resources","href":"https://modelcontextprotocol.io/docs/concepts/resources"},{"title":"MCP Prompts","href":"https://modelcontextprotocol.io/docs/concepts/prompts"},{"title":"TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"MCP Specification","href":"https://spec.modelcontextprotocol.io/"}]} />

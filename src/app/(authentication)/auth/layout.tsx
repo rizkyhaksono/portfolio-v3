@@ -1,35 +1,12 @@
 import { type Metadata } from "next"
-import { MetadataConstants } from "@/commons/constants/metadata";
-import { getMetadataBaseUrl } from "@/lib/site-url";
 
+// Other fields (base URL, Open Graph, authors) come from the root layout.
 export const metadata: Metadata = {
-  title: "Auth | Rizky Haksono",
-  metadataBase: getMetadataBaseUrl(),
-  description: MetadataConstants.description,
-  keywords: MetadataConstants.keyword,
-  creator: MetadataConstants.creator,
-  authors: {
-    name: MetadataConstants.creator,
-    url: MetadataConstants.openGraph.url,
-  },
-  openGraph: {
-    title: MetadataConstants.ogPersonTitle,
-    images: MetadataConstants.profile,
-    url: MetadataConstants.openGraph.url,
-    siteName: MetadataConstants.openGraph.siteName,
-    locale: MetadataConstants.openGraph.locale,
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+  title: "Sign in | Rizky Haksono",
+  description: "Sign in or create an account to keep your Etan AI chats and take part in the public chat.",
+  robots: { index: false, follow: true },
+}
 
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <>
-      {children}
-    </>
-  )
+  return children
 }

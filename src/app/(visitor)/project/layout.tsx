@@ -3,12 +3,10 @@ import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 
-export const dynamic = "force-dynamic"
-
 export const metadata: Metadata = {
-  title: "Project | Rizky Haksono",
+  title: "Projects | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: MetadataConstants.description,
+  description: "Products, public systems and engineering work Rizky Haksono helped bring into production.",
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
   authors: {
@@ -34,9 +32,5 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <BaseLayout>
-      {children}
-    </BaseLayout>
-  )
+  return <BaseLayout>{children}</BaseLayout>
 }

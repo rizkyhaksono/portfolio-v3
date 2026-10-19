@@ -1,241 +1,164 @@
-import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { Shield, Eye, Database, Lock, Cookie, ExternalLink, UserCheck, RefreshCw, Mail, ArrowLeft, FileText } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { Chip } from "@/components/ui/chip"
-import BlurFade from "@/components/magicui/blur-fade"
+import type { Metadata } from "next"
+import { LegalDocument } from "@/components/ui/legal-document"
+import { InkLink } from "@/components/ui/ink-link"
+import { getMetadataBaseUrl } from "@/lib/site-url"
+
+export const metadata: Metadata = {
+  title: "Privacy policy | Rizky Haksono",
+  description: "What natee.my.id collects, why, who else handles it, and how to have it removed.",
+  metadataBase: getMetadataBaseUrl(),
+  alternates: { canonical: "/legal/privacy" },
+}
 
 const sections = [
   {
-    id: "introduction",
-    icon: FileText,
-    title: "1. Introduction",
-    content:
-      "Welcome to my portfolio website. This Privacy Policy explains how I collect, use, disclose, and safeguard your information when you visit my website. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.",
+    id: "who",
+    title: "Who looks after your data",
+    body: (
+      <p>
+        This is the personal site of Rizky Haksono at natee.my.id. I build and run it myself, so &ldquo;I&rdquo; in this
+        policy means me. Nothing here is sold, and nothing is shared for advertising.
+      </p>
+    ),
   },
   {
-    id: "data-collection",
-    icon: Database,
-    title: "2. Information I Collect",
-    content: "I may collect information about you in a variety of ways. The information I may collect on the website includes:",
-    subsections: [
-      {
-        title: "Personal Data",
-        content:
-          "Personally identifiable information, such as your name, email address, and other contact information that you voluntarily give to me when you register with the website, when you contact me through the contact form, or when you participate in activities on the website.",
-      },
-      {
-        title: "Derivative Data",
-        content:
-          "Information our servers automatically collect when you access the website, such as your IP address, browser type, operating system, access times, and the pages you have viewed directly before and after accessing the website.",
-      },
-      {
-        title: "Third-Party Data",
-        content: "Information from third parties, such as social media platforms (GitHub, LinkedIn) if you choose to authenticate using OAuth providers.",
-      },
-    ],
+    id: "what-you-give",
+    title: "What you give me",
+    body: (
+      <>
+        <p>Only what you choose to send:</p>
+        <ul>
+          <li>Your account: the name, email address and picture from the email sign-up or from Google when you sign in with it.</li>
+          <li>Your profile, if you fill it in: headline, location, a few lines about you and a banner image.</li>
+          <li>
+            The contact form: your email address, name and message. EmailJS delivers the message to my inbox, and Cloudflare
+            Turnstile checks that a person sent it.
+          </li>
+          <li>
+            The public chat and the tracker board: what you post there is public, shown with your name and picture, until you
+            or I delete it.
+          </li>
+          <li>The feedback note: your message and the path of the page you sent it from.</li>
+        </ul>
+      </>
+    ),
   },
   {
-    id: "data-usage",
-    icon: Eye,
-    title: "3. Use of Your Information",
-    content: "Having accurate information about you permits me to provide you with a smooth, efficient, and customized experience. Specifically, I may use information collected about you via the website to:",
-    list: [
-      "Create and manage your account",
-      "Process your authentication and login",
-      "Respond to your comments, questions, and provide customer service",
-      "Monitor and analyze usage and trends to improve your experience with the website",
-      "Prevent fraudulent transactions and monitor against theft",
-    ],
+    id: "visitor-counts",
+    title: "Visitor counts",
+    body: (
+      <>
+        <p>
+          I count visits with Umami, which I host myself at umami.natee.my.id. Umami sets no cookies and keeps no identifier
+          that follows you to other sites. It records the page path, the referring site, your browser, operating system,
+          device type, screen size, language and country, and how quickly the page loaded. Query strings are stripped before anything is sent,
+          except campaign tags such as <code>utm_source</code>.
+        </p>
+        <p>
+          Public pages only ever show totals, such as how many people read a post. To leave yourself out of the counts, run{" "}
+          <code>localStorage.setItem(&quot;umami.disabled&quot;, &quot;1&quot;)</code> in your browser&rsquo;s console on
+          this site.
+        </p>
+      </>
+    ),
   },
   {
-    id: "disclosure",
-    icon: ExternalLink,
-    title: "4. Disclosure of Your Information",
-    content: "I may share information I have collected about you in certain situations. Your information may be disclosed as follows:",
-    list: [
-      "By Law or to Protect Rights: If I believe the release of information about you is necessary to respond to legal process, to investigate or remedy potential violations of my policies, or to protect the rights, property, and safety of others.",
-      "Third-Party Service Providers: I may share your information with third parties that perform services for me or on my behalf, such as authentication providers.",
-    ],
+    id: "recordings",
+    title: "Session recordings",
+    body: (
+      <p>
+        On about 15 in every 100 visits, Umami also records how the page is used, such as clicks, scrolling and moves between
+        pages, so I can see where the layout gets in the way. It starts only once the page is idle, and never on the sign-in,
+        account, admin or Etan AI pages, or while you are signed in. The recordings stay on the same Umami server.
+      </p>
+    ),
   },
   {
-    id: "security",
-    icon: Lock,
-    title: "5. Security of Your Information",
-    content:
-      "I use administrative, technical, and physical security measures to help protect your personal information. While I have taken reasonable steps to secure the personal information you provide to me, please be aware that despite my efforts, no security measures are perfect or impenetrable.",
+    id: "etan-ai",
+    title: "Etan AI and Google Gemini",
+    body: (
+      <p>
+        Etan AI, the document reader and the job description matcher send what you type or upload to Google&rsquo;s Gemini
+        API, which writes the answer; Google handles that data under its Gemini API terms. Chats you have while signed in are
+        saved with your account so you can come back to them. Please do not paste passwords, keys or anyone else&rsquo;s
+        personal details.
+      </p>
+    ),
   },
   {
     id: "cookies",
-    icon: Cookie,
-    title: "6. Cookies and Tracking Technologies",
-    content:
-      "I may use cookies, web beacons, tracking pixels, and other tracking technologies on the website to help customize the website and improve your experience. For more information on how I use cookies, please refer to the cookie settings in your browser.",
+    title: "Cookies and browser storage",
+    body: (
+      <>
+        <p>
+          The site sets one cookie of its own, <code>NATEE_V3_TOKEN</code>, when you sign in, to keep you signed in. There
+          are no advertising or tracking cookies. Cloudflare Turnstile and Google sign-in may set their own while you use
+          them.
+        </p>
+        <p>
+          Your browser&rsquo;s local storage keeps a few settings that never leave your device: the paper or night theme,
+          your roadmap progress and the name for its certificate, and when you last used the contact form. Embedded YouTube
+          videos load from YouTube only after you press play.
+        </p>
+      </>
+    ),
   },
   {
-    id: "third-party",
-    icon: ExternalLink,
-    title: "7. Third-Party Websites",
-    content:
-      "The website may contain links to third-party websites and applications of interest. Once you have used these links to leave the website, any information you provide to these third parties is not covered by this Privacy Policy, and I cannot guarantee the safety and privacy of your information.",
+    id: "others",
+    title: "Who else handles it",
+    body: (
+      <p>
+        Google (sign-in and Gemini), Cloudflare (Turnstile), EmailJS (contact messages) and the company that hosts my
+        server process data for these features only. I may also disclose information when the law requires it, or to stop
+        abuse of the site.
+      </p>
+    ),
+  },
+  {
+    id: "security",
+    title: "Security",
+    body: (
+      <p>
+        The site is served over HTTPS and the admin pages are closed to everyone but me. No system is perfectly secure,
+        so please use a password you do not use anywhere else.
+      </p>
+    ),
   },
   {
     id: "rights",
-    icon: UserCheck,
-    title: "8. Your Rights",
-    content: "You have the right to:",
-    list: [
-      "Access the personal information I hold about you",
-      "Request correction of your personal information",
-      "Request deletion of your personal information",
-      "Object to processing of your personal information",
-      "Request transfer of your personal information",
-    ],
+    title: "Your rights",
+    body: (
+      <p>
+        You can ask to see the data I hold about you, to correct it, to delete it, or to have a copy sent to you. You can
+        also object to how I use it. Write to me with the address you signed in with.
+      </p>
+    ),
   },
   {
     id: "changes",
-    icon: RefreshCw,
-    title: "9. Changes to This Privacy Policy",
-    content:
-      'I may update this Privacy Policy from time to time in order to reflect changes to my practices or for other operational, legal, or regulatory reasons. I will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.',
+    title: "Changes",
+    body: <p>When this policy changes, the date at the top of the page changes with it.</p>,
   },
   {
     id: "contact",
-    icon: Mail,
-    title: "10. Contact Me",
-    content: "If you have questions or comments about this Privacy Policy, please contact me via the contact form on this website or through my GitHub profile.",
-    hasContact: true,
+    title: "Contact",
+    body: (
+      <p>
+        Questions go through the <InkLink href="/#contact">contact form on the home page</InkLink>, or to{" "}
+        <InkLink href="mailto:mrizkyhaksono@gmail.com">mrizkyhaksono@gmail.com</InkLink>.
+      </p>
+    ),
   },
 ]
 
 export default function PrivacyPolicyPage() {
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="container max-w-4xl py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-4 gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-          </Link>
-
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-primary/10 text-primary">
-              <Shield className="w-8 h-8" />
-            </div>
-            <SectionHeading
-              as="h1"
-              eyebrow="Legal"
-              title="Privacy"
-              accent="Policy"
-              description="How I collect, use, and protect your information"
-              className="flex-1"
-              titleClassName="md:text-4xl"
-            >
-              <Badge variant="secondary" className="mt-1 w-fit">
-                Last updated: December 28, 2025
-              </Badge>
-            </SectionHeading>
-          </div>
-        </div>
-
-        {/* Quick Navigation */}
-        <Card className="mb-8">
-          <CardContent className="p-4">
-            <Eyebrow className="mb-3">Quick Navigation</Eyebrow>
-            <div className="flex flex-wrap gap-2">
-              {sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`} className="inline-flex">
-                  <Chip className="transition-colors hover:bg-accent hover:text-foreground">
-                    {section.title.replace(/^\d+\.\s/, "")}
-                  </Chip>
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sections */}
-        <div className="space-y-6">
-          {sections.map((section) => {
-            const Icon = section.icon
-            return (
-              <Card key={section.id} id={section.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-lg bg-secondary flex-shrink-0">
-                      <Icon className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      <h2 className="font-display text-lg sm:text-xl font-semibold tracking-tight">{section.title}</h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{section.content}</p>
-
-                      {section.subsections && (
-                        <div className="mt-4 space-y-4 pl-4 border-l-2 border-border">
-                          {section.subsections.map((sub, i) => (
-                            <div key={i}>
-                              <h3 className="font-display font-medium mb-1">{sub.title}</h3>
-                              <p className="text-xs sm:text-sm text-muted-foreground">{sub.content}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {section.list && (
-                        <ul className="mt-3 space-y-2">
-                          {section.list.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-xs sm:text-sm">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                              <span className="text-muted-foreground">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {section.hasContact && (
-                        <div className="flex flex-wrap gap-3 mt-4">
-                          <Link href="/#contact">
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <Mail className="w-4 h-4" />
-                              Contact Form
-                            </Button>
-                          </Link>
-                          <Link href="https://github.com/rizkyhaksono" target="_blank">
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <ExternalLink className="w-4 h-4" />
-                              GitHub Profile
-                            </Button>
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-
-        {/* Footer */}
-        <Separator className="my-8" />
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Rizky Haksono. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/legal/terms" className="hover:text-foreground transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    </BlurFade>
+    <LegalDocument
+      title="Privacy policy"
+      standfirst="What this site collects, why it collects it, and how to have it removed."
+      dateline="Last updated 19 October 2026."
+      next={{ href: "/legal/terms", title: "Terms of service" }}
+      sections={sections}
+    />
   )
 }

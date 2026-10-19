@@ -24,11 +24,11 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 
 ### Styling & UI
 
-- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
-- **[Shadcn/ui](https://ui.shadcn.com/)** - Re-usable components built with Radix UI
-- **[Magic UI](https://magicui.design/)** - Beautiful animated components
-- **[Framer Motion](https://www.framer.com/motion/)** - Production-ready animations
-- **[Lucide React](https://lucide.dev/)** - Beautiful icon library
+- **[Tailwind CSS 3](https://tailwindcss.com/)** - Utility classes over the ink and paper tokens
+- **[Shadcn/ui](https://ui.shadcn.com/)** - Radix primitives restyled to the one-ink system
+- **[Literata](https://fonts.google.com/specimen/Literata)** - The only typeface, roman and italic, via `next/font`
+- **Server SVG figures** - `ink-chart` and `ink-heatmap` draw every chart; no chart library
+- **[Lucide React](https://lucide.dev/)** - Functional icons only, stroke 1.5
 
 ### Backend & Database
 
@@ -56,7 +56,7 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 ### Developer Experience
 
 - **[ESLint](https://eslint.org/)** - Code linting
-- **[Vercel Analytics](https://vercel.com/analytics)** - Web analytics
+- **[Umami](https://umami.is/)** - Self-hosted, cookie-free analytics and custom events
 
 ## Architecture
 
@@ -91,9 +91,9 @@ portfolio-v3/
 │   │   └── api/                # API routes
 │   │
 │   ├── components/             # Reusable components
-│   │   ├── ui/                 # Shadcn UI components
-│   │   ├── magicui/            # Magic UI components
-│   │   └── layout/             # Layout components
+│   │   ├── ui/                 # One-ink primitives (shadcn restyled, ledger, plates, charts, logo)
+│   │   ├── layout/             # Running head, Contents sheet, colophon
+│   │   └── seo/                # JSON-LD
 │   │
 │   ├── commons/                # Shared utilities
 │   │   ├── constants/          # App constants
@@ -141,10 +141,10 @@ portfolio-v3/
 
 - **Portfolio Showcase** - Projects, skills, and professional experience
 - **Blog** - Technical writing with MDX support for rich content
-- **Dark Mode** - Automatically adapts to your system preferences
+- **Night print** - The same sheet reversed, cream ink on night paper; follows the system or a toggle
 - **Responsive Design** - Works seamlessly on all devices
 - **Performance** - Lightning-fast page loads with Next.js 16
-- **Smooth Animations** - Polished interactions using Framer Motion
+- **One-ink print design** - Cobalt ink on cream paper, square corners, hairline rules, no animation library
 - **SEO Optimized** - Proper meta tags, sitemap, and robots.txt
 
 ### For Admins
@@ -396,13 +396,37 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create custom styles in `globals.css` only when necessary
 - Leverage Shadcn/ui components for consistency
 - Use CSS modules for scoped styles if needed: `styles.module.css`
-- **UI system ("Lautan Pasir"):** one cobalt ink (#1E3C9E) printed on cream paper (#F3ECDC), Literata only, radius 0, hairline rules, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
+- **UI system ("Lautan Pasir"):** one cobalt ink printed on cream paper, Literata only, radius 0, hairline rules, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
 
 ### Error Handling
 
 - Use Zod for schema validation
 - Create typed error responses
 - Log errors to monitoring service (Sentry, etc.)
+
+## Brand
+
+The mark is a printer's mark: the Tengger caldera seen from Penanjakan (Bromo's smoking caldera, Batok's ridged dome, Semeru far right) over the dashed sand sea, with an italic Literata "Rh" standing on the sand. It prints in the one ink, so it reverses cleanly for Night print.
+
+| Variant | Use | Rendered as |
+|---|---|---|
+| `mini` | Running head (32px), anywhere under 48px | Inline SVG from `src/components/ui/logo-art.ts`, painted with `currentColor` |
+| `mark` | Auth shell, the locked Etan AI view | CSS mask `public/brand/mark-mask.svg` (`.logo-mask--mark`) |
+| `seal` | Colophon, 404 and error views | CSS mask `public/brand/seal-mask.svg` (`.logo-mask--seal`), ring text "Rizky Haksono" and "printed in Malang, East Java" |
+
+In code, always use the component: `<Logo variant="mini" | "mark" | "seal" label="..." />` from `src/components/ui/logo.tsx`. Pass `label` when the mark stands alone (it becomes `role="img"`); leave it out next to the visible name.
+
+Files in `public/brand/`:
+
+- `seal-light.svg`, `seal-dark.svg`, `mark-light.svg`, `mark-dark.svg`, `mini-light.svg`, `mini-dark.svg`, `lockup-light.svg`, `lockup-dark.svg`: standalone art on paper or night paper. The OG and certificate images and `global-error.tsx` (which has no CSS) read `seal-light.svg`; the rest are for use outside the site
+- `seal-mask.svg`, `mark-mask.svg`: the masks the `Logo` component paints
+
+The same run also writes `src/app/icon.svg` (the "Rh" tile, legible at 16px), `src/app/apple-icon.png` (mini reversed out of an ink tile) and `src/components/ui/logo-art.ts`. All of them are generated; do not edit them by hand. To regenerate, point the script at a folder holding `Literata-Italic[opsz,wght].ttf` (OFL, from google/fonts, kept outside the repo):
+
+```bash
+node scripts/logo/make.mjs <font dir>
+# for example: node scripts/logo/make.mjs ../art-src/fonts
+```
 
 ## AI Agents & UI Docs
 
@@ -509,17 +533,17 @@ bun run test -- --verbose
 
 ## Monitoring & Analytics
 
-### Vercel Analytics
+### Umami
 
-- Automatically enabled in production on Vercel
-- Monitor Web Vitals, user interactions
-- View dashboard at vercel.com
+- The tracker loads only in production, with field Web Vitals per route (`data-performance`)
+- `src/lib/umami-before-send.ts` drops `/admin` and strips query strings except `utm_*` and `ref`
+- Figures on `/stats`, the home Readers section and the admin dashboard read the Umami API server-side
 
-### Custom Tracking
+### Custom events
 
-- Implement tracking in `src/commons/helpers/`
-- Log important events to database
-- Track page views in `api/` routes
+- `data-umami-event` only on `<button>` and external `target="_blank"` links; internal links use `data-track`
+- In code, call `track()` from `src/lib/analytics.ts`; kebab-case names, enum values, never PII
+- The event table lives in [`docs/ui/components.md`](./docs/ui/components.md)
 
 ## Available Scripts
 

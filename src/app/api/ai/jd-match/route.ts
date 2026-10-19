@@ -20,10 +20,11 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/json", ...trustedClientIpHeaders(req) },
       body: JSON.stringify({ jobDescription: body.jobDescription }),
+      signal: AbortSignal.any([req.signal, AbortSignal.timeout(90_000)]),
     })
     const text = await res.text()
     return new Response(text, { status: res.status, headers: { "Content-Type": "application/json" } })
   } catch {
-    return Response.json({ message: "Could not reach the AI service. Please try again." }, { status: 502 })
+    return Response.json({ message: "Could not reach Etan AI. Try again in a minute." }, { status: 502 })
   }
 }

@@ -66,6 +66,29 @@ export function InkChart({
     `${formatX(points[i].x)}: ${formatNumber(points[i].y)} ${name.toLowerCase()}` +
     (dashed?.[i] ? `, ${formatNumber(dashed[i].y)} ${dashedName.toLowerCase()}` : "")
 
+  // Compact charts keep the figures for screen readers only; full ones show them in a disclosure.
+  const table = (className: string) => (
+    <table className={className}>
+      <caption className="sr-only">{label}</caption>
+      <thead>
+        <tr className="border-b border-rule">
+          <th scope="col" className="py-1 text-left text-xs font-semibold text-muted-foreground">Date</th>
+          <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{name}</th>
+          {dashed && <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{dashedName}</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {points.map((p, i) => (
+          <tr key={p.x} className="border-b border-rule hover:bg-tint">
+            <th scope="row" className="py-1 text-left font-normal">{formatX(p.x)}</th>
+            <td className="py-1 text-right">{formatNumber(p.y)}</td>
+            {dashed && <td className="py-1 text-right">{formatNumber(dashed[i]?.y ?? 0)}</td>}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+
   return (
     <figure className={cn("w-full min-w-0", !compact && "pt-5", className)}>
       <div className="relative" style={{ height: height ?? (compact ? 48 : 176) }}>
@@ -114,35 +137,19 @@ export function InkChart({
         </svg>
       </div>
 
-      {!compact && (
+      {compact ? (
+        table("sr-only")
+      ) : (
         <>
           <div aria-hidden className="mt-1.5 flex justify-between text-caption italic tabular-nums text-muted-foreground">
             <span>{formatX(points[0].x)}</span>
             {n > 1 && <span>{formatX(points[n - 1].x)}</span>}
           </div>
           <details className="mt-3 text-small">
-            <summary className="cursor-pointer underline decoration-1 underline-offset-[0.18em] hover:decoration-2">
+            <summary className="cursor-pointer py-3 underline md:py-0 decoration-1 underline-offset-[0.18em] hover:decoration-2">
               Show the figures
             </summary>
-            <table className="mt-2 w-full border-collapse tabular-nums">
-              <caption className="sr-only">{label}</caption>
-              <thead>
-                <tr className="border-b border-rule">
-                  <th scope="col" className="py-1 text-left text-xs font-semibold text-muted-foreground">Date</th>
-                  <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{name}</th>
-                  {dashed && <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{dashedName}</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {points.map((p, i) => (
-                  <tr key={p.x} className="border-b border-rule hover:bg-tint">
-                    <th scope="row" className="py-1 text-left font-normal">{formatX(p.x)}</th>
-                    <td className="py-1 text-right">{formatNumber(p.y)}</td>
-                    {dashed && <td className="py-1 text-right">{formatNumber(dashed[i]?.y ?? 0)}</td>}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {table("mt-2 w-full border-collapse tabular-nums")}
           </details>
         </>
       )}

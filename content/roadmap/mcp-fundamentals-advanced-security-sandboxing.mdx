@@ -1,5 +1,5 @@
 ---
-title: "Security & Sandboxing"
+title: "Security and sandboxing"
 description: "Permission scopes, input validation, and secure tool execution boundaries"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,10 +9,6 @@ duration: "28 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## Why Security Is the Hard Part of MCP
 
@@ -26,7 +22,7 @@ The good news: MCP servers are ordinary programs, so the defenses are the ones y
 
 Before writing code, name what you are defending against. In a typical MCP deployment the server trusts neither the tool arguments nor the data those tools return.
 
-<Card className="my-6">
+<Card>
   <CardHeader>
     <CardTitle>Where attacks enter</CardTitle>
   </CardHeader>
@@ -239,10 +235,8 @@ By requiring `confirm: z.literal(true)`, the model must deliberately pass `confi
   </AccordionItem>
 </Accordion>
 
----
-
 ## Next Steps
 
-<NextLesson title="Custom Transports" description="stdio, SSE, and WebSocket — choosing and building the right transport for your MCP server." href="/roadmap/mcp-fundamentals-advanced-custom-transports" />
+<NextLesson title="Custom transports" description="stdio, SSE, and WebSocket — choosing and building the right transport for your MCP server." href="/roadmap/mcp-fundamentals-advanced-custom-transports" />
 
 <Resources resources={[{"title":"MCP Authorization Specification","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization"},{"title":"MCP Security Best Practices","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/security_best_practices"},{"title":"MCP TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"OWASP Command Injection Prevention","href":"https://owasp.org/www-community/attacks/Command_Injection"}]} />

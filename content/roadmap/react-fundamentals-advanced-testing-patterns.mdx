@@ -1,5 +1,5 @@
 ---
-title: "Testing Patterns"
+title: "Testing patterns"
 description: "Unit and integration testing with Vitest, React Testing Library, and MSW"
 course: "react-fundamentals"
 category: "frontend"
@@ -9,10 +9,6 @@ duration: "28 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## Testing React with Confidence
 
@@ -228,12 +224,10 @@ jobs:
 - **Leaning on `getByTestId`.** Test IDs skip the accessibility tree. Add a proper `label`, `aria-label`, or heading and query by role first.
 - **Leaking state between tests.** Without `cleanup()` and `server.resetHandlers()`, one test's mounted DOM or handler override bleeds into the next, producing order-dependent flakiness.
 
----
-
 ## Next Steps
 
 You have completed the React Fundamentals track. The natural next move is the backend: learn to build and secure the APIs your tested components consume.
 
-<NextLesson title="Express Setup & Environment" description="Start the backend track and build the APIs your React app talks to." href="/roadmap/express-fundamentals-setup-environment" />
+<NextLesson title="Express setup and environment" description="Start the backend track and build the APIs your React app talks to." href="/roadmap/express-fundamentals-setup-environment" />
 
 <Resources resources={[{"title":"Vitest Documentation","href":"https://vitest.dev/guide/"},{"title":"React Testing Library","href":"https://testing-library.com/docs/react-testing-library/intro/"},{"title":"Mock Service Worker","href":"https://mswjs.io/docs/"},{"title":"Testing — react.dev","href":"https://react.dev/learn/testing"}]} />

@@ -1,145 +1,125 @@
-"use client"
-
-import { lazy, Suspense } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import {
-  Eye, Users, MousePointerClick, Activity, Clock, FileText, ExternalLink,
-  Globe, MapPin, Building2, Monitor, Smartphone, Languages, MonitorSmartphone, Zap, BarChart3,
-} from "lucide-react"
+import { StatStrip } from "@/components/ui/stat-strip"
+import { InkChart } from "@/components/ui/ink-chart"
 import type { FullUmamiAnalytics } from "@/services/visitor/umami"
 import type { UmamiMetric } from "@/commons/types/umami"
 
-const AnalyticsChart = lazy(() => import("./analytics-chart"))
+export const RANGES = {
+  "24h": { label: "24 hours", unit: "hour", points: 24, span: "the 24 hours before" },
+  "7d": { label: "7 days", unit: "day", points: 7, span: "the 7 days before" },
+  "30d": { label: "30 days", unit: "day", points: 30, span: "the 30 days before" },
+} as const
 
-const RANGES = [
-  { id: "24h", label: "24h" },
-  { id: "7d", label: "7 days" },
-  { id: "30d", label: "30 days" },
-]
+export type RangeId = keyof typeof RANGES
 
-function formatNumber(n: number) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M"
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K"
-  return String(n)
+const count = (n: number) => n.toLocaleString("en")
+
+function duration(seconds: number) {
+  if (seconds < 60) return `${seconds} s`
+  const minutes = Math.floor(seconds / 60)
+  return minutes < 60 ? `${minutes} min ${seconds % 60} s` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`
 }
 
-function formatTime(seconds: number) {
-  if (seconds < 60) return `${seconds}s`
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return m < 60 ? `${m}m ${s}s` : `${Math.floor(m / 60)}h ${m % 60}m`
-}
+const change = (what: string, delta?: number) =>
+  delta === undefined || delta === 0 ? `${what} unchanged` : `${what} ${delta > 0 ? "up" : "down"} ${count(Math.abs(delta))}`
 
-function Kpi({ icon: Icon, label, value, sub, trend }: { icon: React.ElementType; label: string; value: string; sub?: string; trend?: number }) {
-  return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="rounded-lg bg-primary/10 p-2 text-primary"><Icon className="h-5 w-5" /></div>
-          {trend !== undefined && trend !== 0 && (
-            <Badge variant={trend > 0 ? "default" : "secondary"} className="text-[10px]">{trend > 0 ? "+" : ""}{formatNumber(trend)}</Badge>
-          )}
-        </div>
-        <p className="mt-3 text-2xl font-bold tracking-tight">{value}</p>
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        {sub && <p className="mt-0.5 text-[10px] text-muted-foreground/70">{sub}</p>}
-      </CardContent>
-    </Card>
-  )
-}
-
-function MetricList({ title, icon: Icon, items, format }: { title: string; icon: React.ElementType; items: UmamiMetric[]; format?: (x: string) => string }) {
-  const max = Math.max(1, ...items.map((i) => i.y))
-  return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <Icon className="h-4 w-4 text-primary" />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-1.5">
-        {items.length === 0 ? (
-          <p className="py-4 text-center text-xs text-muted-foreground">No data</p>
-        ) : (
-          items.slice(0, 8).map((item, i) => (
-            <div key={`${item.x}-${i}`} className="relative flex items-center justify-between overflow-hidden rounded-md px-2 py-1.5 text-xs">
-              <div className="absolute inset-y-0 left-0 rounded-md bg-primary/10" style={{ width: `${(item.y / max) * 100}%` }} />
-              <span className="relative z-10 truncate pr-2">{format ? format(item.x) : item.x || "Unknown"}</span>
-              <span className="relative z-10 font-medium tabular-nums">{formatNumber(item.y)}</span>
-            </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
-  )
-}
-
-export default function AnalyticsDashboard({ data, range, unit }: { data: FullUmamiAnalytics; range: string; unit: "hour" | "day" }) {
-  const s = data.stats
-  const bounceRate = s && s.visits > 0 ? Math.round((s.bounces / s.visits) * 100) : 0
-  const avgTime = s && s.visits > 0 ? Math.round(s.totaltime / s.visits) : 0
+/** One dimension as a ruled list: name, count, and a hatched bar for its share of the top row. */
+function MetricLedger({ title, items, format, limit = 8 }: Readonly<{ title: string; items: UmamiMetric[]; format?: (x: string) => string; limit?: number }>) {
+  const max = Math.max(1, ...items.map((item) => item.y))
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Controls row — the topbar already names the page */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        {data.activeVisitors > 0 && (
-          <Badge variant="default" className="animate-pulse gap-1">
-            <span className="h-2 w-2 rounded-full bg-green-400" />
-            {data.activeVisitors} online
-          </Badge>
-        )}
-        <div className="flex rounded-lg border p-0.5">
-          {RANGES.map((r) => (
-            <Link
-              key={r.id}
-              href={`/admin/dashboard/analytics?range=${r.id}`}
-              className={cn("rounded-md px-3 py-1 text-xs font-medium transition-colors", range === r.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}
-            >
-              {r.label}
-            </Link>
+    <section className="min-w-0">
+      <h2 className="font-display text-h4 text-ink">{title}</h2>
+      {items.length === 0 ? (
+        <p className="mt-2 border-t border-rule pt-2 text-small text-ink-soft">Nothing recorded in this range.</p>
+      ) : (
+        <ul className="mt-2 border-t border-ink">
+          {items.slice(0, limit).map((item, i) => (
+            <li key={`${item.x}-${i}`} className="border-b border-rule py-2">
+              <div className="flex items-baseline justify-between gap-4 text-small">
+                <span className="min-w-0 truncate text-ink">{format ? format(item.x) : item.x || "Unknown"}</span>
+                <span className="shrink-0 tabular-nums text-ink-soft">{count(item.y)}</span>
+              </div>
+              <span aria-hidden className="mt-1 block h-1.5">
+                <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${(item.y / max) * 100}%` }} />
+              </span>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      )}
+    </section>
+  )
+}
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-        <Kpi icon={Eye} label="Page Views" value={formatNumber(s?.pageviews ?? 0)} trend={s?.comparison?.pageviews} />
-        <Kpi icon={Users} label="Visitors" value={formatNumber(s?.visitors ?? 0)} trend={s?.comparison?.visitors} />
-        <Kpi icon={MousePointerClick} label="Visits" value={formatNumber(s?.visits ?? 0)} trend={s?.comparison?.visits} />
-        <Kpi icon={Activity} label="Bounce Rate" value={`${bounceRate}%`} sub={s?.bounces ? `${formatNumber(s.bounces)} bounces` : undefined} />
-        <Kpi icon={Clock} label="Avg. Visit" value={formatTime(avgTime)} sub="per visit" />
-      </div>
+export default function AnalyticsDashboard({ data, range }: Readonly<{ data: FullUmamiAnalytics; range: RangeId }>) {
+  const s = data.stats
+  const { label, span } = RANGES[range]
+  const here = data.activeVisitors
 
-      {/* Time-series chart */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Views &amp; Sessions over time</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<div className="flex h-[280px] items-center justify-center text-sm text-muted-foreground">Loading chart…</div>}>
-            <AnalyticsChart series={data.series} unit={unit} />
-          </Suspense>
-        </CardContent>
-      </Card>
+  return (
+    <div className="mx-auto w-full max-w-[60rem]">
+      <nav aria-label="Range" className="flex flex-wrap gap-x-6 border-b border-rule">
+        {(Object.keys(RANGES) as RangeId[]).map((id) => (
+          <Link
+            key={id}
+            href={`/admin/dashboard/analytics?range=${id}`}
+            aria-current={id === range ? "page" : undefined}
+            className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-ink-soft transition-colors hover:text-ink aria-[current=page]:border-ink aria-[current=page]:text-ink [@media(pointer:coarse)]:min-h-11"
+          >
+            Last {RANGES[id].label}
+          </Link>
+        ))}
+      </nav>
 
-      {/* Dimensions */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <MetricList title="Top Pages" icon={FileText} items={data.pages} format={(p) => (p === "/" ? "Home" : p)} />
-        <MetricList title="Referrers" icon={ExternalLink} items={data.referrers} format={(r) => r || "Direct / None"} />
-        <MetricList title="Countries" icon={Globe} items={data.countries} />
-        <MetricList title="Regions" icon={MapPin} items={data.regions} />
-        <MetricList title="Cities" icon={Building2} items={data.cities} />
-        <MetricList title="Browsers" icon={Globe} items={data.browsers} />
-        <MetricList title="Operating Systems" icon={Monitor} items={data.os} />
-        <MetricList title="Devices" icon={Smartphone} items={data.devices} />
-        <MetricList title="Screen Sizes" icon={MonitorSmartphone} items={data.screens} />
-        <MetricList title="Languages" icon={Languages} items={data.languages} />
-        <MetricList title="Events" icon={Zap} items={data.events} />
+      <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+        {here > 0 ? `${count(here)} ${here === 1 ? "person" : "people"} here in the last five minutes.` : "Nobody here in the last five minutes."}
+      </p>
+
+      {s ? (
+        <>
+          <StatStrip
+            className="mt-4"
+            items={[
+              { label: "Views", value: count(s.pageviews) },
+              { label: "Visitors", value: count(s.visitors) },
+              { label: "Visits", value: count(s.visits) },
+              { label: "Bounce rate", value: s.visits > 0 ? `${Math.round((s.bounces / s.visits) * 100)}%` : "–" },
+            ]}
+          />
+          <p className="mt-3 text-small text-ink-soft">
+            {s.visits > 0 && `An average visit lasts ${duration(Math.round(s.totaltime / s.visits))}. `}
+            {s.comparison && `${change("Views", s.comparison.pageviews)} and ${change("visitors", s.comparison.visitors).toLowerCase()} on ${span}.`}
+          </p>
+
+          <section className="mt-12">
+            <h2 className="font-display text-h3 text-ink">Views and sessions</h2>
+            <p className="mt-1 font-display text-caption text-ink-soft">Views as the hatched line, sessions dashed.</p>
+            <InkChart
+              className="mt-2"
+              points={data.series.pageviews}
+              dashed={data.series.sessions}
+              label={`Views and sessions, last ${label}`}
+            />
+          </section>
+        </>
+      ) : (
+        <p className="mt-6 border-y border-rule py-8 text-center text-small text-ink-soft">
+          Umami did not answer. The figures come back on the next load once it is reachable.
+        </p>
+      )}
+
+      <div className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
+        <MetricLedger title="Events" items={data.events} limit={50} />
+        <MetricLedger title="Pages" items={data.pages} format={(path) => (path === "/" ? "Home" : path)} />
+        <MetricLedger title="Referrers" items={data.referrers} format={(host) => host || "Direct"} />
+        <MetricLedger title="Countries" items={data.countries} />
+        <MetricLedger title="Regions" items={data.regions} />
+        <MetricLedger title="Cities" items={data.cities} />
+        <MetricLedger title="Browsers" items={data.browsers} />
+        <MetricLedger title="Operating systems" items={data.os} />
+        <MetricLedger title="Devices" items={data.devices} />
+        <MetricLedger title="Screen sizes" items={data.screens} />
+        <MetricLedger title="Languages" items={data.languages} />
       </div>
     </div>
   )

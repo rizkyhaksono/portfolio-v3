@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidateTag } from "next/cache"
 import { requireAdmin, getServiceClient, isAllowedTable } from "@/lib/admin-supabase-api"
 
 export const dynamic = "force-dynamic"
@@ -21,6 +22,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ tab
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
+    revalidateTag("supabase", "max")
     return NextResponse.json({ data }, { status: 201 })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Create failed" }, { status: 500 })

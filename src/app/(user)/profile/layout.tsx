@@ -1,30 +1,10 @@
 import { type Metadata } from "next"
-import { MetadataConstants } from "@/commons/constants/metadata";
-import { getMetadataBaseUrl } from "@/lib/site-url";
 import BaseLayout from "@/components/layout/base-layout";
 
+// Other fields (base URL, Open Graph, authors) come from the root layout.
 export const metadata: Metadata = {
   title: "Profile | Rizky Haksono",
-  metadataBase: getMetadataBaseUrl(),
-  description: MetadataConstants.description,
-  keywords: MetadataConstants.keyword,
-  creator: MetadataConstants.creator,
-  authors: {
-    name: MetadataConstants.creator,
-    url: MetadataConstants.openGraph.url,
-  },
-  openGraph: {
-    title: MetadataConstants.ogPersonTitle,
-    images: MetadataConstants.profile,
-    url: MetadataConstants.openGraph.url,
-    siteName: MetadataConstants.openGraph.siteName,
-    locale: MetadataConstants.openGraph.locale,
-    type: "website",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: false, follow: false },
 };
 
 export default function ProfileLayout({ children }: Readonly<{ children: React.ReactNode }>) {

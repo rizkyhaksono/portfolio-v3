@@ -139,3 +139,8 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 ### 9.6 Governance
 - Agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, Copilot, `.cursor/rules/*.mdc`) and `docs/ui/` rewritten so agents stop reverting to monochrome. `docs/ui/` is the source of truth.
 - Grep gate (two commands in `docs/ui/README.md`) must print nothing on each phase's paths; the final run over `src` and `content` must be 0.
+
+### 9.7 Status (2026-10-19)
+- Phases 1–3 shipped on `redesign/phase-1`; every route uses a page pattern from `docs/ui/page-shell.md`.
+- Logo: printer's mark of the Tengger caldera (`docs/ui/README.md` → Brand).
+- Removed: Spotify and weather widgets, the anime tool, `/signal`, recharts, motion, gsap, ogl, react-icons, date-fns.

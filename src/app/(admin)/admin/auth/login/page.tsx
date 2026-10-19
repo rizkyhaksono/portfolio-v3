@@ -1,11 +1,22 @@
+import type { Metadata } from "next"
+import { AuthShell } from "@/components/layout/auth-shell"
+import { InkLink } from "@/components/ui/ink-link"
 import { AdminLoginForm } from "./_components/login-form"
+
+export const metadata: Metadata = {
+  title: "Admin sign in | Rizky Haksono",
+  robots: { index: false, follow: false },
+}
 
 export default function AdminAuthLoginPage() {
   return (
-    <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background p-4 sm:p-8">
-      <div className="w-full max-w-3xl border-y border-border py-8">
-        <AdminLoginForm />
-      </div>
-    </div>
+    <AuthShell
+      variant="narrow"
+      title="Admin sign in"
+      standfirst="Projects, writing and the records behind the site."
+      footer={<InkLink href="/" className="inline-flex min-h-11 items-center md:min-h-0">Back to the portfolio</InkLink>}
+    >
+      <AdminLoginForm />
+    </AuthShell>
   )
 }

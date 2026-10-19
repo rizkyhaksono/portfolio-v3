@@ -1,224 +1,66 @@
-import Link from "next/link"
+import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
-import Typography from "@/components/ui/typography"
-import { MacWindow } from "@/components/ui/mac-window"
-import { PageBody } from "@/components/ui/page-body"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Surface } from "@/components/ui/surface"
-import { StatStrip } from "@/components/ui/stat-strip"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
+import { StatStrip, type StatItem } from "@/components/ui/stat-strip"
+import { getDailyPageviews, getPathReads, getUmamiStats } from "@/services/visitor/umami"
 import { getLeetCodeStats } from "@/services/visitor/leetcode"
-import LeetCodeSection from "./_components/leetcode-section"
-import SystemStatus from "./_components/system-status"
+import { getMonkeyTypeData } from "@/services/visitor/monkeytype"
 import { getChessStats } from "@/services/visitor/chess"
 import { getNpmStats } from "@/services/visitor/npm"
-import { ExternalLink } from "lucide-react"
+import ReadersFigures from "./_components/readers-figures"
+import SystemStatus from "./_components/system-status"
+import LeetCodeSection from "./_components/leetcode-section"
+import TypingSection from "./_components/typing-section"
+import PlatformFigures from "./_components/platform-figures"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 900
 
-function StatRow({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="flex justify-between items-center text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-primary">{value}</span>
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "Stats | Rizky Haksono",
+  description: "Who reads this site, whether its API is up, and practice figures from LeetCode, MonkeyType, Chess.com and npm.",
+  alternates: { canonical: "/stats" },
 }
 
-function PlatformCard({
-  title,
-  href,
-  children,
-  unavailable,
-}: {
-  title: string
-  href: string
-  children: React.ReactNode
-  unavailable?: boolean
-}) {
-  return (
-    <Surface variant="solid" padding="cozy" className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <Typography.P className="font-display text-base font-semibold tracking-tight">{title}</Typography.P>
-        <Link
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-muted-foreground transition-colors hover:text-primary"
-          aria-label={`Open ${title} profile`}
-        >
-          <ExternalLink size={16} />
-        </Link>
-      </div>
-      {unavailable ? (
-        <Typography.P className="text-sm text-muted-foreground">Data unavailable</Typography.P>
-      ) : (
-        children
-      )}
-    </Surface>
-  )
-}
-
-type LeetCodeData = NonNullable<Awaited<ReturnType<typeof getLeetCodeStats>>>
-type ChessData = NonNullable<Awaited<ReturnType<typeof getChessStats>>>
-type NpmData = NonNullable<Awaited<ReturnType<typeof getNpmStats>>>
-
-/** Displays the available LeetCode problem and contest metrics. */
-function LeetCodeCard({ data }: Readonly<{ data: LeetCodeData | null }>) {
-  return (
-    <PlatformCard
-      title="LeetCode"
-      href={STATS_PROFILE_URLS.leetcode(STATS_PROFILES.leetcode)}
-      unavailable={!data}
-    >
-      {data ? (
-        <div className="space-y-2">
-          <StatRow label="Easy" value={data.easySolved} />
-          <StatRow label="Medium" value={data.mediumSolved} />
-          <StatRow label="Hard" value={data.hardSolved} />
-          <StatRow label="Total solved" value={data.totalSolved} />
-          {data.ranking != null ? (
-            <StatRow label="Ranking" value={`#${data.ranking.toLocaleString()}`} />
-          ) : null}
-          {data.currentRating != null ? (
-            <StatRow label="Contest rating" value={data.currentRating} />
-          ) : null}
-        </div>
-      ) : null}
-    </PlatformCard>
-  )
-}
-
-/** Displays the available Chess.com ratings and match record. */
-function ChessCard({ data }: Readonly<{ data: ChessData | null }>) {
-  return (
-    <PlatformCard
-      title="Chess.com"
-      href={STATS_PROFILE_URLS.chess(STATS_PROFILES.chess)}
-      unavailable={!data}
-    >
-      {data ? (
-        <div className="space-y-2">
-          {data.rapid != null ? <StatRow label="Rapid" value={data.rapid} /> : null}
-          {data.blitz != null ? <StatRow label="Blitz" value={data.blitz} /> : null}
-          {data.bullet != null ? <StatRow label="Bullet" value={data.bullet} /> : null}
-          {data.daily != null ? <StatRow label="Daily" value={data.daily} /> : null}
-          {data.tacticsHighest != null ? (
-            <StatRow label="Tactics (best)" value={data.tacticsHighest} />
-          ) : null}
-          <StatRow label="Record" value={`${data.wins}W · ${data.losses}L · ${data.draws}D`} />
-        </div>
-      ) : null}
-    </PlatformCard>
-  )
-}
-
-/** Displays npm package and recent download metrics. */
-function NpmCard({ data }: Readonly<{ data: NpmData | null }>) {
-  const topPackages = data?.topPackages ?? []
-
-  return (
-    <PlatformCard
-      title="npm"
-      href={STATS_PROFILE_URLS.npm(STATS_PROFILES.npm)}
-      unavailable={!data}
-    >
-      {data ? (
-        <div className="space-y-2">
-          <StatRow label="Packages" value={data.packageCount} />
-          <StatRow label="Downloads (30d)" value={formatDownloads(data.totalDownloadsLastMonth)} />
-          {topPackages.length > 0 ? <NpmTopPackages packages={topPackages} /> : null}
-        </div>
-      ) : null}
-    </PlatformCard>
-  )
-}
-
-/** Lists the most-downloaded packages in descending order. */
-function NpmTopPackages({ packages }: Readonly<{ packages: NpmData["topPackages"] }>) {
-  return (
-    <div className="space-y-1 border-t border-border pt-2">
-      <Eyebrow>Top packages</Eyebrow>
-      {packages.map((pkg) => (
-        <div key={pkg.name} className="flex justify-between text-xs">
-          <span className="max-w-[60%] truncate text-primary/80">{pkg.name}</span>
-          <span className="text-muted-foreground">{formatDownloads(pkg.downloads)}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-interface StatsContentProps {
-  overviewStats: { label: string; value: React.ReactNode }[]
-  leetcode: LeetCodeData | null
-  chess: ChessData | null
-  npm: NpmData | null
-}
-
-/** Composes the public statistics overview, platform panels, and system health. */
-function StatsContent({
-  overviewStats,
-  leetcode,
-  chess,
-  npm,
-}: Readonly<StatsContentProps>) {
-  return (
-    <>
-      <SectionHeading
-        as="h1"
-        eyebrow="Activity"
-        title="Stats &"
-        accent="Activity"
-        description="My public data from various platforms, plus live API health."
-      />
-      {overviewStats.length > 0 ? <StatStrip items={overviewStats} className="border-x-0" /> : null}
-      <SystemStatus />
-      <MacWindow title="~/stats" bodyClassName="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <LeetCodeCard data={leetcode} />
-          <ChessCard data={chess} />
-          <NpmCard data={npm} />
-        </div>
-        {leetcode ? <LeetCodeSection stats={leetcode} /> : null}
-      </MacWindow>
-    </>
-  )
-}
-
-function formatDownloads(n: number) {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
-  return String(n)
-}
+// shortcut: the render stops waiting after 5 s but the source fetch runs on; give leetcode.ts, chess.ts and npm.ts
+// their own AbortSignal.timeout(5000) when those services are next touched.
+const within5s = <T,>(promise: Promise<T>) =>
+  Promise.race([promise, new Promise<null>((resolve) => setTimeout(resolve, 5000, null))])
 
 export default async function StatsPage() {
-  const [lc, ch, np] = await Promise.allSettled([
-    getLeetCodeStats(),
-    getChessStats(),
-    getNpmStats(),
+  const [stats, daily, reads, leetcode, typing, chess, npm] = await Promise.all([
+    getUmamiStats(),
+    getDailyPageviews(30),
+    getPathReads(),
+    within5s(getLeetCodeStats()),
+    getMonkeyTypeData(),
+    within5s(getChessStats()),
+    within5s(getNpmStats()),
   ])
 
-  const leetcode = lc.status === "fulfilled" ? lc.value : null
-  const chess = ch.status === "fulfilled" ? ch.value : null
-  const npm = np.status === "fulfilled" ? np.value : null
-
-  const overviewStats: { label: string; value: React.ReactNode }[] = []
-  if (leetcode) overviewStats.push({ label: "Problems Solved", value: leetcode.totalSolved })
-  if (chess?.rapid != null) overviewStats.push({ label: "Chess Rapid", value: chess.rapid })
-  if (npm) overviewStats.push({ label: "npm Downloads", value: formatDownloads(npm.totalDownloadsLastMonth) })
+  const strip: StatItem[] = [
+    { label: "Pages read, last 30 days", value: stats?.pageviews ?? 0 },
+    { label: "Readers, last 30 days", value: stats?.visitors ?? 0 },
+    { label: "Problems solved on LeetCode", value: leetcode?.totalSolved ?? 0 },
+    { label: "Best typing speed, words a minute", value: typing.bestWpm },
+  ]
+    .filter((item) => item.value > 0)
+    .map((item) => ({ ...item, value: item.value.toLocaleString("en") }))
 
   return (
     <BaseLayout>
-      <PageBody width="wide">
-        <StatsContent
-          overviewStats={overviewStats}
-          leetcode={leetcode}
-          chess={chess}
-          npm={npm}
-        />
-      </PageBody>
+      <header className="pb-8">
+        <h1 className="font-display text-h1 text-balance text-ink">Stats</h1>
+        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
+          The figures behind this site: who reads it, whether it is up, and how the practice is going.
+        </p>
+      </header>
+      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+
+      {strip.length > 0 && <StatStrip items={strip} className="mt-8" />}
+      <ReadersFigures stats={stats} daily={daily} reads={reads} />
+      <SystemStatus />
+      {leetcode && <LeetCodeSection stats={leetcode} />}
+      <TypingSection data={typing} />
+      <PlatformFigures chess={chess} npm={npm} />
     </BaseLayout>
   )
 }

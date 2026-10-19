@@ -1,81 +1,39 @@
 "use client"
 
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons"
-import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useSidebar } from "./admin-expandable-sidebar"
-import { NotificationBell } from "./notification-bell"
-import { Eyebrow } from "@/components/ui/eyebrow"
+import { buttonVariants } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/layout/theme-toggle"
 import { cn } from "@/lib/utils"
-import { ExternalLink } from "lucide-react"
+import { ADMIN_PAGES, AdminMenu, type AdminUser } from "./admin-spine"
+import { NotificationBell } from "./notification-bell"
 
-const PAGE_TITLES: Record<string, string> = {
-  "/admin/dashboard": "Dashboard",
-  "/admin/dashboard/analytics": "Analytics",
-  "/admin/dashboard/project": "Projects",
-  "/admin/dashboard/work": "Work Experience",
-  "/admin/dashboard/education": "Education",
-  "/admin/dashboard/career": "Career",
-  "/admin/dashboard/blog": "Blog",
-  "/admin/dashboard/feedback": "Feedback",
-  "/admin/dashboard/settings": "Settings",
-}
+// Longest matching href wins, so /admin/dashboard/blog is "Blog", not "Dashboard".
+const titleFor = (pathname: string) =>
+  [...ADMIN_PAGES].sort((a, b) => b.href.length - a.href.length).find((page) => pathname.startsWith(page.href))?.title ??
+  "Dashboard"
 
-function resolveTitle(pathname: string): string {
-  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname]
-  const match = Object.entries(PAGE_TITLES)
-    .filter(([href]) => href !== "/admin/dashboard" && pathname.startsWith(href))
-    .sort((a, b) => b[0].length - a[0].length)[0]
-  return match ? match[1] : "Dashboard"
-}
-
-export function AdminTopHeader() {
-  const { setTheme } = useTheme()
-  const { isExpanded } = useSidebar()
+/** The page's one heading, plus the site link, notifications and the theme. Pages do not repeat their title. */
+export function AdminTopHeader({ user }: Readonly<{ user?: AdminUser }>) {
   const pathname = usePathname()
-  const title = resolveTitle(pathname)
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6",
-        isExpanded ? "sm:pl-[248px]" : "sm:pl-[88px]"
-      )}
-    >
-      {/* Single page identity — pages don't repeat their own title */}
-      <nav className="flex items-center gap-2 pl-12 sm:pl-0" aria-label="Breadcrumb">
-        <Eyebrow>Admin</Eyebrow>
-        <span className="text-border">/</span>
-        <h1 className="font-display text-sm font-semibold text-foreground">{title}</h1>
-      </nav>
-
-      <div className="flex items-center gap-1.5">
-        <Button variant="ghost" size="sm" className="hidden gap-1.5 text-muted-foreground sm:flex" asChild>
-          <Link href="/" target="_blank">
-            <ExternalLink className="h-4 w-4" />
+    <header className="bg-paper-grain sticky top-0 z-30 border-b border-rule">
+      <div className="flex min-h-[var(--head-h)] items-center gap-3 px-4 sm:px-6 lg:px-10">
+        <AdminMenu user={user} />
+        <h1 className="min-w-0 truncate font-display text-h3 text-ink">{titleFor(pathname)}</h1>
+        <div className="ml-auto flex items-center gap-1">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener"
+            aria-label="View site (opens in a new tab)"
+            className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}
+          >
             View site
-          </Link>
-        </Button>
-
-        <NotificationBell />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon">
-              <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </a>
+          <NotificationBell />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   )

@@ -1,5 +1,5 @@
 ---
-title: "Pods & Networking"
+title: "Pods and networking"
 description: "Pod lifecycle, Services, DNS, NetworkPolicies, and cluster networking basics"
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -9,12 +9,6 @@ duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Pods & Networking
 
 A **Pod** is the smallest deployable unit in Kubernetes — one or more containers that share a network namespace, storage volumes, and a lifecycle. Once you have Pods running across many nodes, the hard question becomes: how do they find and talk to each other when Pod IPs change on every restart? This lesson covers the Kubernetes networking model end to end: how Pods get IPs, how **Services** give you a stable address, how **cluster DNS** turns names into IPs, and how **NetworkPolicies** lock down who can talk to whom. Getting this right is the difference between a cluster that "works on my machine" and one that survives a node failure at 3 a.m.
 
@@ -249,6 +243,6 @@ NetworkPolicy is enforced by the **CNI plugin**, not the Kubernetes API server. 
 
 ## Next Steps
 
-<NextLesson title="Helm Charts" description="Package, template, and version your Kubernetes manifests with Helm so you can deploy the same app across environments." href="/roadmap/kubernetes-fundamentals-intermediate-helm-charts" />
+<NextLesson title="Helm charts" description="Package, template, and version your Kubernetes manifests with Helm so you can deploy the same app across environments." href="/roadmap/kubernetes-fundamentals-intermediate-helm-charts" />
 
 <Resources resources={[{"title":"Kubernetes Services","href":"https://kubernetes.io/docs/concepts/services-networking/service/"},{"title":"DNS for Services and Pods","href":"https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/"},{"title":"Network Policies","href":"https://kubernetes.io/docs/concepts/services-networking/network-policies/"},{"title":"Configure Liveness, Readiness and Startup Probes","href":"https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"}]} />

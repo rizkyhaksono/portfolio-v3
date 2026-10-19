@@ -1,5 +1,5 @@
 ---
-title: "Error Handling in Express"
+title: "Error handling in Express"
 description: "Centralized error handling, custom error classes, and async error patterns"
 course: "express-fundamentals"
 category: "backend"
@@ -9,14 +9,6 @@ duration: "24 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
-
-## Centralized Error Handling in Express
 
 Every route in a real API can fail: a database connection drops, a user sends malformed JSON, a record is missing, or a token has expired. If each handler invents its own way to respond to failure, clients receive inconsistent shapes, stack traces leak into production, and debugging becomes guesswork. The fix is a **single, centralized error pipeline**: route handlers throw or forward errors, and one dedicated middleware decides the HTTP status, the response body, and what gets logged. This lesson shows how to build that pipeline with custom error classes, an async wrapper, and an environment-aware error handler.
 
@@ -109,7 +101,7 @@ const asyncHandler = (fn) => (req, res, next) =>
 
 Any thrown or rejected error is passed to `next`, which routes it to your error middleware.
 
-<Tabs defaultValue="v4" className="my-6">
+<Tabs defaultValue="v4">
   <TabsList>
     <TabsTrigger value="v4">Express 4 (wrapper needed)</TabsTrigger>
     <TabsTrigger value="v5">Express 5 (automatic)</TabsTrigger>
@@ -207,7 +199,7 @@ function errorHandler(err, req, res, next) {
 
 ## Best Practices & Common Pitfalls
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="order">
     <AccordionTrigger>Register handlers in the right order</AccordionTrigger>
     <AccordionContent>
@@ -236,10 +228,8 @@ function errorHandler(err, req, res, next) {
 
 <Tip title="Log, don't swallow">A `catch` block that only returns a friendly message without logging the original error destroys your ability to debug production. Always log the real error server-side before responding.</Tip>
 
----
-
 ## Next Steps
 
-<NextLesson title="JWT Authentication" description="Add token-based auth to your Express API." href="/roadmap/express-fundamentals-intermediate-jwt-auth" />
+<NextLesson title="JWT authentication" description="Add token-based auth to your Express API." href="/roadmap/express-fundamentals-intermediate-jwt-auth" />
 
 <Resources resources={[{"title":"Express Error Handling Guide","href":"https://expressjs.com/en/guide/error-handling.html"},{"title":"Migrating to Express 5","href":"https://expressjs.com/en/guide/migrating-5.html"},{"title":"Node.js Error Handling Best Practices","href":"https://nodejs.org/en/learn/asynchronous-work/handling-errors"},{"title":"MDN: HTTP Response Status Codes","href":"https://developer.mozilla.org/en-US/docs/Web/HTTP/Status"}]} />

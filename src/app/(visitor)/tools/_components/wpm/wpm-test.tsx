@@ -1,348 +1,195 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, RotateCcw } from "lucide-react";
-import { getRandomWords } from "./wpm-random-text";
-import WPMStats from "./wpm-stats";
-import TypingArea from "./wpm-typing";
+import { useCallback, useEffect, useState } from "react"
 
-export type Language = "en" | "id";
-export type TestDuration = 15 | 30 | 60 | 120;
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { StatStrip } from "@/components/ui/stat-strip"
+import { getRandomWords, type Language } from "./wpm-random-text"
+import { scoreWord, summarize } from "./score"
 
-export interface WPMStats {
-  wpm: number;
-  accuracy: number;
-  errors: number;
-  correct: number;
-  timeElapsed: number;
+const DURATIONS = [15, 30, 60, 120] as const
+type Duration = (typeof DURATIONS)[number]
+
+const LANGUAGES: { id: Language; name: string }[] = [
+  { id: "en", name: "English" },
+  { id: "id", name: "Indonesian" },
+]
+
+// The passage shows WINDOW words from the start of the current row of ROW words, and grows before it runs out.
+const ROW = 20
+const WINDOW = 40
+
+type Phase = "idle" | "running" | "done"
+type CharState = "right" | "wrong" | "caret" | "todo"
+
+const CHAR: Record<CharState, string> = {
+  right: "text-ink",
+  wrong: "bg-ink text-paper",
+  caret: "text-ink underline decoration-2 underline-offset-4",
+  todo: "text-ink-soft",
+}
+
+function ChoiceGroup<T extends string | number>({
+  label,
+  options,
+  value,
+  onChange,
+  disabled,
+}: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
+  return (
+    <div role="group" aria-label={label}>
+      <p aria-hidden className="text-sm font-semibold text-ink">
+        {label}
+      </p>
+      <div className="mt-1 flex flex-wrap gap-1">
+        {options.map((o) => (
+          <Button key={o.id} type="button" size="sm" variant={o.id === value ? "default" : "outline"} aria-pressed={o.id === value} disabled={disabled} onClick={() => onChange(o.id)}>
+            {o.name}
+          </Button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default function WPMTest() {
-  const [language, setLanguage] = useState<Language>("en");
-  const [duration, setDuration] = useState<TestDuration>(60);
-  const [words, setWords] = useState<string[]>([]);
-  const [userInput, setUserInput] = useState("");
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number>(duration);
-  const [stats, setStats] = useState<WPMStats>({
-    wpm: 0,
-    accuracy: 100,
-    errors: 0,
-    correct: 0,
-    timeElapsed: 0
-  });
-  const [testCompleted, setTestCompleted] = useState(false);
-  const [incorrectChars, setIncorrectChars] = useState<Set<string>>(new Set());
-  const [completedWords, setCompletedWords] = useState<boolean[]>([]);
+  const [language, setLanguage] = useState<Language>("en")
+  const [duration, setDuration] = useState<Duration>(60)
+  const [words, setWords] = useState<string[]>([])
+  const [typed, setTyped] = useState<string[]>([])
+  const [input, setInput] = useState("")
+  const [timeLeft, setTimeLeft] = useState<number>(duration)
+  const [phase, setPhase] = useState<Phase>("idle")
+  const [tally, setTally] = useState({ correct: 0, errors: 0 })
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const restart = useCallback(
+    (freshWords: boolean) => {
+      if (freshWords) setWords(getRandomWords(language, 200))
+      setTyped([])
+      setInput("")
+      setTally({ correct: 0, errors: 0 })
+      setTimeLeft(duration)
+      setPhase("idle")
+    },
+    [language, duration],
+  )
 
-  const generateWords = useCallback(() => {
-    const newWords = getRandomWords(language, 200);
-    setWords(newWords);
-    setCompletedWords(new Array(newWords.length).fill(false));
-  }, [language]);
+  // New words whenever the language or length changes (and on first mount).
+  useEffect(() => restart(true), [restart])
 
   useEffect(() => {
-    generateWords();
-  }, [generateWords]);
+    if (phase !== "running") return
+    const id = setInterval(() => setTimeLeft((t) => t - 1), 1000)
+    return () => clearInterval(id)
+  }, [phase])
 
   useEffect(() => {
-    setTimeLeft(duration);
-    resetTest();
-  }, [duration]);
+    if (phase === "running" && timeLeft <= 0) setPhase("done")
+  }, [phase, timeLeft])
 
-  useEffect(() => {
-    if (isActive && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            endTest();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+  const onType = (value: string) => {
+    if (phase === "done") return
+    if (phase === "idle") setPhase("running")
+    if (!value.endsWith(" ")) {
+      setInput(value)
+      return
     }
+    const word = value.trim()
+    setInput("")
+    if (!word) return
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isActive, timeLeft]);
+    const s = scoreWord(word, words[typed.length] ?? "")
+    setTally((t) => ({ correct: t.correct + s.correct, errors: t.errors + s.errors }))
+    setTyped((list) => [...list, word])
+    if (typed.length + WINDOW >= words.length) setWords((list) => [...list, ...getRandomWords(language, 100)])
+  }
 
-  const startTest = () => {
-    if (!isActive && !testCompleted) {
-      setIsActive(true);
-      inputRef.current?.focus();
-    }
-  };
+  const { wpm, accuracy } = summarize(tally.correct, tally.errors, duration - timeLeft)
+  const start = Math.floor(typed.length / ROW) * ROW
 
-  const endTest = () => {
-    setIsActive(false);
-    setTestCompleted(true);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
-
-  const resetTest = () => {
-    setIsActive(false);
-    setTestCompleted(false);
-    setUserInput("");
-    setCurrentWordIndex(0);
-    setCurrentCharIndex(0);
-    setTimeLeft(duration);
-    setIncorrectChars(new Set());
-    setStats({
-      wpm: 0,
-      accuracy: 100,
-      errors: 0,
-      correct: 0,
-      timeElapsed: 0
-    });
-    setCompletedWords(new Array(words.length).fill(false));
-  };
-
-  const handleInputChange = (value: string) => {
-    if (!isActive && !testCompleted) {
-      startTest();
-    }
-
-    if (!isActive) return;
-
-    const currentWord = words[currentWordIndex];
-    if (!currentWord) return;
-
-    // Handle space (word completion)
-    if (value.endsWith(" ")) {
-      const typedWord = value.slice(0, -1);
-      const newCompletedWords = [...completedWords];
-      newCompletedWords[currentWordIndex] = true;
-      setCompletedWords(newCompletedWords);
-
-      // Finalize the completed word's errors: mark wrong AND missed (untyped) chars
-      setIncorrectChars(prev => {
-        const next = new Set(prev);
-        for (let i = 0; i < currentWord.length; i++) {
-          const key = `${currentWordIndex}-${i}`;
-          if (i >= typedWord.length || typedWord[i] !== currentWord[i]) {
-            next.add(key);
-          } else {
-            next.delete(key);
-          }
-        }
-        return next;
-      });
-
-      setCurrentWordIndex(prev => prev + 1);
-      setCurrentCharIndex(0);
-      setUserInput("");
-
-      // Calculate stats
-      calculateStats(typedWord, currentWord);
-      return;
-    }
-
-    setUserInput(value);
-    setCurrentCharIndex(value.length);
-
-    // Track incorrect characters for the current word while preserving prior words
-    setIncorrectChars(prev => {
-      const next = new Set(prev);
-      for (let i = 0; i < currentWord.length; i++) {
-        const key = `${currentWordIndex}-${i}`;
-        if (i < value.length && value[i] !== currentWord[i]) {
-          next.add(key);
-        } else {
-          next.delete(key);
-        }
-      }
-      return next;
-    });
-  };
-
-  const calculateStats = (typedWord: string, targetWord: string) => {
-    const timeElapsed = duration - timeLeft;
-    const wordsTyped = currentWordIndex + 1;
-    const wpm = timeElapsed > 0 ? Math.round((wordsTyped / timeElapsed) * 60) : 0;
-
-    let correct = 0;
-    let errors = 0;
-
-    for (let i = 0; i < Math.max(typedWord.length, targetWord.length); i++) {
-      if (i < typedWord.length && i < targetWord.length) {
-        if (typedWord[i] === targetWord[i]) {
-          correct++;
-        } else {
-          errors++;
-        }
-      } else {
-        errors++;
-      }
-    }
-
-    const totalChars = correct + errors;
-    const accuracy = totalChars > 0 ? Math.round((correct / totalChars) * 100) : 100;
-
-    setStats(prev => ({
-      wpm,
-      accuracy,
-      errors: prev.errors + errors,
-      correct: prev.correct + correct,
-      timeElapsed
-    }));
-  };
-
-  const getCharClass = (wordIndex: number, charIndex: number, char: string) => {
-    const isCurrentWord = wordIndex === currentWordIndex;
-    const isCurrentChar = isCurrentWord && charIndex === currentCharIndex;
-    const isCompleted = completedWords[wordIndex];
-    const key = `${wordIndex}-${charIndex}`;
-
-    let className = "transition-all duration-75";
-
-    if (isCompleted) {
-      className += incorrectChars.has(key)
-        ? " text-red-500 bg-red-500/20"
-        : " text-green-500";
-    } else if (isCurrentWord && charIndex < userInput.length) {
-      if (incorrectChars.has(key)) {
-        className += " text-red-500 bg-red-500/20";
-      } else {
-        className += " text-green-500";
-      }
-    } else if (isCurrentChar) {
-      className += " text-foreground bg-primary/20 animated-pulse";
-    } else {
-      className += " text-muted-foreground";
-    }
-
-    return className;
-  };
+  const charState = (wordIndex: number, charIndex: number, ch: string): CharState => {
+    if (wordIndex < typed.length) return typed[wordIndex][charIndex] === ch ? "right" : "wrong"
+    if (wordIndex > typed.length) return "todo"
+    if (charIndex < input.length) return input[charIndex] === ch ? "right" : "wrong"
+    return charIndex === input.length ? "caret" : "todo"
+  }
 
   return (
-    <div className="container max-w-5xl mx-auto px-4 py-8">
-      {/* Settings Bar */}
-      <div className="flex items-center justify-center gap-4 mb-8">
-        <div className="flex items-center gap-2">
-          {[15, 30, 60, 120].map((time) => (
-            <Button
-              key={time}
-              variant={duration === time ? "default" : "ghost"}
-              size="sm"
-              onClick={() => setDuration(time as TestDuration)}
-              disabled={isActive}
-            >
-              {time}s
-            </Button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant={language === "en" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setLanguage("en")}
-            disabled={isActive}
-          >
-            EN
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+        <ChoiceGroup
+          label="Length"
+          options={DURATIONS.map((d) => ({ id: d, name: `${d} seconds` }))}
+          value={duration}
+          onChange={setDuration}
+          disabled={phase === "running"}
+        />
+        <ChoiceGroup label="Language" options={LANGUAGES} value={language} onChange={setLanguage} disabled={phase === "running"} />
+        <div className="flex gap-2">
+          <Button variant="ghost" size="sm" onClick={() => restart(true)} disabled={phase === "running"}>
+            New words
           </Button>
-          <Button
-            variant={language === "id" ? "default" : "ghost"}
-            size="sm"
-            onClick={() => setLanguage("id")}
-            disabled={isActive}
-          >
-            ID
+          <Button variant="ghost" size="sm" onClick={() => restart(false)} disabled={phase === "idle"}>
+            Restart
           </Button>
         </div>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            generateWords();
-            resetTest();
-          }}
-          disabled={isActive}
-        >
-          <RefreshCw className="w-4 h-4" />
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={resetTest}
-          disabled={!isActive && !testCompleted}
-        >
-          <RotateCcw className="w-4 h-4" />
-        </Button>
       </div>
 
-      {/* Stats */}
-      {(isActive || testCompleted) && (
-        <WPMStats stats={stats} timeLeft={timeLeft} />
+      {phase !== "idle" && (
+        <StatStrip
+          items={[
+            { label: "Words a minute", value: wpm },
+            { label: "Accuracy", value: `${accuracy}%` },
+            { label: "Errors", value: tally.errors },
+            { label: "Seconds left", value: Math.max(0, timeLeft) },
+          ]}
+        />
       )}
 
-      {/* Test Area */}
-      <div className="space-y-6">
-        {/* Words Display */}
-        <div className="bg-card rounded-lg p-6 min-h-[200px] flex items-center">
-          <div className="text-base leading-relaxed font-mono w-full">
-            {words.slice(0, 50).map((word, wordIndex) => (
-              <span key={wordIndex} className="inline-block mr-3 mb-2">
-                {word.split("").map((char, charIndex) => (
-                  <span
-                    key={charIndex}
-                    className={getCharClass(wordIndex, charIndex, char)}
-                  >
-                    {char}
-                  </span>
-                ))}
-              </span>
-            ))}
+      <p className="min-h-[9rem] border border-rule p-5 text-body leading-loose">
+        {words.slice(start, start + WINDOW).map((word, k) => {
+          const wordIndex = start + k
+          return (
+            <span key={wordIndex} className="mr-3 inline-block">
+              {word.split("").map((ch, j) => (
+                <span key={j} className={CHAR[charState(wordIndex, j, ch)]}>
+                  {ch}
+                </span>
+              ))}
+            </span>
+          )
+        })}
+      </p>
+
+      <div className="mx-auto max-w-md space-y-1">
+        <Label htmlFor="wpm-input">Type the words above. The clock starts with your first letter.</Label>
+        <Input
+          id="wpm-input"
+          value={input}
+          onChange={(e) => onType(e.target.value)}
+          disabled={phase === "done"}
+          autoComplete="off"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+        />
+      </div>
+
+      {phase === "done" && (
+        <div role="status" className="space-y-4 border-t border-ink pt-6 text-center">
+          <p className="font-display text-h3 text-ink">
+            Time is up: {wpm} words a minute at {accuracy}% accuracy.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => restart(false)}>Try again</Button>
+            <Button variant="outline" onClick={() => restart(true)}>
+              New words
+            </Button>
           </div>
         </div>
-
-        {/* Input Area */}
-        <TypingArea
-          ref={inputRef}
-          value={userInput}
-          onChange={handleInputChange}
-          disabled={testCompleted}
-          placeholder={isActive ? "Type here..." : "Click to start typing..."}
-          onFocus={startTest}
-        />
-
-        {testCompleted && (
-          <div className="text-center space-y-4">
-            <div className="text-2xl font-bold">Test Complete!</div>
-            <div className="flex justify-center gap-4">
-              <Button onClick={resetTest}>
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Try Again
-              </Button>
-              <Button variant="outline" onClick={() => {
-                generateWords();
-                resetTest();
-              }}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                New Test
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
-  );
+  )
 }

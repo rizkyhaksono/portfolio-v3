@@ -1,5 +1,5 @@
 ---
-title: "Creating Your First MCP Server"
+title: "Creating your first MCP server"
 description: "Learn to build an MCP server in TypeScript using the official SDK."
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -10,10 +10,6 @@ order: 2
 video: "https://www.youtube.com/embed/5yR1W-S48mY"
 illustration: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Terminal, Download, Code } from "lucide-react"
 
 ## Setup the Environment
 
@@ -100,11 +96,10 @@ async function run() {
 run().catch(console.error)
 ```
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Code className="h-5 w-5" />
-      Why Stdio?
+    <CardTitle>
+      Why stdio?
     </CardTitle>
   </CardHeader>
   <CardContent>
@@ -117,15 +112,17 @@ run().catch(console.error)
 
 Your server is fully built! You can run it via `npx tsx index.ts`. By itself, it won't do much because it expects external JSON-RPC requests on its standard input.
 
-<Alert className="my-6 bg-blue-50/50">
-  <Terminal className="h-4 w-4 text-blue-500" />
+<Alert>
   <AlertTitle>Testing with MCP Inspector</AlertTitle>
   <AlertDescription>
     Anthropic provides a great tool to test your server without needing an AI. Run this in your terminal:
-    <div className="mt-2 text-sm font-mono bg-zinc-900 text-green-400 p-2 rounded">npx @modelcontextprotocol/inspector npx tsx index.ts</div>
+
+    ```bash
+    npx @modelcontextprotocol/inspector npx tsx index.ts
+    ```
   </AlertDescription>
 </Alert>
 
 ## Next Steps
 
-<NextLesson title="Integrating MCP with AI Agents" description="Connect our newly created Weather server to Claude and LangChain so our AI can read the weather live!" href="/roadmap/mcp-fundamentals-ai-integration" />
+<NextLesson title="Integrating MCP with AI agents" description="Connect our newly created Weather server to Claude and LangChain so our AI can read the weather live!" href="/roadmap/mcp-fundamentals-ai-integration" />

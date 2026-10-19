@@ -1,34 +1,62 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { storeCookie } from "@/app/actions/actions";
 
-const authLogin = async (email: string, password: string) => {
+interface AuthResult {
+  ok: boolean;
+  /** Copy meant for people, when the API has some. */
+  message?: string;
+  /** Signup only: the email already has an account. */
+  exists?: boolean;
+}
+
+// Only these API errors carry sentences written for people; anything else gets the form's own line.
+const READABLE_ERRORS = ["BAD_REQUEST", "UNAUTHORIZED", "TOO_MANY_REQUESTS"];
+
+const readable = (json: { name?: string; message?: string } | null) =>
+  json?.name && READABLE_ERRORS.includes(json.name) ? json.message : undefined;
+
+// The session cookie is set here, so the token never travels back to the browser in a response body.
+const authLogin = async (email: string, password: string): Promise<AuthResult> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  })
-  return await response.json();
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+    cache: "no-store",
+  });
+  const json = await response.json().catch(() => null);
+  if (!response.ok || typeof json?.token !== "string") return { ok: false, message: readable(json) };
+
+  await storeCookie("NATEE_V3_TOKEN", json.token);
+  return { ok: true };
 };
 
-const authSignup = async (email: string, password: string, name: string) => {
+// The API echoes the new user row (hash and salt included), so only the outcome crosses to the browser.
+const authSignup = async (email: string, password: string, name: string): Promise<AuthResult> => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/auth/signup`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-      name,
-    }),
-  })
-  return await response.json();
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, name }),
+    cache: "no-store",
+  });
+  if (response.ok) return { ok: true };
+
+  const json = await response.json().catch(() => null);
+  return { ok: false, exists: response.status === 409, message: readable(json) };
+};
+
+// OAuth hands the session token to /auth/callback in the URL; keep it only if the API accepts it.
+const completeOAuthSignin = async (token: string): Promise<boolean> => {
+  if (!token) return false;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  }).catch(() => null);
+  if (!response?.ok) return false;
+
+  await storeCookie("NATEE_V3_TOKEN", token);
+  return true;
 };
 
 // Server-to-server call: the API's Lucia logout reads the session id from its `auth_session` cookie.
@@ -43,42 +71,9 @@ const authLogout = async () => {
   return await response.json();
 }
 
-const requestPasswordReset = async (email: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/v3/auth/password-reset/request`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    }
-  );
-  const json = await response.json();
-  if (!response.ok) {
-    throw new Error(json.message ?? json.error?.message ?? "Request failed");
-  }
-  return json;
-};
-
-const confirmPasswordReset = async (token: string, password: string) => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/v3/auth/password-reset/confirm`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    }
-  );
-  const json = await response.json();
-  if (!response.ok) {
-    throw new Error(json.message ?? json.error?.message ?? "Reset failed");
-  }
-  return json;
-};
-
 export {
   authLogin,
   authSignup,
+  completeOAuthSignin,
   authLogout,
-  requestPasswordReset,
-  confirmPasswordReset,
 }

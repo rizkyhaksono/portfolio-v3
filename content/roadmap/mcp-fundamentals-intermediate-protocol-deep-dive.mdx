@@ -1,5 +1,5 @@
 ---
-title: "MCP Protocol Deep Dive"
+title: "MCP protocol deep dive"
 description: "JSON-RPC message flow, capability negotiation, and transport layers"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,10 +9,6 @@ duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## The Protocol Underneath the SDK
 
@@ -229,7 +225,7 @@ Common ones you will see in a trace:
 - `notifications/message` — structured server logs (`level`, `logger`, `data`) delivered to the client.
 - `notifications/tools/list_changed` — re-fetch `tools/list`; the available tools changed.
 
-<Accordion type="single" collapsible className="not-prose"><AccordionItem value="ping"><AccordionTrigger>What is the ping method for?</AccordionTrigger><AccordionContent>Either side may send a `ping` request (an empty-params request expecting an empty result) as a liveness check. If a ping is not answered within a reasonable timeout, the peer can consider the connection dead and tear it down. Unlike notifications, `ping` has an `id` and does expect a response.</AccordionContent></AccordionItem></Accordion>
+<Accordion type="single" collapsible><AccordionItem value="ping"><AccordionTrigger>What is the ping method for?</AccordionTrigger><AccordionContent>Either side may send a `ping` request (an empty-params request expecting an empty result) as a liveness check. If a ping is not answered within a reasonable timeout, the peer can consider the connection dead and tear it down. Unlike notifications, `ping` has an `id` and does expect a response.</AccordionContent></AccordionItem></Accordion>
 
 ## Common Pitfalls
 
@@ -242,6 +238,6 @@ Common ones you will see in a trace:
 
 ## Next Steps
 
-<NextLesson title="Resources & Prompts" description="Now that you can read the wire, expose read-only data and reusable prompt templates through your server." href="/roadmap/mcp-fundamentals-intermediate-resources-prompts" />
+<NextLesson title="Resources and prompts" description="Now that you can read the wire, expose read-only data and reusable prompt templates through your server." href="/roadmap/mcp-fundamentals-intermediate-resources-prompts" />
 
 <Resources resources={[{"title":"MCP Specification","href":"https://modelcontextprotocol.io/specification/2025-06-18"},{"title":"Lifecycle & Initialization","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle"},{"title":"Transports","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/transports"},{"title":"JSON-RPC 2.0 Specification","href":"https://www.jsonrpc.org/specification"}]} />

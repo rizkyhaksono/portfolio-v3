@@ -1,13 +1,18 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { PlateFigure } from "@/components/ui/plate-figure"
 import { track } from "@/lib/analytics"
-import { Upload, Loader2, ScanText, FileJson, X } from "lucide-react"
+import { Upload } from "lucide-react"
+import { ErrorNote } from "./error-note"
 
 type Mode = "classify" | "extract"
+const MODES: { id: Mode; label: string }[] = [
+  { id: "extract", label: "Extract the fields" },
+  { id: "classify", label: "Name the document only" },
+]
 const MAX_BYTES = 2 * 1024 * 1024
 const MAX_SIDE = 1600
 
@@ -58,15 +63,16 @@ export default function OcrDemo() {
 
   const onFile = async (file: File | undefined) => {
     if (!file) return
+    setError(null)
     let image: Blob
     try {
       image = await downscale(file)
     } catch {
-      toast.error("This image format isn't supported by your browser. Try PNG, JPEG, or WebP.")
+      setError("Your browser cannot open this image. Try PNG, JPEG or WebP.")
       return
     }
     if (image.size > MAX_BYTES) {
-      toast.error("Image too large even after resizing (max 2MB).")
+      setError("The image is still over 2 MB after resizing. Try a smaller photo.")
       return
     }
     try {
@@ -75,9 +81,8 @@ export default function OcrDemo() {
       setMimeType(image.type)
       setBase64(dataUrl.split(",")[1] ?? "")
       setResult(null)
-      setError(null)
     } catch {
-      toast.error("Could not read the image.")
+      setError("Could not read the image.")
     }
   }
 
@@ -105,12 +110,15 @@ export default function OcrDemo() {
       if (!res.ok || json?.status >= 400) {
         const status = res.ok ? json.status : res.status
         track("ai-error", { feature: "ocr", status })
+        track("ai-ocr-run", { mode, status: status === 429 ? "limited" : "error" })
         setError(json?.message || `OCR failed (${status})`)
         return
       }
       setResult(json.data as OcrResult)
+      track("ai-ocr-run", { mode, status: "ok" })
     } catch {
       track("ai-error", { feature: "ocr", status: 0 })
+      track("ai-ocr-run", { mode, status: "error" })
       setError("Could not reach Etan AI. Try again in a minute.")
     } finally {
       setLoading(false)
@@ -118,71 +126,73 @@ export default function OcrDemo() {
   }
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Upload a document image — the AI classifies it and extracts structured fields as JSON. Nothing is stored.
-      </p>
+    <div className="grid gap-8 lg:grid-cols-2">
+      <div className="min-w-0 space-y-5">
+        <p className="max-w-[60ch] text-body text-ink-soft">
+          Upload a photo or scan of a document. Etan names the kind of document and pulls its fields out as JSON. Nothing
+          is stored.
+        </p>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Input */}
-        <div className="space-y-3">
-          {preview ? (
-            <div className="relative overflow-hidden rounded-xl border border-border/60">
+        {preview ? (
+          <div>
+            <PlateFigure caption="Your document, resized for upload.">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={preview} alt="Document preview" className="max-h-72 w-full object-contain bg-muted/30" />
-              <button onClick={reset} className="absolute right-2 top-2 rounded-none bg-black/60 p-1 text-white hover:bg-black/80" aria-label="Remove image">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => inputRef.current?.click()}
-              className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/20 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
-            >
-              <Upload className="h-6 w-6" />
-              <span className="text-sm">Click to upload a document image</span>
-              <span className="text-xs">PNG, JPEG, WebP, HEIC · resized before upload</span>
-            </button>
-          )}
-          <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-
-          <div className="flex items-center gap-2">
-            <div className="flex rounded-lg border border-border/60 p-0.5 text-sm">
-              {(["classify", "extract"] as Mode[]).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={cn("rounded-md px-3 py-1 capitalize transition-colors", mode === m ? "bg-primary/10 font-medium text-primary" : "text-muted-foreground hover:text-foreground")}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
-            <Button onClick={analyze} disabled={!base64 || loading} className="gap-2">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ScanText className="h-4 w-4" />}
-              Analyze
+              <img src={preview} alt="The document you uploaded" className="max-h-72 w-full object-contain" />
+            </PlateFigure>
+            <Button variant="link" size="sm" className="mt-2 px-0" onClick={reset}>
+              Remove image
             </Button>
           </div>
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
-        </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="flex h-48 w-full flex-col items-center justify-center gap-2 border border-dashed border-rule-strong px-4 text-center text-ink transition-colors [transition-duration:var(--dur-ui)] hover:bg-tint"
+          >
+            <Upload className="size-5" strokeWidth={1.5} aria-hidden />
+            <span className="text-body font-semibold">Choose a document image</span>
+            <span className="font-display text-caption text-ink-soft">PNG, JPEG, WebP or HEIC. Large photos are resized first.</span>
+          </button>
+        )}
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
+          className="hidden"
+          tabIndex={-1}
+          aria-hidden
+          onChange={(e) => onFile(e.target.files?.[0])}
+        />
 
-        {/* Output */}
-        <div className="min-w-0">
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <FileJson className="h-3.5 w-3.5" /> Result
-          </div>
-          <pre className="max-h-72 overflow-auto rounded-xl border border-border/60 bg-muted/20 p-3 text-xs">
-            {loading
-              ? "Analyzing…"
-              : result
-                ? JSON.stringify(result.parsed ?? result.raw, null, 2)
-                : "// Upload an image and click Analyze"}
+        <fieldset>
+          <legend className="text-small font-semibold text-ink">What Etan should do</legend>
+          <RadioGroup value={mode} onValueChange={(v) => setMode(v as Mode)} className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+            {MODES.map((m) => (
+              <label key={m.id} className="flex items-center gap-2 text-body text-ink [@media(pointer:coarse)]:min-h-11">
+                <RadioGroupItem value={m.id} />
+                {m.label}
+              </label>
+            ))}
+          </RadioGroup>
+        </fieldset>
+
+        <Button onClick={analyze} disabled={!base64 || loading} aria-busy={loading}>
+          {loading ? "Reading…" : "Read document"}
+        </Button>
+        {error && <ErrorNote>{error}</ErrorNote>}
+      </div>
+
+      <div className="min-w-0">
+        <h2 className="text-small font-semibold text-ink">Result</h2>
+        {result ? (
+          <pre tabIndex={0} className="mt-2 max-h-96 overflow-auto bg-tint p-4 text-[0.84375rem] leading-[1.55] text-ink">
+            {JSON.stringify(result.parsed ?? result.raw, null, 2)}
           </pre>
-        </div>
+        ) : (
+          <p aria-live="polite" className="mt-2 font-display text-caption text-ink-soft">
+            {loading ? "Reading the document…" : "The fields appear here as JSON once the document is read."}
+          </p>
+        )}
       </div>
     </div>
   )

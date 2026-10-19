@@ -1,120 +1,110 @@
 "use client"
 
-import { useEditor, EditorContent, Editor } from "@tiptap/react"
+import { useEffect } from "react"
+import { useEditor, EditorContent, type ChainedCommands, type Editor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Placeholder from "@tiptap/extension-placeholder"
-import { Bold, Italic, List, ListOrdered, Heading2, Heading3, Quote, Undo, Redo, Code } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Bold, Italic, List, ListOrdered, Heading2, Heading3, Quote, Undo, Redo, Code, type LucideIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useEffect } from "react"
 
 interface RichTextEditorProps {
   content: string
   onChange: (content: string) => void
   placeholder?: string
+  /** Accessible name of the writing area (the field label). */
+  label?: string
   className?: string
 }
 
-const MenuBar = ({ editor }: { editor: Editor | null }) => {
-  if (!editor) {
-    return null
-  }
+interface Tool {
+  label: string
+  icon: LucideIcon
+  /** The command, added to a chain that already focuses the editor. */
+  run: (chain: ChainedCommands) => ChainedCommands
+  /** Mark or node name for the pressed state; tools without one are plain actions. */
+  active?: [string, Record<string, unknown>?]
+}
 
+const GROUPS: Tool[][] = [
+  [
+    { label: "Bold", icon: Bold, run: (c) => c.toggleBold(), active: ["bold"] },
+    { label: "Italic", icon: Italic, run: (c) => c.toggleItalic(), active: ["italic"] },
+    { label: "Inline code", icon: Code, run: (c) => c.toggleCode(), active: ["code"] },
+  ],
+  [
+    { label: "Heading", icon: Heading2, run: (c) => c.toggleHeading({ level: 2 }), active: ["heading", { level: 2 }] },
+    { label: "Subheading", icon: Heading3, run: (c) => c.toggleHeading({ level: 3 }), active: ["heading", { level: 3 }] },
+  ],
+  [
+    { label: "Bulleted list", icon: List, run: (c) => c.toggleBulletList(), active: ["bulletList"] },
+    { label: "Numbered list", icon: ListOrdered, run: (c) => c.toggleOrderedList(), active: ["orderedList"] },
+    { label: "Quote", icon: Quote, run: (c) => c.toggleBlockquote(), active: ["blockquote"] },
+  ],
+  [
+    { label: "Undo", icon: Undo, run: (c) => c.undo() },
+    { label: "Redo", icon: Redo, run: (c) => c.redo() },
+  ],
+]
+
+/** Inset toolbar; a pressed tool prints inverted (ink ground) and says so with aria-pressed. */
+function Toolbar({ editor }: Readonly<{ editor: Editor }>) {
   return (
-    <div className="flex flex-wrap gap-1 border-b p-2 bg-muted/50">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        disabled={!editor.can().chain().focus().toggleBold().run()}
-        className={cn("h-8 w-8 p-0", editor.isActive("bold") && "bg-muted")}
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        disabled={!editor.can().chain().focus().toggleItalic().run()}
-        className={cn("h-8 w-8 p-0", editor.isActive("italic") && "bg-muted")}
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => editor.chain().focus().toggleCode().run()}
-        disabled={!editor.can().chain().focus().toggleCode().run()}
-        className={cn("h-8 w-8 p-0", editor.isActive("code") && "bg-muted")}
-      >
-        <Code className="h-4 w-4" />
-      </Button>
-      <div className="w-px h-8 bg-border mx-1" />
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className={cn("h-8 w-8 p-0", editor.isActive("heading", { level: 2 }) && "bg-muted")}>
-        <Heading2 className="h-4 w-4" />
-      </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className={cn("h-8 w-8 p-0", editor.isActive("heading", { level: 3 }) && "bg-muted")}>
-        <Heading3 className="h-4 w-4" />
-      </Button>
-      <div className="w-px h-8 bg-border mx-1" />
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBulletList().run()} className={cn("h-8 w-8 p-0", editor.isActive("bulletList") && "bg-muted")}>
-        <List className="h-4 w-4" />
-      </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleOrderedList().run()} className={cn("h-8 w-8 p-0", editor.isActive("orderedList") && "bg-muted")}>
-        <ListOrdered className="h-4 w-4" />
-      </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().toggleBlockquote().run()} className={cn("h-8 w-8 p-0", editor.isActive("blockquote") && "bg-muted")}>
-        <Quote className="h-4 w-4" />
-      </Button>
-      <div className="w-px h-8 bg-border mx-1" />
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().chain().focus().undo().run()} className="h-8 w-8 p-0">
-        <Undo className="h-4 w-4" />
-      </Button>
-      <Button type="button" variant="ghost" size="sm" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().chain().focus().redo().run()} className="h-8 w-8 p-0">
-        <Redo className="h-4 w-4" />
-      </Button>
+    <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-rule bg-tint p-1">
+      {GROUPS.map((group, i) => (
+        <div key={i} className="flex items-center gap-1 [&:not(:first-child)]:border-l [&:not(:first-child)]:border-rule [&:not(:first-child)]:pl-1">
+          {group.map(({ label, icon: Icon, run, active }) => {
+            const pressed = active ? editor.isActive(...active) : undefined
+            return (
+              <button
+                key={label}
+                type="button"
+                title={label}
+                aria-label={label}
+                aria-pressed={pressed}
+                disabled={!run(editor.can().chain().focus()).run()}
+                onClick={() => run(editor.chain().focus()).run()}
+                className="inline-flex size-8 items-center justify-center text-ink transition-colors hover:bg-paper active:translate-y-px disabled:opacity-40 aria-pressed:bg-ink aria-pressed:text-paper [@media(pointer:coarse)]:size-11"
+              >
+                <Icon className="size-4" strokeWidth={1.5} aria-hidden />
+              </button>
+            )
+          })}
+        </div>
+      ))}
     </div>
   )
 }
 
-export function RichTextEditor({ content, onChange, placeholder = "Write something...", className }: RichTextEditorProps) {
+/** TipTap editor for admin forms. Load it with next/dynamic: it is ~100 KB the rest of the site never needs. */
+export function RichTextEditor({ content, onChange, placeholder = "Write something…", label, className }: Readonly<RichTextEditorProps>) {
   const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [2, 3],
-        },
-      }),
-      Placeholder.configure({
-        placeholder,
-      }),
-    ],
+    extensions: [StarterKit.configure({ heading: { levels: [2, 3] } }), Placeholder.configure({ placeholder })],
     content,
     immediatelyRender: false,
+    // The toolbar reads isActive/can, so it has to re-render as the selection moves.
+    shouldRerenderOnTransaction: true,
     editorProps: {
       attributes: {
-        class: "prose prose-sm dark:prose-invert max-w-none min-h-[150px] p-4 focus:outline-none",
+        class: "prose max-w-none min-h-[150px] px-4 py-3 focus:outline-none",
+        role: "textbox",
+        "aria-multiline": "true",
+        ...(label ? { "aria-label": label } : {}),
       },
     },
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
-    },
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
   })
 
-  // Update editor content when external content changes
+  // A form reset (edit another row, clear after save) replaces the content from outside.
   useEffect(() => {
-    if (editor && content !== editor.getHTML()) {
-      editor.commands.setContent(content)
-    }
+    if (editor && content !== editor.getHTML()) editor.commands.setContent(content)
   }, [content, editor])
 
   return (
-    <div className={cn("border rounded-md overflow-hidden", className)}>
-      <MenuBar editor={editor} />
+    <div className={cn("border border-input transition-colors focus-within:border-ink", className)}>
+      {editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>
   )
 }
+
+export default RichTextEditor

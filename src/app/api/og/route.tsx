@@ -1,122 +1,77 @@
-import { ImageResponse } from "next/og";
-import { JOB_TITLE } from "@/commons/constants/author";
+import { ImageResponse } from "next/og"
+import { JOB_TITLE } from "@/commons/constants/author"
+import { PRINT_HEX } from "@/lib/print-hex"
+import { loadPrintAssets, RULE_HEX } from "./print-assets"
 
-export const runtime = "edge";
+// Node, not edge: the font and the seal are files read from disk.
+export const runtime = "nodejs"
 
-const typeLabel: Record<string, string> = {
-  blog: "Blog",
-  project: "Project",
+const SECTION: Record<string, string> = {
+  blog: "Writing",
+  project: "Projects",
   changelog: "Changelog",
   roadmap: "Roadmap",
-};
-
-const typeAccent: Record<string, string> = {
-  blog: "#6366f1",
-  project: "#10b981",
-  changelog: "#f59e0b",
-  roadmap: "#ec4899",
-};
+}
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const title = (searchParams.get("title") ?? "Rizky Haksono").slice(0, 140);
-  const subtitle = (searchParams.get("subtitle") ?? "").slice(0, 180);
-  const type = (searchParams.get("type") ?? "").toLowerCase();
-  const label = typeLabel[type] ?? "";
-  const accent = typeAccent[type] ?? "#6366f1";
+  const { searchParams } = new URL(request.url)
+  const title = (searchParams.get("title") || "Rizky Haksono").slice(0, 140)
+  const subtitle = (searchParams.get("subtitle") ?? "").slice(0, 180)
+  const section = SECTION[(searchParams.get("type") ?? "").toLowerCase()] ?? "Portfolio"
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "80px",
-          backgroundColor: "#0b1020",
-          backgroundImage: `radial-gradient(circle at 20% 20%, ${accent}33 0%, transparent 45%), radial-gradient(circle at 80% 80%, ${accent}22 0%, transparent 50%)`,
-          color: "#ffffff",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 16,
-              background: accent,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 32,
-              fontWeight: 700,
-              color: "#ffffff",
-            }}
-          >
-            R
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 28, fontWeight: 700 }}>Rizky Haksono</span>
-            <span style={{ fontSize: 20, color: "#94a3b8" }}>{JOB_TITLE}</span>
-          </div>
-          {label ? (
-            <div
-              style={{
-                marginLeft: "auto",
-                padding: "10px 24px",
-                borderRadius: 999,
-                border: `2px solid ${accent}`,
-                color: accent,
-                fontSize: 22,
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: 2,
-              }}
-            >
-              {label}
-            </div>
-          ) : null}
-        </div>
+  try {
+    const { font, seal } = await loadPrintAssets()
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div
-            style={{
-              fontSize: title.length > 70 ? 64 : 80,
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: -2,
-            }}
-          >
-            {title}
-          </div>
-          {subtitle ? (
-            <div style={{ fontSize: 30, color: "#cbd5e1", lineHeight: 1.4 }}>{subtitle}</div>
-          ) : null}
-        </div>
-
+    return new ImageResponse(
+      (
         <div
           style={{
+            height: "100%",
+            width: "100%",
             display: "flex",
-            alignItems: "center",
+            flexDirection: "column",
             justifyContent: "space-between",
-            fontSize: 22,
-            color: "#94a3b8",
+            padding: "56px 72px",
+            backgroundColor: PRINT_HEX.paper,
+            color: PRINT_HEX.ink,
+            fontFamily: "Literata",
+            fontStyle: "italic",
           }}
         >
-          <span>natee.my.id</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 12, height: 12, borderRadius: 999, background: accent }} />
-            <span>{new Date().getFullYear()}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={seal} width={112} height={112} alt="" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <span style={{ fontSize: 34 }}>Rizky Haksono</span>
+              <span style={{ fontSize: 22, color: PRINT_HEX.inkSoft }}>{JOB_TITLE}</span>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ fontSize: title.length > 90 ? 52 : title.length > 50 ? 64 : 76, lineHeight: 1.05 }}>{title}</div>
+            {subtitle ? (
+              <div style={{ display: "block", fontSize: 28, lineHeight: 1.35, color: PRINT_HEX.inkSoft, lineClamp: 2 }}>{subtitle}</div>
+            ) : null}
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* The double rule under every printed page head: ink, a 3px gap, a hairline. */}
+            <div style={{ display: "flex", height: 5, borderTop: `1px solid ${PRINT_HEX.ink}`, borderBottom: `1px solid ${RULE_HEX}` }} />
+            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, fontSize: 24, color: PRINT_HEX.inkSoft }}>
+              <span>{section}</span>
+              <span>natee.my.id</span>
+            </div>
           </div>
         </div>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-    },
-  );
+      ),
+      {
+        width: 1200,
+        height: 630,
+        fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
+      },
+    )
+  } catch (error) {
+    console.error("og image failed", error)
+    return new Response("Failed to generate image", { status: 500 })
+  }
 }

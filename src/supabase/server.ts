@@ -11,4 +11,8 @@ export const supabaseUser = createClient(
     persistSession: false,
     detectSessionInUrl: false,
   },
+  // Tagged so the admin routes' revalidateTag("supabase") refreshes the ISR pages these reads feed.
+  global: {
+    fetch: (input, init) => fetch(input, { ...init, next: { revalidate: 3600, tags: ["supabase"] } }),
+  },
 })

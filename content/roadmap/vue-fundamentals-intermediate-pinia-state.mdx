@@ -1,5 +1,5 @@
 ---
-title: "Pinia State Management"
+title: "Pinia state management"
 description: "Stores, actions, getters, and modular state architecture with Pinia"
 course: "vue-fundamentals"
 category: "frontend"
@@ -9,10 +9,6 @@ duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## Why Pinia?
 
@@ -47,8 +43,8 @@ A store is only created the first time it is used inside a component's `setup()`
 
 `defineStore` takes a unique **id** (used by dev-tools and for SSR hydration) and a definition. There are two equivalent authoring styles — pick one and stay consistent across your codebase.
 
-<Tabs defaultValue="setup" className="my-6">
-  <TabsList className="grid w-full grid-cols-2">
+<Tabs defaultValue="setup">
+  <TabsList>
     <TabsTrigger value="setup">Setup Store</TabsTrigger>
     <TabsTrigger value="option">Option Store</TabsTrigger>
   </TabsList>
@@ -273,7 +269,7 @@ export const useOrdersStore = defineStore("orders", {
 
 ## Best Practices & Common Pitfalls
 
-<Accordion type="single" collapsible className="my-6">
+<Accordion type="single" collapsible>
   <AccordionItem value="reactivity">
     <AccordionTrigger>Losing reactivity when destructuring</AccordionTrigger>
     <AccordionContent>
@@ -297,8 +293,6 @@ export const useOrdersStore = defineStore("orders", {
 <Tip>
 Keep components thin: put fetching, validation, and business rules inside actions and expose derived data via getters. Components should mostly read reactive values and dispatch actions. For persistence across reloads, reach for the community plugin `pinia-plugin-persistedstate` instead of hand-writing `localStorage` logic in every store.
 </Tip>
-
----
 
 ## Next Steps
 

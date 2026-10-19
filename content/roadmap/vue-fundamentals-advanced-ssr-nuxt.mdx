@@ -10,10 +10,6 @@ order: 8
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
 Server-side rendering (SSR) runs your Vue components on the server, sends fully-formed HTML to the browser, and then "hydrates" that HTML into a live, interactive app. The payoff is real: faster first paint, meaningful content for search-engine crawlers and social-preview scrapers, and less blank-screen time on slow devices. Nuxt is the framework that makes SSR practical in Vue 3 — it wires up a server engine (Nitro), a file-based router, auto-imported composables, and deployment presets so you can ship an SSR app without hand-rolling a Node server. This lesson covers how rendering and hydration actually work, how to fetch data correctly on both server and client, how to keep secrets on the server, and how to deploy.
 
 <LearningObjectives objectives={["Explain SSR, hydration, and how they differ from client-only rendering", "Fetch data safely with useFetch and useAsyncData", "Keep secrets server-side with runtimeConfig and server routes", "Configure hybrid rendering with routeRules", "Build and deploy a Nuxt app with Nitro presets"]} />
@@ -272,10 +268,8 @@ npx nuxi preview      # serve .output/public locally to verify
   <CardContent>Place API keys in <code>runtimeConfig</code> (no <code>public</code>) and call third-party services from <code>server/api/</code> handlers — never from a component, so credentials stay out of the client bundle.</CardContent>
 </Card>
 
----
-
 ## Next Steps
 
-<NextLesson title="Testing Vue Applications" description="Vitest + Vue Test Utils." href="/roadmap/vue-fundamentals-advanced-testing-vue" />
+<NextLesson title="Testing Vue applications" description="Vitest + Vue Test Utils." href="/roadmap/vue-fundamentals-advanced-testing-vue" />
 
 <Resources resources={[{"title":"Nuxt Docs","href":"https://nuxt.com/docs"},{"title":"Data Fetching Guide","href":"https://nuxt.com/docs/getting-started/data-fetching"},{"title":"Nitro Deployment Presets","href":"https://nitro.build/deploy"},{"title":"runtimeConfig Reference","href":"https://nuxt.com/docs/guide/going-further/runtime-config"}]} />

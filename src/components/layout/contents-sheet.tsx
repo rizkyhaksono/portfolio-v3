@@ -114,6 +114,17 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
             </SheetClose>
             <p className="mt-2 text-small text-ink-soft">Sign in, or open your profile.</p>
           </div>
+
+          <SheetClose asChild>
+            <button
+              type="button"
+              data-open-feedback="contents"
+              aria-haspopup="dialog"
+              className="mt-6 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2"
+            >
+              Send feedback
+            </button>
+          </SheetClose>
         </div>
       </SheetContent>
     </Sheet>

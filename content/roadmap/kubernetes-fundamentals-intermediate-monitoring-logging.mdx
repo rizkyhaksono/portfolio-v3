@@ -1,5 +1,5 @@
 ---
-title: "Monitoring & Logging"
+title: "Monitoring and logging"
 description: "Prometheus metrics, Grafana dashboards, and centralized logging with Loki"
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -9,10 +9,6 @@ duration: "30 min"
 order: 6
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## Observability in Kubernetes
 
@@ -231,12 +227,10 @@ spec:
   </AccordionItem>
 </Accordion>
 
----
-
 ## Next Steps
 
 You now have metrics, dashboards, logs, and alerts. Next you will use those metrics to scale the cluster automatically in response to real load.
 
-<NextLesson title="Cluster Autoscaling" description="Scale pods and nodes automatically with HPA, VPA, and the Cluster Autoscaler." href="/roadmap/kubernetes-fundamentals-advanced-cluster-autoscaling" />
+<NextLesson title="Cluster autoscaling" description="Scale pods and nodes automatically with HPA, VPA, and the Cluster Autoscaler." href="/roadmap/kubernetes-fundamentals-advanced-cluster-autoscaling" />
 
 <Resources resources={[{"title":"Prometheus Documentation","href":"https://prometheus.io/docs/"},{"title":"Prometheus Operator (CRDs)","href":"https://prometheus-operator.dev/docs/"},{"title":"Grafana Loki Documentation","href":"https://grafana.com/docs/loki/latest/"},{"title":"Google SRE Book — Monitoring Distributed Systems","href":"https://sre.google/sre-book/monitoring-distributed-systems/"}]} />

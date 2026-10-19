@@ -10,12 +10,6 @@ order: 4
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Vue Composition API
-
 The Composition API is a set of function-based APIs (`ref`, `reactive`, `computed`, `watch`, lifecycle hooks) that let you organize component logic by *feature* instead of by *option type*. Where the Options API forces related code apart into `data`, `methods`, `computed`, and `watch` blocks, the Composition API keeps everything about a single concern together — and, crucially, lets you extract that concern into a reusable **composable**. In real projects this is what makes large Vue components maintainable and lets teams share data-fetching, form, and browser-API logic across dozens of components without mixins or wrapper hell.
 
 <LearningObjectives objectives={["Choose correctly between ref and reactive for state", "Derive read-only state with computed and two-way computed setters", "React to state changes with watch and watchEffect", "Run setup, mount, and cleanup logic with lifecycle hooks", "Extract and reuse stateful logic as composables"]} />
@@ -26,14 +20,14 @@ The Composition API is a set of function-based APIs (`ref`, `reactive`, `compute
 
 The two primitives for declarative state are `ref()` and `reactive()`. A `ref` wraps a single value (of any type) in a reactive object; you read and write it through `.value` in JavaScript, but Vue **auto-unwraps** it in templates. `reactive()` makes an entire object deeply reactive, with no `.value`.
 
-<Tabs defaultValue="ref" className="my-6">
-  <TabsList className="grid w-full grid-cols-2">
+<Tabs defaultValue="ref">
+  <TabsList>
     <TabsTrigger value="ref">ref</TabsTrigger>
     <TabsTrigger value="reactive">reactive</TabsTrigger>
   </TabsList>
   <TabsContent value="ref">
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         ```vue
         <script setup lang="ts">
         import { ref } from "vue"
@@ -57,7 +51,7 @@ The two primitives for declarative state are `ref()` and `reactive()`. A `ref` w
   </TabsContent>
   <TabsContent value="reactive">
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         ```vue
         <script setup lang="ts">
         import { reactive } from "vue"
@@ -135,14 +129,14 @@ Never mutate state inside a computed getter or perform async work there. A gette
 
 Watchers run side effects — logging, fetching, saving to `localStorage` — in response to reactive changes. `watch` is explicit about its source and gives you both old and new values. `watchEffect` runs immediately and automatically tracks whatever reactive values it reads.
 
-<Tabs defaultValue="watch" className="my-6">
-  <TabsList className="grid w-full grid-cols-2">
+<Tabs defaultValue="watch">
+  <TabsList>
     <TabsTrigger value="watch">watch</TabsTrigger>
     <TabsTrigger value="watcheffect">watchEffect</TabsTrigger>
   </TabsList>
   <TabsContent value="watch">
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         ```ts
         import { ref, watch } from "vue"
 
@@ -168,7 +162,7 @@ Watchers run side effects — logging, fetching, saving to `localStorage` — in
   </TabsContent>
   <TabsContent value="watcheffect">
     <Card>
-      <CardContent className="pt-6">
+      <CardContent>
         ```ts
         import { ref, watchEffect } from "vue"
 
@@ -218,11 +212,11 @@ onUnmounted(() => {
 })
 ```
 
-<Accordion type="single" collapsible className="my-6">
+<Accordion type="single" collapsible>
   <AccordionItem value="hooks">
     <AccordionTrigger>Common lifecycle hooks at a glance</AccordionTrigger>
     <AccordionContent>
-      <ul className="list-disc list-inside space-y-1">
+      <ul>
         <li><code>onBeforeMount</code> / <code>onMounted</code> — before and after first DOM render</li>
         <li><code>onBeforeUpdate</code> / <code>onUpdated</code> — around reactive-driven re-renders</li>
         <li><code>onBeforeUnmount</code> / <code>onUnmounted</code> — teardown and cleanup</li>
@@ -294,12 +288,12 @@ Accept refs or getters as arguments and unwrap them with <code>toValue()</code>.
 
 ## Common Pitfalls
 
-<Card className="my-6">
+<Card>
   <CardHeader>
     <CardTitle>Mistakes to avoid</CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2 text-sm">
+    <ul>
       <li><strong>Forgetting <code>.value</code></strong> — in <em>JavaScript</em> a ref is always accessed via <code>.value</code>. <code>count + 1</code> concatenates the ref object; you meant <code>count.value + 1</code>. (Templates auto-unwrap, JS does not.)</li>
       <li><strong>Destructuring a <code>reactive</code> object</strong> breaks reactivity. Use <code>toRefs</code> / <code>toRef</code>, or just use <code>ref</code> instead.</li>
       <li><strong>Reassigning a <code>reactive</code> value</strong> (<code>state = reactive(...)</code>) drops the original proxy. Mutate its properties, or use a <code>ref</code> if you need whole-value replacement.</li>
@@ -319,7 +313,7 @@ Accept refs or getters as arguments and unwrap them with <code>toValue()</code>.
 
 ## Next Steps
 
-<NextLesson title="Pinia State Management" description="Global stores with Pinia." href="/roadmap/vue-fundamentals-intermediate-pinia-state" />
+<NextLesson title="Pinia state management" description="Global stores with Pinia." href="/roadmap/vue-fundamentals-intermediate-pinia-state" />
 
 <Resources
   resources={[

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { MetadataConstants } from "@/commons/constants/metadata";
 import { getMetadataBaseUrl } from "@/lib/site-url";
+import BaseLayout from "@/components/layout/base-layout";
 
 export const metadata: Metadata = {
   title: "Roadmap | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: MetadataConstants.description,
+  description: "Learning paths in React, Vue, Express, Kubernetes and MCP, from first principles to advanced practice.",
   keywords: MetadataConstants.keyword,
   creator: MetadataConstants.creator,
   authors: {
@@ -31,9 +32,5 @@ export default function RoadmapLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <>
-      {children}
-    </>
-  )
+  return <BaseLayout>{children}</BaseLayout>;
 }

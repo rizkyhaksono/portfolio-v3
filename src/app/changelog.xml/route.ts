@@ -6,6 +6,8 @@ import { getSiteUrl } from "@/lib/site-url";
 
 export const revalidate = 3600;
 
+const UTM = "utm_source=rss&utm_medium=feed&utm_campaign=changelog";
+
 export function GET() {
   const base = getSiteUrl();
   const author = authors.rizky;
@@ -29,13 +31,13 @@ export function GET() {
 
   const entries = getAllChangelogs();
 
+  // Entries live as anchors on /changelog (there is no per-entry page); summaries only, no raw MDX.
   for (const entry of entries) {
     feed.addItem({
       title: `${entry.meta.title} (v${entry.meta.version})`,
-      id: `${base}/changelog/${entry.slug}`,
-      link: `${base}/changelog/${entry.slug}`,
+      id: `${base}/changelog#${entry.slug}`,
+      link: `${base}/changelog?${UTM}#${entry.slug}`,
       description: entry.meta.description ?? entry.meta.title,
-      content: entry.content,
       author: [{ name: entry.meta.author ?? author.name, link: base }],
       date: new Date(entry.meta.date),
     });

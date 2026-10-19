@@ -1,5 +1,5 @@
 ---
-title: "Microservices Architecture"
+title: "Microservices architecture"
 description: "Split monoliths into services with API gateways and inter-service communication"
 course: "express-fundamentals"
 category: "backend"
@@ -9,12 +9,6 @@ duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Shield, Code2, Layers } from "lucide-react"
 
 ## Microservices with Express
 
@@ -26,7 +20,7 @@ A microservices architecture breaks a single large application into a set of sma
 
 Do not start with microservices by default. A well-structured monolith is faster to build, deploy, and debug. Reach for services when scaling needs, team size, or deployment cadence diverge across parts of the system.
 
-<Tabs defaultValue="monolith" className="not-prose">
+<Tabs defaultValue="monolith">
   <TabsList>
     <TabsTrigger value="monolith">Monolith</TabsTrigger>
     <TabsTrigger value="micro">Microservices</TabsTrigger>
@@ -145,7 +139,7 @@ app.use(
 app.listen(8080, () => console.log("gateway on :8080"))
 ```
 
-<Accordion type="multiple" className="not-prose">
+<Accordion type="multiple">
   <AccordionItem value="discovery">
     <AccordionTrigger>How do services find each other?</AccordionTrigger>
     <AccordionContent>
@@ -217,7 +211,7 @@ channel.consume(q.queue, async (msg) => {
 })
 ```
 
-<Tabs defaultValue="sync" className="not-prose">
+<Tabs defaultValue="sync">
   <TabsList>
     <TabsTrigger value="sync">Synchronous (HTTP)</TabsTrigger>
     <TabsTrigger value="async">Asynchronous (Events)</TabsTrigger>
@@ -232,7 +226,7 @@ channel.consume(q.queue, async (msg) => {
 
 ## Common Pitfalls
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="shared-db">
     <AccordionTrigger>Sharing a database between services</AccordionTrigger>
     <AccordionContent>The most common anti-pattern. It couples migrations and deploys and turns your fleet into a distributed monolith. Each service owns its data; expose it only through the API.</AccordionContent>
@@ -259,10 +253,8 @@ channel.consume(q.queue, async (msg) => {
 - Make writes idempotent (accept an idempotency key) so retries and at-least-once message delivery never double-charge or double-create.
 - Add distributed tracing (OpenTelemetry) early — debugging across services is impossible without it.
 
----
-
 ## Next Steps
 
-<NextLesson title="Testing & Deployment" description="Supertest, Docker, and CI/CD." href="/roadmap/express-fundamentals-advanced-testing-deployment" />
+<NextLesson title="Testing and deployment" description="Supertest, Docker, and CI/CD." href="/roadmap/express-fundamentals-advanced-testing-deployment" />
 
 <Resources resources={[{"title":"Microservices patterns","href":"https://microservices.io/patterns/index.html"},{"title":"http-proxy-middleware","href":"https://github.com/chimurai/http-proxy-middleware"},{"title":"opossum circuit breaker","href":"https://nodeshift.dev/opossum/"},{"title":"RabbitMQ tutorials","href":"https://www.rabbitmq.com/tutorials"}]} />

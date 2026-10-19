@@ -1,21 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { submitFeedback, type FeedbackCategory } from "@/services/visitor/feedback"
-import { MessageSquarePlus } from "lucide-react"
 
-export default function FeedbackWidget() {
-  const [open, setOpen] = useState(false)
+interface FeedbackWidgetProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onCloseAutoFocus?: (event: Event) => void
+}
+
+/** Controlled by DeferredClientUtilities, which opens it from any `[data-open-feedback]` button. */
+export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAutoFocus }: Readonly<FeedbackWidgetProps>) {
   const [category, setCategory] = useState<FeedbackCategory>("suggestion")
   const [message, setMessage] = useState("")
   const [email, setEmail] = useState("")
   const [sending, setSending] = useState(false)
+  const id = useId()
 
   const submit = async () => {
     if (!message.trim() || sending) return
@@ -27,7 +34,7 @@ export default function FeedbackWidget() {
         email: email.trim() || undefined,
         pageUrl: typeof window !== "undefined" ? window.location.pathname : undefined,
       })
-      toast.success("Thanks for the feedback!")
+      toast.success("Thank you. The note is in.")
       setMessage("")
       setEmail("")
       setCategory("suggestion")
@@ -40,59 +47,56 @@ export default function FeedbackWidget() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="Send feedback"
-        className="fixed bottom-4 left-4 z-40 inline-flex h-11 items-center gap-2 border border-ink bg-paper px-3 text-small font-semibold text-ink shadow-[3px_3px_0_hsl(var(--ink))] hover:bg-tint active:translate-y-px print:hidden md:h-9"
-      >
-        <MessageSquarePlus className="size-4" strokeWidth={1.5} aria-hidden />
-        <span className="hidden sm:inline">Feedback</span>
-      </button>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Feedback and suggestions</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
+        <DialogHeader>
+          <DialogTitle>Feedback and suggestions</DialogTitle>
+          <DialogDescription>What should I build or write next? Found something broken?</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-5">
+          <div className="space-y-1">
+            <Label htmlFor={`${id}-category`}>Kind of note</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as FeedbackCategory)}>
-              <SelectTrigger aria-label="Category">
-                <SelectValue placeholder="Category" />
+              <SelectTrigger id={`${id}-category`}>
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="suggestion">Suggest a topic / idea</SelectItem>
-                <SelectItem value="bug">Report a bug</SelectItem>
+                <SelectItem value="suggestion">A topic or an idea</SelectItem>
+                <SelectItem value="bug">Something is broken</SelectItem>
                 <SelectItem value="general">General feedback</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`${id}-message`}>Message</Label>
             <Textarea
-              aria-label="Message"
+              id={`${id}-message`}
               autoFocus
-              placeholder="What should I build or write next? Found something broken?"
               value={message}
               maxLength={2000}
               rows={4}
               onChange={(e) => setMessage(e.target.value)}
             />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor={`${id}-email`}>Your email, if you want a reply</Label>
             <Input
-              aria-label="Email, optional"
+              id={`${id}-email`}
               type="email"
-              placeholder="Email (optional, if you want a reply)"
+              autoComplete="email"
               value={email}
               maxLength={200}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={submit} disabled={sending || !message.trim()} aria-busy={sending}>
-              {sending ? "Sending…" : "Send"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={submit} disabled={sending || !message.trim()} aria-busy={sending}>
+            {sending ? "Sending…" : "Send"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -7,7 +7,7 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 | Primitive | Path | Role |
 |---|---|---|
 | `BaseLayout` | `components/layout/base-layout.tsx` | Visitor and user shell, see [page-shell.md](./page-shell.md) |
-| `PageBody`, `PageSection`, `SectionHeading` | `components/ui/` | Width, rhythm, titles |
+| `PageSection`, `SectionHeading` | `components/ui/` | Width, rhythm, titles |
 | `Card`, `Surface` | `components/ui/card.tsx`, `surface.tsx` | Frame and inset, see [surfaces.md](./surfaces.md) |
 | `InkLink` | `components/ui/ink-link.tsx` | Every text link, internal or external |
 | `LedgerList`, `LedgerRow` | `components/ui/ledger.tsx` | Ledger pattern |
@@ -15,10 +15,9 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 | `Engraving` | `components/ui/engraving.tsx` | The engraving band and its crops |
 | `WordScroll` | `components/ui/word-scroll.tsx` | Home masthead sentence |
 | `StatStrip` | `components/ui/stat-strip.tsx` | `dt` caption, `dd` numeral, `tabular-nums` |
-| `InkChart`, `InkHeatmap`, `HatchBar` | `components/ui/ink-chart.tsx`, `ink-heatmap.tsx` | Data viz |
+| `InkChart`, `InkHeatmap`, `HatchBar` | `components/ui/ink-chart.tsx`, `ink-heatmap.tsx`, `app/_components/contribution/wakatime-progress.tsx` | Data viz (HatchBar takes `name`, `percent`, `value`) |
 | `ReadingNow` | `components/ui/reading-now.tsx` | Realtime visitor line (client island) |
 | `NotFoundView` | `components/ui/not-found-view.tsx` | 404, error and empty states |
-| `MacWindow` | `components/ui/mac-window.tsx` | Legacy. Do not use in new code; existing call sites move to the page patterns in their phase. |
 
 ## Rules per primitive
 
@@ -30,15 +29,15 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 - **Tag** (Chip and Badge merged). 1px `rule-strong`, 13px roman. Status is an 8px square, filled, outline or dashed, plus a word.
 - **Eyebrow.** An italic caption `<p>`, only when it adds information. Never all-caps, never mono.
 - **Table.** `th` 13px / 600 in ink-soft (sticky in admin), numbers right-aligned with `tabular-nums`, hover row `bg-tint`.
-- **Floating layers.** Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command and Sonner toasts use the lift surface and an ink scrim. No `backdrop-blur`.
+- **Floating layers.** Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command and Sonner toasts use the lift surface and an ink scrim. No backdrop blur.
 - **Controls.** Square switch and checkbox, round radio dot (the only circle), static ruled skeleton with no pulse, square duotone avatar.
-- **Icons.** lucide only, stroke 1.5, 16px or 20px, functional only. Drop `react-icons` and `@radix-ui/react-icons` when you touch a file that uses them.
+- **Icons.** lucide only, stroke 1.5, 16px or 20px, functional only. `react-icons` and `@radix-ui/react-icons` are removed; do not add them back.
 - **Code.** Server `<pre>` specimen box (inset ground, system mono 13.5px, `tabIndex={0}`), no syntax colours. The client `CopyButton` keeps the `Click Copy Code` event.
 - **Prose.** `.prose` in `globals.css` (no typography plugin): 66ch, display `h2` and `h3`, ink links, 22px italic blockquote, SVG fleuron `hr`, en-dash bullets, ledger tables, framed images. `.prose--chat` for chat replies.
 
 ## Data viz
 
-All charts are server-rendered SVG in ink. recharts is on its way out and must not be added anywhere new.
+All charts are server-rendered SVG in ink. Recharts is removed; do not add a chart library.
 
 - `InkChart`: 1.5px ink line, hatched area, dotted grid, italic tabular axes, a `<title>` per point, and a `<details>` table as the text alternative. `preserveAspectRatio="none"` with `vector-effect="non-scaling-stroke"`. Sessions as a dashed line.
 - `InkHeatmap`: five levels with a `rule-strong` outline and a `<title>` per cell.

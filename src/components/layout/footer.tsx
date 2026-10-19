@@ -29,6 +29,15 @@ function BackToTop() {
   )
 }
 
+/** Opens the feedback dialog (DeferredClientUtilities listens for `data-open-feedback`). */
+function FeedbackButton() {
+  return (
+    <button type="button" data-open-feedback="colophon" aria-haspopup="dialog" className={cn(linkClass, "shrink-0 text-small")}>
+      Send feedback
+    </button>
+  )
+}
+
 function LegalLinks() {
   return LEGAL_LINKS.map(({ href, label }) => (
     <li key={href}>
@@ -50,7 +59,8 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
           <ul className="flex gap-x-5">
             <LegalLinks />
           </ul>
-          <span className="ml-auto">
+          <span className="ml-auto flex gap-x-5">
+            <FeedbackButton />
             <BackToTop />
           </span>
         </div>
@@ -103,7 +113,10 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
             Set in Literata. Printed in one ink in Malang, East Java. The mark shows the Tengger caldera. Plate after Wenceslaus Hollar,{" "}
             <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain).
           </p>
-          <BackToTop />
+          <div className="flex shrink-0 gap-x-5">
+            <FeedbackButton />
+            <BackToTop />
+          </div>
         </div>
       </div>
       <Engraving crop="band" className="mt-6" />

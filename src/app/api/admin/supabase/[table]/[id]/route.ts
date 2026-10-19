@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidateTag } from "next/cache"
 import { requireAdmin, getServiceClient, isAllowedTable } from "@/lib/admin-supabase-api"
 
 export const dynamic = "force-dynamic"
@@ -35,6 +36,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     if (!data?.length) {
       return NextResponse.json({ error: "Row not found — nothing was updated" }, { status: 404 })
     }
+    revalidateTag("supabase", "max")
     return NextResponse.json({ data: data[0] })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Update failed" }, { status: 500 })
@@ -55,6 +57,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
     if (!data?.length) {
       return NextResponse.json({ error: "Row not found — nothing was deleted" }, { status: 404 })
     }
+    revalidateTag("supabase", "max")
     return NextResponse.json({ data: data[0] })
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Delete failed" }, { status: 500 })

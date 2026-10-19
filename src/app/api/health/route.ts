@@ -13,7 +13,7 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${apiUrl}/v3/health`, { cache: "no-store" })
+    const res = await fetch(`${apiUrl}/v3/health`, { cache: "no-store", signal: AbortSignal.timeout(5000) })
     const text = await res.text()
     return new Response(text, { status: res.status, headers: { "Content-Type": "application/json" } })
   } catch {

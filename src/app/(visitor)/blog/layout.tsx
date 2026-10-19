@@ -3,10 +3,8 @@ import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 
-export const dynamic = "force-dynamic"
-
 export const metadata: Metadata = {
-  title: "Blog | Rizky Haksono",
+  title: "Writing | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
   description: MetadataConstants.description,
   keywords: MetadataConstants.keyword,
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default function BlogLayout({
   children,
 }: Readonly<{
   children: React.ReactNode

@@ -3,17 +3,15 @@ import BaseLayout from "@/components/layout/base-layout"
 import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 
-export const dynamic = "force-dynamic"
-
 export const metadata: Metadata = {
-  title: "Tools - Japanese Quiz, Anime Generator & More | Rizky Haksono",
+  title: "Tools: Pokédex, JLPT quiz, typing test and more | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
-  description: "Collection of useful tools including Japanese JLPT Quiz, Anime Image Generator, Social Media Downloader, WPM Test, postal code lookup, and Web3 utilities. Free and easy to use!",
+  description: "Small free tools: a Pokédex, a Star Wars archive, a Japanese JLPT quiz, IELTS flashcards, a typing test, a social media downloader, Indonesian postal codes and crypto prices.",
   keywords: [
     ...MetadataConstants.keyword,
     "Japanese quiz",
     "JLPT practice",
-    "anime generator",
+    "IELTS flashcards",
     "video downloader",
     "tiktok downloader",
     "instagram downloader",
@@ -29,8 +27,8 @@ export const metadata: Metadata = {
     url: MetadataConstants.openGraph.url,
   },
   openGraph: {
-    title: "Tools - Japanese Quiz, Anime Generator & More",
-    description: "Collection of useful tools for learning Japanese, generating anime images, downloading videos, and more!",
+    title: "Tools: Pokédex, JLPT quiz, typing test and more",
+    description: "Small tools for practising Japanese and English, testing your typing speed, downloading videos and looking things up.",
     images: MetadataConstants.profile,
     url: `${MetadataConstants.openGraph.url}/tools`,
     siteName: MetadataConstants.openGraph.siteName,

@@ -1,99 +1,54 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { getHealth, type HealthData, type HealthService, type ServiceStatus } from "@/services/visitor/health"
-import { MacWindow } from "@/components/ui/mac-window"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Surface } from "@/components/ui/surface"
+import { PageSection } from "@/components/ui/page-section"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Activity, RefreshCw, Loader2 } from "lucide-react"
 
-const DOT: Record<ServiceStatus, string> = {
-  operational: "bg-green-500",
-  degraded: "bg-amber-500",
-  down: "bg-red-500",
+const POLL_MS = 30_000
+
+// Status by shape and word, never colour: filled, dashed outline, empty outline.
+const SHAPE: Record<ServiceStatus, string> = {
+  operational: "border-ink bg-ink",
+  degraded: "border-dashed border-ink",
+  down: "border-ink",
 }
-const LABEL: Record<ServiceStatus, string> = {
+const WORD: Record<ServiceStatus, string> = {
   operational: "Operational",
   degraded: "Degraded",
   down: "Down",
 }
-
-/**
- * Top banner summarizing overall system health.
- */
-function OverallBanner({
-  overall,
-  loading,
-  onRefresh,
-}: Readonly<{
-  overall: ServiceStatus
-  loading: boolean
-  onRefresh: () => void
-}>) {
-  return (
-    <Surface variant="solid" className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <span aria-hidden="true" className={cn("h-3 w-3 shrink-0 rounded-full", DOT[overall])} />
-        <div className="min-w-0">
-          <p className="font-semibold">
-            {loading
-              ? "Checking system health"
-              : overall === "operational"
-              ? "All systems operational"
-              : overall === "degraded"
-                ? "Some systems are degraded"
-                : "Systems unavailable"}
-          </p>
-          <p className="text-xs text-muted-foreground">Live API and dependency health</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={onRefresh}
-        disabled={loading}
-        className="flex min-h-9 items-center justify-center gap-1.5 border px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-wait disabled:opacity-60 sm:min-h-0"
-        aria-label="Refresh"
-      >
-        {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-        Refresh
-      </button>
-    </Surface>
-  )
+const HEADLINE: Record<ServiceStatus, string> = {
+  operational: "All systems operational",
+  degraded: "Some systems are degraded",
+  down: "Systems unavailable",
 }
 
-/**
- * Single dependency row inside the status window.
- */
+const StatusMark = ({ status }: { status: ServiceStatus }) => (
+  <span aria-hidden className={cn("inline-block size-2 shrink-0 border", SHAPE[status])} />
+)
+
 function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
-  const statusClass =
-    service.status === "operational"
-      ? "text-green-600 dark:text-green-400"
-      : service.status === "down"
-        ? "text-red-600 dark:text-red-400"
-        : "text-amber-600 dark:text-amber-400"
-
   return (
-    <Surface variant="inset" className="flex min-w-0 flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <span aria-hidden="true" className={cn("h-2.5 w-2.5 shrink-0 rounded-full", DOT[service.status])} />
-        <div className="min-w-0 leading-tight">
-          <p className="break-words text-sm font-medium">{service.name}</p>
-          {service.detail && <p className="break-words text-[11px] text-muted-foreground">{service.detail}</p>}
-        </div>
+    <li className="grid gap-x-6 gap-y-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
+      <div className="min-w-0">
+        <p className="break-words text-body text-ink">{service.name}</p>
+        {service.detail && <p className="break-words font-display text-caption text-ink-soft">{service.detail}</p>}
       </div>
-      <div className="flex shrink-0 items-center justify-between gap-3 pl-5 text-xs sm:justify-end sm:pl-0">
-        {service.latencyMs != null && <span className="text-muted-foreground">{service.latencyMs}ms</span>}
-        <span className={cn("font-medium", statusClass)}>{LABEL[service.status]}</span>
-      </div>
-    </Surface>
+      <p className="flex items-center gap-2 text-small tabular-nums text-ink-soft sm:justify-end">
+        {service.latencyMs != null && <span className="mr-2">{service.latencyMs} ms</span>}
+        <StatusMark status={service.status} />
+        <span className="text-ink">{WORD[service.status]}</span>
+      </p>
+    </li>
   )
 }
 
 /**
- * Live health of the portfolio API and dependencies (embedded under /stats).
- * AI (Gemini) "not configured" means GENERATIVE_AI_API_KEY is missing on the
- * API host (Portainer). Do not add that key to Azure frontend App Settings.
+ * Live health of the portfolio API and its dependencies, the `#status` strip on /stats. Checks on mount,
+ * then every 30 seconds while the tab is visible. AI (Gemini) "not configured" means GENERATIVE_AI_API_KEY
+ * is missing on the API host (Portainer), not in the web app.
  */
 export default function SystemStatus() {
   const [data, setData] = useState<HealthData | null>(null)
@@ -111,7 +66,9 @@ export default function SystemStatus() {
 
   useEffect(() => {
     load()
-    const id = setInterval(load, 30000)
+    const id = setInterval(() => {
+      if (!document.hidden) load()
+    }, POLL_MS)
     return () => {
       clearInterval(id)
       requestId.current += 1
@@ -125,47 +82,42 @@ export default function SystemStatus() {
       : [{ name: "API", status: data.overall, latencyMs: null }, ...data.services]
     : loading
       ? []
-      : [{ name: "API", status: "down", latencyMs: null, detail: "unreachable" }]
-  const overall: ServiceStatus = data?.overall ?? (loading ? "degraded" : "down")
-
-  const eyebrow: ReactNode = (
-    <>
-      <Activity className="h-3.5 w-3.5 text-primary" />
-      Monitoring
-    </>
-  )
+      : [{ name: "API", status: "down", latencyMs: null, detail: "Unreachable" }]
+  const overall: ServiceStatus | null = data?.overall ?? (loading ? null : "down")
 
   return (
-    <section className="w-full" aria-label="System status">
-      <SectionHeading
-        as="h2"
-        className="mb-4"
-        eyebrow={eyebrow}
-        title="System"
-        accent="status"
-        description="Live health of the portfolio API and its dependencies."
-      />
+    <PageSection
+      id="status"
+      heading={{ title: "Status", description: "Live health of the portfolio API and the services behind it." }}
+      contentClassName="mt-6"
+    >
+      <div aria-busy={loading}>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-ink py-4">
+          <p className="flex items-center gap-3 font-display text-h4 text-ink">
+            {overall && <StatusMark status={overall} />}
+            {overall ? HEADLINE[overall] : "Checking the services"}
+          </p>
+          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+            {loading ? "Checking…" : "Check again"}
+          </Button>
+        </div>
 
-      <MacWindow title="~/status" bodyClassName="space-y-4">
-        <OverallBanner overall={overall} loading={loading} onRefresh={load} />
-        {loading && services.length === 0 ? (
-          <Surface variant="inset" className="flex items-center gap-3 px-4 py-5 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Checking services...
-          </Surface>
-        ) : (
-          <div className="grid gap-2 md:grid-cols-2">
+        {services.length > 0 && (
+          <ul role="list" className="divide-y divide-rule border-b border-rule">
             {services.map((service, index) => (
               <ServiceRow key={`${service.name}-${index}`} service={service} />
             ))}
-          </div>
+          </ul>
         )}
+
         {data?.checkedAt && (
-          <p className="text-right text-[11px] text-muted-foreground">
-            Last checked {new Date(data.checkedAt).toLocaleTimeString()} · auto-refreshes every 30s
+          <p className="mt-3 font-display text-caption text-ink-soft">
+            Checked at{" "}
+            {new Date(data.checkedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}. It checks again every
+            30 seconds while this page is open.
           </p>
         )}
-      </MacWindow>
-    </section>
+      </div>
+    </PageSection>
   )
 }

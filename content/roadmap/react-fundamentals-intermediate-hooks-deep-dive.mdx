@@ -1,5 +1,5 @@
 ---
-title: "Hooks Deep Dive"
+title: "Hooks deep dive"
 description: "Custom hooks, useEffect cleanup, useMemo, useCallback, and performance hooks"
 course: "react-fundamentals"
 category: "frontend"
@@ -9,12 +9,6 @@ duration: "35 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Hooks Deep Dive
 
 Hooks are the primitives that let function components hold state, run side effects, and share logic. `useState` and `useEffect` get you started, but real applications live or die on the details: cleaning up subscriptions, keeping dependency arrays honest, avoiding needless recomputation, and packaging repeated logic into custom hooks. This lesson digs into the intermediate hooks you reach for once components grow past a single input and a click handler — the tools that keep an app fast, predictable, and easy to maintain.
 
@@ -188,8 +182,6 @@ function useLocalStorage<T>(key: string, initial: T) {
 <Accordion type="single" collapsible><AccordionItem value="stale"><AccordionTrigger>Stale closures</AccordionTrigger><AccordionContent>An effect or callback captures the values from the render it was created in. If you omit a dependency, it keeps reading the old value. Fix it by adding the dependency, or use the functional updater form `setCount(c => c + 1)` so you never read stale state.</AccordionContent></AccordionItem><AccordionItem value="object"><AccordionTrigger>New object/array literals in deps</AccordionTrigger><AccordionContent>Passing `{ id }` or `[1, 2]` inline as a dependency creates a new reference every render, so the effect runs every time. Memoize the value with `useMemo`, or depend on the primitive fields instead.</AccordionContent></AccordionItem><AccordionItem value="conditional"><AccordionTrigger>Calling hooks conditionally</AccordionTrigger><AccordionContent>Hooks must run in the same order on every render. Never call them inside `if`, loops, or after an early `return`. Put the condition *inside* the hook, not around it.</AccordionContent></AccordionItem><AccordionItem value="premature"><AccordionTrigger>Premature memoization</AccordionTrigger><AccordionContent>Wrapping everything in `useMemo`/`useCallback` adds overhead and clutter. Add them when a child is memoized, a value feeds an effect dependency, or the profiler shows a real cost — not by default.</AccordionContent></AccordionItem></Accordion>
 
 <InfoCard title="Rules of Hooks">Only call hooks at the top level of a React function component or another custom hook. This guarantees React can match each hook call to its stored state across renders. The ESLint plugin enforces both this and the exhaustive-deps rule.</InfoCard>
-
----
 
 ## Next Steps
 

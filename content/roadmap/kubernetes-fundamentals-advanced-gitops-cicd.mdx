@@ -1,5 +1,5 @@
 ---
-title: "GitOps & CI/CD"
+title: "GitOps and CI/CD"
 description: "ArgoCD, Flux, and automated deployment pipelines for Kubernetes"
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -9,10 +9,6 @@ duration: "32 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 ## GitOps & Continuous Delivery
 
@@ -289,8 +285,6 @@ git push
 </Accordion>
 
 <Warning>Give ArgoCD/Flux a dedicated, least-privilege repository token with read access to manifests only. The image-updater write-back token should be scoped to the manifests repo, never your application source or organization-wide.</Warning>
-
----
 
 ## Wrapping Up
 

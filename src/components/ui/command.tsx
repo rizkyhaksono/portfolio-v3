@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 const Command = React.forwardRef<
@@ -23,11 +23,13 @@ Command.displayName = CommandPrimitive.displayName
 
 interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   className?: string
+  onCloseAutoFocus?: React.ComponentProps<typeof DialogContent>["onCloseAutoFocus"]
 }
 
-const CommandDialog = ({ children, className, ...props }: CommandDialogProps) => (
+const CommandDialog = ({ children, className, onCloseAutoFocus, ...props }: CommandDialogProps) => (
   <Dialog {...props}>
-    <DialogContent className={cn("overflow-hidden p-0", className)}>
+    <DialogContent aria-describedby={undefined} onCloseAutoFocus={onCloseAutoFocus} className={cn("p-0", className)}>
+      <DialogTitle className="sr-only">Search</DialogTitle>
       <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
         {children}
       </Command>
@@ -39,7 +41,7 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b border-ink px-3" cmdk-input-wrapper="">
+  <div className="flex items-center border-b border-ink pl-3 pr-14" cmdk-input-wrapper="">
     <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={1.5} />
     <CommandPrimitive.Input
       ref={ref}

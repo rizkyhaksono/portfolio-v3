@@ -1,5 +1,5 @@
 ---
-title: "State Management Patterns"
+title: "State management patterns"
 description: "Context API, useReducer, and when to reach for external state libraries"
 course: "react-fundamentals"
 category: "frontend"
@@ -9,12 +9,6 @@ duration: "28 min"
 order: 4
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## State Management in React
 
 Every non-trivial React app eventually faces the same question: *where should this piece of state live, and how do components far apart in the tree read and update it?* Get it wrong and you end up prop-drilling values through ten layers, or wrapping the whole app in one giant provider that re-renders on every keystroke. React ships with everything you need for most cases — `useState`, `useReducer`, and the Context API — and only a subset of apps genuinely need an external library. This lesson gives you a decision framework: start local, colocate state, reach for Context + `useReducer` for shared logic, and escalate to Zustand or Redux only when the problem demands it.
 
@@ -212,10 +206,8 @@ function CartBadge() {
 
 <Warning>Don't reach for Redux "just in case." Adding a heavy store to an app that only shares a theme and a logged-in user adds boilerplate with no payoff. Start with the built-in tools and escalate only when you feel real pain.</Warning>
 
----
-
 ## Next Steps
 
-<NextLesson title="Hooks Deep Dive" description="Master useEffect, useMemo, and custom hooks." href="/roadmap/react-fundamentals-intermediate-hooks-deep-dive" />
+<NextLesson title="Hooks deep dive" description="Master useEffect, useMemo, and custom hooks." href="/roadmap/react-fundamentals-intermediate-hooks-deep-dive" />
 
 <Resources resources={[{"title":"React useReducer","href":"https://react.dev/reference/react/useReducer"},{"title":"Scaling Up with Reducer and Context","href":"https://react.dev/learn/scaling-up-with-reducer-and-context"},{"title":"Passing Data Deeply with Context","href":"https://react.dev/learn/passing-data-deeply-with-context"},{"title":"Zustand Documentation","href":"https://zustand.docs.pmnd.rs/"}]} />

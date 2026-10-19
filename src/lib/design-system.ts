@@ -31,7 +31,7 @@ export const SECTION_SPACING = {
 } as const
 
 /**
- * Content width presets for PageBody.
+ * Content width presets for page wrappers.
  * Prefer `default` inside BaseLayout (trust the container).
  */
 export const PAGE_WIDTH = {

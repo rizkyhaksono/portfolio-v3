@@ -1,100 +1,93 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { getOnsiteBlogBySlug } from "@/services/visitor/onsite-blog"
+import type { Metadata } from "next"
+import Image from "next/image"
 import { notFound } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft, CalendarDays, Clock, PenLine } from "lucide-react"
-import ReadingProgress from "@/app/_components/blog/reading-progress"
+import { ArticleShell } from "@/components/ui/article-shell"
 import ClapButton from "@/components/ui/clap-button"
-import { SectionHeading } from "@/components/ui/section-heading"
+import { InkLink } from "@/components/ui/ink-link"
+import { PlateFigure } from "@/components/ui/plate-figure"
+import { ReaderCount } from "@/components/ui/reader-count"
+import { safeHtml } from "@/app/(visitor)/project/safe-html"
+import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
+import { dateline, minutesToRead } from "@/app/_components/blog/format"
+import { getSiteUrl } from "@/lib/site-url"
+import { getOnsiteBlogBySlug, getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
+import { getPathReads } from "@/services/visitor/umami"
 
-export const revalidate = 60
+export const revalidate = 300
 
 type Props = { params: Promise<{ slug: string }> }
 
-function estimateReadingTime(html: string): number {
-  const words = html.replace(/<[^>]+>/g, " ").trim().split(/\s+/).filter(Boolean).length
-  return Math.max(1, Math.round(words / 200))
+export async function generateStaticParams() {
+  return (await getOnsiteBlogPosts()).map((post) => ({ slug: post.slug }))
 }
 
-function formatDate(value?: string | null): string | null {
-  if (!value) return null
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return null
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-}
-
-export default async function OnsiteBlogArticlePage({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const post = await getOnsiteBlogBySlug(slug)
+  if (!post) return { title: "Article not found" }
+
+  const url = `${getSiteUrl()}/blog/onsite/${post.slug}`
+  const image = post.coverImage || `/api/og?type=blog&title=${encodeURIComponent(post.title)}&subtitle=${encodeURIComponent(post.description ?? "")}`
+
+  return {
+    title: `${post.title} | Writing`,
+    description: post.description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      url,
+      publishedTime: post.publishedAt ?? post.created_at,
+      modifiedTime: post.updated_at,
+      images: [{ url: image }],
+    },
+    twitter: { card: "summary_large_image", title: post.title, description: post.description, images: [image] },
+  }
+}
+
+export default async function OnsiteArticlePage({ params }: Props) {
+  const { slug } = await params
+  const [post, reads] = await Promise.all([getOnsiteBlogBySlug(slug), getPathReads()])
   if (!post) notFound()
 
-  const content = post.content ?? ""
-  const publishedDate = formatDate(post.publishedAt ?? post.created_at)
-  const readingMinutes = estimateReadingTime(content)
+  const path = `/blog/onsite/${post.slug}`
+  const content = safeHtml(post.content ?? "")
+  const published = post.publishedAt ?? post.created_at
 
   return (
     <>
-      <ReadingProgress />
-      <BlurFade delay={0.15} inView>
-        <article className="mx-auto max-w-3xl py-8 md:py-12">
-          <Link
-            href="/blog"
-            className="group mb-8 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            Back to blog
-          </Link>
-
-          <header className="mb-8">
-            <SectionHeading
-              as="h1"
-              eyebrow={
-                <>
-                  <PenLine className="h-3.5 w-3.5 text-primary" />
-                  Written here
-                </>
-              }
-              title={post.title}
-              description={post.description || undefined}
-            />
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] tracking-wide text-muted-foreground">
-              {publishedDate && (
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="h-4 w-4" />
-                  {publishedDate}
-                </span>
-              )}
-              <span className="inline-flex items-center gap-1.5">
-                <Clock className="h-4 w-4" />
-                {readingMinutes} min read
-              </span>
-            </div>
-          </header>
-
-          {post.coverImage && (
-            <div className="relative mb-10 aspect-[16/9] overflow-hidden border-y border-border">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
-            </div>
-          )}
-
-          <div
-            className="prose prose-neutral max-w-none dark:prose-invert prose-headings:scroll-mt-24 prose-headings:font-semibold prose-headings:tracking-tight prose-p:text-[1.05rem] prose-p:leading-8 prose-a:font-medium prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-none prose-pre:rounded-none prose-pre:border prose-pre:border-border prose-pre:bg-muted"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
-
-          <footer className="mt-12 flex items-center justify-between border-t border-border/60 pt-6">
-            <ClapButton targetType="blog" targetId={slug} />
-            <Link
-              href="/blog"
-              className="group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-              All posts
-            </Link>
-          </footer>
-        </article>
-      </BlurFade>
+      <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.coverImage} published={published} modified={post.updated_at} />
+      <ArticleShell
+        title={post.title}
+        standfirst={post.description || undefined}
+        dateline={dateline(published, minutesToRead(content))}
+        railLabel="About this article"
+        rail={
+          <>
+            <ReaderCount path={path} reads={reads} />
+            <p>Written for this site.</p>
+            <p>
+              <InkLink href="/blog" className="inline-flex min-h-11 items-center md:min-h-0">All writing</InkLink>
+            </p>
+          </>
+        }
+        footer={
+          <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-rule pt-6">
+            <ClapButton targetType="blog" targetId={post.slug} />
+            <p className="text-small text-ink-soft">If this was useful, a clap tells me so.</p>
+          </div>
+        }
+      >
+        {post.coverImage && (
+          // `.prose img` frames body images; the plate brings its own frame.
+          <PlateFigure className="[&_img]:border-0 [&_img]:p-0">
+            <Image src={post.coverImage} alt="" width={1200} height={675} priority sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-video w-full object-cover" />
+          </PlateFigure>
+        )}
+        {/* Nested `.prose` so the printed HTML gets the same block spacing as direct children. */}
+        <div className="prose" dangerouslySetInnerHTML={{ __html: content }} />
+      </ArticleShell>
     </>
   )
 }

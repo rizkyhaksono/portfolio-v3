@@ -1,94 +1,80 @@
-import {
-  BlogDetailProps,
-  BlogItem,
-  CommentItemProps,
-  BlogParamsProps,
-} from "@/commons/types/blog";
+import { cache } from "react";
+import type { BlogDetailProps, BlogItem, CommentItemProps } from "@/commons/types/blog";
+
+const DEV_USER = "rizkyhaksono";
+const devHeaders = () => ({ "api-key": process.env.DEVTO_KEY ?? "" });
+
+export interface MediumFeedItem {
+  guid: string;
+  title: string;
+  description: string;
+  link: string;
+  pubDate?: string;
+  /** rss2json fills it with the first image of the post. */
+  thumbnail?: string;
+}
 
 export async function getBlogData(): Promise<BlogItem[]> {
   try {
     const response = await fetch(`https://dev.to/api/articles/me`, {
-      method: "GET",
-      headers: {
-        "api-key": process.env.DEVTO_KEY ?? "",
-      },
-      next: {
-        revalidate: 60,
-      },
+      headers: devHeaders(),
+      next: { revalidate: 600 },
       signal: AbortSignal.timeout(4000),
     });
-
-    if (response?.status !== 200) return [] as BlogItem[];
+    if (response.status !== 200) return [];
     return await response.json();
-  } catch (error) {
-    return [] as BlogItem[];
-  }
-}
-
-export async function getBlogDetail({
-  searchParams,
-}: BlogParamsProps): Promise<BlogDetailProps> {
-  try {
-    const URL = `https://dev.to/api/articles/${searchParams.id}`;
-    const response = await fetch(URL, {
-      method: "GET",
-      headers: {
-        "api-key": process.env.DEVTO_KEY ?? "",
-      },
-      next: {
-        revalidate: 60,
-      },
-    });
-    if (response.status !== 200) return {} as BlogDetailProps;
-    return await response.json();
-  } catch (error) {
-    return {} as BlogDetailProps;
-  }
-}
-
-export async function getComments(postId: string): Promise<CommentItemProps[]> {
-  try {
-    const DEV_TO_URL = `https://dev.to/api/comments/?a_id=${postId}`;
-    const response = await fetch(DEV_TO_URL, {
-      headers: {
-        "api-key": process.env.DEVTO_KEY ?? "",
-      },
-    });
-    if (response?.status !== 200) return [];
-    return await response.json();
-  } catch (error) {
+  } catch {
     return [];
   }
 }
 
-export async function getBlogViews(searchParams: string) {
-  try {
-    const URL = `https://dev.to/api/articles/me/all`;
-    const response = await fetch(URL, {
-      headers: {
-        "api-key": process.env.DEVTO_KEY ?? "",
-      },
+/**
+ * One DEV article by slug, so `/blog/{slug}` needs no `?id`. `null` only when DEV answers 404;
+ * any other failure throws, so ISR keeps serving the last good page instead of caching a 404.
+ */
+export const getBlogDetail = cache(async (slug: string): Promise<BlogDetailProps | null> => {
+  const request = () =>
+    fetch(`https://dev.to/api/articles/${DEV_USER}/${encodeURIComponent(slug)}`, {
+      headers: devHeaders(),
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
     });
-    if (response.status !== 200) return 0;
-    const data = await response.json();
+  let response = await request();
+  if (response.status === 429) {
+    // The build prerenders every post at once and DEV rate-limits the burst: wait once (Retry-After, at most 5 s).
+    const seconds = Math.min(Number(response.headers.get("retry-after")) || 1, 5);
+    await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+    response = await request();
+  }
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`DEV article ${slug} answered ${response.status}`);
+  return response.json();
+});
 
-    const findArticle = data?.find(
-      (blog: BlogItem) => blog.id === parseInt(searchParams)
-    );
-    const page_views_count: number = findArticle?.page_views_count;
-    return page_views_count;
-  } catch (error) {
-    return 0;
+export async function getComments(articleId: number): Promise<CommentItemProps[]> {
+  try {
+    const response = await fetch(`https://dev.to/api/comments?a_id=${articleId}`, {
+      headers: devHeaders(),
+      next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (response.status !== 200) return [];
+    return await response.json();
+  } catch {
+    return [];
   }
 }
 
-export async function getBlogMedium() {
+export async function getBlogMedium(): Promise<MediumFeedItem[]> {
   try {
-    const URL = "https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@rizkyhaksono";
-    const response = await fetch(URL)
-    if (response.status !== 200) return { items: [] };
-    return await response.json();
-  } catch (error) {
-    return { items: [] };
+    const response = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://medium.com/feed/@rizkyhaksono", {
+      next: { revalidate: 600 },
+      signal: AbortSignal.timeout(4000),
+    });
+    if (response.status !== 200) return [];
+    const json = await response.json();
+    return Array.isArray(json?.items) ? json.items : [];
+  } catch {
+    return [];
   }
 }

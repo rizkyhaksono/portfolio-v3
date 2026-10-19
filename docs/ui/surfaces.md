@@ -36,16 +36,16 @@ import { Surface } from "@/components/ui/surface"
 
 ## Lift
 
-- Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/app/layout.tsx`. Feature code should not add it by hand.
-- The scrim behind a modal is ink at low opacity. No `backdrop-blur`, ever.
-- Lift is the only shadow in the system. `shadow-sm` through `shadow-2xl`, glows and coloured shadows are banned.
+- Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. Feature code should not add it by hand.
+- The scrim behind a modal is ink at low opacity. No backdrop blur, ever.
+- Lift is the only shadow in the system. The soft shadow scale (small through 2xl), glows and coloured shadows are banned.
 
 ## Forbidden
 
 | Avoid | Use instead |
 |---|---|
-| `bg-white/5`, `border-white/10`, `backdrop-blur-*`, translucent cards | Frame |
-| `shadow-sm`, `shadow-lg`, `hover:shadow-xl`, `hover:-translate-y-1` | Frame with `hover:border-ink` or `bg-tint` row |
+| Translucent white fills and borders, backdrop blur, glass cards | Frame |
+| Soft shadows, shadows on hover, `hover:-translate-y-1` lifts | Frame with `hover:border-ink` or `bg-tint` row |
 | Gradient fills, glows, coloured borders | Rules in ink or rule |
 | `rounded-*` on anything | Radius 0 (radio dot excepted) |
 | Window chrome, traffic lights, terminal title bars on content | A plain frame or no box at all |

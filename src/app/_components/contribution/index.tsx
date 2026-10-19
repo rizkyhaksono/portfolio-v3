@@ -71,8 +71,18 @@ export default async function ContributionSection() {
             {formatHours(hours, minutes)} across the {languages.length === 1 ? "language" : `${languages.length} languages`} below.
           </p>
           <ul role="list" className="mt-4 max-w-[40rem]">
-            {languages.map((language) => (
-              <HatchBar key={language.name} {...language} />
+            {languages.map(({ name, hours, minutes, percent = 0 }) => (
+              <HatchBar
+                key={name}
+                name={name}
+                percent={percent}
+                value={
+                  <>
+                    {formatHours(hours, minutes)}
+                    <span className="sr-only">, {Math.round(percent)}% of the week</span>
+                  </>
+                }
+              />
             ))}
           </ul>
         </div>

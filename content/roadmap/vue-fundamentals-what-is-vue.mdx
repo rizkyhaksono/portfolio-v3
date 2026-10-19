@@ -11,25 +11,18 @@ video: "https://www.youtube.com/embed/nhBVL41-_Cw"
 illustration: "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?q=80&w=2787&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Zap, Heart, Code2 } from "lucide-react"
-
 ## Introduction to Vue.js
 
 Vue.js is a progressive JavaScript framework for building user interfaces. Unlike monolithic frameworks, Vue is designed from the ground up to be incrementally adoptable.
 
-<Card className="my-6 border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
-      <Target className="h-5 w-5" />
-      Learning Objectives
+    <CardTitle>
+      Learning objectives
     </CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2 text-green-800 dark:text-green-200">
+    <ul>
       <li>Understand Vue.js core philosophy and design principles</li>
       <li>Learn about Vue's reactivity system</li>
       <li>Compare Vue with other frameworks</li>
@@ -38,37 +31,11 @@ Vue.js is a progressive JavaScript framework for building user interfaces. Unlik
   </CardContent>
 </Card>
 
----
-
 ## Why Vue.js?
 
-<div className="grid md:grid-cols-3 gap-4 my-6">
-  <Card className="text-center">
-    <CardHeader>
-      <Zap className="h-8 w-8 mx-auto text-yellow-500" />
-      <CardTitle className="text-lg">Approachable</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Builds on standard HTML, CSS, and JavaScript with intuitive API</CardContent>
-  </Card>
-
-  <Card className="text-center">
-    <CardHeader>
-      <Code2 className="h-8 w-8 mx-auto text-blue-500" />
-      <CardTitle className="text-lg">Versatile</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Incrementally adoptable ecosystem scales between a library and full framework</CardContent>
-  </Card>
-
-  <Card className="text-center">
-    <CardHeader>
-      <Heart className="h-8 w-8 mx-auto text-red-500" />
-      <CardTitle className="text-lg">Performant</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Truly reactive, compiler-optimized rendering with minimal manual optimization</CardContent>
-  </Card>
-</div>
-
----
+- **Approachable**: builds on standard HTML, CSS and JavaScript with an intuitive API.
+- **Versatile**: an incrementally adoptable ecosystem that scales between a library and a full framework.
+- **Performant**: truly reactive, compiler-optimised rendering with little manual optimisation.
 
 ## Vue.js Core Concepts
 
@@ -91,14 +58,13 @@ const message = ref("Hello Vue!")
 
 <style scoped>
 h1 {
-  color: #42b883;
+  color: seagreen;
 }
 </style>
 ```
 
-<Alert className="my-6">
-  <Lightbulb className="h-4 w-4" />
-  <AlertTitle>Single-File Components (SFC)</AlertTitle>
+<Alert>
+  <AlertTitle>Single-file components (SFC)</AlertTitle>
   <AlertDescription>Vue uses `.vue` files that encapsulate template, logic, and styles in a single file. This is one of Vue's most beloved features!</AlertDescription>
 </Alert>
 
@@ -106,8 +72,8 @@ h1 {
 
 Vue's reactivity system is at the heart of the framework. It automatically tracks JavaScript state changes and efficiently updates the DOM.
 
-<Tabs defaultValue="ref" className="my-6">
-  <TabsList className="grid w-full grid-cols-3">
+<Tabs defaultValue="ref">
+  <TabsList>
     <TabsTrigger value="ref">ref()</TabsTrigger>
     <TabsTrigger value="reactive">reactive()</TabsTrigger>
     <TabsTrigger value="computed">computed()</TabsTrigger>
@@ -116,7 +82,7 @@ Vue's reactivity system is at the heart of the framework. It automatically track
   <TabsContent value="ref">
     <Card>
       <CardHeader>
-        <CardTitle>ref() for Primitives</CardTitle>
+        <CardTitle>ref() for primitives</CardTitle>
       </CardHeader>
       <CardContent>
         ```vue
@@ -144,7 +110,7 @@ Vue's reactivity system is at the heart of the framework. It automatically track
   <TabsContent value="reactive">
     <Card>
       <CardHeader>
-        <CardTitle>reactive() for Objects</CardTitle>
+        <CardTitle>reactive() for objects</CardTitle>
       </CardHeader>
       <CardContent>
         ```vue
@@ -171,7 +137,7 @@ Vue's reactivity system is at the heart of the framework. It automatically track
   <TabsContent value="computed">
     <Card>
       <CardHeader>
-        <CardTitle>computed() for Derived State</CardTitle>
+        <CardTitle>computed() for derived state</CardTitle>
       </CardHeader>
       <CardContent>
         ```vue
@@ -195,68 +161,23 @@ Vue's reactivity system is at the heart of the framework. It automatically track
   </TabsContent>
 </Tabs>
 
----
-
 ## Vue vs Other Frameworks
 
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left py-2 px-3">Feature</th>
-            <th className="text-left py-2 px-3">Vue</th>
-            <th className="text-left py-2 px-3">React</th>
-            <th className="text-left py-2 px-3">Angular</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Learning Curve</td>
-            <td className="py-2 px-3 text-green-600">Gentle</td>
-            <td className="py-2 px-3 text-yellow-600">Moderate</td>
-            <td className="py-2 px-3 text-red-600">Steep</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Template Syntax</td>
-            <td className="py-2 px-3">HTML-based</td>
-            <td className="py-2 px-3">JSX</td>
-            <td className="py-2 px-3">HTML-based</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">State Management</td>
-            <td className="py-2 px-3">Pinia/Vuex</td>
-            <td className="py-2 px-3">Redux/Zustand</td>
-            <td className="py-2 px-3">NgRx/Services</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Bundle Size</td>
-            <td className="py-2 px-3 text-green-600">~33KB</td>
-            <td className="py-2 px-3 text-green-600">~42KB</td>
-            <td className="py-2 px-3 text-yellow-600">~130KB</td>
-          </tr>
-          <tr>
-            <td className="py-2 px-3 font-medium">TypeScript</td>
-            <td className="py-2 px-3">First-class</td>
-            <td className="py-2 px-3">Good support</td>
-            <td className="py-2 px-3">Built-in</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </CardContent>
-</Card>
-
----
+| Feature | Vue | React | Angular |
+| --- | --- | --- | --- |
+| Learning curve | Gentle | Moderate | Steep |
+| Template syntax | HTML-based | JSX | HTML-based |
+| State management | Pinia, Vuex | Redux, Zustand | NgRx, services |
+| Bundle size | ~33 KB | ~42 KB | ~130 KB |
+| TypeScript | First-class | Good support | Built-in |
 
 ## When to Use Vue
 
-<Accordion type="multiple" className="w-full not-prose">
+<Accordion type="multiple">
   <AccordionItem value="ideal">
-    <AccordionTrigger>✅ Vue is Great For</AccordionTrigger>
-    <AccordionContent className="space-y-2">
-      <ul className="list-disc pl-4 space-y-2">
+    <AccordionTrigger>Vue is great for</AccordionTrigger>
+    <AccordionContent>
+      <ul>
         <li>
           <strong>Progressive Enhancement</strong> — Adding interactivity to existing pages
         </li>
@@ -279,9 +200,9 @@ Vue's reactivity system is at the heart of the framework. It automatically track
     </AccordionContent>
   </AccordionItem>
   <AccordionItem value="ecosystem">
-    <AccordionTrigger>🔧 Vue Ecosystem</AccordionTrigger>
-    <AccordionContent className="space-y-2">
-      <ul className="list-disc pl-4 space-y-2">
+    <AccordionTrigger>Vue ecosystem</AccordionTrigger>
+    <AccordionContent>
+      <ul>
         <li>
           <strong>Vue Router</strong> — Official routing library
         </li>
@@ -304,8 +225,6 @@ Vue's reactivity system is at the heart of the framework. It automatically track
     </AccordionContent>
   </AccordionItem>
 </Accordion>
-
----
 
 ## Quick Start Example
 
@@ -374,12 +293,10 @@ onMounted(() => {
 </style>
 ```
 
----
-
 ## Next Steps
 
 <NextLesson
-  title="Setting Up Vue Development Environment"
+  title="Setting up a Vue development environment"
   description="Now that you understand what Vue.js is, let's set up your development environment and create your first Vue application!"
   href="/roadmap/vue-fundamentals-setup-environment"
 />

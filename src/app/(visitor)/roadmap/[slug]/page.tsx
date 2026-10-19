@@ -1,144 +1,90 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getRoadmapLessonBySlug, getAllRoadmapLessons } from "@/lib/mdx"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Clock, BookOpen, ArrowLeft, GraduationCap, Layers } from "lucide-react"
-import { getMDXComponents } from "@/components/ui/roadmap-mdx-component"
-import { MDXRemote } from "next-mdx-remote/rsc"
+import { compileMDX } from "next-mdx-remote/rsc"
 import remarkGfm from "remark-gfm"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { TableOfContents } from "@/components/ui/toc"
+import { getAllRoadmapLessons, getRoadmapIndex, getRoadmapLessonBySlug } from "@/lib/mdx"
+import { ArticleShell } from "@/components/ui/article-shell"
+import { InkLink } from "@/components/ui/ink-link"
+import { YouTubeFacade } from "@/components/ui/youtube-facade"
+import { getMDXComponents, headingIds } from "@/components/ui/roadmap-mdx-component"
 import { LessonCompleteButton } from "../_components/lesson-complete-button"
+import { courseTitle, minutesOf } from "../course-title"
 
-const difficultyColors = {
-  beginner: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800",
-  intermediate: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800",
-  advanced: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800",
-}
+export const dynamicParams = false
 
-export default async function RoadmapLessonPage({ params }: { params: Promise<{ slug: string }> }) {
+type Props = { params: Promise<{ slug: string }> }
+
+const LEVEL = { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" } as const
+
+/** "https://www.youtube.com/embed/abc" → "abc". */
+const videoId = (url?: string) => url?.match(/(?:embed\/|v=|youtu\.be\/)([\w-]+)/)?.[1]
+
+export default async function RoadmapLessonPage({ params }: Readonly<Props>) {
   const { slug } = await params
   const lesson = getRoadmapLessonBySlug(slug)
-
-  if (!lesson) {
-    notFound()
-  }
+  if (!lesson) notFound()
 
   const { meta, content } = lesson
-  const components = getMDXComponents()
-  const difficultyClass = meta.difficulty ? difficultyColors[meta.difficulty as keyof typeof difficultyColors] : ""
+  const course = getRoadmapIndex().find((entry) => entry.course === meta.course)
+  const position = course ? course.lessons.findIndex((entry) => entry.slug === slug) + 1 : 0
+  const minutes = minutesOf(meta.duration)
+  const video = videoId(meta.video)
+
+  const headings: { id: string; text: string; depth: number }[] = []
+  const { content: body } = await compileMDX({
+    source: content,
+    components: getMDXComponents(),
+    options: { mdxOptions: { remarkPlugins: [remarkGfm, headingIds(headings)] } },
+  })
+
+  const dateline = [
+    course && position > 0 && `Lesson ${position} of ${course.lessons.length} in ${courseTitle(meta.course)}.`,
+    meta.level && `${LEVEL[meta.level]}${minutes > 0 ? `, ${minutes} minutes to read` : ""}.`,
+  ]
+    .filter(Boolean)
+    .join(" ")
 
   return (
-    <div className="min-h-screen">
-      {/* Back Button - Sticky */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
-        <div className="container max-w-7xl py-3 px-4 xl:px-8">
-          <Link href={meta.course ? `/roadmap?course=${meta.course}` : "/roadmap"}>
-            <Button variant="ghost" size="sm" className="gap-2 hover:bg-muted -ml-2">
-              <ArrowLeft className="size-4" />
-              Back to Roadmap
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      <div className="container max-w-7xl py-8 flex flex-col xl:flex-row gap-12">
-        <div className="flex-1 max-w-4xl mx-auto xl:mx-0 w-full min-w-0">
-          {/* Header Section */}
-          <header className="mb-8">
-            {/* Badges */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {meta.difficulty && (
-                <Badge variant="outline" className={`capitalize ${difficultyClass}`}>
-                  <GraduationCap className="size-3 mr-1" />
-                  {meta.difficulty}
-                </Badge>
-              )}
-              {meta.category && (
-                <Badge variant="secondary" className="capitalize">
-                  <Layers className="size-3 mr-1" />
-                  {meta.category}
-                </Badge>
-              )}
-            </div>
-
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-4">{meta.title}</h1>
-
-            {/* Description */}
-            {meta.description && <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6">{meta.description}</p>}
-
-            {/* Meta Info Bar */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground p-4 rounded-lg bg-muted/50 border">
-              {meta.course && (
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
-                  <span className="capitalize font-medium">{meta.course.replace(/-/g, " ")}</span>
-                </div>
-              )}
-              {meta.course && meta.duration && <Separator orientation="vertical" className="h-4" />}
-              {meta.duration && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>{meta.duration} read</span>
-                </div>
-              )}
-            </div>
-          </header>
-
-          {/* Video Embed */}
-          {meta.video && (
-            <Card className="mb-8 overflow-hidden border-2">
-              <CardContent className="p-0">
-                <div className="relative aspect-video w-full">
-                  <iframe src={meta.video} title={meta.title} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full" />
-                </div>
-              </CardContent>
-            </Card>
+    <ArticleShell
+      title={meta.title}
+      standfirst={meta.description}
+      dateline={dateline}
+      railLabel="Contents"
+      rail={
+        <>
+          {headings.length > 0 && (
+            <ol role="list" className="flex flex-col gap-2">
+              {headings.map((heading) => (
+                <li key={heading.id} className={heading.depth === 3 ? "pl-4" : undefined}>
+                  <InkLink href={`#${heading.id}`} className="inline-flex min-h-11 items-center md:min-h-0 no-underline hover:underline">
+                    {heading.text}
+                  </InkLink>
+                </li>
+              ))}
+            </ol>
           )}
-
-          {/* MDX Content */}
-          <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-h2:text-2xl prose-h2:font-bold prose-h2:font-display prose-h2:border-b prose-h2:pb-3 prose-h2:mt-12 prose-h2:mb-5 prose-h3:text-xl prose-h3:font-semibold prose-h3:font-display prose-h3:mt-10 prose-h3:mb-4 prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border prose-code:before:content-none prose-code:after:content-none">
-            <MDXRemote
-              source={content}
-              components={components}
-              options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
-            />
-          </article>
-
-          {/* Completion Action */}
-          <div className="mt-12 mb-8">
-            <LessonCompleteButton courseId={meta.course || "unknown"} slug={slug} />
-          </div>
-        </div>
-
-        {/* Table of Contents sidebar for Desktop */}
-        <div className="hidden xl:block w-72 shrink-0">
-          <TableOfContents />
-        </div>
-      </div>
-    </div>
+          <InkLink href={`/roadmap#${meta.course}`} className="inline-flex min-h-11 items-center md:min-h-0 no-underline hover:underline">
+            All lessons in {courseTitle(meta.course)}
+          </InkLink>
+        </>
+      }
+      footer={<LessonCompleteButton courseId={meta.course || "unknown"} slug={slug} />}
+    >
+      {video && <YouTubeFacade id={video} title={meta.title} lesson={slug} />}
+      {body}
+    </ArticleShell>
   )
 }
 
-export async function generateStaticParams() {
-  const lessons = getAllRoadmapLessons()
-  return lessons.map((lesson) => ({
-    slug: lesson.slug,
-  }))
+export function generateStaticParams() {
+  return getAllRoadmapLessons().map((lesson) => ({ slug: lesson.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const lesson = getRoadmapLessonBySlug(slug)
 
-  if (!lesson) {
-    return {
-      title: "Lesson Not Found",
-    }
-  }
+  if (!lesson) return { title: "Lesson not found" }
 
   const { meta } = lesson
   const ogImage = meta.illustration ?? `/api/og?type=roadmap&title=${encodeURIComponent(meta.title)}&subtitle=${encodeURIComponent(meta.description ?? "")}`
@@ -146,6 +92,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${meta.title} | Roadmap`,
     description: meta.description,
+    alternates: { canonical: `/roadmap/${slug}` },
     openGraph: {
       title: meta.title,
       description: meta.description,

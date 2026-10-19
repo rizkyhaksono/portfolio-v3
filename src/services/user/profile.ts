@@ -1,22 +1,25 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { getAuthorizationHeader, revalidateByTag } from "@/app/actions/actions";
-import { ProfileResponse } from "@/commons/types/profile";
+import { getAuthorizationHeader } from "@/app/actions/actions";
+import { ProfileData } from "@/commons/types/profile";
 
-const getProfile = async (): Promise<ProfileResponse> => {
+const MAX_BANNER_BYTES = 5 * 1024 * 1024;
+const BANNER_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"];
+
+/** `data` is set only on success; callers branch on `status` (401 = the session ended). */
+const getProfile = async (): Promise<{ status: number; data?: ProfileData }> => {
   const response = await fetch(`${process.env.API_URL}/v3/me`, {
-    method: "GET",
     headers: await getAuthorizationHeader(),
-    credentials: "include",
-    next: {
-      tags: ["profile"],
-      revalidate: 0,
-    }
+    cache: "no-store",
+    signal: AbortSignal.timeout(5000),
   });
-  return await response.json();
+  const json = await response.json().catch(() => null);
+  return { status: response.status, data: response.ok ? json?.data : undefined };
 }
 
+// Results, not throws: production masks the message of an error thrown from a Server Action.
 const putProfile = async (
   id: string, {
     email,
@@ -32,8 +35,8 @@ const putProfile = async (
     location: string,
     about: string,
     bannerUrl: string
-  }): Promise<any> => {
-  const response = await fetch(`${process.env.API_URL}/v3/me/${id}`, {
+  }): Promise<{ ok: boolean; message?: string }> => {
+  const response = await fetch(`${process.env.API_URL}/v3/me/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: await getAuthorizationHeader(),
     body: JSON.stringify({
@@ -46,16 +49,19 @@ const putProfile = async (
     })
   });
 
-  const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(data?.message || `Failed to update profile (${response.status})`);
+    const data = await response.json().catch(() => null);
+    return { ok: false, message: data?.message || `Your changes were not saved (error ${response.status}).` };
   }
 
-  revalidateByTag("profile");
-  return data;
+  revalidatePath("/profile");
+  return { ok: true };
 }
 
-const uploadBannerImage = async (file: File): Promise<{ bannerUrl: string }> => {
+const uploadBannerImage = async (file: File): Promise<{ bannerUrl: string; message?: string }> => {
+  if (!BANNER_TYPES.includes(file.type)) return { bannerUrl: "", message: "Choose a PNG, JPG, GIF or WebP image." };
+  if (file.size > MAX_BANNER_BYTES) return { bannerUrl: "", message: "That image is over 5 MB. Choose a smaller one." };
+
   const cookieStore = await cookies();
   const token = cookieStore.get("NATEE_V3_TOKEN")?.value;
 
@@ -70,12 +76,12 @@ const uploadBannerImage = async (file: File): Promise<{ bannerUrl: string }> => 
   });
 
   const data = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new Error(data?.message || `Failed to upload cover image (${response.status})`);
+  if (!response.ok || !data?.data?.bannerUrl) {
+    return { bannerUrl: "", message: data?.message || `The cover image was not uploaded (error ${response.status}).` };
   }
 
-  revalidateByTag("profile");
-  return data?.data ?? { bannerUrl: "" };
+  revalidatePath("/profile");
+  return { bannerUrl: data.data.bannerUrl };
 }
 
 export {

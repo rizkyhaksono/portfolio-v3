@@ -27,7 +27,7 @@ export function LegalDocument({ sections, ...shell }: Readonly<LegalDocumentProp
           {sections.map(({ id, title }, index) => (
             <li key={id} className="grid grid-cols-[2.25rem_minmax(0,1fr)]">
               <span className="font-display tabular-nums">&sect;&nbsp;{index + 1}</span>
-              <InkLink href={`#${id}`} className="no-underline hover:underline">
+              <InkLink href={`#${id}`} className="inline-flex min-h-11 items-center md:min-h-0 no-underline hover:underline">
                 {title}
               </InkLink>
             </li>

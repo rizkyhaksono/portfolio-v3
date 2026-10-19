@@ -81,7 +81,7 @@ const COMMANDS: Command[] = [
     description: "Open my resume",
     run: (_a, ctx) => {
       ctx.navigate("/ai")
-      return ["Ask my resume → opening Etan AI…"]
+      return ["Opening Etan AI, which answers from my résumé…"]
     },
   },
   {
@@ -97,7 +97,7 @@ const COMMANDS: Command[] = [
       const t = args[0]
       if (t !== "light" && t !== "dark" && t !== "system") return ["usage: theme <light|dark|system>"]
       ctx.setTheme(t)
-      return [`theme → ${t}`]
+      return [`Theme set to ${t}.`]
     },
   },
   { name: "echo", description: "Print text", run: (args) => [args.join(" ")] },
@@ -225,7 +225,7 @@ export default function TerminalOverlay() {
             </DialogPrimitive.Close>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 text-[13.5px] leading-relaxed">
+          <div ref={scrollRef} role="log" aria-live="polite" className="flex-1 overflow-y-auto p-4 text-[13.5px] leading-relaxed">
             {lines.map((l, i) => (
               <samp key={i} className={cn("block whitespace-pre-wrap break-words", l.kind === "in" && "text-ink-soft")}>
                 {l.kind === "in" ? `$ ${l.text}` : l.text}

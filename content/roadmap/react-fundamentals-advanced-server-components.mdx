@@ -10,12 +10,6 @@ order: 8
 illustration: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## React Server Components
-
 React Server Components (RSC) let you render components entirely on the server, sending finished HTML and a compact serialized payload to the browser instead of shipping the component's JavaScript. This is a genuine architectural shift: data fetching happens where your data lives, secrets never reach the client, and your bundle shrinks because server-only code stays on the server. In the Next.js App Router every component under `app/` is a Server Component by default, and you opt into the client only where interactivity demands it. Getting this boundary right is the single most impactful skill for building fast, modern React apps.
 
 <LearningObjectives objectives={["Distinguish Server Components from Client Components and what each can do", "Fetch data directly in async Server Components without useEffect", "Place the 'use client' boundary deliberately to minimize bundle size", "Stream UI progressively with Suspense and loading.tsx", "Mutate data safely with Server Actions"]} />
@@ -242,10 +236,8 @@ export default function TodosPage() {
 - **Keep the boundary thin.** A small `LikeButton` or `Collapsible` client leaf is far cheaper than a client-rendered page.
 - **Prefer Server Actions over ad-hoc API routes** for mutations, and revalidate with `revalidatePath` or `revalidateTag` to keep the UI in sync.
 
----
-
 ## Next Steps
 
-<NextLesson title="Testing Patterns" description="Vitest and Testing Library." href="/roadmap/react-fundamentals-advanced-testing-patterns" />
+<NextLesson title="Testing patterns" description="Vitest and Testing Library." href="/roadmap/react-fundamentals-advanced-testing-patterns" />
 
 <Resources resources={[{"title":"React — Server Components","href":"https://react.dev/reference/rsc/server-components"},{"title":"Next.js — Server & Client Components","href":"https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns"},{"title":"Next.js — Data Fetching & Caching","href":"https://nextjs.org/docs/app/building-your-application/data-fetching/fetching"},{"title":"Next.js — Server Actions and Mutations","href":"https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations"}]} />

@@ -1,22 +1,30 @@
 "use client"
 
-import { useState, useCallback, useRef, useTransition, useEffect, useMemo } from "react"
-import { Send, User, Reply, MoreHorizontal, Edit2, Trash2, X, BadgeCheck, Info, RefreshCw, LogIn } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { cn } from "@/lib/utils"
-import { toast } from "sonner"
-import { PublicChatMessage } from "@/commons/types/public-chat"
-import { format } from "date-fns"
-import Link from "next/link"
+import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-
-const CHAT_LABEL = "Public chat"
+import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { InkLink } from "@/components/ui/ink-link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { track } from "@/lib/analytics"
+import { cn } from "@/lib/utils"
+import { PublicChatMessage } from "@/commons/types/public-chat"
 
 const JSON_HEADERS = { "Content-Type": "application/json" }
+// Fixed zone so the server and the browser print the same dateline.
+const STAMP = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jakarta" })
 
 async function chatRequest(
   url: string,
@@ -37,7 +45,7 @@ async function createMessage(message: string, replyToId?: string): Promise<{ dat
   const { result, error } = await chatRequest(
     "/api/chat",
     { method: "POST", headers: JSON_HEADERS, body: JSON.stringify({ message, replyToId }) },
-    "Failed to send message",
+    "The message did not send. Try again.",
   )
   return error ? { error } : { data: result?.data }
 }
@@ -46,13 +54,13 @@ async function updateMessage(messageId: string, message: string): Promise<{ data
   const { result, error } = await chatRequest(
     `/api/chat/${messageId}`,
     { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify({ message }) },
-    "Failed to update message",
+    "The change was not saved. Try again.",
   )
   return error ? { error } : { data: result?.data }
 }
 
 async function deleteMessage(messageId: string): Promise<{ success?: boolean; error?: string }> {
-  const { error } = await chatRequest(`/api/chat/${messageId}`, { method: "DELETE" }, "Failed to delete message")
+  const { error } = await chatRequest(`/api/chat/${messageId}`, { method: "DELETE" }, "The message was not deleted. Try again.")
   return error ? { error } : { success: true }
 }
 
@@ -61,101 +69,68 @@ interface ChatClientProps {
   currentUser: { id: string; name: string } | null
 }
 
-function avatarSrc(user: PublicChatMessage["user"]): string | undefined {
-  return user?.avatarUrl ?? user?.iconUrl ?? undefined
-}
+const nameOf = (message: PublicChatMessage) => message.user?.name || "Anonymous"
 
-function QuoteBox({ quoted }: { quoted: PublicChatMessage }) {
-  return (
-    <div className="mb-1.5 border-l-2 border-border bg-background px-2.5 py-1.5">
-      <p className="truncate text-xs font-semibold text-foreground/90">{quoted.user?.name || "Anonymous"}</p>
-      <p className="line-clamp-2 text-xs text-muted-foreground">{quoted.message}</p>
-    </div>
-  )
-}
-
-interface BubbleProps {
+interface LetterProps {
   message: PublicChatMessage
   quoted: PublicChatMessage | null
-  alignRight: boolean
   canReply: boolean
   canManage: boolean
   onReply: (m: PublicChatMessage) => void
   onEdit: (m: PublicChatMessage) => void
-  onDelete: (id: string) => void
+  onDelete: (m: PublicChatMessage) => void
 }
 
-function Bubble({ message, quoted, alignRight, canReply, canManage, onReply, onEdit, onDelete }: Readonly<BubbleProps>) {
-  const name = message.user?.name || "Anonymous"
-  const isAdmin = message.user?.role === "ADMIN"
+/** One letter: the writer, the text, a dateline sentence. Replies sit behind a left rule. */
+function Letter({ message, quoted, canReply, canManage, onReply, onEdit, onDelete }: Readonly<LetterProps>) {
+  const name = nameOf(message)
+  const date = new Date(message.createdAt)
   const edited = message.updatedAt !== message.createdAt
-  const parsedDate = new Date(message.createdAt)
-  const time = Number.isNaN(parsedDate.getTime()) ? "" : format(parsedDate, "dd/MM/yyyy, HH:mm")
-
-  const AvatarEl = (
-    <Avatar className="h-8 w-8 shrink-0 ring-2 ring-background">
-      <AvatarImage src={avatarSrc(message.user)} alt={name} referrerPolicy="no-referrer" />
-      <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/5 text-xs font-semibold text-primary">
-        {name.charAt(0).toUpperCase() || <User size={14} />}
-      </AvatarFallback>
-    </Avatar>
-  )
-
-  const Actions = (
-    <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-      {canReply && (
-        <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-primary" onClick={() => onReply(message)}>
-          <Reply size={13} />
-        </Button>
-      )}
-      {canManage && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground">
-              <MoreHorizontal size={14} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36">
-            <DropdownMenuItem onClick={() => onEdit(message)} className="cursor-pointer">
-              <Edit2 size={13} className="mr-2" /> Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDelete(message.id)} className="cursor-pointer text-destructive focus:text-destructive">
-              <Trash2 size={13} className="mr-2" /> Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </div>
-  )
 
   return (
-    <div className={cn("group flex w-full gap-2.5", alignRight ? "flex-row-reverse" : "flex-row")}>
-      {AvatarEl}
-      <div className={cn("flex min-w-0 max-w-[78%] flex-col", alignRight ? "items-end" : "items-start")}>
-        <div className={cn("mb-1 flex items-center gap-1.5", alignRight ? "flex-row-reverse" : "")}>
-          <span className="text-sm font-semibold text-foreground">{name}</span>
-          {isAdmin && <BadgeCheck size={14} className="text-primary" />}
-        </div>
-
-        <div className={cn("flex items-center gap-1", alignRight ? "flex-row" : "flex-row-reverse")}>
-          {Actions}
-          <div
-            className={cn(
-              "border px-3 py-2 text-sm leading-relaxed",
-              alignRight ? "border-foreground/20 bg-primary/10" : "border-border bg-muted/40",
-            )}
-          >
-            {quoted && <QuoteBox quoted={quoted} />}
-            <p className="whitespace-pre-wrap break-words">{message.message}</p>
-          </div>
-        </div>
-
-        <div className={cn("mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground", alignRight ? "flex-row-reverse" : "")}>
-          <span>{time}</span>
-          {edited && <span className="opacity-70">· edited</span>}
+    <article className={cn(quoted && "ml-3 border-l border-ink pl-4 sm:ml-8")}>
+      <div className="flex items-center gap-3">
+        <Avatar className="size-8">
+          <AvatarImage src={message.user?.avatarUrl ?? message.user?.iconUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
+          <AvatarFallback className="text-xs">{name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div className="flex min-w-0 flex-wrap items-center gap-x-2 text-body">
+          <span className="font-semibold text-ink">{name}</span>
+          {message.user?.role === "ADMIN" && <Badge variant="outline">Site owner</Badge>}
         </div>
       </div>
-    </div>
+
+      {quoted && (
+        <p className="mt-2 truncate font-display text-caption text-ink-soft">
+          In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
+        </p>
+      )}
+      <p className="mt-2 whitespace-pre-wrap break-words text-body text-ink">{message.message}</p>
+
+      <div className="mt-1 flex flex-wrap items-center gap-x-5">
+        {!Number.isNaN(date.getTime()) && (
+          <time dateTime={message.createdAt} suppressHydrationWarning className="font-display text-caption text-ink-soft">
+            {STAMP.format(date)}
+            {edited && ", edited"}
+          </time>
+        )}
+        {canReply && (
+          <Button variant="ghost" size="sm" className="px-0" aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
+            Reply
+          </Button>
+        )}
+        {canManage && (
+          <>
+            <Button variant="ghost" size="sm" className="px-0" aria-label="Edit your message" onClick={() => onEdit(message)}>
+              Edit
+            </Button>
+            <Button variant="ghost" size="sm" className="px-0" aria-label="Delete your message" onClick={() => onDelete(message)}>
+              Delete
+            </Button>
+          </>
+        )}
+      </div>
+    </article>
   )
 }
 
@@ -165,15 +140,15 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
   const [inputMessage, setInputMessage] = useState("")
   const [replyTo, setReplyTo] = useState<PublicChatMessage | null>(null)
   const [editingMessage, setEditingMessage] = useState<PublicChatMessage | null>(null)
-  const [refreshing, setRefreshing] = useState(false)
+  const [pendingDelete, setPendingDelete] = useState<PublicChatMessage | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const messagesScrollRef = useRef<HTMLDivElement>(null)
+  const newestRef = useRef<HTMLLIElement>(null)
 
   // Derive directly from the prop (not state) so router.refresh() — which refetches
   // the force-dynamic page after send/edit/delete — surfaces the updated messages.
   // Flatten top-level messages + their replies into one chronological stream, dedup
   // by id (a reply may also appear top-level; also guards against cycles), and index
-  // every message so replies can render a quote of their parent.
+  // every message so replies can quote their parent.
   const { stream, byId } = useMemo(() => {
     const byId = new Map<string, PublicChatMessage>()
     const flat: PublicChatMessage[] = []
@@ -196,63 +171,41 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     return { stream: flat, byId }
   }, [initialMessages])
 
-  const scrollToBottom = useCallback(() => {
-    const container = messagesScrollRef.current
-    if (container) container.scrollTop = container.scrollHeight
-  }, [])
-
-  // Scroll to the newest message on mount and whenever the stream changes.
+  // The page scrolls natively; bring a newly arrived message into view, never on first load.
+  const shown = useRef(stream.length)
   useEffect(() => {
-    const id = setTimeout(scrollToBottom, 100)
-    return () => clearTimeout(id)
-  }, [stream.length, scrollToBottom])
+    if (stream.length > shown.current) newestRef.current?.scrollIntoView({ block: "nearest" })
+    shown.current = stream.length
+  }, [stream.length])
 
-  const refresh = () => {
-    setRefreshing(true)
-    startTransition(() => {
-      router.refresh()
-      setTimeout(() => setRefreshing(false), 600)
-    })
-  }
-
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inputMessage.trim()) return
-    if (!currentUser) {
-      toast.error("Please sign in to send messages")
-      return
-    }
+    if (!inputMessage.trim() || !currentUser) return
 
     startTransition(async () => {
       if (editingMessage) {
         const result = await updateMessage(editingMessage.id, inputMessage)
-        if (result.data) {
-          toast.success("Message updated")
-          setEditingMessage(null)
-          setInputMessage("")
-          router.refresh()
-        } else {
-          toast.error(result.error || "Failed to update message")
+        if (!result.data) {
+          toast.error(result.error || "Something went wrong. Try again.")
+          return
         }
+        toast.success("Message updated.")
+        setEditingMessage(null)
       } else {
         const result = await createMessage(inputMessage, replyTo?.id)
-        if (result.data) {
-          toast.success("Message sent")
-          setReplyTo(null)
-          setInputMessage("")
-          router.refresh()
-        } else {
-          toast.error(result.error || "Failed to send message")
+        if (!result.data) {
+          toast.error(result.error || "Something went wrong. Try again.")
+          return
         }
+        track("chat-send", { reply: replyTo ? "yes" : "no" })
+        setReplyTo(null)
       }
+      setInputMessage("")
+      router.refresh()
     })
   }
 
   const handleReply = (message: PublicChatMessage) => {
-    if (!currentUser) {
-      toast.error("Please sign in to reply")
-      return
-    }
     setReplyTo(message)
     setEditingMessage(null)
     textareaRef.current?.focus()
@@ -265,16 +218,18 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     textareaRef.current?.focus()
   }
 
-  const handleDelete = (messageId: string) => {
-    if (!currentUser) return
+  const confirmDelete = () => {
+    const message = pendingDelete
+    setPendingDelete(null)
+    if (!message) return
     startTransition(async () => {
-      const result = await deleteMessage(messageId)
-      if (result.success) {
-        toast.success("Message deleted")
-        router.refresh()
-      } else {
-        toast.error(result.error || "Failed to delete message")
+      const result = await deleteMessage(message.id)
+      if (!result.success) {
+        toast.error(result.error || "Something went wrong. Try again.")
+        return
       }
+      toast.success("Message deleted.")
+      router.refresh()
     })
   }
 
@@ -284,106 +239,104 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
     setInputMessage("")
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
-      handleSendMessage(e as unknown as React.FormEvent)
+      e.currentTarget.form?.requestSubmit()
     }
   }
 
+  const composerLabel = editingMessage
+    ? "Edit your message"
+    : replyTo
+      ? `Reply to ${nameOf(replyTo)}`
+      : "Write a message"
+
   return (
-    <div className="w-full">
-      <section className="flex h-[calc(100svh-7rem)] max-h-[820px] min-h-[520px] flex-col overflow-hidden border-y border-border bg-background">
-        {/* Title bar */}
-        <div className="flex items-center gap-3 border-b border-border/60 bg-muted/40 px-4 py-3">
-          <p className="flex-1 truncate font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">{CHAT_LABEL}</p>
-          <button onClick={refresh} className="text-muted-foreground transition-colors hover:text-foreground" aria-label="Refresh">
-            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
-          </button>
-        </div>
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-x-6 py-3">
+        {stream.length > 3 && <InkLink href="#chat-newest" className="inline-flex min-h-11 items-center md:min-h-0">Go to the newest message</InkLink>}
+        <Button variant="ghost" size="sm" className="ml-auto px-0" disabled={isPending} onClick={() => startTransition(() => router.refresh())}>
+          {isPending ? "Updating…" : "Refresh"}
+        </Button>
+      </div>
 
-        {/* Pinned message — fixed above the scroll area so it stays visible */}
-        <div className="flex shrink-0 items-start gap-2.5 border-b border-border/60 bg-muted/20 px-4 py-3 sm:px-6">
-          <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" />
-          <div className="min-w-0">
-            <Eyebrow>Pinned</Eyebrow>
-            <p className="mt-1 text-sm leading-relaxed">
-              <span className="font-medium text-foreground">@Rizky Haksono</span> Hello welcome to my site, enjoy 👋
-            </p>
-          </div>
-        </div>
-
-        {/* Messages */}
-        <div ref={messagesScrollRef} className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 py-4 sm:px-6">
-          {stream.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-              <p className="font-medium">No messages yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">Be the first to start the conversation.</p>
-            </div>
-          ) : (
-            stream.map((m) => {
-              const isMine = currentUser?.id === m.userId
-              return (
-                <Bubble
-                  key={m.id}
+      {stream.length === 0 ? (
+        <p className="border-t border-rule py-10 font-display text-lead text-ink-soft">No messages yet. Yours could be the first.</p>
+      ) : (
+        <ol role="list" className="divide-y divide-rule border-t border-rule">
+          {stream.map((m, index) => {
+            const isMine = currentUser?.id === m.userId
+            const newest = index === stream.length - 1
+            return (
+              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined} className="scroll-mb-56 py-5">
+                <Letter
                   message={m}
                   quoted={m.replyToId ? byId.get(m.replyToId) ?? null : null}
-                  alignRight={m.user?.role === "ADMIN"}
                   canReply={Boolean(currentUser) && !isMine}
                   canManage={isMine}
                   onReply={handleReply}
                   onEdit={handleEdit}
-                  onDelete={handleDelete}
+                  onDelete={setPendingDelete}
                 />
-              )
-            })
-          )}
-        </div>
-
-        {/* Composer (only when signed in) */}
-        {currentUser && (
-          <div className="border-t border-border/60 bg-muted/20">
-            {(replyTo || editingMessage) && (
-              <div className="flex items-center justify-between border-b border-border/40 bg-primary/5 px-4 py-2 text-sm">
-                <span className="flex items-center gap-2 text-muted-foreground">
-                  {editingMessage ? <Edit2 size={13} /> : <Reply size={13} />}
-                  {editingMessage ? "Editing message" : <>Replying to <strong className="font-semibold text-foreground">{replyTo?.user?.name || "Anonymous"}</strong></>}
-                </span>
-                <Button variant="ghost" size="icon" className="h-6 w-6 hover:text-destructive" onClick={cancelReplyOrEdit}>
-                  <X size={14} />
-                </Button>
-              </div>
-            )}
-            <form onSubmit={handleSendMessage} className="flex items-end gap-2 p-3">
-              <Textarea
-                ref={textareaRef}
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={editingMessage ? "Edit your message…" : replyTo ? `Reply to ${replyTo.user?.name || "Anonymous"}…` : "Type a message…"}
-                disabled={isPending}
-                rows={1}
-                className="max-h-32 min-h-[42px] flex-1 resize-none bg-background focus-visible:ring-2 focus-visible:ring-primary/40"
-              />
-              <Button type="submit" size="icon" disabled={!inputMessage.trim() || isPending} className="h-[42px] w-[42px] shrink-0">
-                {isPending ? <RefreshCw size={16} className="animate-spin" /> : <Send size={16} />}
-              </Button>
-            </form>
-          </div>
-        )}
-      </section>
-
-      {/* Sign-in pill (only when signed out) */}
-      {!currentUser && (
-        <div className="mt-6 flex justify-center">
-          <Button asChild className="gap-2 px-6">
-            <Link href="/auth">
-              <LogIn size={16} />
-              Sign in to use Realtime Chats
-            </Link>
-          </Button>
-        </div>
+              </li>
+            )
+          })}
+        </ol>
       )}
+
+      {currentUser ? (
+        <form onSubmit={handleSendMessage} className="sticky bottom-0 z-10 border-t border-ink bg-paper-grain pb-4 pt-3">
+          <div className="flex items-baseline justify-between gap-4">
+            <Label htmlFor="chat-message" className="truncate">
+              {composerLabel}
+            </Label>
+            {(replyTo || editingMessage) && (
+              <Button type="button" variant="ghost" size="sm" className="px-0" onClick={cancelReplyOrEdit}>
+                Cancel
+              </Button>
+            )}
+          </div>
+          <div className="mt-1 flex items-end gap-3">
+            <Textarea
+              id="chat-message"
+              ref={textareaRef}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isPending}
+              rows={2}
+              aria-describedby="chat-hint"
+              className="max-h-40 min-h-11 flex-1 resize-none"
+            />
+            <Button type="submit" disabled={!inputMessage.trim() || isPending}>
+              {isPending ? "Sending…" : editingMessage ? "Save" : "Send"}
+            </Button>
+          </div>
+          <p id="chat-hint" className="mt-1 font-display text-caption text-ink-soft">
+            Enter sends. Shift and Enter start a new line.
+          </p>
+        </form>
+      ) : (
+        <p className="border-t border-ink pt-4 text-body text-ink">
+          <InkLink href="/auth?redirect=/chat">Sign in</InkLink> to write a message or reply to one.
+        </p>
+      )}
+
+      <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your message?</AlertDialogTitle>
+            <AlertDialogDescription>It disappears for everyone. This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete message
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

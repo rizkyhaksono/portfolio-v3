@@ -1,5 +1,5 @@
 ---
-title: "Security & RBAC"
+title: "Security and RBAC"
 description: "ServiceAccounts, Roles, RoleBindings, Pod Security Standards, and secrets"
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -9,12 +9,6 @@ duration: "34 min"
 order: 8
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Kubernetes Security & RBAC
 
 Every request that hits the Kubernetes API server — whether from `kubectl`, a controller, or a Pod running your application — passes through the same three gates: **authentication** (who are you?), **authorization** (are you allowed to do this?), and **admission control** (does this object meet cluster policy?). Role-Based Access Control (RBAC) is the authorization layer, and it is the single most important tool you have for containing the blast radius when a credential leaks or a workload is compromised. In a shared production cluster, a well-scoped RBAC policy is the difference between "one Pod was breached" and "the attacker read every Secret in the cluster." This lesson walks through the identity model, RBAC objects, Pod Security Standards, and secret handling that a real cluster needs.
 
@@ -233,10 +227,8 @@ kubectl auth can-i --list \
 
 <Tip>Audit RBAC regularly. Tools like `kubectl-who-can`, `rbac-lookup`, and `rakkess` reverse the question — "who can delete secrets?" — which is exactly what you need during an incident or a periodic access review.</Tip>
 
----
-
 ## Next Steps
 
-<NextLesson title="GitOps & CI/CD" description="ArgoCD deployments." href="/roadmap/kubernetes-fundamentals-advanced-gitops-cicd" />
+<NextLesson title="GitOps and CI/CD" description="ArgoCD deployments." href="/roadmap/kubernetes-fundamentals-advanced-gitops-cicd" />
 
 <Resources resources={[{"title":"Using RBAC Authorization","href":"https://kubernetes.io/docs/reference/access-authn-authz/rbac/"},{"title":"Pod Security Standards","href":"https://kubernetes.io/docs/concepts/security/pod-security-standards/"},{"title":"Managing Service Accounts","href":"https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/"},{"title":"Encrypting Secret Data at Rest","href":"https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/"}]} />

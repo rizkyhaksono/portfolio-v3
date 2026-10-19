@@ -1,67 +1,66 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
-import { cn } from "@/lib/utils"
-import { MacWindow } from "@/components/ui/mac-window"
-import { MessageSquare, ScanText, CatIcon, Target } from "lucide-react"
-import JdMatcher from "./jd-matcher"
+import dynamic from "next/dynamic"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { track } from "@/lib/analytics"
+import { setQuery } from "./set-query"
+
+const ToolLoading = () => <Skeleton aria-hidden className="h-72" />
+const OcrDemo = dynamic(() => import("./ocr-demo"), { loading: ToolLoading })
+const JdMatcher = dynamic(() => import("./jd-matcher"), { loading: ToolLoading })
 
 const TABS = [
-  { id: "chat", label: "Chat", icon: MessageSquare },
-  { id: "document", label: "Document AI", icon: ScanText },
-  { id: "hirefit", label: "Hire Fit", icon: Target },
+  { id: "chat", label: "Chat" },
+  { id: "document", label: "Document reader" },
+  { id: "hirefit", label: "Hire fit" },
 ] as const
 
-type Mode = (typeof TABS)[number]["id"]
+type Tab = (typeof TABS)[number]["id"]
 
-/** Unified AI hub: one page, a [Chat | Document AI] toggle. The actual chat node is decided
- * server-side (Etan AI when signed in, public RAG when logged out) and passed in. Both modes
- * stay mounted so switching tabs never loses an in-progress conversation. */
-export default function AIHub({ chat, docTool, loggedIn }: { chat: ReactNode; docTool: ReactNode; loggedIn: boolean }) {
-  const [mode, setMode] = useState<Mode>("chat")
+const isTab = (value?: string): value is Tab => TABS.some((t) => t.id === value)
+
+/** Cabinet for Etan AI. The chat node is decided on the server (chat or sign-in slip); the two tools load on first
+ *  visit and stay mounted, so switching tabs never loses work. The tab lives in `?tab=`. */
+export default function AIHub({ chat, initialTab }: Readonly<{ chat: ReactNode; initialTab?: string }>) {
+  const [tab, setTab] = useState<Tab>(isTab(initialTab) ? initialTab : "chat")
+  const [visited, setVisited] = useState<Tab[]>([tab])
+
+  const select = (value: string) => {
+    if (!isTab(value)) return
+    setTab(value)
+    setVisited((prev) => (prev.includes(value) ? prev : [...prev, value]))
+    setQuery("tab", value === "chat" ? undefined : value)
+    track("ai-tab", { tab: value })
+  }
+
+  const panels: Record<Tab, ReactNode> = { chat, document: <OcrDemo />, hirefit: <JdMatcher /> }
 
   return (
     <div>
-      <div className="mb-5 text-center">
-        <h1 className="flex items-center justify-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-          <CatIcon className="h-6 w-6 text-primary" />
-          Etan AI
-        </h1>
-        <p className="mx-auto mt-1 max-w-xl text-sm text-muted-foreground">
-          Chat with my portfolio assistant — or try the document AI.{" "}
-          {loggedIn ? "Your conversations are saved." : "Sign in to save your chats & history."}
+      <header className="pb-8">
+        <h1 className="font-display text-h1 text-balance text-ink">Etan AI</h1>
+        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
+          Ask about Rizky&apos;s work, read a document image, or check a job description against his record.
         </p>
-      </div>
+      </header>
+      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
-      <div className="mb-5 flex justify-center">
-        <div className="inline-flex rounded-none border border-border/60 bg-muted/30 p-0.5">
-          {TABS.map((t) => {
-            const Icon = t.icon
-            return (
-              <button
-                key={t.id}
-                onClick={() => setMode(t.id)}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-none px-4 py-1.5 text-sm font-medium transition-colors",
-                  mode === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-                )}
-                aria-pressed={mode === t.id}
-              >
-                <Icon className="h-4 w-4" />
-                {t.label}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      <div className={cn(mode !== "chat" && "hidden")}>{chat}</div>
-      <div className={cn(mode !== "document" && "hidden")}>{docTool}</div>
-      <div className={cn(mode !== "hirefit" && "hidden")}>
-        <MacWindow title="etan-ai ~ hire-fit" bodyClassName="p-3 sm:p-5">
-          <JdMatcher />
-        </MacWindow>
-      </div>
+      <Tabs value={tab} onValueChange={select} className="mt-8">
+        <TabsList aria-label="Etan AI tools">
+          {TABS.map((t) => (
+            <TabsTrigger key={t.id} value={t.id}>
+              {t.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {TABS.map((t) => (
+          <TabsContent key={t.id} value={t.id} forceMount className="data-[state=inactive]:hidden">
+            {visited.includes(t.id) && panels[t.id]}
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   )
 }

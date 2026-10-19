@@ -1,5 +1,5 @@
 ---
-title: "ConfigMaps, Secrets, & Ingress"
+title: "ConfigMaps, Secrets and Ingress"
 description: "Isolating configuration data from application code and managing incoming web traffic."
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -10,10 +10,6 @@ order: 3
 video: "https://www.youtube.com/embed/8vIjBtdBfs"
 illustration: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Shield, Settings, Route, ArrowRight } from "lucide-react"
 
 ## Managing Configuration
 
@@ -52,9 +48,8 @@ data:
   password: MWYyZDFlMmU2N2Rm
 ```
 
-<Alert className="my-6">
-  <Shield className="h-4 w-4" />
-  <AlertTitle>Base64 is Not Encryption</AlertTitle>
+<Alert>
+  <AlertTitle>Base64 is not encryption</AlertTitle>
   <AlertDescription>
     Secret values are only base64 *encoded*, not encrypted by default! Anyone with access to the cluster's API (or the raw `etcd` datastore) can decode them. You should always enable Encryption at Rest in your cluster settings or use
     external services like HashiCorp Vault.
@@ -102,11 +97,10 @@ spec:
                   number: 5000
 ```
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Route className="h-5 w-5" />
-      Intelligent Routing
+    <CardTitle>
+      Intelligent routing
     </CardTitle>
   </CardHeader>
   <CardContent>
@@ -120,4 +114,4 @@ spec:
 Congratulations, you have finished the **beginner** Kubernetes track!
 You went from understanding raw container infrastructure (Pods and Nodes) to wrapping them in self-healing lifecycles (Deployments), decoupling network routing (Services and Ingress), and securely managing configuration (Secrets and ConfigMaps).
 
-<NextLesson title="Pods & Networking Deep Dive" description="Ready for more? Continue to the Intermediate track and go deeper into Pod internals and cluster networking." href="/roadmap/kubernetes-fundamentals-intermediate-pods-networking" />
+<NextLesson title="Pods and networking deep dive" description="Ready for more? Continue to the Intermediate track and go deeper into Pod internals and cluster networking." href="/roadmap/kubernetes-fundamentals-intermediate-pods-networking" />

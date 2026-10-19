@@ -2,11 +2,10 @@
 
 @layer base {
   /* One ink on one paper. HSL triples (no hsl() wrapper) so every shadcn part re-inks. */
-  :root{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;--ws-ghost:.6;--head-h:3.25rem;
+  :root{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;--ws-ghost:hsl(var(--ink) / .6);--head-h:3.25rem;
   --background:var(--paper);--foreground:var(--ink);--card:var(--paper);--card-foreground:var(--ink);--popover:var(--paper);--popover-foreground:var(--ink);--primary:var(--ink);--primary-foreground:var(--paper);--secondary:var(--tint);--secondary-foreground:var(--ink);--muted:var(--tint);--muted-foreground:var(--ink-soft);--accent:var(--tint);--accent-foreground:var(--ink);--destructive:var(--ink);--destructive-foreground:var(--paper);--border:var(--rule);--input:var(--rule-strong);--ring:var(--ink);--radius:0rem;
-  --chart-1:var(--ink);--chart-2:var(--ink-soft);--chart-3:var(--rule-strong);--chart-4:var(--rule);--chart-5:var(--tint); /* keep until the admin charts move to InkChart in P3 */
   --dur-press:120ms;--dur-ui:180ms;--dur-sheet:240ms;--ease-print:cubic-bezier(.2,0,0,1);--scrim:var(--ink) / .35}
-  .dark{--paper:229 59% 12.5%;--ink:41 48% 88%;--ink-soft:227 51% 77.6%;--rule:229 44% 30.6%;--rule-strong:228 41% 61%;--tint:227 65% 24.7%;--plate-alpha:.85;--ws-ghost:.38;--scrim:var(--paper) / .7}
+  .dark{--paper:229 59% 12.5%;--ink:41 48% 88%;--ink-soft:227 51% 77.6%;--rule:229 44% 30.6%;--rule-strong:228 41% 61%;--tint:227 65% 24.7%;--plate-alpha:.85;--ws-ghost:hsl(var(--ink-soft) / .7);--scrim:var(--paper) / .7}
   @media (max-width:767px){:root{--head-h:3rem}}
 
   :root {
@@ -123,36 +122,16 @@
 
 /* Unlayered on purpose: always emitted (no content purge), still overridden by utilities below. */
 
-/* Photo duotone: grey image, screen the dark colour into the shadows, multiply the light one into the highlights. */
+/* Photo duotone: a gradient map through the theme's tokens (SVG filters in ui/plate-filters.tsx, root layout). */
 .plate {
   position: relative;
-  isolation: isolate;
   background-color: hsl(var(--paper));
 }
 .plate img {
-  filter: grayscale(1);
+  filter: url(#plate-paper);
 }
-.plate::before,
-.plate::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-.plate::before {
-  background-color: hsl(var(--ink));
-  mix-blend-mode: screen;
-}
-.plate::after {
-  background-color: hsl(var(--paper));
-  mix-blend-mode: multiply;
-}
-.dark .plate::before {
-  background-color: hsl(var(--paper));
-}
-.dark .plate::after {
-  background-color: hsl(var(--ink));
+.dark .plate img {
+  filter: url(#plate-night);
 }
 
 /* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
@@ -172,13 +151,14 @@
 .ws__stage {
   min-height: calc(100svh - var(--head-h));
 }
+/* The ghost is a colour, not opacity: faded cream over night paper reads as neutral grey. */
 @keyframes ws-ink {
   from {
-    opacity: var(--ws-ghost);
+    color: var(--ws-ghost);
     translate: 0.06em 0.04em;
   }
   to {
-    opacity: 1;
+    color: hsl(var(--ink));
     translate: 0 0;
   }
 }

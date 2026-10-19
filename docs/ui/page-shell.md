@@ -33,15 +33,14 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 | `footer?` | `'full'` (default), `'compact'`, `'none'` | `compact` on `/ai` and `/chat` |
 
 - The old `sidebar` and `rightSidebar` props, the navbar, sidebars, right-sidebar windows and visitor panel are gone. Do not bring them back.
-- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger. `DeferredClientUtilities` (command palette, terminal overlay, feedback widget) mounts inside BaseLayout, so admin and auth skip it.
+- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger. `DeferredClientUtilities` (command palette, terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. The palette opens from `[data-open-search]` buttons and ⌘K, the feedback dialog from `[data-open-feedback]` buttons (colophon and Contents sheet); nothing floats over the page.
 - There is no scroll-to-top button; the colophon has a "Back to top" link.
 - Do not add horizontal padding inside BaseLayout. The wrapper already pads.
 
-### PageBody and PageSection
+### Page width and PageSection
 
 | Primitive | File | Role |
 |---|---|---|
-| `PageBody` | `src/components/ui/page-body.tsx` | Width preset: `default`, `prose`, `article`, `wide`, `ledger` (`PAGE_WIDTH`) |
 | `PageSection` | `src/components/ui/page-section.tsx` | Section rhythm (`SECTION_SPACING.section`) and an optional `SectionHeading` |
 | `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title in italic, optional description. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. |
 
@@ -65,7 +64,7 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 | Profile card | Double-rule sheet, definition list, dotted leaders | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` (server) | 404s, `error.tsx`, empty states |
 
-Some pattern components land in phase 2 or 3. Until a route's phase, keep its current primitives but do not add new legacy structure (`MacWindow`, glass cards, sidebars) to it.
+Every route already uses one of these patterns. New routes pick one; never add legacy structure (window chrome, glass cards, sidebars).
 
 ## Home
 
@@ -87,7 +86,7 @@ The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career,
 
 | Avoid | Use |
 |---|---|
-| Nested `max-w-6xl mx-auto px-4` inside BaseLayout | `<PageBody width="wide">` |
+| Nested `max-w-6xl mx-auto px-4` inside BaseLayout | a `PAGE_WIDTH` preset from `src/lib/design-system.ts` |
 | `max-w-8xl` (undefined) | `PAGE_WIDTH` presets |
 | A second `container` inside a page | Trust BaseLayout |
 | Horizontal scroll at 375px | Wrap, stack, or clip with `overflow-x: clip` |

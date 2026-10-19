@@ -1,5 +1,5 @@
 ---
-title: "Setting Up Express Development Environment"
+title: "Setting up an Express development environment"
 description: "Installing Node.js, npm, and creating your first Express.js project with proper structure"
 course: "express-fundamentals"
 category: "backend"
@@ -11,22 +11,12 @@ video: "https://www.youtube.com/embed/L72fhGm1tfE"
 illustration: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=2938&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Terminal, Download, CheckCircle2, AlertCircle, FolderTree, Package } from "lucide-react"
-
-## Setting Up Your Development Environment
-
 Before you can start building with Express.js, you need to set up your development environment properly. This lesson will guide you through installing the necessary tools and creating a well-structured project.
 
-<Alert className="my-6">
-  <Download className="h-4 w-4" />
+<Alert>
   <AlertTitle>Prerequisites</AlertTitle>
   <AlertDescription>You'll need a code editor (VS Code recommended), a terminal, and basic knowledge of JavaScript and npm.</AlertDescription>
 </Alert>
-
----
 
 ## Installing Node.js and npm
 
@@ -36,69 +26,61 @@ Node.js is the runtime that allows Express to run. npm (Node Package Manager) co
 
 Visit [nodejs.org](https://nodejs.org) and download the LTS (Long Term Support) version.
 
-<Tabs defaultValue="windows" className="my-6">
+<Tabs defaultValue="windows">
   <TabsList>
     <TabsTrigger value="windows">Windows</TabsTrigger>
     <TabsTrigger value="macos">macOS</TabsTrigger>
     <TabsTrigger value="linux">Linux</TabsTrigger>
   </TabsList>
 
-{" "}
-
 <TabsContent value="windows">
-  <Card>
-    <CardContent className="pt-6">
-      <ol className="list-decimal list-inside space-y-2">
-        <li>Download the Windows Installer (.msi) from nodejs.org</li>
-        <li>Run the installer and follow the installation wizard</li>
-        <li>Verify installation by opening PowerShell and running:</li>
-      </ol>
-      <div className="mt-4 p-4 bg-muted rounded-lg font-mono text-sm">
-        node --version
-        <br />
-        npm --version
-      </div>
-    </CardContent>
-  </Card>
-</TabsContent>
 
-{" "}
+1. Download the Windows Installer (.msi) from nodejs.org.
+2. Run the installer and follow the installation wizard.
+3. Verify the installation by opening PowerShell and running:
+
+```bash
+node --version
+npm --version
+```
+
+</TabsContent>
 
 <TabsContent value="macos">
-  <Card>
-    <CardContent className="pt-6">
-      Using Homebrew (recommended):
-      <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">brew install node</div>
-      Or download the macOS Installer from nodejs.org Verify installation:
-      <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-        node --version
-        <br />
-        npm --version
-      </div>
-    </CardContent>
-  </Card>
+
+Install it with Homebrew (recommended):
+
+```bash
+brew install node
+```
+
+Or download the macOS Installer from nodejs.org. Then verify the installation:
+
+```bash
+node --version
+npm --version
+```
+
 </TabsContent>
 
-  <TabsContent value="linux">
-    <Card>
-      <CardContent className="pt-6">
-        For Ubuntu/Debian:
-        <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">
-          curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -<br />
-          sudo apt-get install -y nodejs
-        </div>
-        Verify installation:
-        <div className="p-4 bg-muted rounded-lg font-mono text-sm">
-          node --version
-          <br />
-          npm --version
-        </div>
-      </CardContent>
-    </Card>
-  </TabsContent>
-</Tabs>
+<TabsContent value="linux">
 
----
+For Ubuntu or Debian:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+Verify the installation:
+
+```bash
+node --version
+npm --version
+```
+
+</TabsContent>
+</Tabs>
 
 ## Creating Your First Express Project
 
@@ -123,42 +105,16 @@ npm install express cors helmet morgan dotenv
 npm install -D nodemon
 ```
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Package className="h-5 w-5" />
-      Package Breakdown
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <dl className="space-y-3">
-      <div>
-        <dt className="font-semibold">express</dt>
-        <dd className="text-muted-foreground text-sm">The web framework itself</dd>
-      </div>
-      <div>
-        <dt className="font-semibold">cors</dt>
-        <dd className="text-muted-foreground text-sm">Enable Cross-Origin Resource Sharing</dd>
-      </div>
-      <div>
-        <dt className="font-semibold">helmet</dt>
-        <dd className="text-muted-foreground text-sm">Security middleware for HTTP headers</dd>
-      </div>
-      <div>
-        <dt className="font-semibold">morgan</dt>
-        <dd className="text-muted-foreground text-sm">HTTP request logger</dd>
-      </div>
-      <div>
-        <dt className="font-semibold">dotenv</dt>
-        <dd className="text-muted-foreground text-sm">Load environment variables from .env file</dd>
-      </div>
-      <div>
-        <dt className="font-semibold">nodemon</dt>
-        <dd className="text-muted-foreground text-sm">Auto-restart server on file changes (dev only)</dd>
-      </div>
-    </dl>
-  </CardContent>
-</Card>
+What each package does:
+
+| Package | Role |
+| --- | --- |
+| `express` | The web framework itself |
+| `cors` | Enables Cross-Origin Resource Sharing |
+| `helmet` | Security middleware for HTTP headers |
+| `morgan` | HTTP request logger |
+| `dotenv` | Loads environment variables from a `.env` file |
+| `nodemon` | Restarts the server when files change (development only) |
 
 ### Step 3: Update package.json Scripts
 
@@ -185,22 +141,12 @@ npm install -D nodemon
 }
 ```
 
----
-
 ## Project Structure
 
 A well-organized project structure is crucial for maintainability:
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <FolderTree className="h-5 w-5" />
-      Recommended Folder Structure
-    </CardTitle>
-  </CardHeader>
-  <CardContent>
-    <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
-      {`my-express-api/
+```text
+my-express-api/
 ├── src/
 │   ├── index.js          # Entry point
 │   ├── app.js            # Express app configuration
@@ -224,12 +170,8 @@ A well-organized project structure is crucial for maintainability:
 ├── .env.example          # Environment template
 ├── .gitignore
 ├── package.json
-└── README.md`}
-    </pre>
-  </CardContent>
-</Card>
-
----
+└── README.md
+```
 
 ## Setting Up the Files
 
@@ -427,59 +369,24 @@ module.exports = (err, req, res, next) => {
 }
 ```
 
----
-
 ## Running the Server
 
-<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
-  <CardHeader>
-    <CardTitle className="flex items-center gap-2 text-green-700 dark:text-green-300">
-      <CheckCircle2 className="h-5 w-5" />
-      Start Development Server
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="text-green-800 dark:text-green-200">
-    <div className="p-4 bg-muted rounded-lg font-mono text-sm mb-4">npm run dev</div>
-    Your Express server should now be running at <code className="font-mono">http://localhost:3000</code>. Visit <code className="font-mono">http://localhost:3000/health</code> to check if it's working!
-  </CardContent>
-</Card>
+Start the development server:
 
----
+```bash
+npm run dev
+```
+
+Your Express server should now be running at `http://localhost:3000`. Visit `http://localhost:3000/health` to check that it works.
 
 ## VS Code Extensions for Express
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle>Recommended Extensions</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <ul className="space-y-3">
-      <li className="flex items-center gap-2">
-        <span className="font-semibold">REST Client</span>
-        <span className="text-muted-foreground text-sm">— Test APIs directly in VS Code</span>
-      </li>
-      <li className="flex items-center gap-2">
-        <span className="font-semibold">Thunder Client</span>
-        <span className="text-muted-foreground text-sm">— Lightweight REST API client</span>
-      </li>
-      <li className="flex items-center gap-2">
-        <span className="font-semibold">ESLint</span>
-        <span className="text-muted-foreground text-sm">— JavaScript linting</span>
-      </li>
-      <li className="flex items-center gap-2">
-        <span className="font-semibold">Prettier</span>
-        <span className="text-muted-foreground text-sm">— Code formatting</span>
-      </li>
-      <li className="flex items-center gap-2">
-        <span className="font-semibold">DotENV</span>
-        <span className="text-muted-foreground text-sm">— .env file syntax highlighting</span>
-      </li>
-    </ul>
-  </CardContent>
-</Card>
-
----
+- **REST Client**: test APIs directly in VS Code.
+- **Thunder Client**: a lightweight REST API client.
+- **ESLint**: JavaScript linting.
+- **Prettier**: code formatting.
+- **DotENV**: syntax highlighting for `.env` files.
 
 ## Next Steps
 
-<NextLesson title="Routing and Middleware in Depth" description="With your development environment set up, you're ready to learn about advanced routing and middleware patterns!" href="/roadmap/express-fundamentals-routing-middleware" />
+<NextLesson title="Routing and middleware in depth" description="With your development environment set up, you're ready to learn about advanced routing and middleware patterns!" href="/roadmap/express-fundamentals-routing-middleware" />

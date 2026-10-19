@@ -1,12 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
+
 import { IELTS_WORDS, IELTS_TOPICS, type IeltsWord } from "@/commons/constants/ielts-words"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
-import { Eyebrow } from "@/components/ui/eyebrow"
+import { badgeVariants } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { Volume2, RotateCcw, Shuffle, ChevronLeft, ChevronRight, GraduationCap } from "lucide-react"
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -49,140 +49,108 @@ export function IeltsTab() {
     [filtered.length],
   )
 
-  const mark = useCallback(
-    (bucket: "known" | "learning") => {
-      if (!card) return
-      const setter = bucket === "known" ? setKnown : setLearning
-      const other = bucket === "known" ? setLearning : setKnown
-      setter((prev) => new Set(prev).add(card.word))
-      other((prev) => {
-        const next = new Set(prev)
-        next.delete(card.word)
-        return next
-      })
-      go(1)
-    },
-    [card, go],
-  )
+  const mark = (bucket: "known" | "learning") => {
+    if (!card) return
+    const setter = bucket === "known" ? setKnown : setLearning
+    const other = bucket === "known" ? setLearning : setKnown
+    setter((prev) => new Set(prev).add(card.word))
+    other((prev) => {
+      const next = new Set(prev)
+      next.delete(card.word)
+      return next
+    })
+    go(1)
+  }
 
-  const reshuffle = useCallback(() => {
-    setDeck(shuffle(IELTS_WORDS))
+  const restart = (nextDeck: IeltsWord[] = deck) => {
+    setDeck(nextDeck)
     setIndex(0)
     setFlipped(false)
-  }, [])
+  }
 
-  const reset = useCallback(() => {
-    setKnown(new Set())
-    setLearning(new Set())
-    setIndex(0)
-    setFlipped(false)
-  }, [])
-
-  // Reset position when the topic filter changes.
-  useEffect(() => {
-    setIndex(0)
-    setFlipped(false)
-  }, [topic])
-
-  // Keyboard: space/enter flip, arrows navigate.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === " " || e.key === "Enter") {
-        e.preventDefault()
-        setFlipped((f) => !f)
-      } else if (e.key === "ArrowRight") go(1)
-      else if (e.key === "ArrowLeft") go(-1)
+  // Arrow keys only while the card has focus; Space and Enter already turn it, as on any button.
+  const onCardKey = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault()
+      go(e.key === "ArrowRight" ? 1 : -1)
     }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [go])
+  }
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Header */}
-      <div className="flex flex-col gap-1">
-        <Eyebrow>
-          <GraduationCap className="h-3.5 w-3.5" />
-          IELTS Vocabulary
-        </Eyebrow>
-        <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">Flashcards</h2>
-        <p className="text-xs text-muted-foreground sm:text-sm">
-          Band 7+ academic words for Writing &amp; Speaking. Tap the card to reveal — or press Space.
-        </p>
-      </div>
-
-      {/* Topic filter */}
-      <div className="flex flex-wrap gap-1.5">
+      <div role="group" aria-label="Topic" className="flex flex-wrap gap-2">
         {IELTS_TOPICS.map((t) => (
-          <button key={t} type="button" onClick={() => setTopic(t)}>
-            <Chip className={cn(t === topic && "border-foreground bg-primary text-primary-foreground")}>{t}</Chip>
+          <button
+            key={t}
+            type="button"
+            aria-pressed={t === topic}
+            onClick={() => {
+              setTopic(t)
+              restart()
+            }}
+            className={cn(
+              badgeVariants({ variant: "outline" }),
+              "min-h-8 transition-colors hover:border-ink [@media(pointer:coarse)]:min-h-11",
+              t === topic && "border-ink bg-ink text-paper",
+            )}
+          >
+            {t}
           </button>
         ))}
       </div>
 
-      {/* Progress */}
-      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
-        <span>{filtered.length ? `Card ${index + 1} / ${filtered.length}` : "No cards"}</span>
-        <span className="flex gap-3">
-          <span>Known {known.size}</span>
-          <span>Learning {learning.size}</span>
-        </span>
-      </div>
+      <p className="font-display text-caption tabular-nums text-ink-soft">
+        {filtered.length ? `Card ${index + 1} of ${filtered.length}.` : "No cards in this topic."} You know {known.size} and are still learning{" "}
+        {learning.size}.
+      </p>
 
-      {/* Card */}
       {card ? (
         <button
           type="button"
           onClick={() => setFlipped((f) => !f)}
-          className="group relative flex min-h-[16rem] w-full cursor-pointer flex-col items-center justify-center gap-4 border border-border bg-card p-8 text-center transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          onKeyDown={onCardKey}
+          aria-describedby="ielts-hint"
+          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-rule p-8 text-center transition-colors hover:border-ink"
         >
-          {!flipped ? (
-            <>
-              <div className="flex items-center gap-2">
-                <Chip>{card.pos}</Chip>
-                <Chip>{card.topic}</Chip>
-              </div>
-              <p className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{card.word}</p>
-              <span
-                role="button"
-                tabIndex={-1}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  playPronunciation(card.word)
-                }}
-                className="inline-flex items-center gap-1.5 border border-border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <Volume2 className="h-3.5 w-3.5" /> Listen
-              </span>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">Tap to reveal</p>
-            </>
-          ) : (
-            <div className="flex flex-col gap-3">
-              <p className="font-display text-lg font-bold tracking-tight">{card.word}</p>
-              <p className="text-sm text-foreground">{card.definition}</p>
-              <p className="text-sm italic text-muted-foreground">&ldquo;{card.example}&rdquo;</p>
-              <div className="mt-1 flex flex-wrap justify-center gap-1.5">
+          {flipped ? (
+            <span className="flex flex-col gap-3">
+              <span className="font-display text-h4 text-ink">{card.word}</span>
+              <span className="text-body text-ink">{card.definition}</span>
+              <span className="font-display text-body text-ink-soft">&ldquo;{card.example}&rdquo;</span>
+              <span className="mt-1 flex flex-wrap justify-center gap-1.5">
                 {card.synonyms.map((s) => (
                   <Chip key={s}>{s}</Chip>
                 ))}
-              </div>
-            </div>
+              </span>
+            </span>
+          ) : (
+            <>
+              <span className="flex items-center gap-2">
+                <Chip>{card.pos}</Chip>
+                <Chip>{card.topic}</Chip>
+              </span>
+              <span className="font-display text-h1 text-ink">{card.word}</span>
+              <span className="text-caption text-ink-soft">Select to see the meaning</span>
+            </>
           )}
         </button>
       ) : (
-        <div className="flex min-h-[16rem] items-center justify-center border border-border bg-card text-sm text-muted-foreground">
-          No words in this topic.
-        </div>
+        <p className="flex min-h-[16rem] items-center justify-center border border-rule font-display text-body text-ink-soft">No words in this topic.</p>
       )}
+      <p id="ielts-hint" className="font-display text-caption text-ink-soft">
+        Select the card or press Space to turn it. While it has focus, the left and right arrows move between cards.
+      </p>
 
-      {/* Controls */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => go(-1)} disabled={!card}>
-            <ChevronLeft className="h-4 w-4" /> Prev
+            Previous
           </Button>
           <Button variant="outline" size="sm" onClick={() => go(1)} disabled={!card}>
-            Next <ChevronRight className="h-4 w-4" />
+            Next
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
+            Listen
           </Button>
         </div>
         <div className="flex gap-2">
@@ -196,11 +164,19 @@ export function IeltsTab() {
       </div>
 
       <div className="flex gap-2">
-        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={reshuffle}>
-          <Shuffle className="h-4 w-4" /> Shuffle
+        <Button variant="ghost" size="sm" onClick={() => restart(shuffle(IELTS_WORDS))}>
+          Shuffle
         </Button>
-        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={reset}>
-          <RotateCcw className="h-4 w-4" /> Reset progress
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setKnown(new Set())
+            setLearning(new Set())
+            restart()
+          }}
+        >
+          Reset progress
         </Button>
       </div>
     </div>

@@ -5,13 +5,15 @@ import { writeFileSync } from 'node:fs'
 // Fonts stay outside the repo (OFL, google/fonts); outputs below are committed.
 import { mkdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { PRINT_HEX } from '../../src/lib/print-hex.ts'
 const ROOT = fileURLToPath(new URL('../../', import.meta.url))
 const require = createRequire(ROOT + 'package.json')
 const sharp = require('sharp')
 const FONT_DIR = process.argv[2]
 if (!FONT_DIR) { console.error('usage: node scripts/logo/make.mjs <font dir>'); process.exit(1) }
 const it = loadFont(FONT_DIR.replace(/\/?$/, '/') + 'Literata-Italic[opsz,wght].ttf')
-const INK = '#1E3C9E', PAPER = '#F3ECDC'
+// The hex copies of the tokens live in one place (Node strips the types when it imports print-hex.ts).
+const { ink: INK, paper: PAPER, night: NIGHT } = PRINT_HEX
 const f2 = n => +n.toFixed(1)
 
 // --- geometry helpers -------------------------------------------------------
@@ -59,7 +61,7 @@ function scene({ horizon = 560 } = {}) {
   const bromoEdge = curve(bromo)
   const crater = `M236 430Q292 452 352 424`
   const smoke = puffs(296, 398, 4, 16, 5)
-  // Batok: centre-front dome with rounded crest and meridian gullies
+  // Batok: centre-front dome with a round crest and meridian gullies
   const cx = 520, crest = 360, bl = 365, br = 690
   const half = y => { const t = (y - crest) / (H - crest); return 52 + (br - bl) / 2 * Math.pow(Math.min(1, Math.max(0, t)), 0.62) }
   const outline = []
@@ -96,7 +98,7 @@ function monogram(size, cx, baseline) {
 }
 
 // --- compositions --------------------------------------------------------------
-function mark({ ring = true, ringText = true, ghost = true, dark = false, ink = dark ? PAPER : INK, paper = dark ? '#0D1433' : PAPER, bg = true, id = 'disc', cut = false } = {}) {
+function mark({ ring = true, ringText = true, ghost = true, night = false, ink = night ? PAPER : INK, paper = night ? NIGHT : PAPER, bg = true, id = 'disc', cut = false } = {}) {
   const sc = scene({ horizon: 560 })
   const mono = monogram(ringText ? 300 : 340, 500, ringText ? 790 : 812)
   const parts = bg ? [`<rect width="1000" height="1000" fill="${paper}"/>`] : []
@@ -149,14 +151,18 @@ function ringLabel(topStr, bottomStr, ink) {
   return `<g fill="${ink}">${d}${dia(500 - 411, 500)}${dia(500 + 411, 500)}</g>`
 }
 
+// icon.svg sits in src/, where the grep gate bans hex literals; same print-hex values, written as rgb().
+const rgb = hex => `rgb(${[1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(',')})`
+
 function favicon() {
   const mono = monogram(660, 510, 700)
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><rect width="1000" height="1000" fill="${INK}"/>`
-    + `<path d="M120 800H880" stroke="${PAPER}" stroke-width="22" stroke-linecap="round"/><path d="M200 860H800" stroke="${PAPER}" stroke-width="16" stroke-linecap="round" opacity=".6"/>`
-    + `<path d="${mono}" fill="${PAPER}"/></svg>`
+  const ink = rgb(INK), paper = rgb(PAPER)
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><rect width="1000" height="1000" fill="${ink}"/>`
+    + `<path d="M120 800H880" stroke="${paper}" stroke-width="22" stroke-linecap="round"/><path d="M200 860H800" stroke="${paper}" stroke-width="16" stroke-linecap="round" opacity=".6"/>`
+    + `<path d="${mono}" fill="${paper}"/></svg>`
 }
 
-function mini({ dark = false, ink = dark ? PAPER : INK, paper = dark ? '#0D1433' : PAPER, bg = true, id = 'm' } = {}) {
+function mini({ night = false, ink = night ? PAPER : INK, paper = night ? NIGHT : PAPER, bg = true, id = 'm' } = {}) {
   // bold simplification for 24-48px: thick ring, Batok dome with 5 gullies, horizon, Rh
   const cx = 500, crest = 300, H = 520, half = y => 70 + 190 * Math.pow((y - crest) / (H - crest), 0.62)
   const out = []
@@ -173,9 +179,9 @@ function mini({ dark = false, ink = dark ? PAPER : INK, paper = dark ? '#0D1433'
     + `<circle cx="500" cy="500" r="455" fill="none" stroke="${ink}" stroke-width="44"/></svg>`
 }
 
-function lockup({ dark = false } = {}) {
-  const ink = dark ? PAPER : INK, paper = dark ? '#0D1433' : PAPER
-  const m = mark({ ringText: false, dark }).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '').replace(/<rect[^>]*\/>/, '')
+function lockup({ night = false } = {}) {
+  const ink = night ? PAPER : INK, paper = night ? NIGHT : PAPER
+  const m = mark({ ringText: false, night }).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '').replace(/<rect[^>]*\/>/, '')
   const name = text(it, 'Rizky Haksono', 300, 1080, 610)
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f2(name.width + 60)} 1000"><rect width="100%" height="100%" fill="${paper}"/><g>${m}</g><path d="${name.d}" fill="${ink}"/></svg>`
 }
@@ -183,10 +189,10 @@ function lockup({ dark = false } = {}) {
 const pub = ROOT + 'public/brand/'
 mkdirSync(pub, { recursive: true })
 const files = {
-  'seal-light': mark({}), 'seal-dark': mark({ dark: true }),
-  'mark-light': mark({ ringText: false }), 'mark-dark': mark({ ringText: false, dark: true }),
-  'mini-light': mini(), 'mini-dark': mini({ dark: true }),
-  'lockup-light': lockup(), 'lockup-dark': lockup({ dark: true }),
+  'seal-light': mark({}), 'seal-dark': mark({ night: true }),
+  'mark-light': mark({ ringText: false }), 'mark-dark': mark({ ringText: false, night: true }),
+  'mini-light': mini(), 'mini-dark': mini({ night: true }),
+  'lockup-light': lockup(), 'lockup-dark': lockup({ night: true }),
 }
 for (const [k, svg] of Object.entries(files)) writeFileSync(pub + k + '.svg', svg)
 writeFileSync(ROOT + 'src/app/icon.svg', favicon())

@@ -1,188 +1,127 @@
-import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { FileText, Scale, AlertTriangle, ShieldAlert, FileCheck, Link2, RefreshCw, Mail, ArrowLeft, ExternalLink, CheckCircle } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SectionHeading } from "@/components/ui/section-heading"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { Chip } from "@/components/ui/chip"
-import BlurFade from "@/components/magicui/blur-fade"
+import type { Metadata } from "next"
+import { LegalDocument } from "@/components/ui/legal-document"
+import { InkLink } from "@/components/ui/ink-link"
+import { getMetadataBaseUrl } from "@/lib/site-url"
+
+export const metadata: Metadata = {
+  title: "Terms of service | Rizky Haksono",
+  description: "The rules for using natee.my.id, its public chat, tracker, Etan AI and roadmap certificates.",
+  metadataBase: getMetadataBaseUrl(),
+  alternates: { canonical: "/legal/terms" },
+}
 
 const sections = [
   {
     id: "acceptance",
-    icon: CheckCircle,
-    title: "1. Acceptance of Terms",
-    content: "By accessing and using this portfolio website, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use this website.",
+    title: "Using this site",
+    body: <p>By using natee.my.id you agree to these terms. If you do not agree, please do not use the site.</p>,
   },
   {
     id: "license",
-    icon: FileText,
-    title: "2. Use License",
-    content:
-      "Permission is granted to temporarily view the materials (information or software) on this website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:",
-    list: ["Modify or copy the materials", "Use the materials for any commercial purpose", "Attempt to decompile or reverse engineer any software on this website", "Remove any copyright or other proprietary notations from the materials"],
+    title: "What you may do with the content",
+    body: (
+      <>
+        <p>
+          You may read, share links to and quote the writing, projects and roadmaps here for personal, non-commercial use.
+          That is a licence to view, not a transfer of ownership, so you may not:
+        </p>
+        <ul>
+          <li>change or republish the material as your own;</li>
+          <li>use it for commercial purposes without asking;</li>
+          <li>try to decompile or reverse engineer software on the site;</li>
+          <li>remove copyright or other notices from it.</li>
+        </ul>
+        <p>Open-source projects linked from the site are covered by their own licences.</p>
+      </>
+    ),
+  },
+  {
+    id: "posts",
+    title: "What you post",
+    body: (
+      <p>
+        Messages in the public chat, cards on the tracker and feedback notes are yours, and anyone can read the first two.
+        Keep them civil and lawful. I may edit or remove anything abusive, misleading or off topic, and close accounts that
+        keep posting it.
+      </p>
+    ),
+  },
+  {
+    id: "etan-ai",
+    title: "Etan AI answers",
+    body: (
+      <p>
+        Etan AI and the other AI tools write their answers with Google Gemini. The answers can be wrong or out of date, and
+        they are not professional advice. Check anything that matters before you rely on it.
+      </p>
+    ),
+  },
+  {
+    id: "certificates",
+    title: "Roadmap certificates",
+    body: (
+      <p>
+        A roadmap certificate is self-attested: it records that you marked every lesson of a roadmap complete. Nobody
+        examined or checked the work, and it is not an accredited qualification.
+      </p>
+    ),
   },
   {
     id: "disclaimer",
-    icon: AlertTriangle,
-    title: "3. Disclaimer",
-    content:
-      "The materials on this website are provided on an 'as is' basis. I make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.",
-    variant: "warning",
+    title: "No warranty",
+    body: (
+      <p>
+        The site and everything on it are provided as they are. I make no promises, express or implied, that they are
+        accurate, complete, fit for a particular purpose or free of errors, and the material may change at any time without
+        notice.
+      </p>
+    ),
   },
   {
     id: "limitations",
-    icon: ShieldAlert,
-    title: "4. Limitations",
-    content:
-      "In no event shall Rizky Haksono or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on this website.",
-  },
-  {
-    id: "accuracy",
-    icon: FileCheck,
-    title: "5. Accuracy of Materials",
-    content:
-      "The materials appearing on this website could include technical, typographical, or photographic errors. I do not warrant that any of the materials on this website are accurate, complete, or current. I may make changes to the materials contained on this website at any time without notice.",
+    title: "Limits of liability",
+    body: (
+      <p>
+        I am not liable for any loss, including lost data or profit, that comes from using the site or from not being able
+        to use it.
+      </p>
+    ),
   },
   {
     id: "links",
-    icon: Link2,
-    title: "6. Links",
-    content:
-      "I have not reviewed all of the sites linked to this website and am not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by me of the site. Use of any such linked website is at the user's own risk.",
+    title: "Links to other sites",
+    body: (
+      <p>
+        I have not reviewed every site this one links to and am not responsible for what they publish. A link is not an
+        endorsement; you follow it at your own risk.
+      </p>
+    ),
   },
   {
-    id: "modifications",
-    icon: RefreshCw,
-    title: "7. Modifications",
-    content: "I may revise these terms of service for this website at any time without notice. By using this website you are agreeing to be bound by the then current version of these terms of service.",
+    id: "changes",
+    title: "Changes",
+    body: <p>I may revise these terms. The version on this page, with the date at the top, is the one that applies.</p>,
   },
   {
     id: "contact",
-    icon: Mail,
-    title: "8. Contact",
-    content: "If you have any questions about these Terms of Service, please contact me via the contact form on this website or through my GitHub profile.",
-    hasContact: true,
+    title: "Contact",
+    body: (
+      <p>
+        Questions go through the <InkLink href="/#contact">contact form on the home page</InkLink>, or to{" "}
+        <InkLink href="mailto:mrizkyhaksono@gmail.com">mrizkyhaksono@gmail.com</InkLink>.
+      </p>
+    ),
   },
 ]
 
 export default function TermsOfServicePage() {
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="container max-w-4xl py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="mb-4 gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Button>
-          </Link>
-
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-primary/10 text-primary">
-              <Scale className="w-8 h-8" />
-            </div>
-            <SectionHeading
-              as="h1"
-              eyebrow="Legal"
-              title="Terms of"
-              accent="Service"
-              description="Rules and guidelines for using this website"
-              className="flex-1"
-              titleClassName="md:text-4xl"
-            >
-              <Badge variant="secondary" className="mt-1 w-fit">
-                Last updated: December 28, 2025
-              </Badge>
-            </SectionHeading>
-          </div>
-        </div>
-
-        {/* Quick Navigation */}
-        <Card className="mb-8">
-          <CardContent className="p-4">
-            <Eyebrow className="mb-3">Quick Navigation</Eyebrow>
-            <div className="flex flex-wrap gap-2">
-              {sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`} className="inline-flex">
-                  <Chip className="transition-colors hover:bg-accent hover:text-foreground">
-                    {section.title.replace(/^\d+\.\s/, "")}
-                  </Chip>
-                </a>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sections */}
-        <div className="space-y-6">
-          {sections.map((section) => {
-            const Icon = section.icon
-            const isWarning = section.variant === "warning"
-
-            return (
-              <Card key={section.id} id={section.id} className={isWarning ? "border-yellow-200 dark:border-yellow-800" : ""}>
-                <CardContent className={`p-6 ${isWarning ? "bg-yellow-50/50 dark:bg-yellow-950/20" : ""}`}>
-                  <div className="flex items-start gap-4">
-                    <div className={`p-2 rounded-lg flex-shrink-0 ${isWarning ? "bg-yellow-100 dark:bg-yellow-900/30" : "bg-secondary"}`}>
-                      <Icon className={`w-5 h-5 ${isWarning ? "text-yellow-600 dark:text-yellow-400" : "text-muted-foreground"}`} />
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      <h2 className="font-display text-lg sm:text-xl font-semibold tracking-tight">{section.title}</h2>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{section.content}</p>
-
-                      {section.list && (
-                        <ul className="mt-3 space-y-2">
-                          {section.list.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-xs sm:text-sm">
-                              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                              <span className="text-muted-foreground">{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {section.hasContact && (
-                        <div className="flex flex-wrap gap-3 mt-4">
-                          <Link href="/#contact">
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <Mail className="w-4 h-4" />
-                              Contact Form
-                            </Button>
-                          </Link>
-                          <Link href="https://github.com/rizkyhaksono" target="_blank">
-                            <Button variant="outline" size="sm" className="gap-2">
-                              <ExternalLink className="w-4 h-4" />
-                              GitHub Profile
-                            </Button>
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-
-        {/* Footer */}
-        <Separator className="my-8" />
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Rizky Haksono. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/legal/privacy" className="hover:text-foreground transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/" className="hover:text-foreground transition-colors">
-              Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    </BlurFade>
+    <LegalDocument
+      title="Terms of service"
+      standfirst="The few rules for reading, posting and learning here."
+      dateline="Last updated 19 October 2026."
+      prev={{ href: "/legal/privacy", title: "Privacy policy" }}
+      sections={sections}
+    />
   )
 }

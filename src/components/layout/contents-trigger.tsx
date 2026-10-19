@@ -20,6 +20,7 @@ export function ContentsTrigger({ className }: Readonly<{ className?: string }>)
         ref={trigger}
         type="button"
         data-umami-event="contents-open"
+        data-contents-trigger
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={() => {

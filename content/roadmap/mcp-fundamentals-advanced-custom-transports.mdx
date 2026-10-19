@@ -1,5 +1,5 @@
 ---
-title: "Custom Transports"
+title: "Custom transports"
 description: "Build stdio, SSE, and WebSocket transports for custom MCP integrations"
 course: "mcp-fundamentals"
 category: "ai-engineering"
@@ -9,12 +9,6 @@ duration: "30 min"
 order: 9
 illustration: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2832&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Custom Transports
 
 A **transport** is the layer that moves JSON-RPC 2.0 messages between an MCP client and server. The protocol logic — tools, resources, prompts, capability negotiation — is identical regardless of how bytes travel. That separation is deliberate: the same server can talk to Claude Desktop over `stdio`, to a browser agent over HTTP, or to a real-time dashboard over WebSocket, just by swapping the transport you pass to `server.connect()`. Understanding transports is what lets you take a local prototype and expose it to remote, authenticated, multi-client deployments without rewriting your tool handlers.
 
@@ -78,7 +72,7 @@ The host registers the server by command in its config file:
 
 For servers that outlive a single spawned process — shared internal tools, hosted APIs, browser agents — you need an HTTP-based transport. The spec offers two, and it matters which you choose for a new build.
 
-<Tabs defaultValue="streamable" className="my-6">
+<Tabs defaultValue="streamable">
   <TabsList>
     <TabsTrigger value="streamable">Streamable HTTP</TabsTrigger>
     <TabsTrigger value="sse">SSE (legacy)</TabsTrigger>
@@ -218,7 +212,7 @@ wss.on("connection", (ws) => {
 
 ## Common Pitfalls & Best Practices
 
-<Accordion type="single" collapsible className="not-prose">
+<Accordion type="single" collapsible>
   <AccordionItem value="stdout">
     <AccordionTrigger>Logging to stdout under stdio</AccordionTrigger>
     <AccordionContent>Corrupts the JSON-RPC stream and disconnects the client. Route every log line to <code>stderr</code> with <code>console.error</code>, or use a logger configured to write to fd 2.</AccordionContent>
@@ -239,10 +233,8 @@ wss.on("connection", (ws) => {
 
 <Tip>Choose the smallest transport that fits: stdio for local tools, Streamable HTTP for hosted multi-client servers, and a custom WebSocket transport only when you need true full-duplex streaming. Because they all satisfy the same interface, you can start with stdio and graduate to remote without touching a single tool handler.</Tip>
 
----
-
 ## Next Steps
 
-<NextLesson title="Production Deployment" description="Package your transport-ready server with Docker, health checks, and scaling." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
+<NextLesson title="Production deployment" description="Package your transport-ready server with Docker, health checks, and scaling." href="/roadmap/mcp-fundamentals-advanced-production-deployment" />
 
 <Resources resources={[{"title":"MCP Transports Concept","href":"https://modelcontextprotocol.io/docs/concepts/transports"},{"title":"MCP Spec — Transports (2025-06-18)","href":"https://modelcontextprotocol.io/specification/2025-06-18/basic/transports"},{"title":"TypeScript SDK","href":"https://github.com/modelcontextprotocol/typescript-sdk"},{"title":"ws — Node.js WebSocket library","href":"https://github.com/websockets/ws"}]} />

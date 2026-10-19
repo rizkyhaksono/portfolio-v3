@@ -1,43 +1,43 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react"
+import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import { Logo } from "@/components/ui/logo"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eyebrow } from "@/components/ui/eyebrow"
-import { toast } from "sonner"
-import { User, Bell, Shield, Palette, Globe, Save, Loader2, Moon, Sun, Monitor, Camera, LogOut, Mail, CalendarDays, BadgeCheck, Fingerprint } from "lucide-react"
+import { formatDay } from "@/components/layout/admin/admin-format"
+import { PRINT_HEX } from "@/lib/print-hex"
 import {
-  getCurrentUserClient,
   getAdminSettingsClient,
+  getCurrentUserClient,
   updateAdminSettingsClient,
   updateUserClient,
   uploadAvatarClient,
 } from "@/services/admin/client-services"
-import { performAdminLogout } from "@/lib/admin-logout"
-import { useTheme } from "next-themes"
+import { SourceTabs } from "../_components/source-tabs"
 
-// Profile settings schema
 const profileSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
-  website: z.string().url("Invalid URL").optional().or(z.literal("")),
-  location: z.string().max(100).optional(),
+  name: z.string().trim().min(2, "The name needs at least 2 characters."),
+  email: z.string().trim().email("Use a full email address."),
+  website: z.string().trim().url("Use a full address, starting with https://.").or(z.literal("")),
+  location: z.string().trim().max(100, "Keep the place under 100 characters."),
+  bio: z.string().max(500, "Keep the bio under 500 characters."),
 })
 
-// Notification settings schema
 const notificationSchema = z.object({
   emailNotifications: z.boolean(),
   pushNotifications: z.boolean(),
@@ -46,22 +46,40 @@ const notificationSchema = z.object({
   securityAlerts: z.boolean(),
 })
 
-// Appearance settings schema
-const appearanceSchema = z.object({
-  theme: z.enum(["light", "dark", "system"]),
-  language: z.string(),
-  timezone: z.string(),
-})
+const appearanceSchema = z.object({ language: z.string(), timezone: z.string() })
 
-type ProfileFormValues = z.infer<typeof profileSchema>
-type NotificationFormValues = z.infer<typeof notificationSchema>
-type AppearanceFormValues = z.infer<typeof appearanceSchema>
+type NotificationValues = z.infer<typeof notificationSchema>
 
-interface OAuthAccount {
-  provider?: string
-  providerId?: string
-  providerUserId?: string
-}
+// The API reuses older AdminSettings columns for the bell's four sources (portfolio-v3-api
+// controller/notifications/getNotifications.ts), so each switch is labelled by the source it controls,
+// not by its column name. weeklyDigest controls nothing and stays hidden.
+const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: string }[] = [
+  { name: "emailNotifications", label: "Feedback", note: "New messages from the feedback form." },
+  { name: "pushNotifications", label: "Chat", note: "New messages in the public chat." },
+  { name: "projectUpdates", label: "Tracker", note: "New cards on the tracker board." },
+  { name: "securityAlerts", label: "Claps", note: "New claps on posts and projects." },
+]
+
+const THEMES = [
+  { value: "light", label: "Paper" },
+  { value: "dark", label: "Night" },
+  { value: "system", label: "System" },
+] as const
+
+const LANGUAGES = [
+  ["en", "English"],
+  ["id", "Indonesian"],
+  ["ja", "Japanese"],
+  ["zh", "Chinese"],
+] as const
+
+const TIMEZONES = [
+  ["UTC", "UTC"],
+  ["Asia/Jakarta", "Jakarta (WIB)"],
+  ["Asia/Tokyo", "Tokyo (JST)"],
+  ["America/New_York", "New York"],
+  ["Europe/London", "London"],
+] as const
 
 interface UserData {
   id: string
@@ -74,678 +92,405 @@ interface UserData {
   role?: string
   createdAt?: string
   emailVerified?: boolean
-  oauthAccounts?: OAuthAccount[]
+  oauthAccounts?: { provider?: string; providerId?: string }[]
 }
 
-export default function AdminDashboardSettingPage() {
-  const { setTheme } = useTheme()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
+// Paper must print light even inside Night print, where the CSS tokens are flipped, hence the hex copies.
+const PAPER: CSSProperties = { backgroundColor: PRINT_HEX.paper, color: PRINT_HEX.ink }
+
+/** The mini mark printed in each theme's own ink: paper, night (the `.dark` token flip), or half of each. */
+function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
+  return (
+    <span aria-hidden className="relative block size-16 shrink-0 border border-rule">
+      {mode !== "dark" && (
+        <span className="absolute inset-0 flex items-center justify-center" style={PAPER}>
+          <Logo className="size-10 text-current" />
+        </span>
+      )}
+      {mode !== "light" && (
+        <span className={`dark absolute inset-0 flex items-center justify-center bg-paper text-ink ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`}>
+          <Logo className="size-10" />
+        </span>
+      )}
+    </span>
+  )
+}
+
+/** A definition row with a dotted leader between term and value. */
+function Leader({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
+  return (
+    <div className="flex items-baseline gap-2 py-1.5 text-small">
+      <dt className="flex min-w-0 flex-1 items-baseline gap-2 text-ink-soft">
+        {term}
+        <span aria-hidden className="min-w-6 flex-1 border-b border-dotted border-rule-strong" />
+      </dt>
+      <dd className="min-w-0 text-right tabular-nums text-ink [overflow-wrap:anywhere]">{children}</dd>
+    </div>
+  )
+}
+
+const sentence = (word = "") => word.charAt(0).toLocaleUpperCase("en") + word.slice(1).toLowerCase()
+
+export default function AdminSettingsPage() {
+  const router = useRouter()
+  const { theme, setTheme } = useTheme()
+  const [state, setState] = useState<"loading" | "ready" | "failed">("loading")
   const [user, setUser] = useState<UserData | null>(null)
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  // Profile form
-  const profileForm = useForm<ProfileFormValues>({
+  const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      bio: "",
-      website: "",
-      location: "",
-    },
+    defaultValues: { name: "", email: "", website: "", location: "", bio: "" },
   })
-
-  // Notification form
-  const notificationForm = useForm<NotificationFormValues>({
+  const notificationForm = useForm<NotificationValues>({
     resolver: zodResolver(notificationSchema),
-    defaultValues: {
-      emailNotifications: true,
-      pushNotifications: false,
-      weeklyDigest: true,
-      projectUpdates: true,
-      securityAlerts: true,
-    },
+    defaultValues: { emailNotifications: true, pushNotifications: false, weeklyDigest: true, projectUpdates: true, securityAlerts: true },
+  })
+  const appearanceForm = useForm<z.infer<typeof appearanceSchema>>({
+    resolver: zodResolver(appearanceSchema),
+    defaultValues: { language: "en", timezone: "UTC" },
   })
 
-  // Appearance form
-  const appearanceForm = useForm<AppearanceFormValues>({
-    resolver: zodResolver(appearanceSchema),
-    defaultValues: {
-      theme: "system",
-      language: "en",
-      timezone: "UTC",
-    },
-  })
+  const load = useCallback(async () => {
+    setState("loading")
+    try {
+      const [me, settings] = await Promise.all([getCurrentUserClient() as Promise<UserData>, getAdminSettingsClient().catch(() => null)])
+      setUser(me)
+      profileForm.reset({
+        name: me.name ?? "",
+        email: me.email ?? "",
+        website: settings?.website ?? "",
+        location: me.location ?? "",
+        bio: me.about ?? "",
+      })
+      if (settings) {
+        const { emailNotifications, pushNotifications, weeklyDigest, projectUpdates, securityAlerts } = settings
+        notificationForm.reset({ emailNotifications, pushNotifications, weeklyDigest, projectUpdates, securityAlerts })
+        appearanceForm.reset({ language: settings.language || "en", timezone: settings.timezone || "UTC" })
+      }
+      setState("ready")
+    } catch {
+      setState("failed")
+    }
+  }, [profileForm, notificationForm, appearanceForm])
 
   useEffect(() => {
-    async function fetchUser() {
-      setIsLoading(true)
-      try {
-        const [userData, settings] = await Promise.all([
-          getCurrentUserClient(),
-          getAdminSettingsClient().catch(() => null),
-        ])
-        if (userData) {
-          setUser(userData)
-          profileForm.reset({
-            name: userData.name || "",
-            email: userData.email || "",
-            bio: userData.about || "",
-            website: settings?.website || "",
-            location: userData.location || "",
-          })
-        }
-        if (settings) {
-          notificationForm.reset({
-            emailNotifications: settings.emailNotifications,
-            pushNotifications: settings.pushNotifications,
-            weeklyDigest: settings.weeklyDigest,
-            projectUpdates: settings.projectUpdates,
-            securityAlerts: settings.securityAlerts,
-          })
-          appearanceForm.reset({
-            theme: (settings.theme as "light" | "dark" | "system") || "system",
-            language: settings.language || "en",
-            timezone: settings.timezone || "UTC",
-          })
-          if (settings.theme === "light" || settings.theme === "dark" || settings.theme === "system") {
-            setTheme(settings.theme)
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchUser()
-  }, [profileForm, notificationForm, appearanceForm, setTheme])
+    void load()
+  }, [load])
 
-  async function onProfileSubmit(data: ProfileFormValues) {
-    if (!user?.id) return
-    setIsSaving(true)
+  const onProfile = async (values: z.infer<typeof profileSchema>) => {
+    if (!user) return
     try {
-      await updateUserClient(user.id, {
-        name: data.name,
-        email: data.email,
-        about: data.bio,
-        location: data.location,
-      })
-      await updateAdminSettingsClient({ website: data.website || "" })
-      // Keep the on-screen account card in sync without a full reload.
-      setUser((prev) => (prev ? { ...prev, name: data.name, email: data.email, about: data.bio, location: data.location } : prev))
-      toast.success("Profile updated", {
-        description: "Your profile has been updated successfully.",
-      })
-    } catch (error) {
-      console.error("Failed to update profile:", error)
-      toast.error("Error", {
-        description: "Failed to update profile. Please try again.",
-      })
-    } finally {
-      setIsSaving(false)
+      await updateUserClient(user.id, { name: values.name, email: values.email, about: values.bio, location: values.location })
+      await updateAdminSettingsClient({ website: values.website })
+      setUser({ ...user, name: values.name, email: values.email, about: values.bio, location: values.location })
+      toast.success("Profile saved.")
+      // The spine's name and portrait come from the server layout.
+      router.refresh()
+    } catch {
+      toast.error("The profile did not save. Try again.")
     }
   }
 
-  async function onNotificationSubmit(data: NotificationFormValues) {
-    setIsSaving(true)
+  const onNotifications = async (values: NotificationValues) => {
     try {
-      await updateAdminSettingsClient(data)
-      toast.success("Notifications updated", {
-        description: "Your notification preferences have been saved.",
-      })
-    } catch (error) {
-      console.error("Failed to update notifications:", error)
-      toast.error("Error", {
-        description: "Failed to update notifications. Please try again.",
-      })
-    } finally {
-      setIsSaving(false)
+      await updateAdminSettingsClient(values)
+      toast.success("Notification sources saved.")
+    } catch {
+      toast.error("The notification sources did not save. Try again.")
     }
   }
 
-  async function onAppearanceSubmit(data: AppearanceFormValues) {
-    setIsSaving(true)
+  // Theme is not saved here: next-themes is its one source, set the moment a swatch is chosen.
+  const onAppearance = async (values: z.infer<typeof appearanceSchema>) => {
     try {
-      await updateAdminSettingsClient(data)
-      setTheme(data.theme)
-      toast.success("Appearance updated", {
-        description: "Your appearance settings have been saved.",
-      })
-    } catch (error) {
-      console.error("Failed to update appearance:", error)
-      toast.error("Error", {
-        description: "Failed to update appearance. Please try again.",
-      })
-    } finally {
-      setIsSaving(false)
+      await updateAdminSettingsClient(values)
+      toast.success("Language and time zone saved.")
+    } catch {
+      toast.error("Language and time zone did not save. Try again.")
     }
   }
 
-  async function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const onPortrait = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("File too large", { description: "Avatar must be 2MB or smaller." })
+      toast.error("The portrait must be 2 MB or smaller.")
       return
     }
-    setIsUploadingAvatar(true)
+    setUploading(true)
     try {
       const res = (await uploadAvatarClient(file)) as { url?: string; data?: { url?: string; avatarUrl?: string } }
-      const newUrl = res?.data?.avatarUrl ?? res?.data?.url ?? res?.url
-      setUser((prev) => (prev ? { ...prev, avatarUrl: newUrl ?? prev.avatarUrl } : prev))
-      toast.success("Avatar updated", { description: "Your profile picture has been changed." })
+      const avatarUrl = res?.data?.avatarUrl ?? res?.data?.url ?? res?.url
+      setUser((prev) => (prev ? { ...prev, avatarUrl: avatarUrl ?? prev.avatarUrl } : prev))
+      toast.success("Portrait updated.")
+      router.refresh()
     } catch {
-      toast.error("Upload failed", { description: "Could not upload the avatar. Please try again." })
+      toast.error("The portrait did not upload. Try again.")
     } finally {
-      setIsUploadingAvatar(false)
-      if (fileInputRef.current) fileInputRef.current.value = ""
+      setUploading(false)
+      if (fileRef.current) fileRef.current.value = ""
     }
   }
 
-  async function handleLogout() {
-    setIsLoggingOut(true)
-    try {
-      await performAdminLogout()
-    } catch {
-      setIsLoggingOut(false)
-      toast.error("Error", { description: "Failed to sign out. Please try again." })
-    }
-  }
-
-  if (isLoading) {
+  if (state === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div aria-busy="true" className="mx-auto w-full max-w-[44rem] border border-ink p-[3px]">
+        <p className="sr-only">Loading settings</p>
+        <div className="border border-rule p-5 sm:p-8">
+          <div className="flex items-end gap-5 pb-6">
+            <Skeleton className="size-20" />
+            <div className="flex-1 space-y-3">
+              <Skeleton className="h-8 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+            </div>
+          </div>
+          <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+          <div className="mt-6 space-y-3">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-4 w-full" />
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
 
+  if (state === "failed" || !user) {
+    return (
+      <div className="mx-auto w-full max-w-[44rem] border-y border-rule py-10 text-center">
+        <p className="text-small text-ink-soft">Your account did not load. The API may be down for a moment.</p>
+        <Button variant="outline" size="sm" className="mt-3" onClick={() => void load()}>
+          Try again
+        </Button>
+      </div>
+    )
+  }
+
+  const providers = (user.oauthAccounts ?? []).map((account) => sentence(account.provider || account.providerId || "OAuth"))
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto w-full max-w-[44rem]">
+      <article className="border border-ink p-[3px]">
+        <div className="border border-rule p-5 sm:p-8">
+          <header className="flex items-end gap-5 pb-6">
+            <Avatar className="size-20">
+              {(user.avatarUrl ?? user.image) && <AvatarImage src={user.avatarUrl ?? user.image} alt="" referrerPolicy="no-referrer" />}
+              <AvatarFallback className="font-display text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <h2 className="font-display text-h2 text-ink [overflow-wrap:anywhere]">{user.name || "Admin"}</h2>
+              {user.location && <p className="mt-1 font-display text-lead text-ink-soft">{user.location}</p>}
+            </div>
+          </header>
+          <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
-      <Separator />
+          <dl className="mt-6">
+            <Leader term="Email">
+              {user.email || "None"}
+              {user.emailVerified && ", verified"}
+            </Leader>
+            <Leader term="Role">{sentence(user.role || "admin")}</Leader>
+            <Leader term="Member since">{formatDay(user.createdAt) || "Unknown"}</Leader>
+            <Leader term="Signs in with">{providers.length > 0 ? providers.join(", ") : "Email and password"}</Leader>
+            <Leader term="User ID">{user.id}</Leader>
+          </dl>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[400px]">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <span className="hidden sm:inline">Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="notifications" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Notifications</span>
-          </TabsTrigger>
-          <TabsTrigger value="appearance" className="flex items-center gap-2">
-            <Palette className="h-4 w-4" />
-            <span className="hidden sm:inline">Appearance</span>
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            <span className="hidden sm:inline">Security</span>
-          </TabsTrigger>
-        </TabsList>
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} aria-busy={uploading}>
+              {uploading ? "Uploading…" : "Change portrait"}
+            </Button>
+            <p className="text-caption text-ink-soft">PNG, JPG, GIF or WebP, up to 2 MB.</p>
+            <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={onPortrait} />
+          </div>
+        </div>
+      </article>
 
-        {/* Profile Tab */}
-        <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-display">Profile Information</CardTitle>
-              <CardDescription>Update your personal information and public profile.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...profileForm}>
-                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-                  {/* Avatar Section */}
-                  <div className="flex items-center gap-6">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploadingAvatar}
-                      className="group relative h-20 w-20 shrink-0 rounded-full"
-                      aria-label="Change avatar"
-                    >
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage src={user?.avatarUrl ?? user?.image} alt={user?.name} referrerPolicy="no-referrer" />
-                        <AvatarFallback className="text-lg">{user?.name?.charAt(0)?.toUpperCase() || "A"}</AvatarFallback>
-                      </Avatar>
-                      <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
-                        {isUploadingAvatar ? <Loader2 className="h-5 w-5 animate-spin" /> : <Camera className="h-5 w-5" />}
-                      </span>
-                    </button>
-                    <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={handleAvatarChange} />
-                    <div className="space-y-2">
-                      <h3 className="font-medium">{user?.name || "Admin User"}</h3>
-                      <Badge variant="secondary">{user?.role || "Admin"}</Badge>
-                      <div>
-                        <Button type="button" variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploadingAvatar}>
-                          {isUploadingAvatar ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Uploading…</> : <><Camera className="mr-2 h-4 w-4" />Change Avatar</>}
+      <div className="mt-12">
+        <SourceTabs
+          tabs={[
+            {
+              id: "profile",
+              label: "Profile",
+              content: (
+                <Card className="p-4 sm:p-6">
+                  <Form {...profileForm}>
+                    <form noValidate onSubmit={profileForm.handleSubmit(onProfile)} className="grid gap-5 sm:grid-cols-2">
+                      {(
+                        [
+                          ["name", "Name", "text"],
+                          ["email", "Email", "email"],
+                          ["website", "Website", "url"],
+                          ["location", "Place", "text"],
+                        ] as const
+                      ).map(([name, label, type]) => (
+                        <FormField
+                          key={name}
+                          control={profileForm.control}
+                          name={name}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{label}</FormLabel>
+                              <FormControl>
+                                <Input type={type} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ))}
+                      <FormField
+                        control={profileForm.control}
+                        name="bio"
+                        render={({ field }) => (
+                          <FormItem className="sm:col-span-2">
+                            <FormLabel>Bio</FormLabel>
+                            <FormControl>
+                              <Textarea rows={4} {...field} />
+                            </FormControl>
+                            <FormDescription>Up to 500 characters.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="sm:col-span-2">
+                        <Button type="submit" disabled={profileForm.formState.isSubmitting}>
+                          {profileForm.formState.isSubmitting ? "Saving…" : "Save profile"}
                         </Button>
-                        <p className="mt-1.5 text-xs text-muted-foreground">PNG, JPG, GIF or WebP. Max 2MB.</p>
                       </div>
+                    </form>
+                  </Form>
+                </Card>
+              ),
+            },
+            {
+              id: "notifications",
+              label: "Notifications",
+              content: (
+                <Card className="p-4 sm:p-6">
+                  <p className="text-small text-ink-soft">Choose what the bell in the head counts.</p>
+                  <Form {...notificationForm}>
+                    <form onSubmit={notificationForm.handleSubmit(onNotifications)} className="mt-4">
+                      <div className="border-t border-ink">
+                        {BELL_SOURCES.map(({ name, label, note }) => (
+                          <FormField
+                            key={name}
+                            control={notificationForm.control}
+                            name={name}
+                            render={({ field }) => (
+                              <FormItem className="flex items-center justify-between gap-4 space-y-0 border-b border-rule py-3">
+                                <div className="space-y-0.5">
+                                  <FormLabel>{label}</FormLabel>
+                                  <FormDescription>{note}</FormDescription>
+                                </div>
+                                <FormControl>
+                                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <Button type="submit" className="mt-5" disabled={notificationForm.formState.isSubmitting}>
+                        {notificationForm.formState.isSubmitting ? "Saving…" : "Save sources"}
+                      </Button>
+                    </form>
+                  </Form>
+                </Card>
+              ),
+            },
+            {
+              id: "appearance",
+              label: "Appearance",
+              content: (
+                <Card className="p-4 sm:p-6">
+                  <RadioGroup
+                    value={theme}
+                    onValueChange={setTheme}
+                    aria-labelledby="settings-theme"
+                    className="gap-0"
+                  >
+                    <p id="settings-theme" className="font-display text-h4 text-ink">
+                      Theme
+                    </p>
+                    <p className="mt-1 text-small text-ink-soft">Applies at once, in this browser.</p>
+                    <div className="mt-4 flex flex-wrap gap-x-8 gap-y-4">
+                      {THEMES.map(({ value, label }) => (
+                        <Label key={value} className="flex cursor-pointer flex-col items-start gap-2 text-base font-normal">
+                          <Swatch mode={value} />
+                          <span className="flex min-h-11 items-center gap-2 md:min-h-0">
+                            <RadioGroupItem value={value} />
+                            {label}
+                          </span>
+                        </Label>
+                      ))}
                     </div>
-                  </div>
+                  </RadioGroup>
 
-                  <Separator />
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={profileForm.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={profileForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="john@example.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={profileForm.control}
-                      name="website"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Website</FormLabel>
-                          <FormControl>
-                            <Input type="url" placeholder="https://example.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={profileForm.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Location</FormLabel>
-                          <FormControl>
-                            <Input placeholder="New York, USA" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={profileForm.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bio</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Tell us about yourself..." className="resize-none" rows={4} {...field} />
-                        </FormControl>
-                        <FormDescription>Brief description for your profile. Maximum 500 characters.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={isSaving}>
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Notifications Tab */}
-        <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-display">Notification Preferences</CardTitle>
-              <CardDescription>Choose which events show up in your admin notification bell.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...notificationForm}>
-                <form onSubmit={notificationForm.handleSubmit(onNotificationSubmit)} className="space-y-4">
-                  {/* Single divided list — lighter than four separate boxes */}
-                  <div className="divide-y rounded-lg border">
-                    <FormField
-                      control={notificationForm.control}
-                      name="emailNotifications"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-sm">Feedback &amp; suggestions</FormLabel>
-                            <FormDescription>Show new feedback submissions in your notification bell.</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={notificationForm.control}
-                      name="pushNotifications"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-sm">New chat messages</FormLabel>
-                            <FormDescription>Show new public chat messages in your notification bell.</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={notificationForm.control}
-                      name="projectUpdates"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-sm">Tracker activity</FormLabel>
-                            <FormDescription>Show new Kanban tracker cards in your notification bell.</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={notificationForm.control}
-                      name="securityAlerts"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between gap-4 px-4 py-3">
-                          <div className="space-y-0.5">
-                            <FormLabel className="text-sm">Reactions &amp; claps</FormLabel>
-                            <FormDescription>Show new claps on your blog posts and projects in your notification bell.</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={isSaving}>
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Preferences
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Appearance Tab */}
-        <TabsContent value="appearance" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-display">Appearance Settings</CardTitle>
-              <CardDescription>Customize the look and feel of your dashboard.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...appearanceForm}>
-                <form onSubmit={appearanceForm.handleSubmit(onAppearanceSubmit)} className="space-y-6">
-                  <FormField
-                    control={appearanceForm.control}
-                    name="theme"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Theme</FormLabel>
-                        <FormDescription>Select your preferred theme for the dashboard.</FormDescription>
-                        <FormControl>
-                          <div className="grid grid-cols-3 gap-4 pt-2">
-                            <label className={`cursor-pointer rounded-lg border-2 p-4 text-center transition-colors ${field.value === "light" ? "border-primary bg-primary/5" : "border-muted hover:border-primary/50"}`}>
-                              <input type="radio" name="theme" value="light" checked={field.value === "light"} onChange={() => field.onChange("light")} className="sr-only" />
-                              <Sun className="mx-auto h-6 w-6 mb-2" />
-                              <span className="text-sm font-medium">Light</span>
-                            </label>
-                            <label className={`cursor-pointer rounded-lg border-2 p-4 text-center transition-colors ${field.value === "dark" ? "border-primary bg-primary/5" : "border-muted hover:border-primary/50"}`}>
-                              <input type="radio" name="theme" value="dark" checked={field.value === "dark"} onChange={() => field.onChange("dark")} className="sr-only" />
-                              <Moon className="mx-auto h-6 w-6 mb-2" />
-                              <span className="text-sm font-medium">Dark</span>
-                            </label>
-                            <label className={`cursor-pointer rounded-lg border-2 p-4 text-center transition-colors ${field.value === "system" ? "border-primary bg-primary/5" : "border-muted hover:border-primary/50"}`}>
-                              <input type="radio" name="theme" value="system" checked={field.value === "system"} onChange={() => field.onChange("system")} className="sr-only" />
-                              <Monitor className="mx-auto h-6 w-6 mb-2" />
-                              <span className="text-sm font-medium">System</span>
-                            </label>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Separator />
-
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <FormField
-                      control={appearanceForm.control}
-                      name="language"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Language</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <Globe className="mr-2 h-4 w-4" />
-                                <SelectValue placeholder="Select language" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="en">English</SelectItem>
-                              <SelectItem value="id">Indonesian</SelectItem>
-                              <SelectItem value="ja">Japanese</SelectItem>
-                              <SelectItem value="zh">Chinese</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={appearanceForm.control}
-                      name="timezone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Timezone</FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select timezone" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="UTC">UTC</SelectItem>
-                              <SelectItem value="Asia/Jakarta">Asia/Jakarta (WIB)</SelectItem>
-                              <SelectItem value="Asia/Tokyo">Asia/Tokyo (JST)</SelectItem>
-                              <SelectItem value="America/New_York">America/New York (EST)</SelectItem>
-                              <SelectItem value="Europe/London">Europe/London (GMT)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={isSaving}>
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Save Settings
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Security Tab */}
-        <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-display">Account &amp; Security</CardTitle>
-              <CardDescription>Your account details and sign-in methods.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Account overview */}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-lg border p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Mail className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="flex items-center gap-1.5 truncate text-sm font-medium">
-                      {user?.email || "—"}
-                      {user?.emailVerified && <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" />}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-lg border p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Shield className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Role</p>
-                    <p className="truncate text-sm font-medium">{user?.role || "USER"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-lg border p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <CalendarDays className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">Member since</p>
-                    <p className="truncate text-sm font-medium">
-                      {user?.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) : "—"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-lg border p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                    <Fingerprint className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-muted-foreground">User ID</p>
-                    <p className="truncate font-mono text-xs font-medium">{user?.id || "—"}</p>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Connected accounts */}
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <Eyebrow>Connected accounts</Eyebrow>
-                  <p className="text-sm text-muted-foreground">Sign-in providers linked to your account.</p>
-                </div>
-                {user?.oauthAccounts && user.oauthAccounts.length > 0 ? (
-                  <div className="space-y-2">
-                    {user.oauthAccounts.map((acc, i) => {
-                      const provider = acc.provider || acc.providerId || "OAuth"
-                      return (
-                        <div key={`${provider}-${i}`} className="flex items-center justify-between rounded-lg border p-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                              <BadgeCheck className="h-4 w-4 text-primary" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium capitalize">{provider}</p>
-                              <p className="text-xs text-muted-foreground">Connected</p>
-                            </div>
-                          </div>
-                          <Badge variant="secondary">Active</Badge>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <div className="rounded-lg border p-3 text-sm text-muted-foreground">
-                    Signed in with email &amp; password. No external providers linked.
-                  </div>
-                )}
-              </div>
-
-              <Separator />
-
-              {/* Sign out */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1.5">
-                  <Eyebrow>Sign out</Eyebrow>
-                  <p className="text-sm text-muted-foreground">End your admin session on this device.</p>
-                </div>
-                <Button variant="outline" className="text-destructive hover:text-destructive" onClick={handleLogout} disabled={isLoggingOut}>
-                  {isLoggingOut ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing out…</> : <><LogOut className="mr-2 h-4 w-4" />Sign out</>}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  <Form {...appearanceForm}>
+                    <form onSubmit={appearanceForm.handleSubmit(onAppearance)} className="mt-8 grid gap-5 border-t border-rule pt-6 sm:grid-cols-2">
+                      <FormField
+                        control={appearanceForm.control}
+                        name="language"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Language</FormLabel>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Choose a language" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {LANGUAGES.map(([value, label]) => (
+                                  <SelectItem key={value} value={value}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={appearanceForm.control}
+                        name="timezone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Time zone</FormLabel>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Choose a time zone" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {TIMEZONES.map(([value, label]) => (
+                                  <SelectItem key={value} value={value}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="sm:col-span-2">
+                        <Button type="submit" disabled={appearanceForm.formState.isSubmitting}>
+                          {appearanceForm.formState.isSubmitting ? "Saving…" : "Save language and time zone"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </Card>
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   )
 }

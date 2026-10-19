@@ -1,94 +1,54 @@
-import BlurFade from "@/components/magicui/blur-fade"
-import { Award, ChevronLeft, ChevronRight } from "lucide-react"
+import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
-import { CertificationCard } from "@/app/_components/certification/certification-card"
-import { Button } from "@/components/ui/button"
-import { SectionHeading } from "@/components/ui/section-heading"
-import Link from "next/link"
-import { logNonCriticalError } from "@/lib/logging"
+import { CertificationRow } from "@/app/_components/certification/certification-card"
+import { LedgerList } from "@/components/ui/ledger"
+import { PAGE_WIDTH } from "@/lib/design-system"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 3600
 
-interface CertificatesPageProps {
-  searchParams: Promise<{
-    page?: string
-  }>
+// The API caps `limit` at 50, so the whole record takes a page or two.
+const PAGE_SIZE = 50
+const MAX_PAGES = 10
+
+async function getAllCertifications(): Promise<LinkedinCertification[]> {
+  const first = await getLinkedinCertifications(1, PAGE_SIZE)
+  const pages = Math.min(first.totalPages || 1, MAX_PAGES)
+  const rest = await Promise.all(Array.from({ length: pages - 1 }, (_, i) => getLinkedinCertifications(i + 2, PAGE_SIZE)))
+  return [first, ...rest].flatMap((page) => page.data ?? [])
 }
 
-export default async function CertificatesPage({ searchParams }: CertificatesPageProps) {
-  const params = await searchParams
-  const currentPage = Math.max(1, Number.parseInt(params.page ?? "1", 10) || 1)
-  const limit = 10
+const yearOf = (cert: LinkedinCertification) => /^\d{4}/.exec(cert.issued ?? "")?.[0] ?? "Undated"
 
-  let certifications: any[] = []
-  let totalPages = 1
-  let total = 0
-
-  try {
-    const response = await getLinkedinCertifications(currentPage, limit)
-    certifications = response.data || []
-    totalPages = response.totalPages || 1
-    total = response.total || 0
-  } catch (error) {
-    logNonCriticalError("Failed to fetch certifications:", error)
-  }
-
-  const hasPrevPage = currentPage > 1
-  const hasNextPage = currentPage < totalPages
+export default async function CertificatesPage() {
+  const certifications = await getAllCertifications()
+  const years = new Map<string, LinkedinCertification[]>()
+  for (const cert of certifications) years.set(yearOf(cert), [...(years.get(yearOf(cert)) ?? []), cert])
 
   return (
-    <BlurFade delay={0.25} inView>
-      <div className="space-y-6">
-        {/* Header */}
-        <SectionHeading
-          as="h1"
-          eyebrow="Credentials"
-          title="Certifications"
-          accent="& courses"
-          description={`${total} professional certifications and completed courses`}
-        />
+    <div className={PAGE_WIDTH.ledger}>
+      <header className="pb-8">
+        <h1 className="font-display text-h1 text-balance text-ink">Credentials</h1>
+        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
+          {certifications.length > 0
+            ? `${certifications.length.toLocaleString("en")} certificates and courses on record, newest first.`
+            : "Certificates and courses on record."}
+        </p>
+      </header>
+      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
-        {/* Certifications Grid - Compact */}
-        {certifications.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {certifications.map((cert) => (
-                <CertificationCard key={cert.id} certification={cert} compact={true} />
+      {certifications.length === 0 ? (
+        <p className="mt-8 text-body text-ink-soft">The record could not be loaded just now. Please try again in a few minutes.</p>
+      ) : (
+        <div className="mt-8">
+          {[...years].map(([year, rows]) => (
+            <LedgerList key={year} marker={<h2>{year}</h2>}>
+              {rows.map((cert) => (
+                <CertificationRow key={cert.id} certification={cert} />
               ))}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-4 pt-4">
-                <Link href={`/certificates?page=${currentPage - 1}`} className={!hasPrevPage ? "pointer-events-none opacity-50" : ""}>
-                  <Button variant="outline" size="sm" disabled={!hasPrevPage}>
-                    <ChevronLeft className="w-4 h-4 mr-1" />
-                    Previous
-                  </Button>
-                </Link>
-
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                </div>
-
-                <Link href={`/certificates?page=${currentPage + 1}`} className={!hasNextPage ? "pointer-events-none opacity-50" : ""}>
-                  <Button variant="outline" size="sm" disabled={!hasNextPage}>
-                    Next
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="text-center py-12">
-            <Award className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No certifications found</p>
-          </div>
-        )}
-      </div>
-    </BlurFade>
+            </LedgerList>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

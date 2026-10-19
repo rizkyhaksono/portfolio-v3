@@ -7,7 +7,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
+        // Card crawlers honour robots.txt, so the OG images must stay fetchable.
+        allow: ["/", "/api/og"],
         disallow: [
           "/admin/",
           "/api/",

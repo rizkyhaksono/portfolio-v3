@@ -11,12 +11,6 @@ video: "https://www.youtube.com/embed/L72fhGm1tfE"
 illustration: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2834&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Server, Zap, Shield, Code2 } from "lucide-react"
-
 ## Introduction to Express.js
 
 Express.js is a minimal and flexible Node.js web application framework that provides a robust set of features for building web and mobile applications. It's the de facto standard server framework for Node.js.
@@ -25,39 +19,11 @@ Express.js is a minimal and flexible Node.js web application framework that prov
   objectives={["Understand what Express.js is and its role in backend development", "Learn about the middleware architecture", "Understand routing and HTTP methods", "Recognize when Express is the right choice for your project"]}
 />
 
----
-
 ## Why Express.js?
 
-<div className="grid md:grid-cols-3 gap-4 my-6">
-  <Card className="text-center">
-    <CardHeader>
-      <Zap className="h-8 w-8 mx-auto text-yellow-500" />
-      <CardTitle className="text-lg">Minimal & Fast</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Unopinionated framework with minimal overhead for maximum performance</CardContent>
-  </Card>
-
-{" "}
-
-<Card className="text-center">
-  <CardHeader>
-    <Code2 className="h-8 w-8 mx-auto text-blue-500" />
-    <CardTitle className="text-lg">Flexible</CardTitle>
-  </CardHeader>
-  <CardContent className="text-sm text-muted-foreground">Use any database, template engine, or architecture pattern you prefer</CardContent>
-</Card>
-
-  <Card className="text-center">
-    <CardHeader>
-      <Shield className="h-8 w-8 mx-auto text-purple-500" />
-      <CardTitle className="text-lg">Battle-Tested</CardTitle>
-    </CardHeader>
-    <CardContent className="text-sm text-muted-foreground">Powers millions of applications with extensive middleware ecosystem</CardContent>
-  </Card>
-</div>
-
----
+- **Minimal and fast**: an unopinionated framework with minimal overhead.
+- **Flexible**: use any database, template engine or architecture pattern you prefer.
+- **Battle-tested**: powers millions of applications, with an extensive middleware ecosystem.
 
 ## Express.js Core Concepts
 
@@ -81,14 +47,14 @@ app.listen(PORT, () => {
 })
 ```
 
-<Tip title="Key Insight">Express abstracts the complexity of Node.js's built-in HTTP module, making it incredibly easy to build web servers and APIs.</Tip>
+<Tip title="Key insight">Express abstracts the complexity of Node.js's built-in HTTP module, making it incredibly easy to build web servers and APIs.</Tip>
 
 ### HTTP Methods and Routing
 
 Express provides methods for all HTTP verbs:
 
-<Tabs defaultValue="get" className="my-6">
-  <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+<Tabs defaultValue="get">
+  <TabsList>
     <TabsTrigger value="get">GET</TabsTrigger>
     <TabsTrigger value="post">POST</TabsTrigger>
     <TabsTrigger value="put">PUT/PATCH</TabsTrigger>
@@ -98,7 +64,7 @@ Express provides methods for all HTTP verbs:
   <TabsContent value="get">
     <Card>
       <CardHeader>
-        <CardTitle>GET - Retrieve Data</CardTitle>
+        <CardTitle>GET: retrieve data</CardTitle>
       </CardHeader>
       <CardContent>
         <CodeSnippet language="javascript">{`// Get all users
@@ -120,7 +86,7 @@ res.json(user);
   <TabsContent value="post">
     <Card>
       <CardHeader>
-        <CardTitle>POST - Create Data</CardTitle>
+        <CardTitle>POST: create data</CardTitle>
       </CardHeader>
       <CardContent>
         <CodeSnippet language="javascript">{`// Create new user
@@ -140,7 +106,7 @@ app.post('/api/users', (req, res) => {
   <TabsContent value="put">
     <Card>
       <CardHeader>
-        <CardTitle>PUT/PATCH - Update Data</CardTitle>
+        <CardTitle>PUT and PATCH: update data</CardTitle>
       </CardHeader>
       <CardContent>
         <CodeSnippet language="javascript">{`// Update user (full replacement)
@@ -168,7 +134,7 @@ res.json(user);
   <TabsContent value="delete">
     <Card>
       <CardHeader>
-        <CardTitle>DELETE - Remove Data</CardTitle>
+        <CardTitle>DELETE: remove data</CardTitle>
       </CardHeader>
       <CardContent>
         <CodeSnippet language="javascript">{`// Delete user
@@ -183,8 +149,6 @@ app.delete('/api/users/:id', (req, res) => {
     </Card>
   </TabsContent>
 </Tabs>
-
----
 
 ## Middleware Architecture
 
@@ -206,87 +170,31 @@ app.use(express.urlencoded({ extended: true })) // Parse URL-encoded bodies
 app.use(express.static("public")) // Serve static files
 ```
 
-<Card className="my-6">
-  <CardHeader>
-    <CardTitle>Middleware Flow</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="flex items-center justify-center gap-2 flex-wrap text-sm">
-      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded">Request</span>
-      <span>→</span>
-      <span className="px-3 py-1 bg-green-100 dark:bg-green-900 rounded">Middleware 1</span>
-      <span>→</span>
-      <span className="px-3 py-1 bg-green-100 dark:bg-green-900 rounded">Middleware 2</span>
-      <span>→</span>
-      <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 rounded">Route Handler</span>
-      <span>→</span>
-      <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded">Response</span>
-    </div>
-  </CardContent>
-</Card>
+A request passes through each layer in order:
 
----
+1. Request
+2. Middleware 1
+3. Middleware 2
+4. Route handler
+5. Response
 
 ## Express vs Other Frameworks
 
-<Card className="my-6">
-  <CardContent className="pt-6">
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left py-2 px-3">Feature</th>
-            <th className="text-left py-2 px-3">Express</th>
-            <th className="text-left py-2 px-3">Fastify</th>
-            <th className="text-left py-2 px-3">NestJS</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Learning Curve</td>
-            <td className="py-2 px-3 text-green-600">Easy</td>
-            <td className="py-2 px-3 text-green-600">Easy</td>
-            <td className="py-2 px-3 text-yellow-600">Moderate</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Performance</td>
-            <td className="py-2 px-3">Good</td>
-            <td className="py-2 px-3 text-green-600">Excellent</td>
-            <td className="py-2 px-3">Good</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">TypeScript</td>
-            <td className="py-2 px-3">@types/express</td>
-            <td className="py-2 px-3">Built-in</td>
-            <td className="py-2 px-3 text-green-600">Native</td>
-          </tr>
-          <tr className="border-b">
-            <td className="py-2 px-3 font-medium">Architecture</td>
-            <td className="py-2 px-3">Minimal</td>
-            <td className="py-2 px-3">Minimal</td>
-            <td className="py-2 px-3">Opinionated</td>
-          </tr>
-          <tr>
-            <td className="py-2 px-3 font-medium">Ecosystem</td>
-            <td className="py-2 px-3 text-green-600">Massive</td>
-            <td className="py-2 px-3">Growing</td>
-            <td className="py-2 px-3">Strong</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </CardContent>
-</Card>
-
----
+| Feature | Express | Fastify | NestJS |
+| --- | --- | --- | --- |
+| Learning curve | Easy | Easy | Moderate |
+| Performance | Good | Excellent | Good |
+| TypeScript | `@types/express` | Built-in | Native |
+| Architecture | Minimal | Minimal | Opinionated |
+| Ecosystem | Massive | Growing | Strong |
 
 ## When to Use Express
 
-<Accordion type="multiple" className="w-full not-prose">
+<Accordion type="multiple">
   <AccordionItem value="ideal">
-    <AccordionTrigger>✅ Express is Great For</AccordionTrigger>
-    <AccordionContent className="space-y-2">
-      <ul className="list-disc pl-4 space-y-2">
+    <AccordionTrigger>Express is great for</AccordionTrigger>
+    <AccordionContent>
+      <ul>
         <li>
           <strong>REST APIs</strong> — Building RESTful web services
         </li>
@@ -309,9 +217,9 @@ app.use(express.static("public")) // Serve static files
     </AccordionContent>
   </AccordionItem>
   <AccordionItem value="ecosystem">
-    <AccordionTrigger>🔧 Express Ecosystem</AccordionTrigger>
-    <AccordionContent className="space-y-2">
-      <ul className="list-disc pl-4 space-y-2">
+    <AccordionTrigger>Express ecosystem</AccordionTrigger>
+    <AccordionContent>
+      <ul>
         <li>
           <strong>Helmet</strong> — Security headers middleware
         </li>
@@ -334,8 +242,6 @@ app.use(express.static("public")) // Serve static files
     </AccordionContent>
   </AccordionItem>
 </Accordion>
-
----
 
 ## Quick Start Example
 
@@ -411,12 +317,10 @@ app.listen(PORT, () => {
 })
 ```
 
----
-
 ## Next Steps
 
 <NextLesson
-  title="Setting Up Express Development Environment"
+  title="Setting up an Express development environment"
   description="Now that you understand what Express.js is, let's set up your development environment and build your first Express server!"
   href="/roadmap/express-fundamentals-setup-environment"
 />

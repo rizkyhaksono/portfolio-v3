@@ -1,5 +1,5 @@
 ---
-title: "Routing and Middleware"
+title: "Routing and middleware"
 description: "Master Express.js routing patterns and middleware architecture for building modular APIs"
 course: "express-fundamentals"
 category: "backend"
@@ -11,25 +11,18 @@ video: "https://www.youtube.com/embed/L72fhGm1tfE"
 illustration: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { BookOpen, Lightbulb, Target, Route, Layers, Shield } from "lucide-react"
-
 ## Advanced Routing in Express
 
 Routing is the core of any web application. Express provides a powerful and flexible routing system that allows you to create clean, maintainable API endpoints.
 
-<Card className="my-6 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
-      <Target className="h-5 w-5" />
-      Learning Objectives
+    <CardTitle>
+      Learning objectives
     </CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2 text-blue-800 dark:text-blue-200">
+    <ul>
       <li>Understand Express Router and modular routing</li>
       <li>Learn route parameters and query strings</li>
       <li>Master middleware types and patterns</li>
@@ -37,8 +30,6 @@ Routing is the core of any web application. Express provides a powerful and flex
     </ul>
   </CardContent>
 </Card>
-
----
 
 ## Express Router
 
@@ -86,12 +77,10 @@ app.use("/api/orders", ordersRouter)
 module.exports = app
 ```
 
----
-
 ## Route Parameters
 
-<Tabs defaultValue="basic" className="my-6">
-  <TabsList className="grid w-full grid-cols-3">
+<Tabs defaultValue="basic">
+  <TabsList>
     <TabsTrigger value="basic">Basic Params</TabsTrigger>
     <TabsTrigger value="multiple">Multiple Params</TabsTrigger>
     <TabsTrigger value="optional">Optional & Regex</TabsTrigger>
@@ -100,7 +89,7 @@ module.exports = app
   <TabsContent value="basic">
     <Card>
       <CardHeader>
-        <CardTitle>Basic Route Parameters</CardTitle>
+        <CardTitle>Basic route parameters</CardTitle>
       </CardHeader>
       <CardContent>
         ```javascript
@@ -121,7 +110,7 @@ module.exports = app
   <TabsContent value="multiple">
     <Card>
       <CardHeader>
-        <CardTitle>Multiple Parameters</CardTitle>
+        <CardTitle>Multiple parameters</CardTitle>
       </CardHeader>
       <CardContent>
         ```javascript
@@ -148,7 +137,7 @@ module.exports = app
   <TabsContent value="optional">
     <Card>
       <CardHeader>
-        <CardTitle>Optional Parameters & Regex</CardTitle>
+        <CardTitle>Optional parameters and regex</CardTitle>
       </CardHeader>
       <CardContent>
         ```javascript
@@ -177,8 +166,6 @@ module.exports = app
 
   </TabsContent>
 </Tabs>
-
----
 
 ## Query Strings
 
@@ -215,13 +202,10 @@ app.get("/api/products", (req, res) => {
 })
 ```
 
-<Alert className="my-6">
-  <Lightbulb className="h-4 w-4" />
+<Alert>
   <AlertTitle>Important</AlertTitle>
   <AlertDescription>Query string values are always strings! Remember to parse numbers with parseInt() or parseFloat().</AlertDescription>
 </Alert>
-
----
 
 ## Middleware Deep Dive
 
@@ -234,9 +218,9 @@ Middleware functions are the heart of Express. They execute in the order they're
 
 ### Types of Middleware
 
-<Accordion type="multiple" className="w-full not-prose my-6">
+<Accordion type="multiple">
   <AccordionItem value="application">
-    <AccordionTrigger>Application-Level Middleware</AccordionTrigger>
+    <AccordionTrigger>Application-level middleware</AccordionTrigger>
     <AccordionContent>
       Bound to the app instance using app.use() or app.METHOD():
       ```javascript
@@ -265,7 +249,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   </AccordionItem>
   
   <AccordionItem value="router">
-    <AccordionTrigger>Router-Level Middleware</AccordionTrigger>
+    <AccordionTrigger>Router-level middleware</AccordionTrigger>
     <AccordionContent>
       Works like application-level but bound to a router instance:
       ```javascript
@@ -291,7 +275,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   </AccordionItem>
   
   <AccordionItem value="error">
-    <AccordionTrigger>Error-Handling Middleware</AccordionTrigger>
+    <AccordionTrigger>Error-handling middleware</AccordionTrigger>
     <AccordionContent>
       Takes 4 arguments (err, req, res, next):
       ```javascript
@@ -336,7 +320,7 @@ Middleware functions are the heart of Express. They execute in the order they're
   </AccordionItem>
   
   <AccordionItem value="builtin">
-    <AccordionTrigger>Built-in Middleware</AccordionTrigger>
+    <AccordionTrigger>Built-in middleware</AccordionTrigger>
     <AccordionContent>
       Express includes several built-in middleware:
       ```javascript
@@ -356,8 +340,6 @@ Middleware functions are the heart of Express. They execute in the order they're
 
   </AccordionItem>
 </Accordion>
-
----
 
 ## Creating Custom Middleware
 
@@ -473,15 +455,12 @@ const rateLimit = (options = {}) => {
 app.use("/api", rateLimit({ max: 100, windowMs: 60000 }))
 ```
 
----
-
 ## Middleware Execution Order
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Layers className="h-5 w-5" />
-      Middleware Chain
+    <CardTitle>
+      Middleware chain
     </CardTitle>
   </CardHeader>
   <CardContent>
@@ -510,8 +489,6 @@ app.use("/api", rateLimit({ max: 100, windowMs: 60000 }))
   </CardContent>
 </Card>
 
----
-
 ## Route Chaining
 
 Express allows you to chain route handlers:
@@ -529,16 +506,14 @@ router.route("/users").get(getUsers).post(validateBody(userSchema), createUser)
 router.route("/users/:id").get(getUser).patch(validateBody(updateSchema), updateUser).delete(authorize("admin"), deleteUser)
 ```
 
----
-
 ## Best Practices
 
-<Card className="my-6 border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-800">
+<Card>
   <CardHeader>
-    <CardTitle className="text-green-700 dark:text-green-300">✅ Routing & Middleware Best Practices</CardTitle>
+    <CardTitle>Routing and middleware best practices</CardTitle>
   </CardHeader>
-  <CardContent className="text-green-800 dark:text-green-200">
-    <ol className="list-decimal list-inside space-y-2">
+  <CardContent>
+    <ol>
       <li>
         <strong>Keep routes organized</strong> — Group related routes in separate files
       </li>
@@ -561,11 +536,9 @@ router.route("/users/:id").get(getUser).patch(validateBody(updateSchema), update
   </CardContent>
 </Card>
 
----
-
 ## Next Steps
 
-<NextLesson title="Database Integration with MongoDB/PostgreSQL" description="Now that you understand routing and middleware, let's connect to a database and build real CRUD operations!" href="/roadmap/express-fundamentals-intermediate-database-integration" />
+<NextLesson title="Database integration with MongoDB or PostgreSQL" description="Now that you understand routing and middleware, let's connect to a database and build real CRUD operations!" href="/roadmap/express-fundamentals-intermediate-database-integration" />
 
 <Resources
   resources={[

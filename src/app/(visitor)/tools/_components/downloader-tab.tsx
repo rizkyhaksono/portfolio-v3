@@ -1,346 +1,205 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Download, Video, ImageIcon, Play, ExternalLink, Info, Copy, CheckCircle2 } from "lucide-react"
 import Image from "next/image"
-import { Surface } from "@/components/ui/surface"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { PlateFigure } from "@/components/ui/plate-figure"
+import {
+  downloadFromFacebook,
+  downloadFromInstagram,
+  downloadFromTikTok,
+  downloadFromX,
+  downloadFromYouTube,
+} from "@/services/visitor/downloader"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
+import { ToolError } from "./tool-status"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
 
-interface PlatformConfig {
-  id: Platform
-  name: string
-  description: string
-  icon: typeof Video
-  supportedFormats: string[]
-}
-
-const PLATFORMS: PlatformConfig[] = [
-  {
-    id: "tiktok",
-    name: "TikTok",
-    description: "Download TikTok videos without watermark",
-    icon: Video,
-    supportedFormats: ["MP4", "MP3"],
-  },
-  {
-    id: "facebook",
-    name: "Facebook",
-    description: "Download Facebook videos and posts",
-    icon: Video,
-    supportedFormats: ["MP4", "HD"],
-  },
-  {
-    id: "instagram",
-    name: "Instagram",
-    description: "Download Instagram posts, stories, and reels",
-    icon: ImageIcon,
-    supportedFormats: ["MP4", "JPG"],
-  },
-  {
-    id: "youtube",
-    name: "YouTube",
-    description: "Download YouTube videos and audio",
-    icon: Play,
-    supportedFormats: ["MP4", "MP3", "HD", "4K"],
-  },
-  {
-    id: "twitter",
-    name: "X (Twitter)",
-    description: "Download Twitter videos and GIFs",
-    icon: Video,
-    supportedFormats: ["MP4", "GIF"],
-  },
+const PLATFORMS: { id: Platform; name: string; note: string }[] = [
+  { id: "tiktok", name: "TikTok", note: "Videos without the watermark, as MP4 or MP3." },
+  { id: "facebook", name: "Facebook", note: "Videos and posts, as MP4 or HD." },
+  { id: "instagram", name: "Instagram", note: "Posts, stories and reels, as MP4 or JPG." },
+  { id: "youtube", name: "YouTube", note: "Videos and audio, as MP4, MP3, HD or 4K." },
+  { id: "twitter", name: "X (Twitter)", note: "Videos and GIFs, as MP4 or GIF." },
 ]
 
-// Instagram specific result type
-interface InstagramResult {
-  type: "instagram"
-  data: InstagramDownloadData
-}
+const DOWNLOADERS = {
+  tiktok: downloadFromTikTok,
+  facebook: downloadFromFacebook,
+  instagram: downloadFromInstagram,
+  youtube: downloadFromYouTube,
+  twitter: downloadFromX,
+} satisfies Record<Platform, (url: string) => Promise<unknown>>
 
-// Standard download result type
-interface StandardResult {
-  type: "standard"
-  data: DownloadResult
-}
+type Result = { type: "instagram"; data: InstagramDownloadData } | { type: "standard"; data: DownloadResult }
 
-type ResultType = InstagramResult | StandardResult | null
+// Matches InkLink: an absolute sr-only box would sit on the first letter of an inline-flex link.
+const NewTabNote = () => (
+  <span className="-mr-px inline-block size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"> (opens in a new tab)</span>
+)
 
 export function DownloaderTab() {
-  const [activePlatform, setActivePlatform] = useState<Platform>("tiktok")
+  const [platformId, setPlatformId] = useState<Platform>("tiktok")
   const [url, setUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<ResultType>(null)
+  const [result, setResult] = useState<Result | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
-  const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+  const platform = PLATFORMS.find((p) => p.id === platformId) ?? PLATFORMS[0]
 
-  const handleDownload = async () => {
+  const copyShortcode = (text: string) =>
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+      .catch(() => {})
+
+  const handleDownload = async (e?: React.FormEvent) => {
+    e?.preventDefault()
     if (!url.trim()) return
 
     setIsLoading(true)
     setResult(null)
-
+    setError(null)
     try {
-      await processDownload()
-    } catch (error) {
-      console.error("Download error:", error)
-      setResult({
-        type: "standard",
-        data: {
-          title: "Error",
-          thumbnail: "/no-image.jpg",
-          downloadLinks: [],
-          author: error instanceof Error ? error.message : "Failed to download. Please check the URL and try again.",
-        },
-      })
+      const response = await DOWNLOADERS[platformId](url.trim())
+      // Instagram may answer with an embed link instead of files when the download service is down.
+      const data = response.data as DownloadResult | InstagramDownloadData
+      setResult("embedUrl" in data ? { type: "instagram", data } : { type: "standard", data })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "That link did not work. Check it and try again.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const processDownload = async () => {
-    switch (activePlatform) {
-      case "facebook": {
-        const { downloadFromFacebook } = await import("@/services/visitor/downloader")
-        const downloadResult = await downloadFromFacebook(url)
-        if (downloadResult?.data) {
-          setResult({ type: "standard", data: downloadResult.data })
-        }
-        break
-      }
-      case "instagram": {
-        const { downloadFromInstagram } = await import("@/services/visitor/downloader")
-        const igResult = await downloadFromInstagram(url)
-        handleInstagramResult(igResult)
-        break
-      }
-      case "tiktok": {
-        const { downloadFromTikTok } = await import("@/services/visitor/downloader")
-        const downloadResult = await downloadFromTikTok(url)
-        if (downloadResult?.data) {
-          setResult({ type: "standard", data: downloadResult.data })
-        }
-        break
-      }
-      case "twitter": {
-        const { downloadFromX } = await import("@/services/visitor/downloader")
-        const downloadResult = await downloadFromX(url)
-        if (downloadResult?.data) {
-          setResult({ type: "standard", data: downloadResult.data })
-        }
-        break
-      }
-      case "youtube": {
-        const { downloadFromYouTube } = await import("@/services/visitor/downloader")
-        const downloadResult = await downloadFromYouTube(url)
-        if (downloadResult?.data) {
-          setResult({ type: "standard", data: downloadResult.data })
-        }
-        break
-      }
-      default:
-        throw new Error("Unsupported platform")
-    }
-  }
-
-  const handleInstagramResult = (igResult: unknown) => {
-    if (!igResult || typeof igResult !== "object") return
-
-    // Check if it's the new Instagram response format (with success and embedUrl)
-    if ("success" in igResult && "data" in igResult) {
-      const response = igResult as { success: boolean; data: InstagramDownloadData }
-      if (response.success && response.data && "embedUrl" in response.data) {
-        setResult({ type: "instagram", data: response.data })
-        return
-      }
-    }
-
-    // Fall back to standard format
-    if ("data" in igResult) {
-      const response = igResult as { data: DownloadResult }
-      setResult({ type: "standard", data: response.data })
-    }
-  }
-
-  const currentPlatform = PLATFORMS.find((p) => p.id === activePlatform)!
-  const ResultIcon = currentPlatform.icon
-
   return (
     <div className="space-y-6">
-      <div className="flex min-w-0 flex-wrap gap-2">
-        {PLATFORMS.map((platform) => {
-          const PlatformIcon = platform.icon
-          const isActive = activePlatform === platform.id
-          return (
-            <Button
-              key={platform.id}
-              type="button"
-              size="sm"
-              variant={isActive ? "default" : "outline"}
-              aria-pressed={isActive}
-              onClick={() => setActivePlatform(platform.id)}
-              className="min-w-0"
-            >
-              <PlatformIcon size={16} />
-              {platform.name}
-            </Button>
-          )
-        })}
-      </div>
-
-      {/* Supported Formats */}
-      <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <span>Supports:</span>
-        {currentPlatform.supportedFormats.map((format) => (
-          <Badge key={format} variant="outline" className="text-xs">
-            {format}
-          </Badge>
+      <div role="group" aria-label="Platform" className="flex min-w-0 flex-wrap gap-2">
+        {PLATFORMS.map((p) => (
+          <Button
+            key={p.id}
+            type="button"
+            size="sm"
+            variant={platformId === p.id ? "default" : "outline"}
+            aria-pressed={platformId === p.id}
+            onClick={() => setPlatformId(p.id)}
+          >
+            {p.name}
+          </Button>
         ))}
       </div>
 
-      {/* Download Input */}
-      <div className="space-y-3">
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <Input placeholder={`Paste ${currentPlatform.name} URL here...`} value={url} onChange={(e) => setUrl(e.target.value)} className="min-w-0 w-full flex-1" />
-          <Button onClick={handleDownload} disabled={!url.trim() || isLoading} className="w-full px-6 sm:w-auto">
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin mr-2" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Download size={16} className="mr-2" />
-                Download
-              </>
-            )}
+      <form onSubmit={handleDownload} className="space-y-2">
+        <Label htmlFor="download-url">{platform.name} link</Label>
+        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+          <Input
+            id="download-url"
+            type="url"
+            inputMode="url"
+            required
+            placeholder="https://"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            aria-describedby="download-note"
+            className="min-w-0 flex-1"
+          />
+          <Button type="submit" disabled={!url.trim() || isLoading} aria-busy={isLoading} className="w-full sm:w-auto">
+            {isLoading ? "Fetching…" : "Download"}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">{currentPlatform.description}</p>
-      </div>
+        <p id="download-note" className="text-caption text-ink-soft">
+          {platform.note}
+        </p>
+      </form>
 
-      {/* Instagram Result (New Format) */}
+      {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
+
       {result?.type === "instagram" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Info className="w-5 h-5 text-blue-500" />
-              Instagram Content Found
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {result.data.note && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Service Notice</AlertTitle>
-                <AlertDescription>{result.data.note}</AlertDescription>
-              </Alert>
-            )}
+        <article className="space-y-4 border border-rule p-5">
+          <Badge variant="outline" status="outline">
+            Preview only
+          </Badge>
+          <h3 className="font-display text-h4 text-ink">Instagram post found</h3>
+          {result.data.note && <p className="text-small text-ink-soft">{result.data.note}</p>}
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">Shortcode</p>
-                  <p className="text-xs text-muted-foreground truncate">{result.data.shortcode}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.data.shortcode)}>
-                  {copied ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                </Button>
-              </div>
+          <dl className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small">
+            <dt className="text-ink-soft">Shortcode</dt>
+            <dd className="min-w-0 break-all text-ink">{result.data.shortcode}</dd>
+            <dd>
+              <Button variant="ghost" size="sm" onClick={() => copyShortcode(result.data.shortcode)}>
+                <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>
+              </Button>
+            </dd>
+          </dl>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Button variant="outline" className="w-full justify-start gap-2" asChild>
-                  <a href={result.data.embedUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4" />
-                    View Embed
-                  </a>
-                </Button>
-
-                <Button variant="default" className="w-full justify-start gap-2" asChild>
-                  <a href={result.data.directUrl} target="_blank" rel="noopener noreferrer">
-                    <Download className="w-4 h-4" />
-                    Open Direct URL
-                  </a>
-                </Button>
-              </div>
-
-              <p className="text-xs text-muted-foreground text-center">Open the direct URL in your browser, then right-click on the video/image to save it.</p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="grid gap-3 md:grid-cols-2">
+            <Button variant="outline" className="w-full" asChild>
+              <a href={result.data.embedUrl} target="_blank" rel="noopener noreferrer">
+                View the embed
+                <NewTabNote />
+              </a>
+            </Button>
+            <Button className="w-full" asChild>
+              <a href={result.data.directUrl} target="_blank" rel="noopener noreferrer">
+                Open the direct link
+                <NewTabNote />
+              </a>
+            </Button>
+          </div>
+          <p className="font-display text-caption text-ink-soft">Open the direct link, then save the video or image from your browser.</p>
+        </article>
       )}
 
-      {/* Standard Download Result */}
-      {result?.type === "standard" && (
-        <Card className="overflow-hidden border-muted/40">
-          {result.data.downloadLinks && result.data.downloadLinks.length > 0 ? (
-            <CardContent className="p-0">
-              {/* Media preview */}
-              <div className="relative flex h-40 w-full items-center justify-center overflow-hidden bg-gradient-to-br from-primary/15 via-primary/5 to-background">
-                {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" ? (
-                  <Image src={result.data.thumbnail} alt={result.data.title} fill className="object-cover" unoptimized />
-                ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 bg-background/60 text-primary/70 shadow-sm backdrop-blur-sm">
-                    <ResultIcon className="h-8 w-8" />
-                  </div>
-                )}
-                <Badge className="absolute left-3 top-3 gap-1 border-0 bg-green-500/90 text-white">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Ready
-                </Badge>
-              </div>
-
-              {/* Info + actions */}
-              <div className="space-y-4 p-5">
-                <div className="space-y-1.5">
-                  <h3 className="break-all text-base font-semibold leading-snug line-clamp-2">{result.data.title}</h3>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{currentPlatform.name}</Badge>
-                    {result.data.duration && <Badge variant="secondary" className="text-xs">{result.data.duration}</Badge>}
-                    {result.data.author && <span className="text-xs text-muted-foreground">By {result.data.author}</span>}
-                  </div>
+      {result?.type === "standard" &&
+        (result.data.downloadLinks?.length ? (
+          <article className="border border-rule">
+            {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
+              <PlateFigure className="p-3 pb-0">
+                <div className="relative aspect-video w-full">
+                  <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
                 </div>
-
-                <div className="space-y-2">
-                  {result.data.downloadLinks.map((link, i) => (
-                    <Button key={link.url} variant={i === 0 ? "default" : "outline"} className="w-full justify-between gap-2" asChild>
+              </PlateFigure>
+            )}
+            <div className="space-y-4 p-5">
+              <Badge variant="outline" status="filled">
+                Ready
+              </Badge>
+              <h3 className="line-clamp-2 break-words font-display text-h4 text-ink">{result.data.title}</h3>
+              <p className="font-display text-caption text-ink-soft">
+                {[`From ${platform.name}`, result.data.author && `by ${result.data.author}`, result.data.duration && `${result.data.duration} long`]
+                  .filter(Boolean)
+                  .join(", ")}
+                .
+              </p>
+              <ul role="list" className="space-y-2">
+                {result.data.downloadLinks.map((link, i) => (
+                  <li key={link.url}>
+                    <Button variant={i === 0 ? "default" : "outline"} className="w-full justify-between" asChild>
                       <a href={link.url} download target="_blank" rel="noopener noreferrer">
-                        <span className="flex items-center gap-2">
-                          <Download className="h-4 w-4" />
-                          {link.quality}
+                        <span>
+                          Download {link.quality}
+                          <NewTabNote />
                         </span>
-                        {link.size && <span className="text-xs opacity-70">{link.size}</span>}
+                        {link.size && <span className="text-caption font-normal tabular-nums">{link.size}</span>}
                       </a>
                     </Button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          ) : (
-            <CardContent className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-              <Surface variant="inset" className="p-3">
-                <Info className="h-6 w-6 text-destructive" />
-              </Surface>
-              <p className="font-semibold">Download failed</p>
-              <p className="max-w-sm text-sm text-muted-foreground">
-                {result.data.author || "Couldn't fetch this URL. Check the link and try again."}
-              </p>
-            </CardContent>
-          )}
-        </Card>
-      )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ) : (
+          <ToolError>Nothing to download came back for this link. Check that the post is public.</ToolError>
+        ))}
     </div>
   )
 }

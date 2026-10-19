@@ -18,20 +18,35 @@ The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesq
 
 ## The rules in one screen
 
-1. **One ink.** Colour classes are `ink`, `ink-soft`, `paper`, `tint`, `rule`, `rule-strong`, or the shadcn names that map onto them (`background`, `foreground`, `muted`, `border`, `primary`, ...). No other hue, no hex, no `white` / `black`, no `dark:` variants.
+1. **One ink.** Colour classes are `ink`, `ink-soft`, `paper`, `tint`, `rule`, `rule-strong`, or the shadcn names that map onto them (`background`, `foreground`, `muted`, `border`, `primary`, ...). No other hue, no hex, no `white` / `black`, no dark-variant classes.
 2. **One family.** Literata roman and italic. System mono only inside code, kbd and raw data.
 3. **Radius 0.** The radio dot is the only circle.
 4. **Three surfaces.** Frame, inset, lift. Nothing else.
 5. **No decoration from the screen.** No gradients, glass, blur, glows or soft shadows. The only shadow is the ink lift on floating layers.
 6. **The press moves once.** Native scroll and sticky layouts; two CSS scroll-driven effects; response motion on input. No scroll animation library.
 7. **State by shape and word.** Errors, destructive actions and status never rely on colour.
-8. **Plain copy.** Sentence case, no `uppercase`, no letter-spacing, no middle-dot meta strings, no "→" on links, numbers only for real sequences.
+8. **Plain copy.** Sentence case, no upper-case transform, no letter-spacing, no middle-dot meta strings, no "→" on links, numbers only for real sequences.
 9. **Umami events.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track`.
 10. **Grep gate at 0** on every path you touch.
 
 ## Migration
 
-Phase 1 flips the tokens site-wide. Files that have not been migrated yet still carry old classes (`dark:`, `rounded-full`, `BlurFade`, palette colours, `MacWindow`). That is accepted until the file's phase. When you touch a file, bring it up to these docs and leave it passing the gate. Never add a new instance of a banned class.
+Every route is on the one-ink system and both grep gates are clean over `src/` and `content/`. Keep it that way: any file you touch must still pass the gate, and never add a banned class.
+
+## Brand
+
+The printer's mark is the Tengger caldera seen from Penanjakan (Bromo's smoking caldera, Batok's ridged dome, Semeru far right) over the dashed sand sea, with an italic Literata "Rh" on the sand. It is one ink like everything else, so Night print reverses it for free. Always place it through `<Logo>` (`src/components/ui/logo.tsx`); never paste the SVG or recolour it.
+
+| Variant | Where | How it renders |
+|---|---|---|
+| `mini` | Running head (32px before the wordmark), admin spine | Inline SVG from `logo-art.ts`, `currentColor` |
+| `mark` | Auth shell, locked Etan AI view | `.logo-mask--mark` over `public/brand/mark-mask.svg` |
+| `seal` | Colophon (96 to 112px), 404 and error views (`NotFoundView`) | `.logo-mask--seal` over `public/brand/seal-mask.svg` |
+
+- `label` gives the mark `role="img"` and a name ("Rizky Haksono printer's mark"); leave it out when the name is printed beside it.
+- Size it with a width class only (`w-24`); the mask keeps the square.
+- `public/brand/{seal,mark,mini,lockup}-{light,dark}.svg` are standalone art on paper or night paper. The OG and certificate images and `global-error.tsx` (no CSS there) use `seal-light.svg`.
+- Generated, never hand-edited: `public/brand/*.svg`, `src/app/icon.svg`, `src/app/apple-icon.png`, `src/components/ui/logo-art.ts`. Regenerate with `node scripts/logo/make.mjs <font dir>`, where the folder holds `Literata-Italic[opsz,wght].ttf` (OFL, kept outside the repo, for example `../art-src/fonts`).
 
 ## Grep gate
 
@@ -50,4 +65,5 @@ The exclusions are deliberate: `radio-group.tsx` owns the one circle, code block
 - Fonts: `src/app/layout.tsx` (Literata via `next/font/google`)
 - Shell: `src/components/layout/base-layout.tsx`
 - Primitives: `src/components/ui/`
+- Logo: `src/components/ui/logo.tsx`, art from `scripts/logo/make.mjs`
 - Navigation: `src/commons/constants/navigation-menu.ts` (single source for head, Contents, colophon, command palette, terminal)

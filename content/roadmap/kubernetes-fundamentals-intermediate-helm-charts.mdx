@@ -1,5 +1,5 @@
 ---
-title: "Helm Charts"
+title: "Helm charts"
 description: "Package applications with Helm, values files, and chart templating"
 course: "kubernetes-fundamentals"
 category: "devops"
@@ -9,12 +9,6 @@ duration: "28 min"
 order: 5
 illustration: "https://images.unsplash.com/photo-1667372393119-3d4c48d91fcb?q=80&w=2940&auto=format&fit=crop"
 ---
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-
-## Helm Charts
 
 Once your application grows past a single manifest, copy-pasting near-identical YAML for `dev`, `staging`, and `prod` becomes a maintenance nightmare. **Helm** is the de-facto package manager for Kubernetes: it bundles all the manifests an application needs into a versioned, templated, shareable unit called a **chart**. Instead of applying a dozen raw files with `kubectl`, you install one chart, override a handful of values per environment, and get atomic upgrades and rollbacks for free.
 
@@ -264,12 +258,12 @@ helm upgrade --install myapp ./myapp --dry-run=server
 
 ## Best Practices and Common Pitfalls
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle>Ship Reliable Charts</CardTitle>
+    <CardTitle>Ship reliable charts</CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2">
+    <ul>
       <li><strong>Version discipline</strong> — bump <code>version</code> on every chart change and <code>appVersion</code> when the app image changes; they are independent.</li>
       <li><strong>Document every value</strong> — keep <code>values.yaml</code> complete with sane defaults and comments so consumers know what is configurable.</li>
       <li><strong>Prefer idempotent deploys</strong> — always use <code>helm upgrade --install</code> in automation, never a bare <code>helm install</code> that fails on the second run.</li>
@@ -281,12 +275,10 @@ helm upgrade --install myapp ./myapp --dry-run=server
 
 <Warning>Avoid `--force` on upgrades unless you understand it deletes and recreates resources, which causes downtime and can drop data on stateful workloads. Prefer `--atomic` for safe, self-reverting rollouts.</Warning>
 
----
-
 ## Next Steps
 
 You can now package, template, and safely roll out applications with Helm. The next step is knowing whether those releases are actually healthy — the domain of observability.
 
-<NextLesson title="Monitoring & Logging" description="Instrument your workloads and cluster with Prometheus and Grafana for metrics, dashboards, and alerts." href="/roadmap/kubernetes-fundamentals-intermediate-monitoring-logging" />
+<NextLesson title="Monitoring and logging" description="Instrument your workloads and cluster with Prometheus and Grafana for metrics, dashboards, and alerts." href="/roadmap/kubernetes-fundamentals-intermediate-monitoring-logging" />
 
 <Resources resources={[{"title":"Helm Documentation","href":"https://helm.sh/docs/"},{"title":"Chart Template Guide","href":"https://helm.sh/docs/chart_template_guide/"},{"title":"Best Practices for Charts","href":"https://helm.sh/docs/chart_best_practices/"},{"title":"Chart.yaml Reference","href":"https://helm.sh/docs/topics/charts/"}]} />

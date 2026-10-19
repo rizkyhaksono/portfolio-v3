@@ -21,7 +21,7 @@ test.describe("Auth & public pages", () => {
 
   test("ai page shows a sign-in gate that returns to /ai", async ({ page }) => {
     await page.goto("/ai");
-    await expect(page.getByRole("heading", { name: /sign in to use etan ai/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /sign in to write to etan/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /^sign in$/i })).toHaveAttribute("href", "/auth?redirect=/ai");
   });
 });

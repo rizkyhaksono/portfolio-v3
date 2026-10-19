@@ -1,8 +1,7 @@
-"use server";
+import "server-only";
 
+import { cache } from "react";
 import { supabaseUser } from "@/supabase/server";
-import { authHeaders } from "@/lib/header.config";
-import { logNonCriticalError } from "@/lib/logging";
 
 type projectType = {
   id: string;
@@ -15,7 +14,8 @@ type projectType = {
   source_code: string | null;
 };
 
-export const getAllProject = async () => {
+/** Newest first. Wrapped in `cache()` so metadata, page and previous / next share one query per request. */
+export const getAllProject = cache(async () => {
   const { data } = await supabaseUser
     .from("projects")
     .select("*")
@@ -24,51 +24,5 @@ export const getAllProject = async () => {
     })
     .abortSignal(AbortSignal.timeout(4000));
 
-  return data as projectType[];
-};
-
-export const getSupabaseProjectById = async (id: string) => {
-  const { data } = await supabaseUser
-    .from("projects")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  return data as projectType;
-}
-
-export const getProjects = async () => {
-  try {
-    const response = await fetch(`${process.env.API_URL}/project`,
-      {
-        method: "GET",
-        headers: await authHeaders(),
-        next: {
-          revalidate: 0,
-        }
-      }
-    ).then(async (res) => await res.json());
-    return response;
-  } catch (error) {
-    logNonCriticalError("fetch timeout/error in getProjects:", error);
-    return [];
-  }
-}
-
-export const getProjectById = async (id: number) => {
-  try {
-    const response = await fetch(`${process.env.API_URL}/project/${id}`,
-      {
-        method: "GET",
-        headers: await authHeaders(),
-        next: {
-          revalidate: 0,
-        }
-      }
-    ).then(async (res) => await res.json());
-    return response;
-  } catch (error) {
-    logNonCriticalError("fetch timeout/error in getProjectById:", error);
-    return null;
-  }
-}
+  return (data ?? []) as projectType[];
+});

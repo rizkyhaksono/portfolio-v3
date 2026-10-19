@@ -1,6 +1,7 @@
 import { Minus, Plus } from "lucide-react"
 
 import { InkLink } from "@/components/ui/ink-link"
+import { PAGE_WIDTH } from "@/lib/design-system"
 import { cn } from "@/lib/utils"
 
 interface ArticleLink {
@@ -45,7 +46,8 @@ export function ArticleShell({
   className,
 }: Readonly<ArticleShellProps>) {
   return (
-    <article className={cn("mx-auto w-full text-prose", rail ? "max-w-[calc(13rem+3rem+66ch)]" : "max-w-[66ch]", className)}>
+    // With a rail, the Ledger's width, so an index and its articles share one left edge.
+    <article className={cn("text-prose", rail ? PAGE_WIDTH.ledger : "mx-auto w-full max-w-[66ch]", className)}>
       <div aria-hidden data-print-hide className="reading-hairline" />
 
       <header className="pb-8">
@@ -78,7 +80,7 @@ export function ArticleShell({
               {prev && (
                 <p className="text-small text-ink-soft">
                   <span className="block font-display text-caption">Previous</span>
-                  <InkLink href={prev.href} className="font-display text-h4">
+                  <InkLink href={prev.href} className="inline-flex min-h-11 items-center font-display text-h4 md:min-h-0">
                     {prev.title}
                   </InkLink>
                 </p>
@@ -86,7 +88,7 @@ export function ArticleShell({
               {next && (
                 <p className="text-small text-ink-soft sm:col-start-2 sm:text-right">
                   <span className="block font-display text-caption">Next</span>
-                  <InkLink href={next.href} className="font-display text-h4">
+                  <InkLink href={next.href} className="inline-flex min-h-11 items-center font-display text-h4 md:min-h-0">
                     {next.title}
                   </InkLink>
                 </p>

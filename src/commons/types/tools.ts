@@ -59,11 +59,6 @@ export interface JLPTRandomWordResponse {
   word: JLPTWord;
 }
 
-// Anime Types
-export interface AnimeImageResponse {
-  url: string;
-}
-
 // Downloader Types
 export interface DownloadResult {
   title: string;
@@ -165,26 +160,6 @@ export interface PostalCodeSearchResponse {
     data: PostalCodeData[];
   };
   total: number;
-}
-
-
-// Anime Quote Types
-export interface AnimeQuote {
-  content: string;
-  anime: {
-    id: number;
-    name: string;
-    altName: string;
-  };
-  character: {
-    id: number;
-    name: string;
-  };
-}
-
-export interface AnimeQuoteResponse {
-  status: string;
-  data: AnimeQuote;
 }
 
 
@@ -314,17 +289,9 @@ export interface GasPriceResponse {
 export type ToolTab =
   | "japanese-quiz"
   | "ielts"
-  | "anime-generator"
   | "downloader"
   | "wpm"
   | "postal-code"
   | "web3-crypto"
   | "pokemon"
   | "starwars";
-
-export interface ToolCategory {
-  id: ToolTab;
-  name: string;
-  description: string;
-  icon: string;
-}

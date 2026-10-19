@@ -11,23 +11,18 @@ video: "https://www.youtube.com/embed/Sxg3b3bB5k"
 illustration: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=2940&auto=format&fit=crop"
 ---
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { BookOpen, Lightbulb, Target } from "lucide-react"
-
 ## Introduction to MCP
 
 The **Model Context Protocol (MCP)** is an open standard that enables AI models to securely connect to data sources, tools, and integrations. Developed initially by Anthropic, it acts as a universal bridge, standardizing how AI Assistants like Claude, Cursor, and custom agents fetch context from local or external environments.
 
-<Card className="my-6">
+<Card>
   <CardHeader>
-    <CardTitle className="flex items-center gap-2">
-      <Target className="h-5 w-5" />
-      Learning Objectives
+    <CardTitle>
+      Learning objectives
     </CardTitle>
   </CardHeader>
   <CardContent>
-    <ul className="list-disc list-inside space-y-2">
+    <ul>
       <li>Understand what MCP is and the problems it solves.</li>
       <li>Learn the architectural difference between MCP Clients and Servers.</li>
       <li>Recognize the three core capabilities: Resources, Prompts, and Tools.</li>
@@ -60,9 +55,8 @@ MCP relies on transport mechanisms (typically **stdio** for local servers execut
 
 ## Capabilities
 
-<Alert className="my-6">
-  <Lightbulb className="h-4 w-4" />
-  <AlertTitle>Resources, Prompts, and Tools</AlertTitle>
+<Alert>
+  <AlertTitle>Resources, prompts and tools</AlertTitle>
   <AlertDescription>An MCP Server can provide three distinct types of context to the LLM:</AlertDescription>
 </Alert>
 
@@ -72,4 +66,4 @@ MCP relies on transport mechanisms (typically **stdio** for local servers execut
 
 ## Next Steps
 
-<NextLesson title="Creating your first MCP Server" description="Now that we understand the architecture, let's write our first TypeScript MCP Server from scratch." href="/roadmap/mcp-fundamentals-creating-server" />
+<NextLesson title="Creating your first MCP server" description="Now that we understand the architecture, let's write our first TypeScript MCP Server from scratch." href="/roadmap/mcp-fundamentals-creating-server" />
