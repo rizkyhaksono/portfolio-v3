@@ -17,7 +17,7 @@ test.describe('Navigation', () => {
     for (const { label } of headLinks('lg')) {
       await expect(head.getByRole('link', { name: label, exact: true })).toBeVisible();
     }
-    await expect(page.getByRole('button', { name: 'Contents' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Menu' })).toBeHidden();
 
     await head.getByRole('link', { name: 'Writing', exact: true }).click();
     await expect(page).toHaveURL(/\/blog$/);
@@ -26,7 +26,7 @@ test.describe('Navigation', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  test('tablet head shows the short row, search and Contents', async ({ page }) => {
+  test('tablet head shows the short row, search and the menu', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     const head = page.getByRole('navigation', { name: 'Sections' });
@@ -35,16 +35,16 @@ test.describe('Navigation', () => {
     }
     await expect(head.getByRole('link', { name: 'Chat', exact: true })).toBeHidden();
     await expect(page.getByRole('banner').getByRole('button', { name: /Search/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Contents' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Menu' })).toBeVisible();
   });
 
-  test('Contents sheet reaches every section on a phone', async ({ page }) => {
+  test('menu reaches every section on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
     await expect(page.getByRole('navigation', { name: 'Sections' })).toBeHidden();
 
-    await page.getByRole('button', { name: 'Contents' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Contents' });
+    await page.getByRole('button', { name: 'Menu' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Menu' });
     await expect(sheet).toBeVisible();
     for (const { href, label } of NAV_SECTIONS) {
       await expect(sheet.getByRole('link', { name: new RegExp(`^${label}`) })).toHaveAttribute('href', href);

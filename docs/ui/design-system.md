@@ -133,7 +133,7 @@ Photos use the `.plate` duotone. The engraving is a CSS mask painted with `hsl(v
 
 ## Night print (dark mode)
 
-- Token flip on `<html class="dark">`, driven by next-themes. Default theme is System; the Contents sheet offers Paper, Night and System.
+- Token flip on `<html class="dark">`, driven by next-themes. Default theme is System; the menu sheet offers Paper, Night and System.
 - Do not write dark-variant classes. Every colour already flips through the tokens; existing ones are deleted as files are touched.
 - Engravings flip through `--plate-alpha`; photos keep the `.plate` duotone; the grain tile swaps.
 - `color-scheme` follows the theme. Viewport `themeColor` is paper by day and night paper at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
@@ -141,7 +141,7 @@ Photos use the `.plate` duotone. The engraving is a CSS mask painted with `hsl(v
 
 ## Print
 
-The print stylesheet forces paper tokens, hides the running head, Contents sheet and engraving band, stops the wordscroll, and prints link URLs.
+The print stylesheet forces paper tokens, hides the running head, menu sheet and engraving band, stops the wordscroll, and prints link URLs.
 
 ## Shared class tokens
 

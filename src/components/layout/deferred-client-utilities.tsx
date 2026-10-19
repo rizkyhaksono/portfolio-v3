@@ -58,7 +58,7 @@ export function UmamiRecorder() {
   return null
 }
 
-/** Where focus goes when a trigger-less dialog closes. From inside the Contents sheet (gone by then), the Contents button. */
+/** Where focus goes when a trigger-less dialog closes. From inside the menu sheet (gone by then), the menu button. */
 function focusOrigin(from: Element | null): HTMLElement | null {
   if (from?.closest("[role=dialog]")) return document.querySelector<HTMLElement>("[data-contents-trigger]")
   return from instanceof HTMLElement ? from : null

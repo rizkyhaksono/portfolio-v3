@@ -52,7 +52,7 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 
 ## Shell and page patterns
 
-`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the Contents sheet, `main#main` and the colophon with the engraving band. No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
+`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the menu sheet, `main#main` and the colophon with the engraving band. No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
 
 | Pattern | Component | Routes |
 |---|---|---|

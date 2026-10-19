@@ -12,15 +12,15 @@
   Colophon: name, role, email / Read, Try, Site columns / credit line / Back to top
   Engraving band, full bleed, clamp(200px, 26vw, 440px) tall
 
-768px to 1023px   wordmark, Projects Writing Etan AI, [Search] [Contents]
-under 768px       wordmark, [Contents]   (48px head, 44px targets)
+768px to 1023px   wordmark, Projects Writing Etan AI, [Search] [menu icon]
+under 768px       wordmark, [menu icon]   (48px head, 44px targets)
 ```
 
-- If the head row overflows at 1024px, Chat moves into Contents for 1024px to 1279px only.
-- Credentials and Changelog live in the colophon, Contents and the command palette.
-- **Contents** is a full-height Radix Sheet: a search field (opens the palette), every section in 28px italic with a one-line note, a theme radio (Paper, Night, System) and Account.
+- If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
+- Credentials and Changelog live in the colophon, the menu and the command palette.
+- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section in 26px italic, then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
 - The colophon credit line: "Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum (public domain)."
-- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, Contents, colophon, command palette and terminal overlay all import it.
+- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon, command palette and terminal overlay all import it.
 
 ### BaseLayout
 
@@ -32,7 +32,7 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 | `footer?` | `'full'` (default), `'compact'`, `'none'` | `compact` on `/ai` and `/chat` |
 
 - The old `sidebar` and `rightSidebar` props, the navbar, sidebars, right-sidebar windows and visitor panel are gone. Do not bring them back.
-- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger. `DeferredClientUtilities` (command palette, terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. The palette opens from `[data-open-search]` buttons and ⌘K, the feedback dialog from `[data-open-feedback]` buttons (colophon and Contents sheet); nothing floats over the page.
+- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger (a two-rule menu icon labelled "Menu"). `DeferredClientUtilities` (command palette, terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. The palette opens from `[data-open-search]` buttons and ⌘K, the feedback dialog from `[data-open-feedback]` buttons (colophon); nothing floats over the page.
 - There is no scroll-to-top button; the colophon has a "Back to top" link.
 - Do not add horizontal padding inside BaseLayout. The wrapper already pads.
 
@@ -79,7 +79,7 @@ The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career,
 - Sticky elements use `top: var(--head-h)` (plus an offset) so they clear the running head.
 - Opaque sticky surfaces take `.bg-paper-grain`.
 - No `overflow: hidden` or `auto` on any ancestor of a sticky element. Use `overflow-x: clip` where clipping is needed.
-- Verify sticky still works after the Contents sheet opens and closes.
+- Verify sticky still works after the menu sheet opens and closes.
 
 ## Width anti-patterns
 

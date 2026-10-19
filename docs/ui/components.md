@@ -60,7 +60,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 
 | Event | Where | Data |
 |---|---|---|
-| `nav-click`, `contents-open`, `search-open` | Head, Contents, colophon, command palette | `item`, `area` / none / `via` |
+| `nav-click`, `menu-open`, `search-open` | Head, menu, colophon, command palette | `item`, `area` / none / `via` |
 | `theme-toggle` | ThemeToggle | `to` |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
 | `cta-click`, `resume-open`, `portfolio-open` | Masthead, About | `target` / `area` |

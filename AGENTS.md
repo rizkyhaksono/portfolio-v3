@@ -88,7 +88,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 | Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, Contents sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
+Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
 ### Motion
 

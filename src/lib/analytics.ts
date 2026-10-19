@@ -3,7 +3,7 @@ type EventData = Record<string, string | number | boolean>
 // Plan §5.3: kebab-case, ≤50 chars, enum-like data values, never PII.
 export type EventName =
   | 'nav-click'
-  | 'contents-open'
+  | 'menu-open'
   | 'search-open'
   | 'theme-toggle'
   | 'outbound-click'

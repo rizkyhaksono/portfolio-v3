@@ -12,7 +12,7 @@ The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesq
 |---|---|
 | [design-system.md](./design-system.md) | Ink and paper tokens, contrast, Literata roles, type scale, lines, texture, motion tiers, banned list, dark mode, print |
 | [surfaces.md](./surfaces.md) | The three surfaces: frame, inset, lift |
-| [page-shell.md](./page-shell.md) | BaseLayout, running head, Contents sheet, colophon, page patterns, widths |
+| [page-shell.md](./page-shell.md) | BaseLayout, running head, menu sheet, colophon, page patterns, widths |
 | [components.md](./components.md) | Primitive rules, links, fields, data viz, Umami event rules |
 | [platforms.md](./platforms.md) | Visitor, user, admin and auth shells, plus the agent file map |
 
@@ -66,4 +66,4 @@ The exclusions are deliberate: `radio-group.tsx` owns the one circle, code block
 - Shell: `src/components/layout/base-layout.tsx`
 - Primitives: `src/components/ui/`
 - Logo: `src/components/ui/logo.tsx`, art from `scripts/logo/make.mjs`
-- Navigation: `src/commons/constants/navigation-menu.ts` (single source for head, Contents, colophon, command palette, terminal)
+- Navigation: `src/commons/constants/navigation-menu.ts` (single source for head, menu, colophon, command palette, terminal)

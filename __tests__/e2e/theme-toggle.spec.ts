@@ -23,11 +23,11 @@ test.describe('Theme', () => {
     await expect(html).not.toHaveClass(/\bdark\b/);
   });
 
-  test('Contents sheet offers Paper, Night and System', async ({ page }) => {
+  test('menu offers Paper, Night and System', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    await page.getByRole('button', { name: 'Contents' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Contents' });
+    await page.getByRole('button', { name: 'Menu' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Menu' });
     const html = page.locator('html');
 
     await expect(sheet.getByRole('radio', { name: 'System' })).toBeChecked();

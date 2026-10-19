@@ -4,11 +4,9 @@ import Link from "next/link"
 import type { RefObject } from "react"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Search } from "lucide-react"
 import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { buttonVariants } from "@/components/ui/button"
 import { NAV_SECTIONS, isCurrentPath, navTrack } from "@/commons/constants/navigation-menu"
 import { track } from "@/lib/analytics"
 
@@ -25,7 +23,7 @@ interface ContentsSheetProps {
   returnFocus: RefObject<HTMLButtonElement | null>
 }
 
-/** The full-height Contents sheet: search, every section, theme and account. Loaded on first open. */
+/** The menu sheet: every section, the theme and the account link. Loaded on first open. */
 export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<ContentsSheetProps>) {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
@@ -43,87 +41,44 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
           event.preventDefault()
           returnFocus.current?.focus({ preventScroll: true })
         }}
-        className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 sm:max-w-[28rem]"
+        className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 sm:max-w-[24rem]"
       >
-        <div className="flex min-h-[3.75rem] items-center border-b md:min-h-[var(--head-h)] border-rule px-5 pr-14">
-          <SheetTitle>Contents</SheetTitle>
+        <div className="flex min-h-12 items-center px-5 pr-14 md:min-h-[var(--head-h)]">
+          <SheetTitle className="sr-only">Menu</SheetTitle>
         </div>
 
-        <div className="px-5 pb-10 pt-5">
-          <SheetClose asChild>
-            <button
-              type="button"
-              data-open-search="contents"
-              aria-keyshortcuts="Meta+K Control+K"
-              className="flex min-h-11 w-full items-center gap-3 border-b border-input text-left text-base text-ink-soft hover:border-ink"
-            >
-              <Search className="size-4 shrink-0" strokeWidth={1.5} aria-hidden />
-              Search pages and posts
-              <kbd className="ml-auto hidden text-caption md:inline" aria-hidden>
-                ⌘K
-              </kbd>
-            </button>
-          </SheetClose>
+        <nav aria-label="Menu" className="px-5">
+          <ul>
+            {NAV_SECTIONS.map(({ href, label }) => (
+              <li key={href}>
+                <SheetClose asChild>
+                  <Link
+                    href={href}
+                    aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
+                    className="flex min-h-12 items-center font-display text-[1.625rem] leading-tight text-ink decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
+                    {...navTrack(href, "menu")}
+                  >
+                    {label}
+                  </Link>
+                </SheetClose>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-          <nav aria-label="Contents" className="mt-6">
-            <ul>
-              {NAV_SECTIONS.map(({ href, label, note }) => (
-                <li key={href} className="border-b border-rule">
-                  <SheetClose asChild>
-                    <Link
-                      href={href}
-                      aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-                      className="group block py-3"
-                      {...navTrack(href, "contents")}
-                    >
-                      <span className="block font-display text-[1.75rem] leading-tight decoration-1 underline-offset-[0.2em] group-hover:underline group-aria-[current=page]:underline group-aria-[current=page]:decoration-2">
-                        {label}
-                      </span>
-                      <span className="mt-0.5 block text-small text-ink-soft">{note}</span>
-                    </Link>
-                  </SheetClose>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <RadioGroup
-            value={theme}
-            onValueChange={chooseTheme}
-            aria-labelledby="contents-theme"
-            className="mt-8 gap-0"
-          >
-            <p id="contents-theme" className="font-display text-caption text-ink-soft">
-              Theme
-            </p>
-            <div className="flex flex-wrap gap-x-6">
-              {THEMES.map(({ value, label }) => (
-                <Label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 text-base font-normal">
-                  <RadioGroupItem value={value} />
-                  {label}
-                </Label>
-              ))}
-            </div>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-rule px-5 py-4">
+          <RadioGroup value={theme} onValueChange={chooseTheme} aria-label="Theme" className="flex gap-x-5 gap-y-0">
+            {THEMES.map(({ value, label }) => (
+              <Label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 text-small font-normal text-ink">
+                <RadioGroupItem value={value} />
+                {label}
+              </Label>
+            ))}
           </RadioGroup>
-
-          <div className="mt-8 border-t border-rule pt-5">
-            <SheetClose asChild>
-              <Link href="/profile" className={buttonVariants({ variant: "outline" })} {...navTrack("/profile", "contents")}>
-                Account
-              </Link>
-            </SheetClose>
-            <p className="mt-2 text-small text-ink-soft">Sign in, or open your profile.</p>
-          </div>
-
           <SheetClose asChild>
-            <button
-              type="button"
-              data-open-feedback="contents"
-              aria-haspopup="dialog"
-              className="mt-6 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2"
-            >
-              Send feedback
-            </button>
+            <Link href="/profile" className="inline-flex min-h-11 items-center text-small font-semibold text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2" {...navTrack("/profile", "menu")}>
+              Account
+            </Link>
           </SheetClose>
         </div>
       </SheetContent>

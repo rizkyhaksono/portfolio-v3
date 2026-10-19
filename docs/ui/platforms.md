@@ -6,7 +6,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 **Routes:** `/`, `/blog`, `/project`, `/certificates`, `/changelog`, `/roadmap`, `/tools`, `/tracker`, `/stats`, `/chat`, `/legal/*`
 
-**Shell:** `BaseLayout` with the running head, Contents sheet and colophon. No sidebars.
+**Shell:** `BaseLayout` with the running head, menu sheet and colophon. No sidebars.
 
 | Route | Pattern |
 |---|---|

@@ -1,6 +1,6 @@
 // The only nav source: running head, Contents, colophon, command palette and terminal overlay read it.
 
-export type NavArea = "head" | "contents" | "colophon"
+export type NavArea = "head" | "menu" | "colophon"
 
 export interface NavSection {
   href: string
