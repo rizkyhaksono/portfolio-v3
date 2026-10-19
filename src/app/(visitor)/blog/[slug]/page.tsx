@@ -9,6 +9,7 @@ import CodeBlock, { Pre } from "@/components/ui/code-block"
 import { InkLink } from "@/components/ui/ink-link"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { ReaderCount } from "@/components/ui/reader-count"
+import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import BlogLetters from "@/app/_components/blog/blog-letters"
 import { dateline } from "@/app/_components/blog/format"
@@ -25,6 +26,7 @@ const MARKDOWN: Components = {
   h1: "h2",
   pre: Pre,
   code: CodeBlock,
+  table: Table,
   // eslint-disable-next-line @next/next/no-img-element -- DEV body images come from many hosts; `.prose img` frames them
   img: ({ src, alt }) => <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" decoding="async" />,
 }

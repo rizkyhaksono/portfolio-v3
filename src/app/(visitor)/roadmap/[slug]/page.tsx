@@ -49,7 +49,7 @@ export default async function RoadmapLessonPage({ params }: Readonly<Props>) {
       title={meta.title}
       standfirst={meta.description}
       dateline={dateline}
-      railLabel="Contents"
+      railLabel="On this page"
       rail={
         <>
           {headings.length > 0 && (

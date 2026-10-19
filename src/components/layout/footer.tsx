@@ -90,11 +90,11 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
           </div>
 
           {COLUMNS.map(({ column, heading }) => (
-            <nav key={column} aria-labelledby={`colophon-${column}`}>
+            <nav key={column} aria-labelledby={`colophon-${column}`} className={cn(column === "site" && "col-span-2 sm:col-span-1")}>
               <p id={`colophon-${column}`} className="font-display text-caption text-ink-soft">
                 {heading}
               </p>
-              <ul className="mt-2">
+              <ul className={cn("mt-2", column === "site" && "columns-2 gap-x-6 sm:columns-1")}>
                 {NAV_SECTIONS.filter((section) => section.column === column).map(({ href, label }) => (
                   <li key={href}>
                     <Link href={href} className={linkClass} {...navTrack(href, "colophon")}>

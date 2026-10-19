@@ -27,7 +27,12 @@ export function ContentsTrigger({ className }: Readonly<{ className?: string }>)
           setLoaded(true)
           setOpen(true)
         }}
-        className={cn(buttonVariants({ variant: "outline" }), "h-9 px-3", className)}
+        className={cn(
+          buttonVariants({ variant: "outline" }),
+          // A 36px box with a 44px hit area: the pseudo-element extends the target 4px above and below.
+          "relative h-9 px-3 [@media(pointer:coarse)]:min-h-9 before:absolute before:inset-x-0 before:-inset-y-1 before:content-['']",
+          className,
+        )}
       >
         Contents
       </button>

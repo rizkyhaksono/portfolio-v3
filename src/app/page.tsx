@@ -54,8 +54,8 @@ function Masthead() {
           </InkLink>
         </li>
       </ul>
-      {/* Takes what the stage has left (at least 3rem, at most 22svh), so it never pushes below the fold. */}
-      <Engraving crop="masthead" className="mt-auto max-h-[22svh] min-h-12 grow basis-12" />
+      {/* Takes what the stage has left (at least 3rem, at most min(36svh,22rem)), so it never pushes below the fold. */}
+      <Engraving crop="masthead" className="mt-auto max-h-[min(36svh,22rem)] min-h-12 grow basis-12" />
     </WordScroll>
   )
 }

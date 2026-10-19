@@ -43,7 +43,7 @@ function ChoiceGroup<T extends string | number>({
       <p aria-hidden className="text-sm font-semibold text-ink">
         {label}
       </p>
-      <div className="mt-1 flex flex-wrap gap-1">
+      <div className="mt-1 grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
         {options.map((o) => (
           <Button key={o.id} type="button" size="sm" variant={o.id === value ? "default" : "outline"} aria-pressed={o.id === value} disabled={disabled} onClick={() => onChange(o.id)}>
             {o.name}
@@ -118,7 +118,7 @@ export default function WPMTest() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+      <div className="grid gap-4 sm:flex sm:flex-wrap sm:items-end sm:gap-x-8">
         <ChoiceGroup
           label="Length"
           options={DURATIONS.map((d) => ({ id: d, name: `${d} seconds` }))}
@@ -137,16 +137,10 @@ export default function WPMTest() {
         </div>
       </div>
 
-      {phase !== "idle" && (
-        <StatStrip
-          items={[
-            { label: "Words a minute", value: wpm },
-            { label: "Accuracy", value: `${accuracy}%` },
-            { label: "Errors", value: tally.errors },
-            { label: "Seconds left", value: Math.max(0, timeLeft) },
-          ]}
-        />
-      )}
+      {/* One fixed line on phones: nothing above the field may grow while the keyboard is open. */}
+      <p className="font-display text-caption tabular-nums text-ink-soft sm:hidden">
+        {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
+      </p>
 
       <p className="min-h-[9rem] border border-rule p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
@@ -176,6 +170,17 @@ export default function WPMTest() {
           spellCheck={false}
         />
       </div>
+
+      {phase !== "idle" && (
+        <StatStrip
+          items={[
+            { label: "Words a minute", value: wpm },
+            { label: "Accuracy", value: `${accuracy}%` },
+            { label: "Errors", value: tally.errors },
+            { label: "Seconds left", value: Math.max(0, timeLeft) },
+          ]}
+        />
+      )}
 
       {phase === "done" && (
         <div role="status" className="space-y-4 border-t border-ink pt-6 text-center">

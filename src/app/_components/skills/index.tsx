@@ -40,7 +40,7 @@ export default function SkillSection() {
           >
             <h3 className="flex min-h-[3.25rem] items-center font-display text-h3 text-ink">{group.name}</h3>
             <p className="text-small text-ink-soft">{group.note}</p>
-            <ul role="list" className="mt-6 grid gap-x-10 sm:grid-cols-2">
+            <ul role="list" className="mt-6 grid grid-cols-2 gap-x-6 sm:gap-x-10">
               {group.skills.map((skill) => (
                 <li key={skill} className="border-b border-rule py-2 text-lead text-ink">
                   {skill}

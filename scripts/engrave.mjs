@@ -2,7 +2,7 @@
 // Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> > speckle-uri.txt
 // Source: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0).
 // The source scan lives in art-src/ outside the repo and is never committed.
-// Writes src/assets/plates/hollar-band-{1600,800}.webp and src/assets/paper/grain-{light,dark}.webp,
+// Writes src/assets/plates/hollar-band-1600.webp and src/assets/paper/grain-{light,dark}.webp,
 // prints the speckle mask data URI to stdout (sizes go to stderr). Exits non-zero if any budget is blown.
 import assert from "node:assert/strict"
 import fs from "node:fs"
@@ -56,7 +56,7 @@ const { data, info } = await sharp(src).extract(CROP).removeAlpha().raw().toBuff
 const gray = Buffer.alloc(info.width * info.height)
 for (let i = 0, j = 0; j < gray.length; i += info.channels, j++) gray[j] = Math.max(data[i], data[i + 1], data[i + 2])
 
-for (const [width, budget] of [[1600, 72 * KB], [800, 30 * KB]]) {
+for (const [width, budget] of [[1600, 72 * KB]]) {
   const plate = await sharp(gray, { raw: { width: info.width, height: info.height, channels: 1 } })
     .resize({ width })
     .normalise({ lower: 2, upper: 98 })

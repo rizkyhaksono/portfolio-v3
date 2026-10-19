@@ -103,9 +103,9 @@ export function CommandPalette({ open, onOpenChange: setOpen, onCloseAutoFocus }
   }
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen} onCloseAutoFocus={onCloseAutoFocus}>
+    <CommandDialog className="max-sm:mt-4 max-sm:w-[calc(100%-40px)]" open={open} onOpenChange={setOpen} onCloseAutoFocus={onCloseAutoFocus}>
       <CommandInput
-        placeholder="Search pages, writing, projects and lessons…"
+        placeholder="Search pages and posts"
         value={query}
         onValueChange={setQuery}
       />

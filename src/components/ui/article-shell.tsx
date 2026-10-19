@@ -51,7 +51,7 @@ export function ArticleShell({
       <div aria-hidden data-print-hide className="reading-hairline" />
 
       <header className="pb-8">
-        <h1 className="font-display text-h1 text-balance text-ink">{title}</h1>
+        <h1 className="font-display text-h2 text-balance text-ink sm:text-h1">{title}</h1>
         {standfirst && <div className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">{standfirst}</div>}
         {dateline && <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">{dateline}</p>}
       </header>

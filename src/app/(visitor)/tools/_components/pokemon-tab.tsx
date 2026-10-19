@@ -110,7 +110,7 @@ export function PokemonTab() {
                   </li>
                 ))}
           </ul>
-          <Pager page={page} totalPages={list.data?.totalPages ?? 1} loading={loading} onPage={setPage} />
+          <Pager page={page} totalPages={list.data?.totalPages ?? 1} loading={loading} onPage={(p) => { setPage(p); document.getElementById("tool-title")?.scrollIntoView() }} />
         </>
       )}
 

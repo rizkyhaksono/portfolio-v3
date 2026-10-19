@@ -8,7 +8,7 @@ const PLATE_LABEL = "A rider on a country road, after Wenceslaus Hollar, 1650"
 // Each crop reserves its box up front (no CLS) and aims the `.engraving` mask with --pos.
 const CROPS = {
   band: { "--pos": "62% 100%", aspectRatio: "100 / 26", minHeight: 200, maxHeight: 440 },
-  masthead: { "--pos": "50% 0%", aspectRatio: "5 / 1" },
+  masthead: { "--pos": "62% 80%", aspectRatio: "5 / 1" },
   riders: { "--pos": "80% 50%", aspectRatio: "4 / 3" },
 } as const
 

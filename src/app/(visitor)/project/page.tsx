@@ -71,7 +71,7 @@ export default async function ProjectPage() {
                     <ProjectLinks project={project} className="mt-3" />
                   </div>
                   {plate && (
-                    <PlateFigure className="md:sticky md:top-[calc(var(--head-h)+1.5rem)] md:self-start">
+                    <PlateFigure className="order-first md:sticky md:order-none md:top-[calc(var(--head-h)+1.5rem)] md:self-start">
                       <div className="relative aspect-[16/10]">
                         <Image src={plate} alt="" fill priority={project.id === leadPlateId} sizes="(min-width: 768px) 20rem, 100vw" className="object-cover object-top" />
                       </div>

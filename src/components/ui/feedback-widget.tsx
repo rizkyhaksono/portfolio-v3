@@ -48,7 +48,7 @@ export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAut
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent onCloseAutoFocus={onCloseAutoFocus}>
+      <DialogContent className="max-sm:mt-4" onCloseAutoFocus={onCloseAutoFocus}>
         <DialogHeader>
           <DialogTitle>Feedback and suggestions</DialogTitle>
           <DialogDescription>What should I build or write next? Found something broken?</DialogDescription>

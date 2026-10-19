@@ -62,11 +62,11 @@ function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => P
                 </PlateFigure>
                 <h3 className="mt-3 font-display text-h4 text-ink">{entry.name}</h3>
                 {entry.line && <p className="mt-1 text-caption text-ink-soft">{entry.line}</p>}
-                {entry.extra && <p className="mt-1 truncate text-caption text-ink-soft" title={entry.extra}>{entry.extra}</p>}
+                {entry.extra && <p className="mt-1 line-clamp-2 text-caption text-ink-soft">{entry.extra}</p>}
               </li>
             ))}
       </ul>
-      <Pager page={page} totalPages={list.data?.totalPages ?? 1} loading={loading} onPage={setPage} />
+      <Pager page={page} totalPages={list.data?.totalPages ?? 1} loading={loading} onPage={(p) => { setPage(p); document.getElementById("tool-title")?.scrollIntoView() }} />
     </div>
   )
 }

@@ -83,7 +83,7 @@ export function DownloaderTab() {
 
   return (
     <div className="space-y-6">
-      <div role="group" aria-label="Platform" className="flex min-w-0 flex-wrap gap-2">
+      <div role="group" aria-label="Platform" className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {PLATFORMS.map((p) => (
           <Button
             key={p.id}

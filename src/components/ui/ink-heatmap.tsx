@@ -104,6 +104,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
           <Swatch key={i} level={i} />
         ))}
         <span className="ml-1">More</span>
+        <span className="ml-auto md:hidden">Swipe for earlier weeks</span>
       </figcaption>
     </figure>
   )

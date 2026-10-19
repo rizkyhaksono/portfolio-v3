@@ -302,7 +302,7 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
   return (
     <div
       data-private
-      className="grid h-[calc(100dvh-14rem)] min-h-[30rem] grid-rows-[minmax(0,1fr)] border border-rule md:grid-cols-[16rem_minmax(0,1fr)]"
+      className="grid h-[calc(100dvh-16rem)] min-h-[24rem] grid-rows-[minmax(0,1fr)] border border-rule md:h-[calc(100dvh-14rem)] md:min-h-[30rem] md:grid-cols-[16rem_minmax(0,1fr)]"
     >
       <aside aria-label="Conversations" className="hidden min-h-0 flex-col border-r border-rule md:flex">
         <div className="flex items-center justify-between gap-2 border-b border-rule p-3">
@@ -334,9 +334,6 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
               {list}
             </SheetContent>
           </Sheet>
-          <Button size="sm" variant="outline" className="md:hidden" onClick={newChat}>
-            New chat
-          </Button>
         </div>
 
         <div ref={scrollRef} aria-busy={loading} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">

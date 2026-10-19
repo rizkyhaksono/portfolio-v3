@@ -1,6 +1,6 @@
 ﻿"use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
@@ -21,6 +21,11 @@ const LEVELS: [RoadmapLevel, string][] = [
 ]
 
 const NAME_KEY = "roadmap-cert-name"
+
+/** Under sm the slips stack above the panel and push it below the fold, so bring its heading into view. */
+const revealPanel = (id: string) => {
+  if (!matchMedia("(min-width: 640px)").matches) document.getElementById(`${id}-title`)?.scrollIntoView()
+}
 
 function Tick() {
   return (
@@ -65,6 +70,8 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   const [name, setName] = useState("")
   const ids = courses.map(({ course }) => course)
   const [open, setOpen] = useState(ids[0] ?? "")
+  // A hash landing opens a panel after the effect, and the hash names no element, so the browser cannot scroll to it.
+  const revealPending = useRef(false)
 
   const doneOf = (course: Course) => (isLoaded ? completedCount(course.course, course.lessons.map((lesson) => lesson.slug)) : 0)
 
@@ -80,7 +87,9 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   useEffect(() => {
     const fromHash = () => {
       const id = decodeURIComponent(window.location.hash.slice(1))
-      if (ids.includes(id)) setOpen(id)
+      if (!ids.includes(id)) return
+      setOpen(id)
+      revealPending.current = true
     }
     if (window.location.hash) fromHash()
     else if (isLoaded) {
@@ -95,7 +104,14 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded])
 
+  useEffect(() => {
+    if (!revealPending.current) return
+    revealPending.current = false
+    revealPanel(open)
+  }, [open])
+
   const choose = (id: string) => {
+    revealPending.current = false
     setOpen(id)
     history.replaceState(null, "", `#${id}`)
   }
@@ -122,10 +138,12 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
               value={course.course}
               data-track="roadmap-course"
               data-track-course={course.course}
-              className="block h-full whitespace-normal border-b border-r-0 border-rule px-4 py-4 text-left font-normal text-ink-soft hover:bg-tint hover:text-ink data-[state=active]:border-b-2 data-[state=active]:border-ink data-[state=active]:bg-tint data-[state=active]:text-ink sm:border-r lg:[&:nth-child(5n)]:border-r-0"
+              // Radix activates on mousedown, so the panel is mounted by the time click fires.
+              onClick={() => revealPanel(course.course)}
+              className="block h-full whitespace-normal border-b border-r-0 border-rule px-4 py-3 sm:py-4 text-left font-normal text-ink-soft hover:bg-tint hover:text-ink data-[state=active]:border-b-2 data-[state=active]:border-ink data-[state=active]:bg-tint data-[state=active]:text-ink sm:border-r lg:[&:nth-child(5n)]:border-r-0"
             >
               <span className="block font-display text-h4 text-ink">{courseTitle(course.course)}</span>
-              <span className="mt-1 block text-small tabular-nums">
+              <span className="mt-1 hidden text-small tabular-nums sm:block">
                 {total} lessons{minutes > 0 && `, about ${minutes} minutes`}
               </span>
               <Progress done={done} total={total} />

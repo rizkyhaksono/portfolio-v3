@@ -1,7 +1,8 @@
 import { cookies } from "next/headers"
 import { getTrackerTasks } from "@/services/visitor/tracker"
 import { getProfile } from "@/services/user/profile"
-import { InkLink } from "@/components/ui/ink-link"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import TrackerBoard from "./_components/tracker-board"
 
 export const dynamic = "force-dynamic"
@@ -23,14 +24,18 @@ export default async function TrackerPage() {
         </p>
         <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
           {tasks.length > 0 && `${tasks.length} ${tasks.length === 1 ? "card" : "cards"} on the board, ${done} of them done. `}
-          {currentUserId ? (
-            "Drag your cards between columns to move them."
-          ) : (
+          {currentUserId && (
             <>
-              <InkLink href="/auth?redirect=/tracker">Sign in</InkLink> to add and move cards.
+              <span className="hidden sm:inline">Drag your cards between columns to move them.</span>
+              <span className="sm:hidden">Use Move to on a card to change its column.</span>
             </>
           )}
         </p>
+        {!currentUserId && (
+          <Button asChild variant="outline" size="sm" className="mt-4">
+            <Link href="/auth?redirect=/tracker">Sign in to add cards</Link>
+          </Button>
+        )}
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 

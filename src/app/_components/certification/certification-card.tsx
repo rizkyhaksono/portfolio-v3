@@ -18,16 +18,19 @@ export function verifyUrl(link?: string | null): string | null {
 export function CertificationRow({ certification }: Readonly<{ certification: LinkedinCertification }>) {
   const href = verifyUrl(certification.link)
   return (
-    <LedgerRow title={certification.title} meta={certification.issuedDisplay}>
+    <LedgerRow title={certification.title} meta={certification.issuedDisplay && <span className="hidden sm:inline">{certification.issuedDisplay}</span>}>
       <span className="flex flex-wrap items-baseline gap-x-4">
-        <span>{certification.provider}</span>
+        <span>
+          {certification.provider}
+          {certification.issuedDisplay && <span className="sm:hidden">, {certification.issuedDisplay}</span>}
+        </span>
         {href ? (
           <InkLink
             href={href}
             external
             event="cert-verify"
             eventData={{ issuer: certification.provider }}
-            className="inline-flex min-h-11 items-center md:min-h-0"
+            className="relative after:absolute after:inset-x-0 after:-inset-y-3"
           >
             Verify
           </InkLink>

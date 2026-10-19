@@ -25,7 +25,7 @@ export default function ProjectImageViewer({ src, alt }: Readonly<ProjectImageVi
         <DialogTitle className="sr-only">{alt}</DialogTitle>
         <div className="plate">
           {/* eslint-disable-next-line @next/next/no-img-element -- natural size, uncropped */}
-          <img src={src} alt={alt} className="mx-auto max-h-[80vh] w-auto max-w-full object-contain" />
+          <img src={src} alt={alt} className="mx-auto max-h-[80svh] w-auto max-w-full object-contain" />
         </div>
       </DialogContent>
     </Dialog>

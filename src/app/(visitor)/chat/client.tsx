@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { InkLink } from "@/components/ui/ink-link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   AlertDialog,
@@ -242,7 +242,8 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    // Phone keyboards have no Shift: there Enter is a new line and Send posts.
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !window.matchMedia("(pointer: coarse)").matches) {
       e.preventDefault()
       e.currentTarget.form?.requestSubmit()
     }
@@ -320,13 +321,16 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
             </Button>
           </div>
           <p id="chat-hint" className="mt-1 font-display text-caption text-ink-soft">
-            Enter sends. Shift and Enter start a new line.
+            <span className="[@media(pointer:coarse)]:hidden">Enter sends. Shift and Enter start a new line.</span>
+            <span className="hidden [@media(pointer:coarse)]:inline">Enter starts a new line. Send posts the message.</span>
           </p>
         </form>
       ) : (
-        <p className="shrink-0 border-t border-ink py-4 text-body text-ink">
-          <InkLink href="/auth?redirect=/chat">Sign in</InkLink> to write a message or reply to one.
-        </p>
+        <div className="shrink-0 border-t border-ink py-3">
+          <Button asChild size="sm">
+            <Link href="/auth?redirect=/chat">Sign in to write a message</Link>
+          </Button>
+        </div>
       )}
 
       <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>

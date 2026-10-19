@@ -21,7 +21,7 @@ export function LegalDocument({ sections, ...shell }: Readonly<LegalDocumentProp
   return (
     <ArticleShell
       {...shell}
-      railLabel="Contents"
+      railLabel="On this page"
       rail={
         <ol role="list" className="flex flex-col gap-2">
           {sections.map(({ id, title }, index) => (

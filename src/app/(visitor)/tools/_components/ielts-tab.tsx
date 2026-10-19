@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react"
 import { IELTS_WORDS, IELTS_TOPICS, type IeltsWord } from "@/commons/constants/ielts-words"
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { badgeVariants } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
@@ -76,18 +77,32 @@ export function IeltsTab() {
     }
   }
 
+  const pickTopic = (t: string) => {
+    setTopic(t)
+    restart()
+  }
+
   return (
     <div className="flex flex-col gap-5">
-      <div role="group" aria-label="Topic" className="flex flex-wrap gap-2">
+      <Select value={topic} onValueChange={pickTopic}>
+        <SelectTrigger aria-label="Topic" className="sm:hidden">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {IELTS_TOPICS.map((t) => (
+            <SelectItem key={t} value={t}>
+              {t}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <div role="group" aria-label="Topic" className="hidden flex-wrap gap-2 sm:flex">
         {IELTS_TOPICS.map((t) => (
           <button
             key={t}
             type="button"
             aria-pressed={t === topic}
-            onClick={() => {
-              setTopic(t)
-              restart()
-            }}
+            onClick={() => pickTopic(t)}
             className={cn(
               badgeVariants({ variant: "outline" }),
               "min-h-8 transition-colors hover:border-ink [@media(pointer:coarse)]:min-h-11",
@@ -110,7 +125,7 @@ export function IeltsTab() {
           onClick={() => setFlipped((f) => !f)}
           onKeyDown={onCardKey}
           aria-describedby="ielts-hint"
-          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-rule p-8 text-center transition-colors hover:border-ink"
+          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-rule p-5 text-center transition-colors hover:border-ink sm:p-8"
         >
           {flipped ? (
             <span className="flex flex-col gap-3">
@@ -129,7 +144,7 @@ export function IeltsTab() {
                 <Chip>{card.pos}</Chip>
                 <Chip>{card.topic}</Chip>
               </span>
-              <span className="font-display text-h1 text-ink">{card.word}</span>
+              <span className="font-display text-h2 text-ink [overflow-wrap:anywhere] sm:text-h1">{card.word}</span>
               <span className="text-caption text-ink-soft">Select to see the meaning</span>
             </>
           )}
@@ -138,26 +153,29 @@ export function IeltsTab() {
         <p className="flex min-h-[16rem] items-center justify-center border border-rule font-display text-body text-ink-soft">No words in this topic.</p>
       )}
       <p id="ielts-hint" className="font-display text-caption text-ink-soft">
-        Select the card or press Space to turn it. While it has focus, the left and right arrows move between cards.
+        <span className="[@media(pointer:coarse)]:hidden">
+          Select the card or press Space to turn it. While it has focus, the left and right arrows move between cards.
+        </span>
+        <span className="hidden [@media(pointer:coarse)]:inline">Tap the card to turn it.</span>
       </p>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => go(-1)} disabled={!card}>
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="contents sm:flex sm:gap-2">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => go(-1)} disabled={!card}>
             Previous
           </Button>
-          <Button variant="outline" size="sm" onClick={() => go(1)} disabled={!card}>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => go(1)} disabled={!card}>
             Next
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
+          <Button variant="ghost" size="sm" className="col-span-2 w-full sm:w-auto" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
             Listen
           </Button>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => mark("learning")} disabled={!card}>
+        <div className="contents sm:flex sm:gap-2">
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => mark("learning")} disabled={!card}>
             Still learning
           </Button>
-          <Button size="sm" onClick={() => mark("known")} disabled={!card}>
+          <Button size="sm" className="w-full sm:w-auto" onClick={() => mark("known")} disabled={!card}>
             Know it
           </Button>
         </div>

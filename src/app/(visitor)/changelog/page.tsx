@@ -55,7 +55,7 @@ export default function ChangelogPage() {
                 <article>
                   <h2 className="font-display text-h3 text-balance text-ink">
                     {meta.title}{" "}
-                    <a href={`#${slug}`} aria-label="Permalink" className="not-italic text-ink-soft no-underline hover:text-ink hover:underline">
+                    <a href={`#${slug}`} aria-label="Permalink" className="relative not-italic after:absolute after:-inset-3 text-ink-soft no-underline hover:text-ink hover:underline">
                       &para;
                     </a>
                   </h2>

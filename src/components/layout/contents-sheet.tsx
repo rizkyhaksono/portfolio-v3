@@ -45,7 +45,7 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
         }}
         className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 sm:max-w-[28rem]"
       >
-        <div className="flex min-h-[var(--head-h)] items-center border-b border-rule px-5 pr-14">
+        <div className="flex min-h-[3.75rem] items-center border-b md:min-h-[var(--head-h)] border-rule px-5 pr-14">
           <SheetTitle>Contents</SheetTitle>
         </div>
 

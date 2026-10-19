@@ -11,6 +11,8 @@ export default function AboutSection() {
   return (
     <PageSection
       id="about"
+      // The masthead strip already closes the stage, so a 3rem gap (wrapper padding plus mt-4 on phones) is enough.
+      className="mt-4 sm:mt-0"
       heading={{ title: "About" }}
       contentClassName="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_10rem] md:gap-12"
     >

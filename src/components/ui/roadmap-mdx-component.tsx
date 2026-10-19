@@ -138,7 +138,7 @@ const CodeSnippet = ({ children, language = "javascript" }: { children?: ReactNo
 )
 
 // `.prose` sets tables full width; wide ones scroll sideways inside this box instead of the page.
-const Table = (props: ComponentProps<"table">) => (
+export const Table = (props: ComponentProps<"table">) => (
   <div className="my-6 w-full overflow-x-auto">
     <table {...props} />
   </div>
@@ -172,7 +172,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     AlertTitle,
     Tabs: (props: ComponentProps<typeof Tabs>) => <Tabs {...props} className={cn("my-6", props.className)} />,
     TabsContent,
-    TabsList,
+    TabsList: (props: ComponentProps<typeof TabsList>) => <TabsList {...props} className={cn("flex-wrap gap-x-5 overflow-x-visible", props.className)} />,
     TabsTrigger,
     CodeSnippet,
     NextLesson,

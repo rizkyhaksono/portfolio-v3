@@ -29,7 +29,7 @@ export function JapaneseQuizTab() {
         ) : levels.status === "loading" && !levels.data ? (
           <ToolLoading>Loading levels…</ToolLoading>
         ) : (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
             {levels.data?.map((l) => (
               <Button
                 key={l.code}
@@ -37,10 +37,10 @@ export function JapaneseQuizTab() {
                 variant={level === l.code ? "default" : "outline"}
                 aria-pressed={level === l.code}
                 onClick={() => setLevel(l.code)}
-                className="h-auto flex-col items-start gap-0 py-2"
+                className="h-auto w-full flex-col items-start gap-0 px-2 py-2 sm:w-auto sm:px-4"
               >
                 {l.code}
-                <span className="text-caption font-normal">{l.name}</span>
+                <span className="hyphens-auto whitespace-normal text-left text-caption font-normal">{l.name}</span>
               </Button>
             ))}
           </div>
@@ -81,8 +81,16 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
           <LedgerRow
             key={`${w.word}-${i}`}
             titleAs="p"
-            title={<span lang="ja">{w.word}</span>}
-            meta={<span lang="ja">{w.reading}</span>}
+            title={
+              <>
+                <span lang="ja" className="text-h3">
+                  {w.word}
+                </span>{" "}
+                <span lang="ja" className="text-body text-ink-soft">
+                  {w.reading}
+                </span>
+              </>
+            }
           >
             <span className="text-ink">{w.meaning}</span>
             {w.partOfSpeech && <span>, {w.partOfSpeech}</span>}

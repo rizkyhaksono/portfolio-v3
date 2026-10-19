@@ -140,12 +140,6 @@
   -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
   mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
 }
-@media (max-width: 767px) {
-  .engraving {
-    -webkit-mask-image: url("../assets/plates/hollar-band-800.webp");
-    mask-image: url("../assets/plates/hollar-band-800.webp");
-  }
-}
 
 /* Wordscroll: static and fully inked unless scroll timelines, motion and a tall enough viewport all exist. */
 .ws__stage {
@@ -166,7 +160,7 @@
   /* min-height, not range syntax: Lightning CSS rewrites (height > 560px) into a query browsers drop. */
   @media (prefers-reduced-motion: no-preference) and (min-height: 561px) {
     .ws {
-      height: 220svh;
+      height: 180svh;
       view-timeline: --ws block;
     }
     .ws__stage {
@@ -181,7 +175,7 @@
   }
   @media (prefers-reduced-motion: no-preference) and (min-height: 561px) and (max-width: 767px) {
     .ws {
-      height: 180svh;
+      height: 150svh;
     }
   }
 }
@@ -280,6 +274,10 @@
   text-align: left;
   vertical-align: top;
   overflow-wrap: anywhere;
+}
+/* Keep code tokens whole; a wide table scrolls inside its wrapper instead. */
+.prose :is(th, td) code {
+  white-space: nowrap;
 }
 .prose th {
   font-size: 0.8125rem;

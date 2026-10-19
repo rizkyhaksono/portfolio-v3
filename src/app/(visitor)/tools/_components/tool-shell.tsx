@@ -59,9 +59,8 @@ export function ToolCabinet({ tab }: Readonly<{ tab: ToolTab | null }>) {
                 return (
                   <li key={t.id} className="border-b border-rule">
                     <Link
-                      href={`/tools?tab=${t.id}`}
+                      href={`/tools?tab=${t.id}#tool-title`}
                       replace
-                      scroll={false}
                       aria-current={active ? "page" : undefined}
                       data-track="tool-open"
                       data-track-tool={t.id}

@@ -185,7 +185,7 @@ export default function OcrDemo() {
       <div className="min-w-0">
         <h2 className="text-small font-semibold text-ink">Result</h2>
         {result ? (
-          <pre tabIndex={0} className="mt-2 max-h-96 overflow-auto bg-tint p-4 text-[0.84375rem] leading-[1.55] text-ink">
+          <pre tabIndex={0} className="mt-2 max-h-[60svh] overflow-auto whitespace-pre-wrap break-words bg-tint p-4 text-[0.84375rem] leading-[1.55] text-ink sm:max-h-96">
             {JSON.stringify(result.parsed ?? result.raw, null, 2)}
           </pre>
         ) : (

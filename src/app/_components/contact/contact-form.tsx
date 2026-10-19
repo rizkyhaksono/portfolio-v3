@@ -60,7 +60,7 @@ export function ContactForm() {
       setStatus({ kind: "sent" })
       track("contact-send", { status: "ok" })
     } catch {
-      setStatus({ kind: "error", message: "The message did not send. Try again, or write to the address on the left." })
+      setStatus({ kind: "error", message: "The message did not send. Try again, or write to mrizkyhaksono@gmail.com." })
       track("contact-send", { status: "error" })
     } finally {
       sending.current = false

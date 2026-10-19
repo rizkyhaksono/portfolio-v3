@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import type { DropResult } from "@hello-pangea/dnd"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
 import {
@@ -31,10 +32,11 @@ interface TaskCardProps {
   lifted?: boolean
   canDelete: boolean
   onDelete: (task: TrackerTask) => void
+  onMove: (task: TrackerTask, status: TrackerStatus) => void
 }
 
 /** An index card: title, then the key, type and priority as one sentence. */
-function TaskCard({ task, lifted, canDelete, onDelete }: Readonly<TaskCardProps>) {
+function TaskCard({ task, lifted, canDelete, onDelete, onMove }: Readonly<TaskCardProps>) {
   const author = task.createdByName ?? "Someone"
   const priority = PRIORITIES.includes(task.priority) ? task.priority : "medium"
 
@@ -52,6 +54,21 @@ function TaskCard({ task, lifted, canDelete, onDelete }: Readonly<TaskCardProps>
           </Avatar>
           <span className="truncate">{author}</span>
         </span>
+        {canDelete && (
+          // Phones stack the columns, so a long drag is replaced by a menu there.
+          <Select value="" onValueChange={(status) => onMove(task, status as TrackerStatus)}>
+            <SelectTrigger aria-label={`Move card ${task.key} to`} className="ml-auto w-auto shrink-0 text-small sm:hidden">
+              <SelectValue placeholder="Move to" />
+            </SelectTrigger>
+            <SelectContent>
+              {TRACKER_COLUMNS.filter(({ id }) => id !== task.status).map(({ id }) => (
+                <SelectItem key={id} value={id}>
+                  {COLUMN_LABEL[id]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {canDelete && (
           <Button
             variant="ghost"
@@ -104,15 +121,22 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
     else if (!after) newOrder = before.order + 1
     else newOrder = (before.order + after.order) / 2
 
+    move(moving, newStatus, newOrder)
+  }
+
+  const move = (task: TrackerTask, status: TrackerStatus, order: number) => {
     const snapshot = tasks
-    setTasks((prev) => prev.map((t) => (t.id === draggableId ? { ...t, status: newStatus, order: newOrder } : t)))
-    updateTrackerTaskClient(draggableId, { status: newStatus, order: newOrder })
-      .then(() => track("tracker-card-move", { from: source.droppableId, to: newStatus }))
+    setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status, order } : t)))
+    updateTrackerTaskClient(task.id, { status, order })
+      .then(() => track("tracker-card-move", { from: task.status, to: status }))
       .catch((err) => {
         setTasks(snapshot)
         toast.error(err instanceof Error ? err.message : "The card could not be moved.")
       })
   }
+
+  // The menu puts the card at the foot of its new column.
+  const moveToEnd = (task: TrackerTask, status: TrackerStatus) => move(task, status, Math.max(0, ...column(status).map((t) => t.order)) + 1)
 
   const openAdd = (status: TrackerStatus) => {
     setForm(EMPTY_FORM)
@@ -157,7 +181,7 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
   }
 
   const renderCard = (task: TrackerTask, lifted = false) => (
-    <TaskCard task={task} lifted={lifted} canDelete={ownsTask(task)} onDelete={setPendingDelete} />
+    <TaskCard task={task} lifted={lifted} canDelete={ownsTask(task)} onDelete={setPendingDelete} onMove={moveToEnd} />
   )
 
   const board = (
