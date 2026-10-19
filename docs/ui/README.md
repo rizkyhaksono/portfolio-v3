@@ -1,68 +1,74 @@
-# UI design system: Lautan Pasir
+# UI design system: Drafting sheet
 
 **This folder is the source of truth for every UI decision in Portfolio v3.** The agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, `.github/copilot-instructions.md`, `.cursor/rules/*.mdc`) only summarise it. When a summary and these docs disagree, these docs win. Code tokens live in `src/app/globals.css`, `tailwind.config.ts` and `src/lib/design-system.ts`.
 
-The site is one printed publication: one cobalt ink on cream paper with riso grain, Literata italic headings, square corners, hairline rules, and an engraving band (Wenceslaus Hollar, *Landscape with a Rider*, 1650) at the foot of every page. Dark mode, "Night print", is the same sheet reversed: cream ink on night paper. Hierarchy comes from size, italic against roman, and rules. Never from extra colour, capitals or mono labels.
+The site is an engineering drafting sheet: near-black ink on off-white paper, IBM Plex Sans and Mono, square corners, hairline rules, and one orange mark colour that appears only on marks (the focus ring, the current page, the reading line, crop marks on photos). Dark mode is the same sheet reversed: off-white ink on near-black paper. Hierarchy comes from size, weight and rules. Never from extra colour, capitals, italics or mono labels.
 
-The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels, glass surfaces) is retired. Do not reintroduce any of it.
+Two earlier languages are retired. Do not reintroduce any of either:
+
+- **Lautan Pasir** (release 1.5.0): cobalt ink on cream paper, Literata italic headings, riso grain and speckle, a duotone engraving band, the Tengger caldera logo, "Night print".
+- **The monochrome / grayscale language** before it: Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels, glass surfaces.
 
 ## Index
 
 | Doc | Covers |
 |---|---|
-| [design-system.md](./design-system.md) | Ink and paper tokens, contrast, Literata roles, type scale, lines, texture, motion tiers, banned list, dark mode, print |
+| [design-system.md](./design-system.md) | Tokens, the orange list, contrast, IBM Plex roles, type scale, lines, ornaments, motion tiers, banned list, dark mode, print |
 | [surfaces.md](./surfaces.md) | The three surfaces: frame, inset, lift |
-| [page-shell.md](./page-shell.md) | BaseLayout, running head, menu sheet, colophon, page patterns, widths |
-| [components.md](./components.md) | Primitive rules, links, fields, data viz, Umami event rules |
+| [page-shell.md](./page-shell.md) | BaseLayout, running head, menu sheet, colophon title block, page patterns, home hero, widths |
+| [components.md](./components.md) | Primitive rules, links, fields, plates, data viz, Umami event rules |
 | [platforms.md](./platforms.md) | Visitor, user, admin and auth shells, plus the agent file map |
 
 ## The rules in one screen
 
-1. **One ink.** Colour classes are `ink`, `ink-soft`, `paper`, `tint`, `rule`, `rule-strong`, or the shadcn names that map onto them (`background`, `foreground`, `muted`, `border`, `primary`, ...). No other hue, no hex, no `white` / `black`, no dark-variant classes.
-2. **One family.** Literata roman and italic. System mono only inside code, kbd and raw data.
+1. **Ink, paper and one mark.** Colour classes are `ink`, `ink-soft`, `paper`, `tint`, `rule`, `rule-strong`, or the shadcn names that map onto them (`background`, `foreground`, `muted`, `border`, `primary`, ...). The orange is `mark` (with `mark-text` and `on-mark`) and only where [design-system.md](./design-system.md#where-orange-may-appear) lists it. No other hue, no hex, no `white` / `black`, no dark-variant classes.
+2. **One family.** IBM Plex Sans for everything. IBM Plex Mono only for code, kbd, slugs, keys, raw JSON and title-block values. No italic anywhere.
 3. **Radius 0.** The radio dot is the only circle.
 4. **Three surfaces.** Frame, inset, lift. Nothing else.
-5. **No decoration from the screen.** No gradients, glass, blur, glows or soft shadows. The only shadow is the ink lift on floating layers.
-6. **The press moves once.** Native scroll and sticky layouts; two CSS scroll-driven effects; response motion on input. No scroll animation library.
+5. **No decoration from the screen.** No gradients, glass, blur, glows or soft shadows. The only shadow is the ink lift on floating layers. Ornaments are plain 1px rules: no fleuron, grain, speckle, engraving or duotone.
+6. **Motion is rationed.** Native scroll and sticky layouts; two CSS scroll-driven effects; response motion on input. No scroll animation library.
 7. **State by shape and word.** Errors, destructive actions and status never rely on colour.
-8. **Plain copy.** Sentence case, no upper-case transform, no letter-spacing, no middle-dot meta strings, no "→" on links, numbers only for real sequences.
+8. **Plain copy.** Sentence case, no upper-case transform, no letter-spacing, no middle-dot meta strings, no "→" on links, numbers only for real sequences, no print metaphors in wording.
 9. **Umami events.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track`.
-10. **Grep gate at 0** on every path you touch.
+10. **Three grep gates at 0** on every path you touch.
 
 ## Migration
 
-Every route is on the one-ink system and both grep gates are clean over `src/` and `content/`. Keep it that way: any file you touch must still pass the gate, and never add a banned class.
+Every route is on the drafting sheet and all three grep gates are clean over `src/` and `content/`. Keep it that way: any file you touch must still pass the gates, and never add a banned class or a retired-system term.
 
 ## Brand
 
-The printer's mark is the Tengger caldera seen from Penanjakan (Bromo's smoking caldera, Batok's ridged dome, Semeru far right) over the dashed sand sea, with an italic Literata "Rh" on the sand. It is one ink like everything else, so Night print reverses it for free. Always place it through `<Logo>` (`src/components/ui/logo.tsx`); never paste the SVG or recolour it.
+The mark is the RH monogram "a1": three square stems (R, the stem R and H share, H right), a square R bowl closed by the shared stem, one crossbar that runs from the R stem through the H, and a 45° leg from the crossbar to the foot of the shared stem. Square terminals, every edge on a whole unit of a 64-unit grid. It reads as RH at 16px and uses one drawing at every size. Always place it through `<Logo>` (`src/components/ui/logo.tsx`); never paste the SVG or recolour it.
 
 | Variant | Where | How it renders |
 |---|---|---|
-| `mini` | Running head (32px before the wordmark), admin spine | Inline SVG from `logo-art.ts`, `currentColor` |
-| `mark` | Auth shell, locked Etan AI view | `.logo-mask--mark` over `public/brand/mark-mask.svg` |
-| `seal` | Colophon (96 to 112px), 404 and error views (`NotFoundView`) | `.logo-mask--seal` over `public/brand/seal-mask.svg` |
+| `mini` | Running head (32px before the wordmark), admin spine, the narrow auth shell | Inline SVG from `logo-art.ts`, `currentColor`, viewBox `0 0 64 64` |
+| `mark` | Colophon title block, 404 and error views (`NotFoundView`), the split auth shell (from 768px), locked Etan AI view | The glyph plus four orange crop marks on the trim lines, viewBox `-4 0 72 64`. Display sizes only: the marks are sub-pixel at 32px |
+| `tile` | Favicon and app icons | The glyph reversed out of an ink square. The same drawing is `src/app/icon.svg` |
 
-- `label` gives the mark `role="img"` and a name ("Rizky Haksono printer's mark"); leave it out when the name is printed beside it.
-- Size it with a width class only (`w-24`); the mask keeps the square.
-- `public/brand/{seal,mark,mini,lockup}-{light,dark}.svg` are standalone art on paper or night paper. The OG and certificate images and `global-error.tsx` (no CSS there) use `seal-light.svg`.
-- Generated, never hand-edited: `public/brand/*.svg`, `src/app/icon.svg`, `src/app/apple-icon.png`, `src/components/ui/logo-art.ts`. Regenerate with `node scripts/logo/make.mjs <font dir>`, where the folder holds `Literata-Italic[opsz,wght].ttf` (OFL, kept outside the repo, for example `../art-src/fonts`).
+- `label` gives the logo `role="img"` and a name; leave it out when the name is written beside it (the running head).
+- Size it with a width class only (`w-24`, `size-8`).
+- Generated, never hand-edited: `src/components/ui/logo-art.ts`, `src/app/icon.svg`, `src/app/apple-icon.png`, `src/app/favicon.ico` (16 and 32 PNG-in-ICO, at that exact path because the Swarm healthchecks and the API's Swagger page fetch `/favicon.ico`), `public/brand/{mark,tile,lockup}-{light,dark}.svg` and `public/brand/og-mark.svg` (the OG and certificate images read it). Regenerate with `node scripts/logo/make.mjs` after changing the geometry; it needs no font.
+- `global-error.tsx` has no CSS, so it uses `/brand/mark-light.svg`.
 
-## Grep gate
+## Grep gates
 
-Both commands must print nothing. `$PHASE_PATHS` is the list of files your change touched. List files, not folders: until P2 and P3 migrate them, untouched files in the same folders still carry old literals. The final run uses `src content`. Hex copies of the tokens live only in `src/lib/print-hex.ts` (theme-color, manifest, global-error), which the second command skips.
+All three must print nothing: gate 1 bans classes, gate 2 bans literals, gate 3 keeps the retired Lautan Pasir system out. `$PHASE_PATHS` is the list of files your change touched, or `src` for a full run. Gate 3 always runs over `src content`. Hex copies of the tokens live only in `src/lib/print-hex.ts` (theme-color, manifest, OG and certificate images, global-error, the settings swatch) and the generated `src/app/icon.svg`, which gate 2 skips.
 
 ```bash
-grep -rnE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
+grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
+grep -rnIE "bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex|app/icon\.svg"
+grep -rnIE "\bitalic\b|font-style: ?italic|engrav|grain|speckle|Literata|plate-filters|logo-mask|#1E3C9E|#F3ECDC|#0D1433|#EFE6D2|Hollar|Tengger|caldera" src content \
+  | grep -vE "content/changelog/(2025-|2026-0|2026-10-19)|rich-text-editor.tsx"
 ```
 
-The exclusions are deliberate: `radio-group.tsx` owns the one circle, code blocks and `kbd` own mono, and the OG / certificate image routes paint fixed paper colours.
+The exclusions are deliberate. Gate 1: `radio-group.tsx` owns the one circle. Gate 2: code blocks and `kbd` own mono, the OG and certificate image routes paint fixed paper colours, and `print-hex.ts` and `icon.svg` hold the only hex copies. Gate 3: changelog entries before 1.6.0 describe the old systems (`content/changelog/2025-*`, `2026-0*` and `2026-10-19`), and `rich-text-editor.tsx` names TipTap's own `italic` mark.
 
 ## Source of truth in code
 
 - Tokens: `src/app/globals.css` (`:root`, `.dark`, print), `tailwind.config.ts` (colours, `fontSize`, radius), `src/lib/design-system.ts` (`SURFACE`, `PAGE_WIDTH`, `SECTION_SPACING`)
-- Fonts: `src/app/layout.tsx` (Literata via `next/font/google`)
+- Contrast guard: `src/__tests__/unit/lib/contrast.test.ts` (floors for every token pair, and that `print-hex.ts` matches the CSS)
+- Fonts: `src/app/layout.tsx` (IBM Plex Sans and Mono via `next/font/google`); the OG and certificate images read `src/assets/fonts/ibm-plex-sans-latin-{400,600}-normal.woff`
 - Shell: `src/components/layout/base-layout.tsx`
 - Primitives: `src/components/ui/`
 - Logo: `src/components/ui/logo.tsx`, art from `scripts/logo/make.mjs`

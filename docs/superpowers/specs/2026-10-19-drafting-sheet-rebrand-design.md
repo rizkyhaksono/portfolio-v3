@@ -139,7 +139,7 @@ The engraving strip is removed. The masthead stage keeps the wordscroll (CSS scr
 | Width | Layout |
 |---|---|
 | ≥1024px | Two columns `[minmax(0,1fr) | minmax(18rem,26rem)]`. Left: h1, lead, sentence, links. Right: the portrait in a `PlateFigure` with crop marks, square, top-aligned with the h1, capped at `min(26rem, 60svh)` so the stage fits the viewport |
-| <1024px | The portrait sits directly after the sticky stage (outside it, so the pinned stage never overflows the viewport), at `min(100%, 20rem)` |
+| <1024px | The portrait sits inside the stage, directly after the lead line, left-aligned and square, at `size-[min(24svh,20rem)]` (`sm:size-[min(30svh,20rem)]` from 640px). The svh caps keep the pinned stage within the viewport, and the sentence and links follow it |
 
 The portrait:
 

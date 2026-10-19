@@ -25,8 +25,8 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 ### Styling & UI
 
 - **[Tailwind CSS 3](https://tailwindcss.com/)** - Utility classes over the ink and paper tokens
-- **[Shadcn/ui](https://ui.shadcn.com/)** - Radix primitives restyled to the one-ink system
-- **[Literata](https://fonts.google.com/specimen/Literata)** - The only typeface, roman and italic, via `next/font`
+- **[Shadcn/ui](https://ui.shadcn.com/)** - Radix primitives restyled to the ink and paper tokens
+- **[IBM Plex](https://www.ibm.com/plex/)** - Plex Sans for the whole site and Plex Mono for code, via `next/font`; no italic
 - **Server SVG figures** - `ink-chart` and `ink-heatmap` draw every chart; no chart library
 - **[Lucide React](https://lucide.dev/)** - Functional icons only, stroke 1.5
 
@@ -91,8 +91,8 @@ portfolio-v3/
 │   │   └── api/                # API routes
 │   │
 │   ├── components/             # Reusable components
-│   │   ├── ui/                 # One-ink primitives (shadcn restyled, ledger, plates, charts, logo)
-│   │   ├── layout/             # Running head, Contents sheet, colophon
+│   │   ├── ui/                 # Primitives (shadcn restyled, ledger, plates, charts, logo)
+│   │   ├── layout/             # Running head, menu sheet, colophon title block
 │   │   └── seo/                # JSON-LD
 │   │
 │   ├── commons/                # Shared utilities
@@ -141,10 +141,10 @@ portfolio-v3/
 
 - **Portfolio Showcase** - Projects, skills, and professional experience
 - **Blog** - Technical writing with MDX support for rich content
-- **Night print** - The same sheet reversed, cream ink on night paper; follows the system or a toggle
+- **Light and dark themes** - The same sheet reversed, off-white ink on near-black paper; follows the system or a toggle
 - **Responsive Design** - Works seamlessly on all devices
 - **Performance** - Lightning-fast page loads with Next.js 16
-- **One-ink print design** - Cobalt ink on cream paper, square corners, hairline rules, no animation library
+- **Drafting sheet design** - Black and white with one orange accent, IBM Plex, square corners, hairline rules, no animation library
 - **SEO Optimized** - Proper meta tags, sitemap, and robots.txt
 
 ### For Admins
@@ -396,7 +396,7 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create custom styles in `globals.css` only when necessary
 - Leverage Shadcn/ui components for consistency
 - Use CSS modules for scoped styles if needed: `styles.module.css`
-- **UI system ("Lautan Pasir"):** one cobalt ink printed on cream paper, Literata only, radius 0, hairline rules, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
+- **UI system ("Drafting sheet"):** near-black ink on off-white paper with one orange mark, IBM Plex only, no italic, radius 0, hairline rules, three surfaces (frame, inset, lift), and a reversed dark theme. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the three grep gates every UI change must pass.
 
 ### Error Handling
 
@@ -406,26 +406,26 @@ For your specific schema, check Supabase dashboard or migration files.
 
 ## Brand
 
-The mark is a printer's mark: the Tengger caldera seen from Penanjakan (Bromo's smoking caldera, Batok's ridged dome, Semeru far right) over the dashed sand sea, with an italic Literata "Rh" standing on the sand. It prints in the one ink, so it reverses cleanly for Night print.
+The mark is the RH monogram: three square stems (R, the stem R and H share, H right), a square R bowl, one crossbar running from the R stem through the H, and a 45° leg to the foot of the shared stem. One drawing on a 64-unit grid serves every size, and it reads as RH at 16px.
 
 | Variant | Use | Rendered as |
 |---|---|---|
-| `mini` | Running head (32px), anywhere under 48px | Inline SVG from `src/components/ui/logo-art.ts`, painted with `currentColor` |
-| `mark` | Auth shell, the locked Etan AI view | CSS mask `public/brand/mark-mask.svg` (`.logo-mask--mark`) |
-| `seal` | Colophon, 404 and error views | CSS mask `public/brand/seal-mask.svg` (`.logo-mask--seal`), ring text "Rizky Haksono" and "printed in Malang, East Java" |
+| `mini` | Running head (32px), admin spine, anywhere under 48px | Inline SVG from `src/components/ui/logo-art.ts`, painted with `currentColor` |
+| `mark` | Colophon title block, 404 and error views, auth shell, the locked Etan AI view | The glyph plus four orange crop marks on the trim lines (the only orange in the logo) |
+| `tile` | Favicon and app icons | The glyph reversed out of an ink square |
 
-In code, always use the component: `<Logo variant="mini" | "mark" | "seal" label="..." />` from `src/components/ui/logo.tsx`. Pass `label` when the mark stands alone (it becomes `role="img"`); leave it out next to the visible name.
+In code, always use the component: `<Logo variant="mini" | "mark" | "tile" label="..." />` from `src/components/ui/logo.tsx`. Pass `label` when the mark stands alone (it becomes `role="img"`); leave it out next to the visible name.
 
-Files in `public/brand/`:
+Generated files, never hand-edited:
 
-- `seal-light.svg`, `seal-dark.svg`, `mark-light.svg`, `mark-dark.svg`, `mini-light.svg`, `mini-dark.svg`, `lockup-light.svg`, `lockup-dark.svg`: standalone art on paper or night paper. The OG and certificate images and `global-error.tsx` (which has no CSS) read `seal-light.svg`; the rest are for use outside the site
-- `seal-mask.svg`, `mark-mask.svg`: the masks the `Logo` component paints
+- `src/components/ui/logo-art.ts` (path data), `src/app/icon.svg`, `src/app/apple-icon.png` and `src/app/favicon.ico`. The favicon keeps its path because the Swarm healthchecks and the API's Swagger page fetch `/favicon.ico`
+- `public/brand/{mark,tile,lockup}-{light,dark}.svg`: standalone art on the light or dark ground, for use outside the site. `global-error.tsx` (which has no CSS) reads `mark-light.svg`
+- `public/brand/og-mark.svg`: the mark without a ground, read by the OG and certificate images
 
-The same run also writes `src/app/icon.svg` (the "Rh" tile, legible at 16px), `src/app/apple-icon.png` (mini reversed out of an ink tile) and `src/components/ui/logo-art.ts`. All of them are generated; do not edit them by hand. To regenerate, point the script at a folder holding `Literata-Italic[opsz,wght].ttf` (OFL, from google/fonts, kept outside the repo):
+To regenerate after changing the geometry (no font needed):
 
 ```bash
-node scripts/logo/make.mjs <font dir>
-# for example: node scripts/logo/make.mjs ../art-src/fonts
+node scripts/logo/make.mjs
 ```
 
 ## AI Agents & UI Docs

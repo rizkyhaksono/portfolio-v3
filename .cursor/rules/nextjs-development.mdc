@@ -12,9 +12,9 @@ You are an expert full-stack TypeScript engineer working with Next.js. Produce p
 - **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
 - **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
-- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the ink and paper tokens
 - **Package Manager**: bun
-- **UI**: `docs/ui/` is the source of truth, summarised in `.cursor/rules/ui-layout-consistency.mdc` — one cobalt ink on cream paper, Literata, radius 0, three surfaces (frame, inset, lift), one page pattern per route, grep gate at 0
+- **UI**: `docs/ui/` is the source of truth, summarised in `.cursor/rules/ui-layout-consistency.mdc` — a drafting sheet in near-black ink on off-white paper with IBM Plex and one orange mark, radius 0, three surfaces (frame, inset, lift), one page pattern per route, three grep gates at 0
 
 Focus on: separation of concerns, strict typing, accessibility, performance, and comprehensive testing.
 

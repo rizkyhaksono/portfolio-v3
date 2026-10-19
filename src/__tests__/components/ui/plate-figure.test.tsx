@@ -4,7 +4,7 @@ import '@testing-library/jest-dom'
 import { PlateFigure } from '@/components/ui/plate-figure'
 
 describe('PlateFigure', () => {
-  it('prints a photo in grayscale with four crop marks on the frame', () => {
+  it('renders a photo in grayscale with four crop marks on the frame', () => {
     const { container } = render(
       <PlateFigure>
         <img src="/x.jpg" alt="" />
@@ -27,13 +27,13 @@ describe('PlateFigure', () => {
     expect(container.querySelectorAll('[data-crop]')).toHaveLength(4)
   })
 
-  it('sets the caption upright', () => {
+  it('sets the caption in the plain caption style, with no extra type utilities', () => {
     render(
       <PlateFigure caption="A caption">
         <img src="/x.jpg" alt="" />
       </PlateFigure>,
     )
-    expect(screen.getByText('A caption').className).not.toMatch(/italic/)
+    expect(screen.getByText('A caption').className).toBe('mt-2 font-display text-caption text-ink-soft')
   })
 
   it('rings the whole frame when a control inside is keyboard-focused, since the photo clips its own outline', () => {

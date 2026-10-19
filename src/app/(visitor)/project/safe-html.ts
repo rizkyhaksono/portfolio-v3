@@ -11,7 +11,7 @@ const BULLET_RUN = new RegExp(`(?:<p>${TYPED_BULLET}[\\s\\S]*?</p>\\s*)+`, "g")
 const BULLET_ITEM = new RegExp(`<p>${TYPED_BULLET}([\\s\\S]*?)</p>\\s*`, "g")
 
 /**
- * Re-prints the admin's rich-text HTML through an allowlist: only the tags above survive, with no
+ * Re-serialises the admin's rich-text HTML through an allowlist: only the tags above survive, with no
  * attributes except a safe `href`, and every other `<` is escaped, so the output holds only tags written here.
  */
 export function safeHtml(html: string): string {

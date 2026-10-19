@@ -1,6 +1,6 @@
 # Platform shells
 
-Every route group prints in the same ink on the same paper. Groups differ in shell and pattern, never in palette.
+Every route group uses the same ink on the same paper. Groups differ in shell and pattern, never in palette.
 
 ## Visitor (public portfolio)
 
@@ -10,7 +10,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 | Route | Pattern |
 |---|---|
-| `/` | Masthead stage (`bleed`) then the home story, see [page-shell.md](./page-shell.md) |
+| `/` | Masthead stage (`bleed`, with the portrait) then the home story, see [page-shell.md](./page-shell.md) |
 | `/blog`, `/certificates`, `/changelog`, `/project` index | Ledger (projects add three featured Plates rows) |
 | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
 | `/roadmap` | Ledger |
@@ -44,14 +44,14 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 **Routes:** `/auth/*`, `/admin/auth/login`
 
-**Shell:** `layout/auth-shell.tsx`, split or narrow. A frame form slip with baseline fields. No gradients, stock photos, heavy shadows or coloured checks.
+**Shell:** `layout/auth-shell.tsx`, split or narrow. A frame form slip with baseline fields. The split view carries the large `mark` logo from 768px; the narrow view (admin login) keeps the `mini` logo. No gradients, stock photos, heavy shadows or coloured checks.
 
 ## Outliers
 
 | Item | Guidance |
 |---|---|
 | Terminal overlay | Own layout, same ink and paper |
-| OG and certificate images (`/api/og`, `/api/certificate`) | Always printed on paper colours; the only place hex values are allowed in code |
+| OG and certificate images (`/api/og`, `/api/certificate`) | Always drawn on the light paper colours in IBM Plex Sans with the RH mark (orange only on its crop marks); exempt from the hex rule in gate 2. Their URLs always carry `v=2` (`ogImageUrl` in `src/lib/site-url.ts`), because crawlers and CDNs cache cards hard |
 
 ## Agent instruction files
 

@@ -5,7 +5,7 @@ interface PlateFigureProps {
   children: React.ReactNode
   caption?: React.ReactNode
   className?: string
-  /** `photo` prints in grayscale; `color` keeps the picture's own colour (brand cards, sprites, the user's upload). */
+  /** `photo` renders in grayscale; `color` keeps the picture's own colour (brand cards, sprites, the user's upload). */
   tone?: "photo" | "color"
 }
 

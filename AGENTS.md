@@ -8,7 +8,7 @@ You are an expert full-stack TypeScript engineer. Produce production-ready code 
 
 - **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
-- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the ink and paper tokens
 - **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
 - **Package Manager**: bun
 
@@ -34,7 +34,7 @@ Always read `prd/feature.md` and `prd/progress.md` before starting feature work;
    - Feature-specific code belongs in `components/[feature]/` or `app/_components/`.
 3. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid `any`.
 4. **Styling:**
-   - Use Tailwind utility classes and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, `.plate`, `.engraving`, `.ws`, grain) lives in `src/app/globals.css`.
+   - Use Tailwind utility classes and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, `.plate`, `.ws`, `.bg-hatch`, the reading hairline) lives in `src/app/globals.css`.
    - Use `cn()` from `@/lib/utils` for conditional class merging.
    - Mobile-first responsive design; no horizontal scroll at 375px.
 5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. No superfluous comments — names should be self-documenting.
@@ -42,27 +42,47 @@ Always read `prd/feature.md` and `prd/progress.md` before starting feature work;
 
 ## UI rules (mandatory)
 
-Design brief: the whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules and a Hollar engraving band. Dark mode ("Night print") is the same sheet reversed: cream ink on night paper. The old monochrome / grayscale rules, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono and `MacWindow` panels are retired. Do not bring them back.
+Design brief: the whole site is a drafting sheet. Near-black ink on off-white paper, IBM Plex, radius 0, hairline rules, and one orange mark colour that appears only on marks (the focus ring, the current page, the reading line, crop marks). Dark mode is the same sheet reversed. The earlier Lautan Pasir system (cobalt ink on cream paper, Literata italic, riso grain, an engraving band, the caldera logo) and the older monochrome / grayscale rules, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono and `MacWindow` panels are retired. Do not bring any of it back.
 
 - Docs: [`docs/ui/README.md`](docs/ui/README.md) (source of truth)
 - Agent rule: `.cursor/rules/ui-layout-consistency.mdc`
 
 ### Ink and paper
 
-| Tailwind colour | Paper | Night | Role |
+| Tailwind colour | Light | Dark | Role |
 |---|---|---|---|
-| `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
-| `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `ink-soft` | #445BAA | #A9B5E3 | Secondary text (on paper or tint only) |
-| `rule` | #BFC6DE | #2C3870 | Decorative hairlines |
-| `rule-strong` | #6476B2 | #7383C4 | Control boundaries |
-| `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
+| `paper` | #F7F7F5 | #141414 | Page, card, text on solid ink |
+| `ink` | #141414 | #F2F2EE | Text, icons, strong rules, solid button, charts |
+| `ink-soft` | #5C5C57 | #A3A39C | Secondary text (on paper or tint only) |
+| `rule` | #DCDCD7 | #33332F | Decorative hairlines |
+| `rule-strong` | #8A8A84 | #75756F | Control boundaries |
+| `tint` | #EDEDE9 | #1F1F1D | Hover row, code ground, inset |
+| `mark` | #FF4F00 | #FF6326 | Marks only (see Orange) |
+| `mark-text` | #C03A00 | #FF7A45 | Orange text, where unavoidable |
+| `on-mark` | #141414 | #141414 | Text on a `mark` fill, in both themes |
 
-shadcn names (`background`, `foreground`, `muted`, `border`, `input`, `primary`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes (tokens flip on `<html class="dark">`). Status is shape plus word, never colour.
+shadcn names (`background`, `foreground`, `muted`, `border`, `input`, `primary`, ...) map onto these; `ring` maps to `mark`. No other hue, no hex, no `white` / `black`, no `dark:` classes (tokens flip on `<html class="dark">`). Status is shape plus word, never colour. `src/__tests__/unit/lib/contrast.test.ts` guards the contrast floors; change a token and it must still pass.
+
+### Orange
+
+`mark` is not a theme colour. It appears only on:
+
+- the focus ring (`--ring`)
+- the active nav underline (`aria-[current=page]:decoration-mark`)
+- the article reading hairline
+- the crop marks on plates and the logo `mark` variant
+- the last point of a chart line
+- text selection (`mark` fill, `on-mark` text)
+
+Primary buttons stay ink, links stay ink with an ink underline, and nothing else is orange. If orange must carry text, use `mark-text`; `mark` itself fails contrast as small text on light paper. Raw `orange-*` classes stay banned (gate 1).
 
 ### Type
 
-Literata only (`next/font/google`, roman and italic). Italic for h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals. Roman for body, prose, nav, buttons, labels, table heads, tags, form values. System mono only for code, slugs, keys, raw JSON and kbd.
+IBM Plex, via `next/font/google` in `src/app/layout.tsx`. Plex Sans (variable, normal style) is the whole voice: `font-sans` is `--font-sans`, and `font-display` is only an alias of it. Plex Mono (400 and 500, `preload: false`, `font-mono` is `--font-mono`) is for code, kbd, slugs, keys, raw JSON and the title-block values. It is never for decorative small labels. Figures (stat numerals, ledgers, tables) stay in Plex Sans with `tabular-nums`.
+
+- Headings carry weight 600 on the `text-h1` to `text-h4` and `text-display` size tokens; `display` and `h1` also set letter-spacing -0.02em. Body and captions are 400.
+- No italic anywhere. `<em>`, `<i>` and `<cite>` render upright at weight 500, `<strong>` at 600. The TipTap italic mark still exists so authored content keeps its meaning.
+- Sentence case. No `uppercase`, no `tracking-[...]`.
 
 ### Three surfaces
 
@@ -71,6 +91,13 @@ Literata only (`next/font/google`, roman and italic). Italic for h1 to h4, displ
 3. **Lift** — `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only (dialog, sheet, popover, menu, tooltip, select, command, toast). Already applied inside the shared primitives.
 
 Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or soft shadows.
+
+### Plates, logo and title block
+
+- **Plates.** Photos go through `PlateFigure` (`tone?: "photo" | "color"`): a `relative border border-ink p-2` frame with four orange L-shaped crop marks in the gutter, and the photo in grayscale. `tone="color"` keeps colour for site OG covers, the OCR upload and Pokémon sprites. Avatars use `.plate` for the grayscale and never get crop marks. The YouTube facade renders through `PlateFigure`.
+- **Logo.** `<Logo variant="mini" | "mark" | "tile" label?>` from `src/components/ui/logo.tsx`: the RH monogram (shared stem, one crossbar, a 45° leg) as inline SVG. `mini` is `currentColor`, `mark` adds the orange crop marks and is for display sizes (title block, 404 and error, auth), `tile` is the glyph reversed out of an ink square. Never paste the SVG or recolour it. Generated by `node scripts/logo/make.mjs`, never hand-edited.
+- **Ornaments.** Plain 1px rules only: `hr` and `.tail-piece`. No fleuron, grain, speckle, engraving or duotone. The double rule on page heads stays.
+- **Title block.** The colophon is `TitleBlock` (`src/components/layout/title-block.tsx`): a ruled `dl` grid of Drawn by, Role, Location, Revision (latest changelog version and date), Set in and Contact, values in Plex Mono, with the `mark` logo beside it. `/ai` and `/chat` use the compact footer with no title block.
 
 ### Page patterns
 
@@ -88,7 +115,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 | Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
+Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Home hero: the portrait (`HeroPortrait` in `src/app/page.tsx`) is part of the masthead stage, the right column from 1024px and directly after the lead line below it. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
 ### Motion
 
@@ -99,7 +126,7 @@ Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with runn
 
 ### Copy
 
-Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences (versions, stages, legal sections).
+Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences (versions, stages, legal sections). Plain wording, not print metaphors: the themes are Light, Dark and System.
 
 ### Umami events
 
@@ -107,16 +134,18 @@ Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no mid
 - Internal links use `data-track="nav-click"` plus `data-track-*` (for example `data-track-item="blog"`); a delegated listener forwards them. In code, call `track()` from `src/lib/analytics.ts`.
 - Kebab-case names, 50 characters or fewer, enum values only, one event per element. Never PII (emails, names, prompts, chat text, queries, ids, full URLs). Event table: [`docs/ui/components.md`](docs/ui/components.md).
 
-### Grep gate
+### Grep gates
 
-Both must print nothing for the files you touched (`$PHASE_PATHS`: files, not folders, until P2/P3 migrate the rest); the final run uses `src content`. Token hex copies live only in `src/lib/print-hex.ts`, which the second command skips.
+All three must print nothing: gate 1 bans classes, gate 2 bans literals, gate 3 keeps the retired Lautan Pasir system out. Gates 1 and 2 take `$PHASE_PATHS`: the files you touched, or `src` for a full run. Gate 3 always runs over `src content`. Hex copies of the tokens live only in `src/lib/print-hex.ts` and the generated `src/app/icon.svg`, which gate 2 skips.
 
 ```bash
-grep -rnE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
+grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
+grep -rnIE "bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex|app/icon\.svg"
+grep -rnIE "\bitalic\b|font-style: ?italic|engrav|grain|speckle|Literata|plate-filters|logo-mask|#1E3C9E|#F3ECDC|#0D1433|#EFE6D2|Hollar|Tengger|caldera" src content \
+  | grep -vE "content/changelog/(2025-|2026-0|2026-10-19)|rich-text-editor.tsx"
 ```
 
-Unmigrated files may still fail the gate until their phase. When you touch one, make it pass; never add a new hit.
+Gate 3 is the regression gate: it keeps the Lautan Pasir system out. Its exclusions cover changelog history and TipTap's `italic` mark name. Never add a new hit; when you touch a file, make it pass.
 
 ## Development Workflow
 
@@ -125,14 +154,14 @@ Unmigrated files may still fail the gate until their phase. When you touch one, 
 3. Validate input at boundaries; fail fast; map errors cleanly.
 4. Keep UI accessible (`aria-current`, labels, keyboard navigation, 44px targets on mobile, chart text alternatives).
 5. Update `prd/progress.md` when a task is done.
-6. Before claiming completion: `bunx tsc --noEmit`, `bun run test`, the grep gate on your paths, and `bun run build --webpack` for anything that touches routes or config.
+6. Before claiming completion: `bunx tsc --noEmit`, `bun run test`, the three grep gates, and `bun run build --webpack` for anything that touches routes or config.
 
 ## Acceptance checklist (UI)
 
 - [ ] Route uses one page pattern from the table above
-- [ ] Colours from ink / paper tokens only; no hex, palette colours, `white` / `black` or `dark:`
+- [ ] Colours from the ink / paper tokens only; orange only where the Orange list allows; no hex, palette colours, `white` / `black` or `dark:`
 - [ ] Only frame, inset or lift; no glass, gradients, blur or soft shadows
-- [ ] Literata roles respected; mono only for machine text
-- [ ] No banned motion; reduced motion prints everything fully
+- [ ] Plex Sans for text, Plex Mono only for machine text; no italic
+- [ ] No banned motion; reduced motion shows everything fully
 - [ ] Umami attributes follow the button / external-link rule
-- [ ] Grep gate prints nothing for the touched paths
+- [ ] All three grep gates print nothing

@@ -44,7 +44,7 @@ const CodeBlock = ({ className, children, node: _node, ...props }: CodeBlockProp
   return <Specimen text={code.replace(/\n$/, "")} lang={langOf(className)} className={className} />;
 };
 
-/** MDX `pre`: prints the fenced `<code>` child as a specimen (the `code` mapping then only sees inline code). */
+/** MDX `pre`: renders the fenced `<code>` child as a specimen (the `code` mapping then only sees inline code). */
 export function Pre({ children }: ComponentPropsWithoutRef<"pre">) {
   const { className, children: code } = isValidElement<CodeProps>(children) ? children.props : ({} as CodeProps);
   return <Specimen text={textOf(code).replace(/\n$/, "")} lang={langOf(className)} className={className} />;
