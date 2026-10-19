@@ -25,7 +25,7 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
 function HeroPortrait({ className }: Readonly<{ className?: string }>) {
   return (
     <PlateFigure className={className}>
-      <Image src="/rizky.jpg" alt="Rizky Haksono" width={1200} height={1200} priority sizes="(min-width: 1024px) 26rem, 20rem" />
+      <Image src="/rizky.jpg" alt="Rizky Haksono" width={1200} height={1200} priority fetchPriority="high" sizes="(min-width: 1024px) 26rem, 20rem" />
     </PlateFigure>
   )
 }

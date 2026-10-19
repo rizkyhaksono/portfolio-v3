@@ -422,7 +422,7 @@ Generated files, never hand-edited:
 - `public/brand/{mark,tile,lockup}-{light,dark}.svg`: standalone art on the light or dark ground, for use outside the site. `global-error.tsx` (which has no CSS) reads `mark-light.svg`
 - `public/brand/og-mark.svg`: the mark without a ground, read by the OG and certificate images
 
-To regenerate after changing the geometry (no font needed):
+To regenerate after changing the geometry (no font needed; needs Node 22.18 or newer, because the script imports a .ts file through type stripping):
 
 ```bash
 node scripts/logo/make.mjs

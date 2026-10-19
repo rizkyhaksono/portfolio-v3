@@ -55,7 +55,7 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
                   <Link
                     href={href}
                     aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-                    className="flex min-h-12 items-center font-display text-h2 font-normal leading-tight text-ink decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
+                    className="flex min-h-12 items-center font-display text-h2 font-normal leading-tight text-ink decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-mark aria-[current=page]:decoration-2"
                     {...navTrack(href, "menu")}
                   >
                     {label}

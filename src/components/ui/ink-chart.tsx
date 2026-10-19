@@ -152,7 +152,7 @@ export function InkChart({
         {/* An HTML square, not an SVG rect: the stretched viewBox would draw a rect as a flat bar. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute size-0.5 -translate-x-1/2 -translate-y-1/2 bg-mark"
+          className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 bg-mark"
           style={{ left: `${px(n - 1)}%`, top: `${py(points[n - 1].y)}%` }}
         />
       </div>

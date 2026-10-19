@@ -69,10 +69,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   // dvh app shells (/chat, /ai) shrink above the Android keyboard instead of panning.
   interactiveWidget: "resizes-content",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: PRINT_HEX.paper },
-    { media: "(prefers-color-scheme: dark)", color: PRINT_HEX.night },
-  ],
+  themeColor: PRINT_HEX.paper,
 }
 
 export default function RootLayout({

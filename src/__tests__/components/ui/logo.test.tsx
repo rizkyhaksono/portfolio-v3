@@ -22,7 +22,7 @@ describe('Logo', () => {
     const paths = svg.querySelectorAll('path')
     expect(paths[0]).toHaveAttribute('d', LOGO_ART.glyph)
     expect(paths[1]).toHaveAttribute('d', LOGO_ART.marks)
-    expect(paths[1]).toHaveAttribute('stroke', 'hsl(var(--mark))')
+    expect(paths[1]).toHaveClass('stroke-mark')
   })
 
   it('reverses the glyph out of an ink tile', () => {
