@@ -105,7 +105,7 @@ export default async function BlogPage() {
             {lead.image && (
               <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
                 <div className="relative aspect-[1000/420]">
-                  <Image src={lead.image} alt="" fill priority unoptimized={isSiteImage(lead.image)} sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
+                  <Image src={lead.image} alt="" fill priority unoptimized sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
                 </div>
               </PlateFigure>
             )}

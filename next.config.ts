@@ -30,6 +30,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     // Only hosts that optimized <Image> sources actually use; `unoptimized` images skip this list.
+    // Admin-entered images (blog covers, project shots) are rendered `unoptimized`, so any host works
+    // without turning this server into an open image proxy.
     remotePatterns: [
       // Project covers (Supabase Storage signed/public URLs)
       { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/**" },
