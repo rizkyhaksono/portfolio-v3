@@ -12,7 +12,7 @@ export default async function CertificationSection() {
   if (data.length === 0) return null
 
   return (
-    <PageSection id="credentials" heading={{ title: "Credentials" }} className={DEFERRED_SECTION} contentClassName="mt-6">
+    <PageSection id="credentials" heading={{ title: "Certificates" }} className={DEFERRED_SECTION} contentClassName="mt-6">
       <LedgerList>
         {data.map((cert) => (
           <CertificationRow key={cert.id} certification={cert} />
@@ -20,7 +20,7 @@ export default async function CertificationSection() {
       </LedgerList>
       <p className="mt-4 text-body">
         <InkLink href="/certificates" className="inline-flex min-h-11 items-center md:min-h-0">
-          All {Math.max(total || 0, data.length).toLocaleString("en")} credentials
+          All {Math.max(total || 0, data.length).toLocaleString("en")} certificates
         </InkLink>
       </p>
     </PageSection>

@@ -4,7 +4,7 @@ import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 
 export const metadata: Metadata = {
-  title: "Credentials | Rizky Haksono",
+  title: "Certificates | Rizky Haksono",
   metadataBase: getMetadataBaseUrl(),
   description: "Certificates and courses on record, newest first.",
   keywords: MetadataConstants.keyword,

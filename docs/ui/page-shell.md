@@ -17,7 +17,7 @@ under 768px       wordmark, [menu icon]   (48px head, 44px targets)
 ```
 
 - If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
-- Credentials and Changelog live in the colophon, the menu and the command palette.
+- Certificates and Changelog live in the colophon, the menu and the command palette.
 - **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section in italic at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
 - The colophon credit line: "Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum (public domain)."
 - `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon, command palette and terminal overlay all import it.
@@ -51,7 +51,7 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 
 | Pattern | Component | Routes |
 |---|---|---|
-| Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Credentials, admin lists |
+| Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
 | Article | `ui/article-shell.tsx` (server; 13rem sticky rail beside a 66ch column; rail becomes `<details>` under `lg`) | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
 | Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, italic caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
@@ -67,7 +67,7 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 ## Home
 
-The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Credentials, Readers, Recommendations, Contact.
+The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
 
 - Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`), text only: the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. The stage carries no image and no engraving.
 - One column, centred in the pinned stage, so the slack falls above and below the block, never between the job line and the sentence. The name is the `display` token capped at `15svh` (104px at 1280x800, 90px at 1280x600, 44px and one line at 375), so the stage fits 375x667 and 1280x600.
@@ -75,7 +75,7 @@ The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career,
 - About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with an italic drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
 - Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.
 - Sections with no data hide. They never show zeros, `NaN` or `-Infinity`.
-- `content-visibility: auto` only on Activity, Credentials, Readers and Recommendations, never on or around sticky content.
+- `content-visibility: auto` only on Activity, Certificates, Readers and Recommendations, never on or around sticky content.
 
 ## Sticky rules
 

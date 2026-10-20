@@ -50,7 +50,7 @@ test.describe('Navigation', () => {
       await expect(sheet.getByRole('link', { name: new RegExp(`^${label}`) })).toHaveAttribute('href', href);
     }
 
-    await sheet.getByRole('link', { name: /^Credentials/ }).click();
+    await sheet.getByRole('link', { name: /^Certificates/ }).click();
     await expect(page).toHaveURL(/\/certificates$/);
     await expect(sheet).toBeHidden();
   });

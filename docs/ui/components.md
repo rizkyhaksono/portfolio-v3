@@ -70,7 +70,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `outbound-click` | InkLink `external` default | `host`, `area` |
 | `cta-click`, `resume-open`, `portfolio-open` | Masthead, About | `target` / `area` |
 | `social-click`, `email-click` | Contact (both), colophon (email only) | `network`, `area` |
-| `cert-verify` | Credentials rows, `/certificates` | `issuer` |
+| `cert-verify` | Certificates rows, `/certificates` | `issuer` |
 | `contact-send` | Contact form | `status`: `ok`, `error`, `limited` |
 | `ai-error` | AI chat, OCR demo, JD matcher catch blocks | `feature`, `status` |
 | `not-found` | NotFoundView island | `path` (pathname only) |

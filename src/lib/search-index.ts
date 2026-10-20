@@ -22,7 +22,7 @@ const HOME_SECTIONS = [
   ["skills", "Skills", "The AI and engineering work I focus on."],
   ["career", "Career", "Work and education, newest first."],
   ["activity", "Activity", "GitHub contributions, coding time and streaks."],
-  ["credentials", "Credentials", "Recent certificates and courses."],
+  ["credentials", "Certificates", "Recent certificates and courses."],
   ["readers", "Readers", "How many people read the site, and what they read most."],
   ["recommendations", "Recommendations", "What colleagues say about working with me."],
   ["contact", "Contact", "Email, socials and a message form."],

@@ -21,7 +21,7 @@ export const NAV_SECTIONS: readonly NavSection[] = [
   { href: "/roadmap", label: "Roadmap", note: "Learning paths, from first principles up.", head: "lg", column: "read" },
   { href: "/tools", label: "Tools", note: "Quizzes, a typing test and small utilities.", head: "lg", column: "try" },
   { href: "/stats", label: "Stats", note: "Readers, coding time and live API health.", head: "lg", column: "site" },
-  { href: "/certificates", label: "Credentials", note: "Certificates and courses on record.", column: "read" },
+  { href: "/certificates", label: "Certificates", note: "Certificates and courses on record.", column: "read" },
   { href: "/changelog", label: "Changelog", note: "What changed on this site, and when.", column: "site" },
 ]
 
