@@ -62,6 +62,12 @@ test.describe('Navigation', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
+  test('home has no horizontal scroll at 320', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  });
+
   test('home portrait sits in the stage on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');

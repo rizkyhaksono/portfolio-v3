@@ -50,7 +50,7 @@ function Masthead() {
             Rizky Haksono
           </h1>
           <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-          <HeroPortrait className="mt-[min(2rem,4svh)] size-[min(max(22svh,100svh_-_34rem),20rem)] sm:size-[min(max(30svh,100svh_-_36rem),36rem)] lg:hidden" />
+          <HeroPortrait className="mt-[min(2rem,4svh)] size-[min(max(22svh,100svh_-_34rem),20rem,100vw_-_2.5rem)] sm:size-[min(max(30svh,100svh_-_36rem),36rem)] lg:hidden" />
           <InkedSentence
             className="mt-auto max-w-[24ch] pt-[min(2rem,4svh)] text-h2 text-ink max-sm:text-[1.5rem]"
             text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."

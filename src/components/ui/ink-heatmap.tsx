@@ -69,7 +69,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
               return (
                 <g key={first ?? col}>
                   {showMonth && (
-                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption italic text-muted-foreground">
+                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption font-display text-muted-foreground">
                       {formatDay(first, { month: "short" })}
                     </text>
                   )}
