@@ -68,19 +68,19 @@ test.describe('Navigation', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
 
-  test('home portrait sits in the stage on desktop', async ({ page }) => {
+  test('portrait sits in About, not the hero, on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
-    await expect(page.locator('.ws__stage').getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeVisible();
+    const portrait = { name: 'Portrait of Rizky Haksono', exact: true };
+    await expect(page.locator('#about').getByRole('img', portrait)).toBeVisible();
+    await expect(page.locator('.ws__stage').getByRole('img', portrait)).toHaveCount(0);
   });
 
-  test('home portrait sits in the first screen on a phone without overflow', async ({ page }) => {
+  test('hero stage has no image on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    const stage = page.locator('.ws__stage');
-    await expect(stage.getByRole('img', { name: 'Rizky Haksono', exact: true })).toBeInViewport({ ratio: 1 });
-    await expect(stage.getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeInViewport({ ratio: 1 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+    await expect(page.locator('.ws__stage h1')).toBeVisible();
+    await expect(page.locator('.ws__stage img')).toHaveCount(0);
   });
 
   // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).

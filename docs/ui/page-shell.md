@@ -53,7 +53,7 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 |---|---|---|
 | Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Credentials, admin lists |
 | Article | `ui/article-shell.tsx` (server; 13rem sticky rail beside a 66ch column; rail becomes `<details>` under `lg`) | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, italic caption) | Covers, project shots, home portrait, OCR specimen, anime and Pokémon pictures |
+| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, italic caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | A column of letters, replies set behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Board | Ruled columns of index cards | `/tracker` |
@@ -69,10 +69,10 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Credentials, Readers, Recommendations, Contact.
 
-- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated), the job line, the duotone portrait, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. The stage carries no engraving.
-- The portrait is `HeroPortrait`, a `PlateFigure` and the LCP candidate (`priority`). From `lg` it is the right column (`minmax(18rem, 26rem)`, at most 60svh wide) beside the name, whose size is tied to its column so its cap height meets the plate's top rule. Below `lg` it follows the job line and takes the stage's slack (`100svh` less the rest of the stage, capped at 20rem on phones and 36rem from `sm`), so tall screens get a bigger plate and 375x667 still fits.
+- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`), text only: the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. The stage carries no image and no engraving.
+- One column, centred in the pinned stage, so the slack falls above and below the block, never between the job line and the sentence. The name is the `display` token capped at `15svh` (104px at 1280x800, 90px at 1280x600, 44px and one line at 375), so the stage fits 375x667 and 1280x600.
 - The hero sentence keeps a 24px floor below `sm` (it is `h2` size otherwise) so its unscrolled ghost still passes as large text (3.17:1).
-- About is text only: three prose paragraphs under the `h2`, the first with an italic drop cap.
+- About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with an italic drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
 - Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.
 - Sections with no data hide. They never show zeros, `NaN` or `-Infinity`.
 - `content-visibility: auto` only on Activity, Credentials, Readers and Recommendations, never on or around sticky content.

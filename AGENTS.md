@@ -84,7 +84,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 |---|---|---|
 | Ledger | `ui/ledger.tsx` | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Credentials, admin lists |
 | Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` | Covers, project shots, home portrait, OCR specimen, anime and Pokémon pictures |
+| Plates | `ui/plate-figure.tsx` | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Board | Ruled columns of index cards | `/tracker` |
@@ -96,7 +96,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 
 Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
-Home: the masthead stage (`bleed` slot) has the italic name, the job line, the duotone portrait (`HeroPortrait` in `src/app/page.tsx`, a `PlateFigure`: right column from `lg`, under the job line below it) and the wordscroll sentence, which keeps a 24px floor on phones. No engraving in the hero; the engraving band belongs to the colophon, with the riders crop on 404 and auth. About is text only, with an italic drop cap.
+Home: the masthead stage (`bleed` slot) is text only: the italic name (the LCP element), the job line, the wordscroll sentence, which keeps a 24px floor on phones, and the links, in one column centred in the pinned stage. No image and no engraving in the hero; the engraving band belongs to the colophon, with the riders crop on 404 and auth. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with an italic drop cap.
 
 Shared details agents trip on:
 

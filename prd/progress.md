@@ -29,7 +29,7 @@
 - **One-ink redesign P3 (/ai, profile, auth, admin)**: ✅ COMPLETED — Etan AI cabinet + correspondence, AuthShell, profile cards, admin spine/dashboard/analytics (InkChart, events ledger)/CRUD ledgers; recharts, react-icons, date-fns, motion removed; grep gate clean over `src/` and `content/`
 - **Spotify + weather widgets**: removed (routes, services, scripts, docs, env)
 - **Redesign P1 review fixes**: ✅ COMPLETED (2026-10-17, not deployed) — masthead fits 1280x600 (svh caps, plate strip takes the remaining height), 404 inside BaseLayout + `not-found` event, error.tsx on NotFoundView, quartile heatmap levels, token durations on Button/Tabs, site-theme Turnstile, `[id]` scroll-margin instead of html scroll-padding, menu sheet lazy-loaded, wordscroll sr-only sentence, legacy `min-height` media query, 44px inputs/links, terminal on Radix Dialog, Umami failures never cached, spotify/weather removed, blog covers moved to `art-src/`, speckle mask, hex tokens only in `src/lib/print-hex.ts`
-- **One ink returns (release 1.7.0)**: ✅ COMPLETED (2026-10-20, on `restyle/one-ink-return`, deploy pending) — the one-ink print is back after the 1.6.0 restyle; RH mark, home portrait, compact type scale, Paper (light) default and the anime generator carried over; agent files and `docs/ui/` back to the one-ink rules with the two grep gates of `CLAUDE.md`
+- **One ink returns (release 1.7.0)**: ✅ COMPLETED (2026-10-20, on `restyle/one-ink-return`, deploy pending) — the one-ink print is back after the 1.6.0 restyle; RH mark, portrait (now in About, larger), compact type scale, Paper (light) default and the anime generator carried over; agent files and `docs/ui/` back to the one-ink rules with the two grep gates of `CLAUDE.md`
 - **Redesign P1 H (governance docs)**: ✅ COMPLETED (2026-10-17) — agent files and `docs/ui/` rewritten for the one-ink system; monochrome / grayscale / old-font / `MacWindow` mandates removed; `docs/ui/` declared source of truth; grep gate documented
 
 ---
@@ -47,7 +47,8 @@
 #### One ink returns (2026-10-20, release 1.7.0)
 - ✅ Visual system back to the one-ink print of 1.5.0 (cobalt on cream, night print, Literata roman and italic, riso grain, duotone double-rule plates, Hollar engraving band in the colophon, 404 and auth views); the 1.6.0 look is retired at the owner's request (only the logo was meant to change)
 - ✅ Logo: RH monogram in one ink (`mark` adds registration ticks at 60% opacity); `node scripts/logo/make.mjs` (Node 22.18+) writes `logo-art.ts`, `icon.svg`, `apple-icon.png`, `favicon.ico` (same path, healthchecks), `public/brand/{mark,tile,lockup}-{light,dark}.svg` and `og-mark.svg`
-- ✅ Home: `HeroPortrait` (duotone `PlateFigure`) beside the name from `lg`, under the job line below it; no hero engraving; hero sentence 24px floor; About text only with the italic drop cap
+- ✅ Home: text-only hero (name, job line, wordscroll sentence, links) centred in the pinned stage, h1 is the LCP; no hero image or engraving; hero sentence 24px floor
+- ✅ About: duotone portrait (`PlateFigure`, lazy `next/image`) as an 18rem left column from `md`, under the heading at up to 20rem on phones, beside the prose with the italic drop cap (owner: the portrait belongs in About, not the hero)
 - ✅ Compact type scale (body 15 to 16px, h1 30 to 44px, display 44 to 104px, small 13px, caption 12px), `SECTION_SPACING.section` `mt-12 sm:mt-16`
 - ✅ Default theme Paper (light), labels Paper / Night / System
 - ✅ Anime generator kept in Tools (it returned in 1.6.0; cringe, blush, dance, quotes; waifu and neko hidden); `PlateFigure tone?: "photo" | "color"`; `ogImageUrl` always `v=3`; hover tips via `data-tip`; contrast guard `src/__tests__/unit/lib/contrast.test.ts` with the one-ink floors
@@ -173,8 +174,8 @@
 - **Job title constant:** `src/commons/constants/author.ts` (`JOB_TITLE`)
 - **Metadata:** `src/commons/constants/metadata.ts`
 - **Canonical site URL:** `src/lib/site-url.ts` (`getSiteUrl`, `getMetadataBaseUrl`)
-- **About section:** `src/app/_components/about/index.tsx`
-- **Home hero (masthead and portrait):** `src/app/page.tsx`
+- **About section (and portrait):** `src/app/_components/about/index.tsx`
+- **Home hero (masthead):** `src/app/page.tsx`
 - **Downloader:** `src/app/(visitor)/tools/_components/downloader-tab.tsx`
 - **Contribution section:** `src/app/_components/contribution/index.tsx`
 - **Tokens:** `src/lib/design-system.ts`
