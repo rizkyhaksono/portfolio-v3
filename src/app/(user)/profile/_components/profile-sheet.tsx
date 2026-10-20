@@ -9,7 +9,7 @@ interface ProfileSheetProps {
   children: React.ReactNode
 }
 
-/** Profile card pattern: a double-rule sheet (1px ink, 3px paper, 1px rule) with its head on a double rule. */
+/** Profile card pattern: a double-rule sheet (1px ink, 3px paper, 1px rule) with its head on a single ink rule. */
 export function ProfileSheet({ title, standfirst, portrait, cover, children }: Readonly<ProfileSheetProps>) {
   return (
     <article className="w-full border border-ink p-[3px]">
@@ -22,7 +22,7 @@ export function ProfileSheet({ title, standfirst, portrait, cover, children }: R
             {standfirst && <p className="mt-2 font-display text-lead text-ink-soft">{standfirst}</p>}
           </div>
         </header>
-        <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+        <div aria-hidden className="border-t border-ink" />
         <div className="mt-8">{children}</div>
       </div>
     </article>

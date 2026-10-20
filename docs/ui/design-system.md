@@ -106,8 +106,8 @@ Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones 
 | Hairline | 1px `rule` (`border-border`) | Frames, row separators, decorative rules |
 | Strong | 1px `ink` | Controls, outline buttons, floating layers |
 | Active | 2px `ink` underline | Current nav item, active tab, link hover |
-| Double rule | 1px ink, 3px gap, 1px rule | Page heads and above the colophon only |
-| Plate frame | double rule around a figure | `PlateFigure` |
+| Head rule | single 1px ink | Page heads and above the colophon; never stacked with another rule |
+| Plate frame | 1px ink, 3px paper, 1px rule around a figure | `PlateFigure` |
 | Dotted leader | dotted `rule` | Definition lists, profile card, ledgers |
 | Dashed | dashed `rule-strong` | Draft and archived states |
 
@@ -117,7 +117,7 @@ Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones 
 2. **Ink speckle.** A small mask, only on numerals 48px and up below the fold, inverted blocks, and the 404 line.
 3. **Hatching.** 45 degree hatching (`repeating-linear-gradient(135deg, ...)`) for chart areas and `HatchBar`. This is the only permitted use of a gradient function, and it lives in CSS, not in class names.
 
-Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is the double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The engraving is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. Engravings never go through `next/image`.
+Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The engraving is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. Engravings never go through `next/image`.
 
 ## Motion: the press moves once
 

@@ -29,7 +29,7 @@ export interface ArticleShellProps {
 }
 
 /**
- * Article pattern (server, no cookies): head on a double rule, a 13rem sticky rail beside a 66ch column,
+ * Article pattern (server, no cookies): head on a single ink rule, a 13rem sticky rail beside a 66ch column,
  * a tail-piece and previous / next. The reading hairline under the running head is CSS only (`.reading-hairline`); home renders it too.
  */
 export function ArticleShell({
@@ -54,7 +54,7 @@ export function ArticleShell({
         {standfirst && <div className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">{standfirst}</div>}
         {dateline && <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">{dateline}</p>}
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       <div className={cn("mt-8 grid gap-y-8", rail && "lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-12")}>
         {rail && (

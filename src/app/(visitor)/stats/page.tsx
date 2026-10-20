@@ -50,9 +50,9 @@ export default async function StatsPage() {
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Stats</h1>
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
-      {strip.length > 0 && <StatStrip items={strip} className="mt-8" />}
+      {strip.length > 0 && <StatStrip items={strip} className="mt-8 border-t-0" />}
       <ReadersFigures stats={stats} daily={daily} reads={reads} />
       <SystemStatus />
       {leetcode && <LeetCodeSection stats={leetcode} />}

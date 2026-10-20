@@ -12,7 +12,7 @@ export default async function ChatPage() {
         <h1 className="font-display text-h2 text-balance text-ink sm:text-h1">Chat</h1>
         <p className="mt-2 font-display text-caption text-ink-soft">Times are Jakarta time.</p>
       </header>
-      <div aria-hidden className="h-[5px] shrink-0 border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="shrink-0 border-t border-ink" />
 
       <ChatClient initialMessages={initialMessages} currentUser={currentUser} />
     </div>

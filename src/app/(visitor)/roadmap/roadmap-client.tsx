@@ -128,7 +128,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
 
   return (
     <Tabs value={open} onValueChange={choose} className="mt-8">
-      <TabsList aria-label="Courses" className="grid grid-cols-1 gap-0 border-b-0 border-t border-rule sm:grid-cols-2 lg:grid-cols-5">
+      <TabsList aria-label="Courses" className="grid grid-cols-1 gap-0 border-b-0 sm:grid-cols-2 lg:grid-cols-5">
         {courses.map((course) => {
           const done = doneOf(course)
           const total = course.lessons.length

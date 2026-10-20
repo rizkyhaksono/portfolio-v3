@@ -18,8 +18,8 @@ const COLUMNS = [
 const linkClass =
   "inline-flex min-h-11 items-center text-ink decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
 
-function DoubleRule() {
-  return <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+function InkRule() {
+  return <div aria-hidden className="border-t border-ink" />
 }
 
 function BackToTop() {
@@ -54,7 +54,7 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
   if (variant === "compact") {
     return (
       <footer className={cn(SHELL_WIDTH, "pb-6")}>
-        <DoubleRule />
+        <InkRule />
         <div className="flex flex-wrap items-center gap-x-6 pt-2 text-small">
           <p className="font-display text-ink">Rizky Haksono</p>
           <ul className="flex gap-x-5">
@@ -72,7 +72,7 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
   return (
     <footer>
       <div className={SHELL_WIDTH}>
-        <DoubleRule />
+        <InkRule />
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="col-span-2 flex items-start gap-5 sm:col-span-3 lg:col-span-1">
             <Logo variant="mark" className="w-20 shrink-0 sm:w-28" />

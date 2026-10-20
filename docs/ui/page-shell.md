@@ -8,7 +8,7 @@
     [RH mark] Rizky Haksono   Projects Writing Etan AI Chat Tracker Roadmap Tools Stats   [Search ⌘K] [theme] [Account]
   Bleed slot (home masthead only)
   main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
-  Double rule
+  Ink rule (single, 1px)
   Colophon: RH mark beside name, role, email / Read, Try, Site columns / credit line / Send feedback, Back to top
   Engraving band, full bleed, 100:26 (about 26vw tall), at most 440px, at least min(200px, 18svh)
 
@@ -45,7 +45,7 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 
 One width for every page. Every visitor and user route fills BaseLayout's wrapper (`SHELL_WIDTH` in `layout/running-head.tsx`), so the page head starts on the logo's left edge and the widest rule or row ends under "Account". Pages never narrow or centre their outer container: no `mx-auto max-w-*` wrapper, no width preset. Admin keeps its own shell, and Auth keeps `AuthShell`.
 
-- **Page head.** The `h1`, then the double rule, both full width. No description, standfirst or italic lead under the title. Only short functional meta lines stay: counts, "Subscribe by RSS", "Times are Jakarta time.", datelines.
+- **Page head.** The `h1`, then a single 1px ink rule (`border-t border-ink`), both full width. Never stack rules: a list, strip, tab row or board right under the head drops its own top rule, so only the head rule shows. No description, standfirst or italic lead under the title. Only short functional meta lines stay: counts, "Subscribe by RSS", "Times are Jakarta time.", datelines.
 - **Running text keeps a readable measure.** Prose, article bodies, chat messages, form text and excerpts cap at about 60 to 66ch (`.prose` is 66ch, otherwise `max-w-[66ch]`), left-aligned on the same edge. Never centre them.
 - **Ledgers.** Rows, rules and the marker (date) column span the full width.
 - **Articles.** `ArticleShell` starts on the shell's left edge: the 13rem rail, then a column that takes the rest; `.prose` inside it holds the 66ch measure. An article's own summary (a post or lesson description) may sit under its title as the one standfirst.

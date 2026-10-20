@@ -9,7 +9,7 @@ export default function ToolsPage() {
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Tools</h1>
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       <Suspense fallback={<ToolCabinet tab={null} />}>
         <ToolShell />

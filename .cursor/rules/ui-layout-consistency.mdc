@@ -49,7 +49,7 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 - `glass` / `glass-static` are retired aliases of frame. Do not use them.
 - Radius 0 everywhere; the radio dot is the only circle.
 - No gradients, glass, `backdrop-blur`, glows, `shadow-sm`..`shadow-2xl`, hover lifts. Hover = rule turns ink or row takes `bg-tint`.
-- Lines: hairline 1px rule; strong 1px ink; active 2px ink underline; double rule only on page heads and above the colophon; dotted leaders; dashed = draft or archived.
+- Lines: hairline 1px rule; strong 1px ink; active 2px ink underline; page heads and the colophon sit on a single 1px ink rule; never stack rules; dotted leaders; dashed = draft or archived.
 
 ## Shell and page patterns
 

@@ -42,7 +42,7 @@ export default function SkillSection() {
             <p className="text-small text-ink-soft">{group.note}</p>
             <ul role="list" className="mt-6 grid grid-cols-2 gap-x-6 sm:gap-x-10">
               {group.skills.map((skill) => (
-                <li key={skill} className="border-b border-rule py-2 text-lead text-ink">
+                <li key={skill} className="border-t border-rule py-2 text-lead text-ink">
                   {skill}
                 </li>
               ))}

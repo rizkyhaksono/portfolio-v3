@@ -33,12 +33,13 @@ export default async function CertificatesPage() {
           </p>
         )}
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       {certifications.length === 0 ? (
         <p className="mt-8 text-body text-ink-soft">The record could not be loaded just now. Please try again in a few minutes.</p>
       ) : (
-        <div className="mt-8">
+        // The head rule tops the first year, so its own top rule would stack under it.
+        <div className="mt-8 [&>:first-child]:border-t-0">
           {[...years].map(([year, rows]) => (
             <LedgerList key={year} marker={<h2>{year}</h2>}>
               {rows.map((cert) => (

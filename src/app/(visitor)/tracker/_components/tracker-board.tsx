@@ -188,8 +188,9 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
     <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-4">
       {TRACKER_COLUMNS.map(({ id }) => {
         const items = column(id)
+        // The head rule tops the first row of columns (1, 2 or 4 wide), so those drop their own.
         return (
-          <section key={id} aria-labelledby={`column-${id}`} className="border-t border-ink pt-3">
+          <section key={id} aria-labelledby={`column-${id}`} className="border-t border-ink pt-3 first:border-t-0 sm:[&:nth-child(2)]:border-t-0 xl:border-t-0">
             <div className="flex items-baseline justify-between gap-3">
               <h2 id={`column-${id}`} className="font-display text-h4 text-ink">
                 {COLUMN_LABEL[id]}

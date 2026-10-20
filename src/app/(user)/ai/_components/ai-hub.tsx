@@ -42,7 +42,7 @@ export default function AIHub({ chat, initialTab }: Readonly<{ chat: ReactNode; 
       <header className="pb-6 sm:pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Etan AI</h1>
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       <Tabs value={tab} onValueChange={select} className="mt-6 sm:mt-8">
         <TabsList aria-label="Etan AI tools">

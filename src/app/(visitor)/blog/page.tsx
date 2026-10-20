@@ -97,7 +97,7 @@ export default async function BlogPage() {
           .
         </p>
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       {lead ? (
         <>

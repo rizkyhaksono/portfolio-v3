@@ -34,7 +34,7 @@ export default async function TrackerPage() {
           </Button>
         )}
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       <TrackerBoard initialTasks={tasks} currentUserId={currentUserId} isAdmin={isAdmin} />
     </div>

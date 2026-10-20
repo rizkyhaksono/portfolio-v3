@@ -36,9 +36,10 @@ export default function ChangelogPage() {
             .
           </p>
         </header>
-        <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+        <div aria-hidden className="border-t border-ink" />
 
-        <div className="mt-8">
+        {/* The head rule tops the first release, so its own top rule would stack under it. */}
+        <div className="mt-8 [&>:first-child]:border-t-0">
           {changelogs.map(({ meta, content, slug }) => (
             <LedgerList
               key={slug}

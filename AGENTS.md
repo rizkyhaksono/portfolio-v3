@@ -76,7 +76,7 @@ One RH monogram in the one ink (cobalt on cream, cream on night). Always place i
 2. **Inset** — `tint` ground for nested rows, code and hover rows: `Surface variant="inset"`.
 3. **Lift** — `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only (dialog, sheet, popover, menu, tooltip, select, command, toast). Already applied inside the shared primitives.
 
-Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or soft shadows.
+Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or soft shadows. Page heads sit on a single 1px ink rule; never stack rules.
 
 ### Page patterns
 

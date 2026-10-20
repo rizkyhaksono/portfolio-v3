@@ -43,7 +43,7 @@ export default async function ProjectPage() {
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Projects</h1>
       </header>
-      <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+      <div aria-hidden className="border-t border-ink" />
 
       {projects.length === 0 && <p className="mt-8 text-body text-ink-soft">No projects are published yet.</p>}
 

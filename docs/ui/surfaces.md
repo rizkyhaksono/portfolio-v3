@@ -23,7 +23,7 @@ import { Surface } from "@/components/ui/surface"
 - Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet, a plate).
 - Interactive frames show hover with the rule turning ink (`hover:border-ink`) or the row taking `bg-tint`. Never with a shadow or a lift.
 - Do not restate `border border-border bg-card` on `Card`; it is the default.
-- Page heads and the colophon use the double rule (1px ink, 3px gap, 1px rule), not a frame.
+- Page heads and the colophon sit on a single 1px ink rule (`border-t border-ink`), not a frame. Never stack rules: whatever sits right under a head (a ledger, a stat strip, a tab row, board columns) drops its own top rule. Row separators inside a ledger stay.
 
 ## Inset
 

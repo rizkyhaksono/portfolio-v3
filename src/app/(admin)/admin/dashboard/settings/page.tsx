@@ -247,7 +247,7 @@ export default function AdminSettingsPage() {
               <Skeleton className="h-4 w-1/3" />
             </div>
           </div>
-          <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+          <div aria-hidden className="border-t border-ink" />
           <div className="mt-6 space-y-3">
             {[0, 1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-4 w-full" />
@@ -285,7 +285,7 @@ export default function AdminSettingsPage() {
               {user.location && <p className="mt-1 font-display text-lead text-ink-soft">{user.location}</p>}
             </div>
           </header>
-          <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
+          <div aria-hidden className="border-t border-ink" />
 
           <dl className="mt-6">
             <Leader term="Email">
