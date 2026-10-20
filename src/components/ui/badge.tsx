@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// The Tag look shared by Badge and Chip: 13px roman in a 1px frame. Status is shape plus word, never colour.
+// The Tag look shared by Badge and Chip: 12px roman in a 1px frame. Status is shape plus word, never colour.
 const badgeVariants = cva(
   "inline-flex items-center gap-1.5 rounded-none border px-2 py-0.5 text-xs leading-snug text-ink",
   {

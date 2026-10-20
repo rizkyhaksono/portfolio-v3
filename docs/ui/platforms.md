@@ -19,7 +19,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 | `/stats` | Figures |
 | `/chat` | Correspondence, `footer="compact"` |
 
-`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/ai`). Do not rebuild them. `/status` gains the `#status` hash in P2, when /stats gets its `id="status"` strip.
+`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/ai`). Do not rebuild them.
 
 ## User (signed in)
 
@@ -51,7 +51,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 | Item | Guidance |
 |---|---|
 | Terminal overlay | Own layout, same ink and paper |
-| OG and certificate images (`/api/og`, `/api/certificate`) | Always printed on paper colours, with the RH mark from `public/brand/og-mark.svg`; the only place hex values are allowed in code. Request them through `ogImageUrl` (`v=3`) |
+| OG and certificate images (`/api/og`, `/api/certificate`) | Always printed on paper colours, with the RH mark from `public/brand/og-mark.svg`; with `src/lib/print-hex.ts`, the only places hex values are allowed in code. Request them through `ogImageUrl` (`v=3`) |
 
 ## Agent instruction files
 

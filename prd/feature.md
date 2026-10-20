@@ -8,7 +8,7 @@ Unify Portfolio v3 UI so all boxes, sections, and page shells share one design l
 
 ## 2. System Goals
 - Three surfaces: frame (content), inset (nested rows), lift (floating layers only); glass is retired
-- Shared page recipe: BaseLayout → PageBody → SectionHeading → content
+- Shared page recipe: BaseLayout → PageSection → SectionHeading → content (width presets are `PAGE_WIDTH`)
 - Eliminate ad-hoc glass cards, double padding, and undefined max-widths
 - Document rules for Cursor, Claude, Gemini, and Copilot
 
@@ -20,8 +20,7 @@ Unify Portfolio v3 UI so all boxes, sections, and page shells share one design l
 ### 3.2 Primitives
 - `Surface` — solid / glass / glass-static / inset
 - `PageSection` — mt-10 + optional SectionHeading
-- `PageBody` — width presets (default / prose / article / wide)
-- `MacWindow` — legacy-compatible solid editorial panel; `backdrop` is deprecated/no-op
+- `PageBody` and `MacWindow` — removed in the one-ink redesign; width presets are `PAGE_WIDTH` in `src/lib/design-system.ts`
 
 ### 3.3 Migrations
 - Glass content cards (stats, duolingo, monkeytype, spotify) → solid
@@ -129,7 +128,7 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 ### 9.3 Surfaces and patterns
 - Three surfaces: frame, inset, lift (lift = 1px ink and a `3px 3px 0` ink shadow on floating layers only). No gradients, glass, blur or soft shadows.
 - Page patterns: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found.
-- `BaseLayout` becomes running head + Contents sheet + colophon; sidebars and `MacWindow` panels retire.
+- `BaseLayout` becomes running head + menu sheet + colophon; sidebars and `MacWindow` panels retire.
 
 ### 9.4 Motion
 - Tier 0 native scroll and sticky layouts; tier 1 CSS scroll-driven home wordscroll and article reading hairline only. Parallax, marquees, typing effects, page transitions, fade-up sections, Lenis, GSAP and `motion` are banned.

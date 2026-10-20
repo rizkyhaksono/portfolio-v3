@@ -9,7 +9,6 @@ const PLATE_LABEL = "A rider on a country road, after Wenceslaus Hollar, 1650"
 const CROPS = {
   // The floor only bites below ~770px wide; on phones it yields to 18svh so the band does not fill the screen.
   band: { "--pos": "62% 100%", aspectRatio: "100 / 26", minHeight: "min(200px, 18svh)", maxHeight: 440 },
-  masthead: { "--pos": "62% 80%", aspectRatio: "5 / 1" },
   riders: { "--pos": "80% 50%", aspectRatio: "4 / 3" },
 } as const
 

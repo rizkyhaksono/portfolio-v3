@@ -92,7 +92,7 @@ portfolio-v3/
 │   │
 │   ├── components/             # Reusable components
 │   │   ├── ui/                 # One-ink primitives (shadcn restyled, ledger, plates, charts, logo)
-│   │   ├── layout/             # Running head, Contents sheet, colophon
+│   │   ├── layout/             # Running head, menu sheet, colophon
 │   │   └── seo/                # JSON-LD
 │   │
 │   ├── commons/                # Shared utilities
@@ -167,7 +167,7 @@ portfolio-v3/
 
 ### Prerequisites
 
-- Node.js 18+ or Bun
+- Node.js 18+ or Bun (Node 22.18+ only to run the logo generator, `node scripts/logo/make.mjs`)
 - npm, yarn, pnpm, or bun
 - Supabase account (for database)
 

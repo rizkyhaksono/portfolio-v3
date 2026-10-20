@@ -39,6 +39,10 @@ export interface RoadmapContent {
   slug: string
 }
 
+// Front matter is untyped: a date can be missing or invalid, a version can be absent or a YAML number.
+const time = (date: string) => new Date(date).getTime() || 0
+const version = (meta: ChangelogMeta) => String(meta.version ?? '')
+
 // Changelog functions
 export function getAllChangelogs(): ChangelogContent[] {
   const changelogDir = path.join(contentDir, 'changelog')
@@ -65,8 +69,8 @@ export function getAllChangelogs(): ChangelogContent[] {
     })
     .sort(
       (a, b) =>
-        new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime() ||
-        b.meta.version.localeCompare(a.meta.version, undefined, { numeric: true })
+        time(b.meta.date) - time(a.meta.date) ||
+        version(b.meta).localeCompare(version(a.meta), undefined, { numeric: true })
     )
 
   return changelogs
