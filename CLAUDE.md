@@ -9,7 +9,7 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 - **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
-- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the ink and paper tokens
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
 - **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
 - **Package Manager**: bun
 
@@ -36,16 +36,14 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 ## UI rules (mandatory)
 
-[`docs/ui/`](./docs/ui/README.md) is the source of truth for UI; [`AGENTS.md`](./AGENTS.md) carries the full summary (token table, page patterns table, event rules). Design brief: a drafting sheet, near-black ink on off-white paper in IBM Plex, with one orange mark colour. The earlier Lautan Pasir system (cobalt ink on cream paper, Literata italic, riso grain, an engraving band, the caldera logo) and the older monochrome / grayscale rules, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono and `MacWindow` panels are retired. Do not bring any of it back.
+[`docs/ui/`](./docs/ui/README.md) is the source of truth for UI; [`AGENTS.md`](./AGENTS.md) carries the full summary (token table, page patterns table, event rules). The old monochrome / grayscale rules, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono and `MacWindow` panels are retired. Do not bring them back.
 
-- **Ink and paper.** Near-black ink on off-white paper (`paper` #F7F7F5, `ink` #141414), plus `ink-soft`, `rule`, `rule-strong` and `tint`. Dark mode flips the same tokens (paper #141414, ink #F2F2EE) through `<html class="dark">`. shadcn names (`background`, `foreground`, `muted`, `border`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes. Status is shape plus word, never colour.
-- **One orange.** `mark` (#FF4F00 light, #FF6326 dark) appears only on the focus ring, the active nav underline, the reading hairline, the crop marks on plates and the logo `mark` variant, the last chart point, and text selection. Never on buttons, links, headings or fills. Orange text, if unavoidable, is `mark-text`; text on a `mark` fill is `on-mark`. Raw `orange-*` classes stay banned.
-- **IBM Plex.** Plex Sans is the whole voice (`font-sans`; `font-display` is an alias, and weight 600 rides on the h1 to h4 and display sizes). Plex Mono (`font-mono`) only for code, kbd, slugs, keys, raw JSON and title-block values, never for small decorative labels. No italic anywhere: `<em>`, `<i>` and `<cite>` render upright at weight 500, `<strong>` at 600.
+- **Ink and paper.** One cobalt ink (`ink` #1E3C9E) printed on cream paper (`paper` #F3ECDC), plus `ink-soft`, `rule`, `rule-strong` and `tint`. Night print flips the same tokens to cream ink on night paper (#0D1433) through `<html class="dark">`. shadcn names (`background`, `foreground`, `muted`, `border`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes. Status is shape plus word, never colour.
+- **Literata.** One family, roman and italic. Italic for h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals. Roman for body, nav, buttons, labels, table heads, tags, form values. System mono only for code, slugs, keys, raw JSON and kbd.
 - **Three surfaces.** Frame: 1px `rule` hairline on paper (`Card`, `Surface variant="solid"`). Inset: `tint` ground for nested rows and code (`Surface variant="inset"`). Lift: paper, 1px ink, `shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only. Radius 0. No gradients, glass, blur, glows or soft shadows.
-- **Plates and logo.** Photos go through `PlateFigure`: 1px ink frame, four orange crop marks, grayscale (`tone="color"` for site cards, the OCR upload and sprites); avatars use `.plate` with no marks. The logo is `<Logo variant="mini" | "mark" | "tile">`, the RH monogram; never paste or recolour it. No grain, speckle, engraving, duotone or fleuron: ornaments are plain 1px rules.
-- **Page patterns.** Every route uses one: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found ([`docs/ui/page-shell.md`](./docs/ui/page-shell.md)). The shell is `BaseLayout` with running head, menu sheet and colophon (a `TitleBlock`); no sidebars, no extra `px-*` inside it.
+- **Page patterns.** Every route uses one: Ledger, Article, Plates, Cabinet, Correspondence, Board, Figures, Admin, Auth, Profile card, Not found ([`docs/ui/page-shell.md`](./docs/ui/page-shell.md)). The shell is `BaseLayout` with running head, menu sheet and colophon; no sidebars.
 - **Motion.** Tier 0: native scroll and sticky layouts. Tier 1: CSS scroll-driven home wordscroll and article reading hairline, nothing else. Otherwise response motion on input only. Banned: parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up on sections, hover lifts, Lenis, GSAP, `motion`.
-- **Copy.** Sentence case. No `uppercase`, letter-spacing, all-caps eyebrows, middle-dot meta strings, mono small labels or "→" on links. Numbers only for real sequences. Plain wording, not print metaphors: the themes are Light, Dark and System.
+- **Copy.** Sentence case. No `uppercase`, letter-spacing, all-caps eyebrows, middle-dot meta strings, mono small labels or "→" on links. Numbers only for real sequences.
 - **Umami.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track="nav-click" data-track-item="..."`. Kebab-case names, enum values, never PII.
 - **Grep gate.** Both commands must print nothing for the paths you touched (`$PHASE_PATHS`):
 
