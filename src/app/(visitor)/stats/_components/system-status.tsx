@@ -47,7 +47,7 @@ function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
 
 /**
  * Live health of the portfolio API and its dependencies, the `#status` strip on /stats. Checks on mount,
- * then every 30 seconds while the tab is visible. AI (Gemini) "not configured" means GENERATIVE_AI_API_KEY
+ * then every 30 seconds while the tab is visible. AI "not configured" means GENERATIVE_AI_API_KEY
  * is missing on the API host (Portainer), not in the web app.
  */
 export default function SystemStatus() {
