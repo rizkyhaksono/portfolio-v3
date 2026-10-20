@@ -155,7 +155,6 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalDocument
       title="Privacy policy"
-      standfirst="What this site collects, why it collects it, and how to have it removed."
       dateline="Last updated 19 October 2026."
       next={{ href: "/legal/terms", title: "Terms of service" }}
       sections={sections}

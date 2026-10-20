@@ -13,7 +13,7 @@ export default async function EditProfilePage() {
   if (!profile) return <ProfileUnavailable />
 
   return (
-    <ProfileSheet title="Edit your profile" standfirst="How your name, headline and cover read on your profile.">
+    <ProfileSheet title="Edit your profile">
       <EditProfileForm profile={profile} />
     </ProfileSheet>
   )

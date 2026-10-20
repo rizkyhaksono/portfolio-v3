@@ -1,7 +1,6 @@
 import { Minus, Plus } from "lucide-react"
 
 import { InkLink } from "@/components/ui/ink-link"
-import { PAGE_WIDTH } from "@/lib/design-system"
 import { cn } from "@/lib/utils"
 
 interface ArticleLink {
@@ -46,8 +45,8 @@ export function ArticleShell({
   className,
 }: Readonly<ArticleShellProps>) {
   return (
-    // With a rail, the Ledger's width, so an index and its articles share one left edge.
-    <article className={cn("text-prose", rail ? PAGE_WIDTH.ledger : "mx-auto w-full max-w-[66ch]", className)}>
+    // The shell's full width, so an index and its articles share one left edge; `.prose` keeps the 66ch measure.
+    <article className={cn("text-prose", className)}>
       <div aria-hidden data-print-hide className="reading-hairline" />
 
       <header className="pb-8">
@@ -57,7 +56,7 @@ export function ArticleShell({
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
-      <div className={cn("mt-8 grid gap-y-8", rail && "lg:grid-cols-[13rem_minmax(0,66ch)] lg:gap-x-12")}>
+      <div className={cn("mt-8 grid gap-y-8", rail && "lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-12")}>
         {rail && (
           <details className="article-rail group self-start border-b border-rule text-small text-ink-soft lg:sticky lg:top-[calc(var(--head-h)+1.5rem)] lg:border-0">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-ink [&::-webkit-details-marker]:hidden">

@@ -4,7 +4,6 @@ import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { ReaderCount } from "@/components/ui/reader-count"
-import { PAGE_WIDTH } from "@/lib/design-system"
 import { excerpt, formatDay, formatDayMonth, toDate, yearOf } from "@/app/_components/blog/format"
 import { getBlogData, getBlogMedium } from "@/services/visitor/blog"
 import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
@@ -81,12 +80,9 @@ export default async function BlogPage() {
   const [lead, ...rest] = posts
 
   return (
-    <div className={PAGE_WIDTH.ledger}>
+    <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Writing</h1>
-        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          Notes from building software, learning in public, and the work behind the finished product.
-        </p>
         <p className="mt-4 text-small text-ink-soft">
           {lead && `${sourcesSentence(posts)} `}
           {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
@@ -109,7 +105,7 @@ export default async function BlogPage() {
             {lead.image && (
               <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
                 <div className="relative aspect-[1000/420]">
-                  <Image src={lead.image} alt="" fill priority unoptimized={isSiteImage(lead.image)} sizes="(min-width: 960px) 31rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
+                  <Image src={lead.image} alt="" fill priority unoptimized={isSiteImage(lead.image)} sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
                 </div>
               </PlateFigure>
             )}

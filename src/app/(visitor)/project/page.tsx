@@ -5,7 +5,7 @@ import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { ReaderCount } from "@/components/ui/reader-count"
-import { PAGE_WIDTH, SECTION_SPACING } from "@/lib/design-system"
+import { SECTION_SPACING } from "@/lib/design-system"
 import { ProjectLinks, plateOf } from "./project-links"
 import { plainText } from "./safe-html"
 
@@ -39,12 +39,9 @@ export default async function ProjectPage() {
   const leadPlateId = featured.find((project) => plateOf(project))?.id
 
   return (
-    <div className={PAGE_WIDTH.ledger}>
+    <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Projects</h1>
-        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          Products, public systems and engineering work I helped bring into production.
-        </p>
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 
@@ -66,7 +63,7 @@ export default async function ProjectPage() {
                         {project.title}
                       </InkLink>
                     </h3>
-                    <p className="mt-3 line-clamp-4 text-body text-ink-soft">{plainText(project.description)}</p>
+                    <p className="mt-3 line-clamp-4 max-w-[66ch] text-body text-ink-soft">{plainText(project.description)}</p>
                     <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-3" />
                     <ProjectLinks project={project} className="mt-3" />
                   </div>

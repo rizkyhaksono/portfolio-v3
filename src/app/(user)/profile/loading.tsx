@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 /** Static ruled stand-in for the profile sheet while the account server answers. No pulse. */
 export default function ProfileLoading() {
   return (
-    <div role="status" className="mx-auto w-full max-w-[44rem] border border-ink p-[3px]">
+    <div role="status" className="w-full border border-ink p-[3px]">
       <span className="sr-only">Loading your profile…</span>
       <div aria-hidden className="border border-rule p-5 sm:p-8">
         <div className="flex items-end gap-5 pb-6">

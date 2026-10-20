@@ -30,17 +30,4 @@ export const SECTION_SPACING = {
   sectionGap: "mt-3",
 } as const
 
-/**
- * Content width presets for page wrappers.
- * Prefer `default` inside BaseLayout (trust the container).
- */
-export const PAGE_WIDTH = {
-  default: "w-full",
-  prose: "mx-auto w-full max-w-3xl",
-  article: "mx-auto w-full max-w-5xl",
-  wide: "mx-auto w-full max-w-7xl",
-  ledger: "mx-auto w-full max-w-[60rem]",
-} as const
-
 export type SurfaceVariant = keyof typeof SURFACE
-export type PageWidth = keyof typeof PAGE_WIDTH

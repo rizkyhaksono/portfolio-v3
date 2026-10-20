@@ -49,9 +49,6 @@ export default async function StatsPage() {
     <BaseLayout>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Stats</h1>
-        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          The figures behind this site: who reads it, whether it is up, and how the practice is going.
-        </p>
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 

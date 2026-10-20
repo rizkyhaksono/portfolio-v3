@@ -13,7 +13,7 @@ interface NotFoundViewProps {
 /** Not found pattern: the mark, italic title, one standfirst, two ways back, and the riders cut from the plate. */
 export function NotFoundView({ title = "Page not found", children, className }: Readonly<NotFoundViewProps>) {
   return (
-    <section className={cn("mx-auto grid w-full max-w-[60rem] items-center gap-10 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] md:py-24", className)}>
+    <section className={cn("grid w-full items-center gap-10 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] md:py-24", className)}>
       <div>
         <Logo variant="mark" label="Rizky Haksono" className="mb-6 w-20 sm:w-24" />
         <h1 className="speckle font-display text-h1 text-balance text-ink">{title}</h1>

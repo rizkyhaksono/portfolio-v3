@@ -8,19 +8,19 @@ Unify Portfolio v3 UI so all boxes, sections, and page shells share one design l
 
 ## 2. System Goals
 - Three surfaces: frame (content), inset (nested rows), lift (floating layers only); glass is retired
-- Shared page recipe: BaseLayout → PageSection → SectionHeading → content (width presets are `PAGE_WIDTH`)
+- Shared page recipe: BaseLayout → PageSection → SectionHeading → content (one width: every page fills BaseLayout's wrapper; only running text caps at about 66ch)
 - Eliminate ad-hoc glass cards, double padding, and undefined max-widths
 - Document rules for Cursor, Claude, Gemini, and Copilot
 
 ## 3. Features
 
 ### 3.1 Design tokens
-- `src/lib/design-system.ts` exports `SURFACE`, `PAGE_WIDTH`, `SECTION_SPACING`
+- `src/lib/design-system.ts` exports `SURFACE`, `SECTION_SPACING` (`PAGE_WIDTH` was removed: pages no longer narrow)
 
 ### 3.2 Primitives
 - `Surface` — solid / glass / glass-static / inset
 - `PageSection` — mt-10 + optional SectionHeading
-- `PageBody` and `MacWindow` — removed in the one-ink redesign; width presets are `PAGE_WIDTH` in `src/lib/design-system.ts`
+- `PageBody` and `MacWindow` — removed in the one-ink redesign; pages take BaseLayout's width (see `docs/ui/page-shell.md`)
 
 ### 3.3 Migrations
 - Glass content cards (stats, duolingo, monkeytype, spotify) → solid

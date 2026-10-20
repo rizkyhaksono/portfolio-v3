@@ -41,9 +41,6 @@ export default function AIHub({ chat, initialTab }: Readonly<{ chat: ReactNode; 
     <div>
       <header className="pb-6 sm:pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Etan AI</h1>
-        <p className="mt-4 hidden max-w-[46ch] font-display text-lead text-ink-soft sm:block">
-          Ask about Rizky&apos;s work, read a document image, or check a job description against his record.
-        </p>
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 

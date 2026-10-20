@@ -62,7 +62,7 @@ The exclusions are deliberate: `radio-group.tsx` owns the one circle, code block
 
 ## Source of truth in code
 
-- Tokens: `src/app/globals.css` (`:root`, `.dark`, print), `tailwind.config.ts` (colours, `fontSize`, radius), `src/lib/design-system.ts` (`SURFACE`, `PAGE_WIDTH`, `SECTION_SPACING`)
+- Tokens: `src/app/globals.css` (`:root`, `.dark`, print), `tailwind.config.ts` (colours, `fontSize`, radius), `src/lib/design-system.ts` (`SURFACE`, `SECTION_SPACING`)
 - Fonts: `src/app/layout.tsx` (Literata via `next/font/google`)
 - Shell: `src/components/layout/base-layout.tsx`
 - Primitives: `src/components/ui/`

@@ -4,7 +4,6 @@ import remarkGfm from "remark-gfm"
 import { getAllChangelogs } from "@/lib/mdx"
 import BaseLayout from "@/components/layout/base-layout"
 import { LedgerList } from "@/components/ui/ledger"
-import { PAGE_WIDTH } from "@/lib/design-system"
 
 export const metadata: Metadata = {
   title: "Changelog | Rizky Haksono",
@@ -21,10 +20,9 @@ export default function ChangelogPage() {
 
   return (
     <BaseLayout>
-      <div className={PAGE_WIDTH.ledger}>
+      <div>
         <header className="pb-8">
           <h1 className="font-display text-h1 text-balance text-ink">Changelog</h1>
-          <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">What changed on this site, and when.</p>
           <p className="mt-4 text-body text-ink-soft">
             Follow it in a feed reader with the{" "}
             <a
@@ -60,7 +58,7 @@ export default function ChangelogPage() {
                     </a>
                   </h2>
                   <p className="mt-1 font-display text-caption text-ink-soft">Released {released(meta.date)}.</p>
-                  {meta.description && <p className="mt-3 text-body text-ink-soft">{meta.description}</p>}
+                  {meta.description && <p className="mt-3 max-w-[66ch] text-body text-ink-soft">{meta.description}</p>}
                   <div className="prose mt-4">
                     <MDXRemote source={content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
                   </div>

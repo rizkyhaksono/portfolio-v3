@@ -61,7 +61,7 @@ One family, Literata (variable, OFL), roman and italic, loaded with `next/font/g
 | `--font-display` | `font-display` | Literata for headings, display, numerals |
 | system mono | `font-mono` (code-block and kbd only) | Code, slugs, keys such as TRK-12, raw JSON, WPM passage, kbd |
 
-Italic is rationed. Italic: h1 to h4, the masthead, one standfirst per page, captions, datelines, pull quotes, numerals. Roman: body, prose, nav, buttons (15px / 600), labels (13px / 600), table heads (12px / 600, ink-soft), tags (12px), form values.
+Italic is rationed. Italic: h1 to h4, the masthead, an article's standfirst (page heads carry none), captions, datelines, pull quotes, numerals. Roman: body, prose, nav, buttons (15px / 600), labels (13px / 600), table heads (12px / 600, ink-soft), tags (12px), form values.
 
 ### Scale
 
@@ -73,7 +73,7 @@ Compact and fluid between 375px and 1280px, defined as `fontSize` keys in `tailw
 | `small` | 13 / 1.45 | |
 | `body` | 15 to 16 / 1.6 | |
 | `prose` | 16 to 17 / 1.65 | 66ch measure |
-| `lead` | 17 to 19 / 1.45 | Italic standfirst |
+| `lead` | 17 to 19 / 1.45 | Italic standfirst, articles only |
 | `h4` | 16 / 1.35 | |
 | `h3` | 18 to 20 / 1.3 | |
 | `h2` | 22 to 30 / 1.15 | |
@@ -148,7 +148,7 @@ The print stylesheet forces paper tokens, hides the running head, menu sheet and
 ## Shared class tokens
 
 ```ts
-import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/design-system"
+import { SURFACE, SURFACE_PADDING, SECTION_SPACING } from "@/lib/design-system"
 ```
 
 | Export | Keys | Use |
@@ -156,4 +156,3 @@ import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PAGE_WIDTH } from "@/lib/des
 | `SURFACE` | `solid` (frame), `inset`; `glass` and `glassNoBlur` are retired aliases of `solid` | Surface classes, see [surfaces.md](./surfaces.md) |
 | `SURFACE_PADDING` | `default`, `compact`, `cozy` | Inner padding |
 | `SECTION_SPACING` | `section` (`mt-12 sm:mt-16`), `sectionGap` (`mt-3`) | Section rhythm |
-| `PAGE_WIDTH` | `default`, `prose`, `article`, `wide`, `ledger` (`max-w-[60rem]`) | Width presets for page wrappers |

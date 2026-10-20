@@ -88,7 +88,7 @@ export default function SystemStatus() {
   return (
     <PageSection
       id="status"
-      heading={{ title: "Status", description: "Live health of the portfolio API and the services behind it." }}
+      heading={{ title: "Status" }}
       contentClassName="mt-6"
     >
       <div aria-busy={loading}>

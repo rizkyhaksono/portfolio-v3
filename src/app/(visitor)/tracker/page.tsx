@@ -19,9 +19,6 @@ export default async function TrackerPage() {
     <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Tracker</h1>
-        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          A public board of index cards. Anyone can read it; signed-in readers can add cards and move their own.
-        </p>
         <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
           {tasks.length > 0 && `${tasks.length} ${tasks.length === 1 ? "card" : "cards"} on the board, ${done} of them done. `}
           {currentUserId && (

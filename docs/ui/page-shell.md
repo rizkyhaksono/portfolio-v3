@@ -41,9 +41,15 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 | Primitive | File | Role |
 |---|---|---|
 | `PageSection` | `src/components/ui/page-section.tsx` | Section rhythm (`SECTION_SPACING.section`) and an optional `SectionHeading` |
-| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title in italic, optional description. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. |
+| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title in italic. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. `description` is for figures only (the LeetCode summary), never a standfirst. |
 
-Page heads sit on a double rule. One `h1` per page.
+One width for every page. Every visitor and user route fills BaseLayout's wrapper (`SHELL_WIDTH` in `layout/running-head.tsx`), so the page head starts on the logo's left edge and the widest rule or row ends under "Account". Pages never narrow or centre their outer container: no `mx-auto max-w-*` wrapper, no width preset. Admin keeps its own shell, and Auth keeps `AuthShell`.
+
+- **Page head.** The `h1`, then the double rule, both full width. No description, standfirst or italic lead under the title. Only short functional meta lines stay: counts, "Subscribe by RSS", "Times are Jakarta time.", datelines.
+- **Running text keeps a readable measure.** Prose, article bodies, chat messages, form text and excerpts cap at about 60 to 66ch (`.prose` is 66ch, otherwise `max-w-[66ch]`), left-aligned on the same edge. Never centre them.
+- **Ledgers.** Rows, rules and the marker (date) column span the full width.
+- **Articles.** `ArticleShell` starts on the shell's left edge: the 13rem rail, then a column that takes the rest; `.prose` inside it holds the 66ch measure. An article's own summary (a post or lesson description) may sit under its title as the one standfirst.
+- **Cards.** The Profile card and the Etan sign-in slip fill the width; their text keeps its measure.
 
 ## Page patterns
 
@@ -88,7 +94,9 @@ The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career,
 
 | Avoid | Use |
 |---|---|
-| Nested `max-w-6xl mx-auto px-4` inside BaseLayout | a `PAGE_WIDTH` preset from `src/lib/design-system.ts` |
-| `max-w-8xl` (undefined) | `PAGE_WIDTH` presets |
+| `mx-auto max-w-*` on a page wrapper, page head or section | Nothing: the page fills BaseLayout's wrapper |
+| A width preset or a narrower "ledger" or "article" column | The shell width; cap only running text with `max-w-[66ch]` |
+| A centred text column (`mx-auto max-w-[66ch]`) | Left-aligned `max-w-[66ch]` on the shell's left edge |
+| A description, standfirst or italic lead under a page `h1` | Nothing, or a short functional meta line (a count, a feed link, a dateline) |
 | A second `container` inside a page | Trust BaseLayout |
 | Horizontal scroll at 375px | Wrap, stack, or clip with `overflow-x: clip` |

@@ -2,7 +2,6 @@ import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationRow } from "@/app/_components/certification/certification-card"
 import { LedgerList } from "@/components/ui/ledger"
-import { PAGE_WIDTH } from "@/lib/design-system"
 
 export const revalidate = 3600
 
@@ -25,14 +24,14 @@ export default async function CertificatesPage() {
   for (const cert of certifications) years.set(yearOf(cert), [...(years.get(yearOf(cert)) ?? []), cert])
 
   return (
-    <div className={PAGE_WIDTH.ledger}>
+    <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Certificates</h1>
-        <p className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          {certifications.length > 0
-            ? `${certifications.length.toLocaleString("en")} certificates and courses on record, newest first.`
-            : "Certificates and courses on record."}
-        </p>
+        {certifications.length > 0 && (
+          <p className="mt-4 text-small text-ink-soft">
+            {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.
+          </p>
+        )}
       </header>
       <div aria-hidden className="h-[5px] border-y border-b-rule border-t-ink" />
 

@@ -105,7 +105,7 @@ function Letter({ message, quoted, canReply, canManage, onReply, onEdit, onDelet
           In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
         </p>
       )}
-      <p className="mt-2 whitespace-pre-wrap break-words text-body text-ink">{message.message}</p>
+      <p className="mt-2 max-w-[66ch] whitespace-pre-wrap break-words text-body text-ink">{message.message}</p>
 
       <div className="mt-1 flex flex-wrap items-center gap-x-5">
         {!Number.isNaN(date.getTime()) && (

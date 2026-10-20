@@ -118,7 +118,6 @@ export default function TermsOfServicePage() {
   return (
     <LegalDocument
       title="Terms of service"
-      standfirst="The few rules for reading, posting and learning here."
       dateline="Last updated 19 October 2026."
       prev={{ href: "/legal/privacy", title: "Privacy policy" }}
       sections={sections}

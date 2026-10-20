@@ -5,7 +5,7 @@ import { Logo } from "@/components/ui/logo"
 /** Signed-out chat: a ruled sign-in slip with the RH mark. Chat history is per user, so nothing is previewed. */
 export default function AIChatLocked() {
   return (
-    <section aria-labelledby="ai-signin-title" className="mx-auto max-w-[44rem] border border-ink p-[3px]">
+    <section aria-labelledby="ai-signin-title" className="border border-ink p-[3px]">
       <div className="grid gap-6 border border-rule p-6 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-8 sm:p-8">
         <Logo variant="mark" className="w-20 sm:w-24" />
         <div>
