@@ -1,10 +1,10 @@
 # Surfaces: frame, inset, lift
 
-There are exactly three surfaces. Each one is a plain ruled or filled area of the sheet, in ink and paper only. Do not blend them and do not invent a fourth.
+There are exactly three surfaces. Each one is something a printer could make on one sheet with one ink. Do not blend them and do not invent a fourth.
 
 | Surface | Looks like | Code | Use for |
 |---|---|---|---|
-| **Frame** | 1px `rule` hairline on the paper, transparent ground, radius 0, no shadow | `Card`, `Surface variant="solid"` (`SURFACE.solid` = `rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card |
+| **Frame** | 1px `rule` hairline on the paper, transparent ground, radius 0, no shadow | `Card`, `Surface variant="solid"` (`SURFACE.solid` = `rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card, plates |
 | **Inset** | `tint` ground, no border needed | `Surface variant="inset"` (`SURFACE.inset` = `bg-muted`) | Nested rows, code specimens, hover rows, inline status cells |
 | **Lift** | `paper` ground, 1px `ink` border, hard offset ink shadow `3px 3px 0` | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` inside the floating primitives | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command, Sonner toasts, the tracker card being dragged |
 
@@ -20,11 +20,10 @@ import { Surface } from "@/components/ui/surface"
 <Surface padding="compact">...</Surface>
 ```
 
-- Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet).
+- Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet, a plate).
 - Interactive frames show hover with the rule turning ink (`hover:border-ink`) or the row taking `bg-tint`. Never with a shadow or a lift.
 - Do not restate `border border-border bg-card` on `Card`; it is the default.
-- Page heads and the line above the colophon use the double rule (1px ink, 3px gap, 1px rule), not a frame.
-- A photo is not a frame either: it is a plate, a 1px ink border with orange crop marks (see [components.md](./components.md#plates)).
+- Page heads and the colophon use the double rule (1px ink, 3px gap, 1px rule), not a frame.
 
 ## Inset
 
@@ -33,12 +32,12 @@ import { Surface } from "@/components/ui/surface"
 ```
 
 - Tint is a ground, not a colour. Text on tint is `ink` or `ink-soft` only.
-- Code is an inset specimen: server `<pre>`, `bg-tint`, Plex Mono 13.5px, `tabIndex={0}`, no syntax colours.
+- Code is an inset specimen: server `<pre>`, `bg-tint`, system mono 13.5px, `tabIndex={0}`, no syntax colours.
 
 ## Lift
 
 - Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. Feature code should not add it by hand.
-- The scrim behind a modal is `--scrim` (ink at low opacity in light, paper in dark). No backdrop blur, ever.
+- The scrim behind a modal is ink at low opacity. No backdrop blur, ever.
 - Lift is the only shadow in the system. The soft shadow scale (small through 2xl), glows and coloured shadows are banned.
 
 ## Forbidden

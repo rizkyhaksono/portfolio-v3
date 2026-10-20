@@ -1,10 +1,10 @@
 # PRD — UI Layout Consistency
 
 > **2026-10-17:** the monochrome / grayscale language described in §1–3, §5.2 and §8 is superseded by §9 (one-ink redesign).
-> **2026-10-20:** §9's visual identity (Lautan Pasir) is in turn superseded by §10 (Drafting sheet). [`docs/ui/`](../docs/ui/README.md) is the source of truth for UI.
+> **2026-10-20:** release 1.6.0 (the Drafting sheet look) replaced §9 for a day and was reverted to this one-ink system in 1.7.0 at the owner's request; see §10. [`docs/ui/`](../docs/ui/README.md) is the source of truth for UI.
 
 ## 1. Overview
-Unify Portfolio v3 UI so all boxes, sections, and page shells share one design language (since 2026-10-20: the Drafting sheet, near-black ink on off-white paper with one orange mark, see §10). Encode the system in shared primitives and AI agent rules so future changes stay consistent.
+Unify Portfolio v3 UI so all boxes, sections, and page shells share one design language (since 2026-10-17: one cobalt ink on cream paper, see §9). Encode the system in shared primitives and AI agent rules so future changes stay consistent.
 
 ## 2. System Goals
 - Three surfaces: frame (content), inset (nested rows), lift (floating layers only); glass is retired
@@ -100,8 +100,8 @@ Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
 - Remove backend execution endpoint and Piston/Paiza configuration
 - Fall back to the default tool when an obsolete compiler URL is opened
 
-### 8.2 Dark palette (superseded by §10.2 Dark theme)
-- The grayscale dark hierarchy is retired; dark mode is the same sheet reversed (off-white ink on near-black paper)
+### 8.2 Dark palette (superseded by §9.2 Night print)
+- The grayscale dark hierarchy is retired; dark mode is the same sheet reversed (cream ink on night paper)
 
 ### 8.3 Stats and system status
 - Place system health directly below overview metrics
@@ -115,9 +115,7 @@ Out of scope: `api.nateee.com` WebSocket/API host until backend migrates.
 
 ---
 
-## 9. Track — One-ink redesign, "Lautan Pasir" (2026-10-17) — superseded by §10
-
-> **Superseded by §10 (2026-10-20).** The cobalt ink, cream paper, Literata, riso grain, Hollar engraving band, "Night print" and caldera logo described here are retired and gated out by grep gate 3. What still holds from §9: radius 0, the three surfaces (§9.3), the page patterns, the motion tiers (§9.4), the Umami rules (§9.5) and the governance structure (§9.6). Its token values and type rules are history.
+## 9. Track — One-ink redesign, "Lautan Pasir" (2026-10-17)
 
 Redesign every page as one printed publication: one cobalt ink on cream paper, riso grain, Literata italic headings, radius 0, hairline rules, and a Wenceslaus Hollar engraving band (*Landscape with a Rider*, 1650, Rijksmuseum, public domain). Delivered in three phases: P1 shell, home, tokens, Umami foundation and production fixes; P2 visitor pages; P3 `/ai`, profile, auth and admin. Full spec: [`docs/ui/`](../docs/ui/README.md).
 
@@ -126,7 +124,7 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 - Literata (roman and italic) via `next/font/google`; Instrument Serif, Bricolage Grotesque, Inter and JetBrains Mono removed. System mono for machine text only.
 
 ### 9.2 Night print
-- Same tokens flipped on `<html class="dark">`: cream ink on night paper #0D1433. No `dark:` classes. The default theme was the system until 2026-10-20; it is now Light (§10.2).
+- Same tokens flipped on `<html class="dark">`: cream ink on night paper #0D1433. No `dark:` classes. The default theme is Paper (light) since 1.7.0 (§10); System stays an option.
 
 ### 9.3 Surfaces and patterns
 - Three surfaces: frame, inset, lift (lift = 1px ink and a `3px 3px 0` ink shadow on floating layers only). No gradients, glass, blur or soft shadows.
@@ -145,46 +143,29 @@ Redesign every page as one printed publication: one cobalt ink on cream paper, r
 
 ### 9.7 Status (2026-10-19)
 - Phases 1–3 shipped on `redesign/phase-1`; every route uses a page pattern from `docs/ui/page-shell.md`.
-- Logo: printer's mark of the Tengger caldera (`docs/ui/README.md` → Brand).
-- Removed: Spotify and weather widgets, the anime tool (restored 2026-10-20, §10.10), `/signal`, recharts, motion, gsap, ogl, react-icons, date-fns.
+- Logo: replaced by the RH monogram in 1.7.0 (§10; `docs/ui/README.md` → Brand).
+- Removed: Spotify and weather widgets, `/signal`, recharts, motion, gsap, ogl, react-icons, date-fns.
 
 ---
 
-## 10. Track — Drafting sheet rebrand (2026-10-20, release 1.6.0)
+## 10. Track — Back to one ink, "One ink, new mark" (2026-10-20, release 1.7.0)
 
-Total identity change after the owner rejected Lautan Pasir: the caldera logo was busy and the wrong concept for an AI engineer, the italic "Rh" monogram was weak, a horse engraving sat under the masthead, and the portrait was small and pushed to the far right. Direction: engineering drafting sheet. Black and white plus one accent. Scope: a reskin, so page structure and page patterns stay, except that the home hero gains the portrait. Spec: [`docs/superpowers/specs/2026-10-19-drafting-sheet-rebrand-design.md`](../docs/superpowers/specs/2026-10-19-drafting-sheet-rebrand-design.md). UI rules: [`docs/ui/`](../docs/ui/README.md).
+Release 1.6.0 (the Drafting sheet: IBM Plex, black and white with one orange mark, grayscale plates, a title-block colophon) restyled the whole site. The owner wanted only the logo changed, so 1.7.0 reverts the visual system to the one-ink print of §9 (cobalt on cream, night print, Literata roman and italic, riso grain, duotone double-rule plates, the Hollar engraving band in the colophon, the 404 and auth views) and keeps the owner-approved changes below. The 1.6.0 spec and plan stay in `docs/superpowers/` marked superseded; the 1.6.0 changelog entry carries a forward note.
 
-### 10.1 Tokens and type
-- Nine tokens as HSL triples in `src/app/globals.css`, exposed as Tailwind colours: `paper` #F7F7F5 / #141414, `ink` #141414 / #F2F2EE, `ink-soft`, `rule`, `rule-strong`, `tint`, plus `mark` #FF4F00 / #FF6326, `mark-text` and `on-mark`. shadcn names map onto them (`ring` is `mark`); `--radius: 0rem`. `src/__tests__/unit/lib/contrast.test.ts` guards the contrast floors.
-- IBM Plex Sans (variable, normal style) and IBM Plex Mono (400 and 500) via `next/font/google`; Literata removed. No italic anywhere: `<em>`, `<i>` and `<cite>` are upright at weight 500, `<strong>` at 600. Headings are weight 600 on the size tokens.
+### 10.1 Kept from 1.6.0
+- RH monogram: `<Logo variant="mini" | "mark" | "tile">`, inline SVG in one ink (`mark` adds registration ticks at 60% ink opacity), generated by `node scripts/logo/make.mjs` (Node 22.18+) into `logo-art.ts`, `src/app/icon.svg`, `apple-icon.png`, `favicon.ico` (same path, the healthcheck needs it), `public/brand/{mark,tile,lockup}-{light,dark}.svg` and `og-mark.svg`. Every earlier logo is gone.
+- Home hero: the duotone portrait (`HeroPortrait`) sits beside the name from `lg` and under the job line below it; no engraving in the hero; the hero sentence keeps a 24px floor; About is text only with the italic drop cap.
+- Compact type scale (body 15 to 16px, h1 30 to 44px, display 44 to 104px, small 13px, caption 12px) and section rhythm `mt-12 sm:mt-16`.
+- Default theme Paper (light), `enableSystem` kept; labels Paper, Night, System.
+- Anime generator in `/tools` (cringe, blush, dance and quotes; waifu and neko stay hidden), `anime-generate` and `anime-quote` events.
+- `PlateFigure tone?: "photo" | "color"` (`color` skips the duotone for anime, Pokémon, OCR and site OG covers); the frame draws the focus outline when an interactive child is focused.
+- `ogImageUrl(params, path?)` always sets `v=3` so cached cards refresh.
+- Hover tips through `data-tip` (`ui/hover-tip.tsx`).
+- Contrast guard test `src/__tests__/unit/lib/contrast.test.ts`, with the one-ink floors.
 
-### 10.2 Dark theme
-- The same tokens flipped on `<html class="dark">`. Themes are named Light, Dark and System; the print-metaphor labels are gone. The default is Light (owner request, 2026-10-20): `ThemeProvider defaultTheme="light"` with `enableSystem` kept, so System is a choice and no longer the first-visit behaviour.
+### 10.2 Reverted
+- Fonts back to Literata (roman and italic); palette back to `paper`, `ink`, `ink-soft`, `rule`, `rule-strong`, `tint`; plates back to the duotone double rule; the engraving band, grain and speckle are back; the colophon is the one-ink colophon again.
+- Agent files and `docs/ui/` restored to the one-ink rules, edited for the kept changes. Both grep gates in `docs/ui/README.md` are byte-identical to the two in `CLAUDE.md`; the third (regression) gate of 1.6.0 is gone.
 
-### 10.3 One orange
-- `mark` appears only on the focus ring, the active nav underline, the reading hairline, the crop marks on plates and the logo `mark` variant, the last chart point, and text selection. Primary buttons and links stay ink.
-
-### 10.4 Logo
-- The RH monogram "a1" (shared stem, continuous crossbar, 45° leg). `<Logo variant="mini" | "mark" | "tile">` as inline SVG; `scripts/logo/make.mjs` generates `logo-art.ts`, `icon.svg`, `apple-icon.png`, `favicon.ico` (same path, needed by the Swarm healthchecks), `public/brand/*` and `og-mark.svg`.
-
-### 10.5 Plates and ornaments
-- `PlateFigure` frames photos in a 1px ink border with four orange crop marks and renders them in grayscale; `tone="color"` keeps colour for site OG covers, the OCR upload and sprites.
-- Ornaments are plain 1px rules. Grain, speckle, the engraving band, duotone filters and the fleuron are removed.
-
-### 10.6 Home, About and colophon
-- The portrait is in the home hero: the right column from 1024px, and inside the stage after the lead line below that. About is one text column with no drop cap.
-- The colophon is a title block (Drawn by, Role, Location, Revision, Set in, Contact) beside the `mark` logo. `NotFoundView` and the auth shell show the large `mark` logo.
-
-### 10.7 OG and certificate images
-- IBM Plex Sans 400 and 600 (`src/assets/fonts`) and `og-mark.svg`, on a light paper ground. Card URLs carry `v=2` through `ogImageUrl` so shared and cached copies refresh.
-
-### 10.8 Governance
-- All agent files and `docs/ui/` rewritten so agents stop steering back to Lautan Pasir. Three grep gates in `docs/ui/README.md`: gate 1 (banned classes), gate 2 (literals, now with `-I` and without the `font-mono` ban) and the new regression gate 3 that keeps the retired system out of `src` and `content`. All print nothing.
-- Changelog 1.6.0 "Drafting sheet" (`content/changelog/2026-10-20.mdx`); `package.json` is 1.6.0.
-
-### 10.9 Status (2026-10-20)
-- Code and docs complete on `redesign/phase-1`. Deploy is a push to `main`, after the build, local smoke and e2e checks.
-
-### 10.10 Owner requests (2026-10-20)
-- The anime generator is back in `/tools` (`?tab=anime-generator`, group Play): three image categories (cringe, blush, dance; waifu and neko stay hidden as the owner left them) and a quote tab, images in a colour `PlateFigure`, errors inline, `anime-generate` and `anime-quote` events. Source: `src/services/visitor/anime.ts` and `tools/_components/anime-generator-tab.tsx`.
-- The site opens in Light on every first visit (see §10.2).
+### 10.3 Status (2026-10-20)
+- Changelog 1.7.0 "One ink, new mark" (`content/changelog/2026-10-20-one-ink.mdx`); `package.json` is 1.7.0. `getAllChangelogs` breaks same-date ties by version, newest first.

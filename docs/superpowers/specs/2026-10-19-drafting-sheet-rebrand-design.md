@@ -1,3 +1,5 @@
+Superseded 2026-10-20: reverted to the one-ink style in 1.7.0 (owner wanted only the logo changed).
+
 # Drafting sheet rebrand: design
 
 Date: 2026-10-19 · Status: awaiting owner review · Supersedes: the Lautan Pasir system (release 1.5.0)

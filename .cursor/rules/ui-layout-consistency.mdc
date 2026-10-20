@@ -1,47 +1,41 @@
 ---
-description: Drafting sheet UI system for Portfolio v3 (near-black ink on off-white paper, IBM Plex, one orange mark). Enforce tokens, surfaces, page patterns, motion and analytics rules.
+description: One-ink UI system for Portfolio v3 (cobalt ink on cream paper). Enforce tokens, surfaces, page patterns, motion and analytics rules.
 globs: ["src/**/*.{tsx,ts,css}", "content/**/*.{md,mdx}", "tailwind.config.ts"]
 alwaysApply: true
 ---
 
-# UI system: drafting sheet
+# UI system: one ink on paper
 
 `docs/ui/` is the source of truth. This rule summarises it; when they disagree, `docs/ui/` wins.
 
-The whole site is a drafting sheet: near-black ink on off-white paper, IBM Plex, radius 0, hairline rules, and one orange mark colour used only on marks. Dark mode is the same sheet reversed. Hierarchy comes from size, weight and rules.
+The whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. Hierarchy comes from size, italic against roman, and rules.
 
-The earlier Lautan Pasir system (cobalt ink on cream paper, Literata italic, riso grain, an engraving band, the caldera logo) and the older monochrome / grayscale language, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and glass surfaces are retired. Never reintroduce them.
+The old monochrome / grayscale language, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and glass surfaces are retired. Never reintroduce them.
 
 ## Tokens
 
 Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed in `tailwind.config.ts`.
 
-| Class | Light | Dark | Role |
+| Class | Paper | Night | Role |
 |---|---|---|---|
-| `paper` | #F7F7F5 | #141414 | Page, card, text on solid ink |
-| `ink` | #141414 | #F2F2EE | Text, icons, strong rules, solid button, charts |
-| `ink-soft` | #5C5C57 | #A3A39C | Secondary text (paper or tint only) |
-| `rule` | #DCDCD7 | #33332F | Decorative hairlines |
-| `rule-strong` | #8A8A84 | #75756F | Control boundaries |
-| `tint` | #EDEDE9 | #1F1F1D | Hover row, code ground, inset |
-| `mark` | #FF4F00 | #FF6326 | Marks only (see Orange) |
-| `mark-text` | #C03A00 | #FF7A45 | Orange text, where unavoidable |
-| `on-mark` | #141414 | #141414 | Text on a `mark` fill, in both themes |
+| `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
+| `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `ink-soft` | #445BAA | #A9B5E3 | Secondary text (paper or tint only) |
+| `rule` | #BFC6DE | #2C3870 | Decorative hairlines |
+| `rule-strong` | #6476B2 | #7383C4 | Control boundaries |
+| `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
 
-- shadcn names map onto these (`background`/`card`/`popover` = paper, `foreground`/`primary`/`destructive` = ink, `ring` = mark, `muted`/`secondary`/`accent` = tint, `muted-foreground` = ink-soft, `border` = rule, `input` = rule-strong). `src/__tests__/unit/lib/contrast.test.ts` guards the contrast floors.
+- shadcn names map onto these (`background`/`card`/`popover` = paper, `foreground`/`primary`/`ring`/`destructive` = ink, `muted`/`secondary`/`accent` = tint, `muted-foreground` = ink-soft, `border` = rule, `input` = rule-strong).
 - **Never**: palette colours (`blue-500`, `neutral-*`, `zinc-*`, ...), hex in class names, `white` / `black`, opacity on text (`text-foreground/70`), `dark:` variants. Tokens flip on `<html class="dark">`.
 - Status, errors and destructive actions are shape plus word (8px square filled / outline / dashed, SVG cross, explicit verb). No red, green or amber.
 
-## Orange
-
-`mark` appears only on: the focus ring (`--ring`), the active nav underline (`aria-[current=page]:decoration-mark`), the article reading hairline, the crop marks on plates and the logo `mark` variant, the last point of a chart line, and text selection (`mark` fill, `on-mark` text). Primary buttons and links stay ink. If orange must carry text, use `mark-text`. Raw `orange-*` classes stay banned.
-
 ## Type
 
-- IBM Plex via `next/font/google`. Plex Sans (variable, normal style) is the whole voice: `font-sans` is `--font-sans`, `font-display` is only an alias. Plex Mono (400/500, `--font-mono`) is `font-mono`. `font-synthesis: none`.
-- Headings carry weight 600 on the `text-h1` to `text-h4` and `text-display` size tokens; `display` and `h1` set letter-spacing -0.02em. Body and captions are 400.
-- No italic anywhere. `<em>`, `<i>` and `<cite>` render upright at weight 500, `<strong>` at 600. The TipTap italic mark stays so authored content keeps its meaning.
-- Plex Mono only for code, kbd, slugs, keys, raw JSON and title-block values; never for small decorative labels. Figures stay in Plex Sans with `tabular-nums`.
+- Literata only, roman and italic, via `next/font/google` (`--font-serif`, `--font-display`). `font-synthesis: none`.
+- Italic: h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals.
+- Roman: body, prose, nav, buttons (15/600), labels (13/600), table heads (12/600 ink-soft), tags (12), form values.
+- Compact fluid scale (375 to 1280px), the `fontSize` keys in `tailwind.config.ts`: `body` 15 to 16px, `prose` 16 to 17, `lead` 17 to 19, `h3` 18 to 20, `h2` 22 to 30, `h1` 30 to 44, `display` 44 to 104, `numeral` 32 to 48, `small` 13, `caption` and `xs` 12. Use the keys, never ad-hoc sizes.
+- System mono (`ui-monospace, ...`) only for code, slugs, keys, raw JSON, WPM passage, kbd. `font-mono` class only in code-block and kbd files.
 - Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences. Links underline 1px, 2px on hover. `tabular-nums` in ledgers, tables, figures.
 
 ## Three surfaces only
@@ -59,13 +53,13 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 
 ## Shell and page patterns
 
-`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the menu sheet, `main#main` and the colophon (`TitleBlock`). No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
+`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the menu sheet, `main#main` and the colophon with the engraving band. No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
 
 | Pattern | Component | Routes |
 |---|---|---|
 | Ledger | `ui/ledger.tsx` | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Credentials, admin lists |
 | Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` | Covers, project shots, portrait, OCR specimen |
+| Plates | `ui/plate-figure.tsx` | Covers, project shots, home portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Board | Ruled columns of index cards | `/tracker` |
@@ -75,12 +69,19 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 | Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-- Widths via the `PAGE_WIDTH` presets in `src/lib/design-system.ts` (`default`, `prose`, `article`, `wide`, `ledger`). Section rhythm via `PageSection` (`mt-12 sm:mt-16`). Titles via `SectionHeading` (no `marker`).
+- Widths via `PageBody` (`PAGE_WIDTH`: `default`, `prose`, `article`, `wide`, `ledger`). Section rhythm via `PageSection` (`mt-12 sm:mt-16`). Titles via `SectionHeading` (no `marker`).
 - Charts are server SVG (`InkChart`, `InkHeatmap`, `HatchBar`). Never add recharts.
-- Photos use `PlateFigure`: 1px ink frame, four orange crop marks, grayscale (`tone="color"` for site OG covers, the OCR upload and sprites). Avatars use `.plate` with no marks. Logo only through `<Logo variant="mini" | "mark" | "tile">`.
-- Ornaments are plain 1px rules (`hr`, `.tail-piece`). No fleuron, grain, speckle, engraving or duotone.
-- Home hero: the portrait (`HeroPortrait`) is in the masthead stage, the right column from 1024px and directly after the lead line below it. About is one text column.
 - Fields are baseline only (`border-0 border-b border-input`). Buttons: `bg-ink text-paper`, never a `Button` inside a `Link` (use `asChild`).
+
+## Brand, plates and details
+
+- **Logo.** The RH monogram in one ink, only through `<Logo variant="mini" | "mark" | "tile">` (`ui/logo.tsx`): `mini` glyph in `currentColor` (running head, admin spine), `mark` adds four registration ticks at 60% ink (colophon, 404, auth, locked Etan AI view), `tile` reverses it out of an ink square. Never paste the SVG or recolour it. Art is generated by `node scripts/logo/make.mjs` (Node 22.18+); do not hand-edit `logo-art.ts`, `src/app/icon.svg`, `apple-icon.png`, `favicon.ico` or `public/brand/*`. `src/app/favicon.ico` must exist: the healthcheck fetches `/favicon.ico`.
+- **Home hero.** Italic name, job line, duotone portrait (`HeroPortrait` in `src/app/page.tsx`, a `PlateFigure`: right column from `lg`, under the job line below it) and the wordscroll sentence with a 24px floor on phones. No engraving in the hero. About is text only with an italic drop cap.
+- **PlateFigure.** `tone?: "photo" | "color"`. `photo` (default) is the duotone; `color` skips it (anime, Pokémon, OCR upload, site `/api/og` covers). The frame draws the focus outline when an interactive child is focused.
+- **Generated cards.** `ogImageUrl(params, path?)` in `src/lib/site-url.ts` always sets `v=3`.
+- **Hover tips.** `data-tip="..."` (`ui/hover-tip.tsx`), never the native `title`.
+- **Contrast guard.** `src/__tests__/unit/lib/contrast.test.ts` fails below ink on paper 7:1, ink-soft on paper and tint 4.5:1, rule-strong on paper 3:1 and the wordscroll ghost 3:1, in Paper and Night.
+- **Themes.** `defaultTheme="light"` with `enableSystem`; labels Paper, Night, System.
 
 ## Motion
 
@@ -96,24 +97,22 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 - Internal links: `data-track="nav-click" data-track-item="blog"`; the delegated listener in `deferred-client-utilities.tsx` forwards them. In code use `track()` from `src/lib/analytics.ts`.
 - Kebab-case, 50 characters or fewer, enum values only, one event per element, never PII. Event table in `docs/ui/components.md`.
 
-## Grep gates
+## Grep gate
 
-All three must print nothing: gate 1 bans classes, gate 2 bans literals, gate 3 keeps the retired Lautan Pasir system out. Gates 1 and 2 take `$PHASE_PATHS` (the files you touched, or `src` for a full run); gate 3 runs over `src content`. Hex copies of the tokens live only in `src/lib/print-hex.ts` and the generated `src/app/icon.svg`. Never add a new hit; make touched files pass.
+Both must print nothing for the paths you touched (`$PHASE_PATHS`; final run `src content`). Never add a new hit; make touched files pass.
 
 ```bash
 grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnIE "bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex|app/icon\.svg"
-grep -rnIE "\bitalic\b|font-style: ?italic|engrav|grain|speckle|Literata|plate-filters|logo-mask|#1E3C9E|#F3ECDC|#0D1433|#EFE6D2|Hollar|Tengger|caldera" src content \
-  | grep -vE "content/changelog/(2025-|2026-0|2026-10-19)|rich-text-editor.tsx"
+grep -rnIE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
 ```
 
 ## Checklist before shipping UI
 
 - [ ] Route uses one page pattern
-- [ ] Ink / paper tokens only; orange only where the Orange list allows; no hex, palette colours, `white` / `black`, `dark:`
+- [ ] Ink / paper tokens only; no hex, palette colours, `white` / `black`, `dark:`
 - [ ] Only frame, inset or lift
-- [ ] Plex Sans for text, Plex Mono only for machine text; no italic
+- [ ] Literata roles respected; mono only for machine text
 - [ ] No banned motion; reduced motion works
 - [ ] Umami attributes follow the button / external-link rule
 - [ ] Accessible: `aria-current`, 44px targets under 768px, chart text alternatives, no horizontal scroll at 375px
-- [ ] All three grep gates print nothing
+- [ ] Grep gate prints nothing

@@ -63,7 +63,11 @@ export function getAllChangelogs(): ChangelogContent[] {
         slug,
       }
     })
-    .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime() ||
+        b.meta.version.localeCompare(a.meta.version, undefined, { numeric: true })
+    )
 
   return changelogs
 }
