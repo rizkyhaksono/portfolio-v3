@@ -83,6 +83,16 @@ test.describe('Navigation', () => {
     await expect(page.locator('.ws__stage img')).toHaveCount(0);
   });
 
+  test('hero prints the press engraving from lg and drops it on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+    const press = page.locator('.ws__stage .engraving-press');
+    await expect(press).toBeVisible();
+    await expect(press).toHaveAttribute('aria-hidden', 'true');
+    await page.setViewportSize({ width: 375, height: 812 });
+    await expect(press).toBeHidden();
+  });
+
   // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).
   test('home hero sentence keeps the 24px large-text floor on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });

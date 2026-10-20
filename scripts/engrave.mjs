@@ -1,17 +1,19 @@
 // Prints the one-ink plates and paper textures (plan §4).
-// Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> > speckle-uri.txt
-// Source: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0).
-// The source scan lives in art-src/ outside the repo and is never committed.
-// Writes src/assets/plates/hollar-band-1600.webp and src/assets/paper/grain-{light,dark}.webp,
-// prints the speckle mask data URI to stdout (sizes go to stderr). Exits non-zero if any budget is blown.
+// Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> [<path/to/impressio-librorum-3840.jpg>] > speckle-uri.txt
+// Sources: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0);
+// Impressio librorum, Nova Reperta, after Jan van der Straet, publ. Galle, c. 1600, Museum Plantin-Moretus PK.OPB.0186.005 (PDM).
+// The source scans live in art-src/ outside the repo and are never committed.
+// Writes src/assets/plates/hollar-band-1600.webp, press-<w>.webp (when the second scan is given) and
+// src/assets/paper/grain-{light,dark}.webp, prints the speckle mask data URI to stdout (sizes go to stderr).
+// Exits non-zero if any budget is blown.
 import assert from "node:assert/strict"
 import fs from "node:fs"
 import path from "node:path"
 import sharp from "sharp"
 
-const [src] = process.argv.slice(2)
-if (!src || !fs.existsSync(src)) {
-  console.error("usage: bun scripts/engrave.mjs <hollar-landschap-met-ruiter-1650.jpg>")
+const [src, pressSrc] = process.argv.slice(2)
+if (!src || !fs.existsSync(src) || (pressSrc && !fs.existsSync(pressSrc))) {
+  console.error("usage: bun scripts/engrave.mjs <hollar-landschap-met-ruiter-1650.jpg> [<impressio-librorum-3840.jpg>]")
   process.exit(2)
 }
 
@@ -21,6 +23,10 @@ const INK = [0x1e, 0x3c, 0x9e] // --ink, light
 const CREAM = [0xef, 0xe6, 0xd2] // --ink, dark (cream)
 const CROP = { left: 330, top: 1500, width: 6150, height: 2620 } // excludes the plate caption line
 const THRESHOLD = 140
+// Press, both pressmen, the paper carrier and the proofreader; inside the plate border, above the signatures and caption.
+const PRESS_CROP = { left: 1790, top: 115, width: 1870, height: 2300 }
+const PRESS_THRESHOLD = 130
+const PRESS_WIDTH = 800 // 2.7x its widest render (~300 CSS px from lg); at 1200 the hatching costs ~165 KB
 
 // Smallest of lossless + lossy [80,70,60]; throws (non-zero exit) when even that is over budget.
 async function encode(rgba, width, height, budget, label) {
@@ -50,26 +56,31 @@ async function write(rel, buf) {
   fs.writeFileSync(file, buf)
 }
 
-// --- Band plate -------------------------------------------------------------
+// --- Plates -----------------------------------------------------------------
 // Greyscale via max(R,G,B) so any hand colouring or paper stain reads as paper, not ink.
-const { data, info } = await sharp(src).extract(CROP).removeAlpha().raw().toBuffer({ resolveWithObject: true })
-const gray = Buffer.alloc(info.width * info.height)
-for (let i = 0, j = 0; j < gray.length; i += info.channels, j++) gray[j] = Math.max(data[i], data[i + 1], data[i + 2])
+async function engrave(file, crop, threshold, sizes, name) {
+  const { data, info } = await sharp(file).extract(crop).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const gray = Buffer.alloc(info.width * info.height)
+  for (let i = 0, j = 0; j < gray.length; i += info.channels, j++) gray[j] = Math.max(data[i], data[i + 1], data[i + 2])
 
-for (const [width, budget] of [[1600, 72 * KB]]) {
-  const plate = await sharp(gray, { raw: { width: info.width, height: info.height, channels: 1 } })
-    .resize({ width })
-    .normalise({ lower: 2, upper: 98 })
-    .sharpen({ sigma: 0.6 })
-    .extractChannel(0) // sharp raw output is otherwise 3-channel
-    .threshold(THRESHOLD)
-    .raw()
-    .toBuffer({ resolveWithObject: true })
-  assert.equal(plate.info.channels, 1, "plate mask must be single-channel")
-  const ink = plate.data.map((v) => 255 - v) // dark line = opaque ink
-  const buf = await encode(tint(INK, ink), plate.info.width, plate.info.height, budget, `hollar-band-${width}`)
-  await write(`src/assets/plates/hollar-band-${width}.webp`, buf)
+  for (const [width, budget] of sizes) {
+    const plate = await sharp(gray, { raw: { width: info.width, height: info.height, channels: 1 } })
+      .resize({ width })
+      .normalise({ lower: 2, upper: 98 })
+      .sharpen({ sigma: 0.6 })
+      .extractChannel(0) // sharp raw output is otherwise 3-channel
+      .threshold(threshold)
+      .raw()
+      .toBuffer({ resolveWithObject: true })
+    assert.equal(plate.info.channels, 1, "plate mask must be single-channel")
+    const ink = plate.data.map((v) => 255 - v) // dark line = opaque ink
+    const buf = await encode(tint(INK, ink), plate.info.width, plate.info.height, budget, `${name}-${width}`)
+    await write(`src/assets/plates/${name}-${width}.webp`, buf)
+  }
 }
+
+await engrave(src, CROP, THRESHOLD, [[1600, 72 * KB]], "hollar-band")
+if (pressSrc) await engrave(pressSrc, PRESS_CROP, PRESS_THRESHOLD, [[PRESS_WIDTH, 70 * KB]], "press")
 
 // --- Paper textures ---------------------------------------------------------
 // Seeded so re-runs give byte-identical tiles. Per-pixel noise is seamless when tiled.

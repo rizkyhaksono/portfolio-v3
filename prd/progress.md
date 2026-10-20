@@ -48,7 +48,8 @@
 #### One ink returns (2026-10-20, release 1.7.0)
 - ✅ Visual system back to the one-ink print of 1.5.0 (cobalt on cream, night print, Literata roman and italic, riso grain, duotone double-rule plates, Hollar engraving band in the colophon, 404 and auth views); the 1.6.0 look is retired at the owner's request (only the logo was meant to change)
 - ✅ Logo: RH monogram in one ink (`mark` adds registration ticks at 60% opacity); `node scripts/logo/make.mjs` (Node 22.18+) writes `logo-art.ts`, `icon.svg`, `apple-icon.png`, `favicon.ico` (same path, healthchecks), `public/brand/{mark,tile,lockup}-{light,dark}.svg` and `og-mark.svg`
-- ✅ Home: text-only hero (name, job line, wordscroll sentence, links) centred in the pinned stage, h1 is the LCP; no hero image or engraving; hero sentence 24px floor
+- ✅ Home: hero (name, job line, wordscroll sentence, links) centred in the pinned stage, h1 is the LCP; no hero photo; hero sentence 24px floor
+- ✅ Hero press plate (owner's pick, an engraving that prints in on scroll): from `lg` the press from *Impressio librorum* (after Stradanus, c. 1600, Museum Plantin-Moretus, public domain) fills the column right of the text, cap line to link row, as an ink mask (`press-800.webp`, `scripts/engrave.mjs` second source); Tier 1 ink-in on the `.ws` timeline; text only below `lg`; credit in the colophon; e2e covers 1280 and 375
 - ✅ About: duotone portrait (`PlateFigure`, lazy `next/image`) as an 18rem left column from `md`, under the heading at up to 20rem on phones, beside the prose with the italic drop cap (owner: the portrait belongs in About, not the hero)
 - ✅ Compact type scale (body 15 to 16px, h1 30 to 44px, display 44 to 104px, small 13px, caption 12px), `SECTION_SPACING.section` `mt-12 sm:mt-16`
 - ✅ Default theme Paper (light), labels Paper / Night / System

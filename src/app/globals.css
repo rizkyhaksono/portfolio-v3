@@ -140,6 +140,10 @@
   -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
   mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
 }
+.engraving-press {
+  -webkit-mask-image: url("../assets/plates/press-800.webp");
+  mask-image: url("../assets/plates/press-800.webp");
+}
 
 /* Wordscroll: static and fully inked unless scroll timelines, motion and a tall enough viewport all exist. */
 .ws__stage {
@@ -153,6 +157,17 @@
   }
   to {
     color: hsl(var(--ink));
+    translate: 0 0;
+  }
+}
+/* The hero press plate prints the same way: a faint, mis-registered pull comes into register at full ink. */
+@keyframes press-ink {
+  from {
+    opacity: 0.15;
+    translate: 0.06em 0.04em;
+  }
+  to {
+    opacity: 1;
     translate: 0 0;
   }
 }
@@ -171,6 +186,12 @@
       display: inline-block;
       animation: ws-ink auto linear both;
       animation-timeline: --ws;
+    }
+    /* In step with the sentence: its first word starts at contain 4%, its last is inked at 50%. */
+    .ws .engraving-press {
+      animation: press-ink auto linear both;
+      animation-timeline: --ws;
+      animation-range: contain 4% contain 50%;
     }
   }
   @media (prefers-reduced-motion: no-preference) and (min-height: 561px) and (max-width: 767px) {

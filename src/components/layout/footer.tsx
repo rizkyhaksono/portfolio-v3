@@ -114,7 +114,8 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
         <div className="mt-12 flex flex-col gap-3 border-t border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
           <p className="max-w-[62ch] text-small text-ink-soft">
             Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar,{" "}
-            <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain).
+            <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain). Press after Jan van der
+            Straet, <cite>Impressio librorum</cite>, c. 1600, Museum Plantin-Moretus (public domain).
           </p>
           <div className="flex shrink-0 gap-x-5">
             <FeedbackButton />
