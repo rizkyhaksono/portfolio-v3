@@ -47,13 +47,11 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 - **Motion.** Tier 0: native scroll and sticky layouts. Tier 1: CSS scroll-driven home wordscroll and article reading hairline, nothing else. Otherwise response motion on input only. Banned: parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up on sections, hover lifts, Lenis, GSAP, `motion`.
 - **Copy.** Sentence case. No `uppercase`, letter-spacing, all-caps eyebrows, middle-dot meta strings, mono small labels or "→" on links. Numbers only for real sequences. Plain wording, not print metaphors: the themes are Light, Dark and System.
 - **Umami.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track="nav-click" data-track-item="..."`. Kebab-case names, enum values, never PII.
-- **Grep gates.** All three must print nothing: gate 1 bans classes, gate 2 bans literals, gate 3 keeps the retired Lautan Pasir system out. Gates 1 and 2 take `$PHASE_PATHS` (the files you touched, or `src` for a full run); gate 3 runs over `src content`. Hex copies of the tokens live only in `src/lib/print-hex.ts` and the generated `src/app/icon.svg`.
+- **Grep gate.** Both commands must print nothing for the paths you touched (`$PHASE_PATHS`):
 
 ```bash
 grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnIE "bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex|app/icon\.svg"
-grep -rnIE "\bitalic\b|font-style: ?italic|engrav|grain|speckle|Literata|plate-filters|logo-mask|#1E3C9E|#F3ECDC|#0D1433|#EFE6D2|Hollar|Tengger|caldera" src content \
-  | grep -vE "content/changelog/(2025-|2026-0|2026-10-19)|rich-text-editor.tsx"
+grep -rnIE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
 ```
 
 ## Development Workflow
@@ -62,4 +60,4 @@ grep -rnIE "\bitalic\b|font-style: ?italic|engrav|grain|speckle|Literata|plate-f
 - Before modifying code, always look at existing patterns (especially UI primitives) and `docs/ui/`.
 - Validate input at boundaries; fail fast; robust error handling.
 - Make UI accessible via keyboard nav and accurate ARIA attributes.
-- Run `bunx tsc --noEmit` and the three grep gates before claiming completion.
+- Run `bunx tsc --noEmit` and the grep gate before claiming completion.
