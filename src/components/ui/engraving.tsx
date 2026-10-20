@@ -7,7 +7,8 @@ const PLATE_LABEL = "A rider on a country road, after Wenceslaus Hollar, 1650"
 // The Hollar plate is ~2.35:1 with the rider at about 63% across, in the lower half.
 // Each crop reserves its box up front (no CLS) and aims the `.engraving` mask with --pos.
 const CROPS = {
-  band: { "--pos": "62% 100%", aspectRatio: "100 / 26", minHeight: 200, maxHeight: 440 },
+  // The floor only bites below ~770px wide; on phones it yields to 18svh so the band does not fill the screen.
+  band: { "--pos": "62% 100%", aspectRatio: "100 / 26", minHeight: "min(200px, 18svh)", maxHeight: 440 },
   masthead: { "--pos": "62% 80%", aspectRatio: "5 / 1" },
   riders: { "--pos": "80% 50%", aspectRatio: "4 / 3" },
 } as const

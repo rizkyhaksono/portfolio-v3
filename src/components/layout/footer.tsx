@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { SHELL_WIDTH } from "./running-head"
 
 const EMAIL = "mrizkyhaksono@gmail.com"
+const [MAILBOX, MAIL_DOMAIN] = EMAIL.split("@")
 
 const COLUMNS = [
   { column: "read", heading: "Read" },
@@ -74,17 +75,19 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
         <DoubleRule />
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="col-span-2 flex items-start gap-5 sm:col-span-3 lg:col-span-1">
-            <Logo variant="mark" className="w-24 shrink-0 sm:w-28" />
+            <Logo variant="mark" className="w-20 shrink-0 sm:w-28" />
             <div>
               <p className="font-display text-h3 text-ink">Rizky Haksono</p>
-              <p className="mt-1 text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+              <p className="mt-1 text-pretty text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
               <a
                 href={`mailto:${EMAIL}`}
                 data-track="email-click"
                 data-track-area="colophon"
                 className="mt-2 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
               >
-                {EMAIL}
+                {/* Below ~360px the address cannot fit beside the mark; it may break before the @, never mid-word. */}
+                {MAILBOX}
+                <wbr />@{MAIL_DOMAIN}
               </a>
             </div>
           </div>
