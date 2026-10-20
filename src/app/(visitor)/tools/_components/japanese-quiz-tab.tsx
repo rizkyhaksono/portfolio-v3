@@ -21,7 +21,7 @@ export function JapaneseQuizTab() {
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="text-sm font-semibold text-ink">Level</legend>
+        <legend className="text-small font-semibold text-ink">Level</legend>
         {levels.status === "error" ? (
           <div className="mt-2">
             <ToolError onRetry={levels.retry}>The JLPT levels did not load.</ToolError>

@@ -40,7 +40,7 @@ function ChoiceGroup<T extends string | number>({
 }: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
   return (
     <div role="group" aria-label={label}>
-      <p aria-hidden className="text-sm font-semibold text-ink">
+      <p aria-hidden className="text-small font-semibold text-ink">
         {label}
       </p>
       <div className="mt-1 grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">

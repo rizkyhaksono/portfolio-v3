@@ -8,7 +8,7 @@ import { PRINT_HEX } from '../../src/lib/print-hex.ts'
 
 // 64-unit square, 16px grid (4 units = 1px at 16). Stems R / shared / H-right, R bowl top bar,
 // one crossbar from the R stem to the H stem, 45° leg to the foot of the shared stem.
-// The leg's edges sit half a pixel off the grid so it rasterises as a crisp 2px stair at 16px.
+// The leg's edges sit half a pixel off the grid, so at 16px it rasterises as an anti-aliased stair.
 export const GLYPH = 'M4 8h8v48H4z M28 8h8v48h-8z M52 8h8v48h-8z M4 8h32v8H4z M4 28h56v8H4z M8 32h2l22 22v2h-6L8 38z'
 // Four L-ticks on the glyph's trim lines (box 4,8 to 60,56), for the "mark" viewBox -4 0 72 64.
 export const MARKS = 'M-3 8h4 M4 1v4 M63 8h4 M60 1v4 M-3 56h4 M4 59v4 M63 56h4 M60 59v4'

@@ -105,7 +105,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-8" aria-busy={isSubmitting}>
         <fieldset className="flex flex-col gap-3" aria-busy={uploading}>
-          <legend className="mb-3 text-sm font-semibold text-ink">Cover image</legend>
+          <legend className="mb-3 text-small font-semibold text-ink">Cover image</legend>
           {bannerUrl ? (
             <PlateFigure>
               <div className="relative aspect-[3/1]">

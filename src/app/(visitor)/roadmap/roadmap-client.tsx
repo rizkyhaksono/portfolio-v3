@@ -162,7 +162,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
         const minutes = lessons.reduce((total, lesson) => total + minutesOf(lesson.meta.duration), 0)
 
         return (
-          <TabsContent key={id} value={id} className="mt-12 focus-visible:outline-none">
+          <TabsContent key={id} value={id} className="mt-12">
             <section aria-labelledby={`${id}-title`}>
               <h2 id={`${id}-title`} className="font-display text-h2 text-balance text-ink">
                 {courseTitle(id)}
