@@ -77,6 +77,15 @@ test.describe('Navigation', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
   });
 
+  // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).
+  test('home hero sentence keeps the 24px large-text floor on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/');
+    const sentence = page.locator('.ws__stage p', { has: page.locator('.ws__w') });
+    const size = await sentence.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThanOrEqual(24);
+  });
+
   test('home hero fits the first screen of a short phone', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');

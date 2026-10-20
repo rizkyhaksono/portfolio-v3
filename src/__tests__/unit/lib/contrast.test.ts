@@ -65,7 +65,7 @@ describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, 
   })
 })
 
-// The unscrolled hero sentence is set at 24px or larger, which is large text, so its ghost colour needs 3:1.
+// The unscrolled hero sentence is large text (24px floor, asserted at 375x812 in __tests__/e2e/navigation.spec.ts), so its ghost needs 3:1.
 describe.each([["light", light, ":root"], ["dark", dark, "\\.dark"]] as const)("%s wordscroll ghost", (_theme, tokens, selector) => {
   it("the ghost colour over paper is at least 3:1", () => {
     const { token, alpha } = ghostOf(selector)

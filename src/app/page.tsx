@@ -25,32 +25,34 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
 function HeroPortrait({ className }: Readonly<{ className?: string }>) {
   return (
     <PlateFigure className={className}>
-      <Image src="/rizky.jpg" alt="Rizky Haksono" width={1200} height={1200} priority fetchPriority="high" sizes="(min-width: 1024px) 26rem, 20rem" />
+      <Image src="/rizky.jpg" alt="Rizky Haksono" width={1200} height={1200} priority fetchPriority="high" sizes="(min-width: 1024px) 26rem, (min-width: 640px) 36rem, 20rem" />
     </PlateFigure>
   )
 }
 
 /**
  * Masthead stage: the h1 never animates; only the sentence fills in word by word. The portrait is the LCP candidate.
- * From lg it is the right column and the two columns sit centred in the stage. Below lg it follows the lead,
- * capped in svh so the pinned stage still fits 375x667, and the sentence and links stand on the stage's foot.
- * The svh caps only bite below ~800px of height, so the stage still fits on 1280x600.
+ * From lg it is the right column and the two columns sit centred in the stage. Below lg it follows the lead and
+ * takes the stage's slack (100svh less the rest of the stage, never under its svh floor), so tall phones and tablets
+ * get a bigger plate instead of a void and 375x667 still fits; the sentence and links stand on the stage's foot.
+ * The lg svh caps only bite below ~800px of height, so the stage still fits on 1280x600.
  */
 function Masthead() {
   return (
     <WordScroll className={cn(SHELL_WIDTH, "flex flex-col py-10 sm:py-[min(4rem,8svh)] lg:justify-center")}>
       <div className="flex grow flex-col lg:grid lg:grow-0 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:gap-12">
-        {/* From lg the name is sized to its column (cqi) so it holds one line, and its cap height meets the
-            portrait's frame (-0.145em); the sentence and links then stand on the frame's foot. The bottom padding
-            clears the italic descenders, which hang below a 0.92 line box. */}
+        {/* From lg the name is sized to its column (13cqi of Literata italic is ~86% of it, one line) and its cap
+            height meets the portrait's top rule (-0.19em, measured); the sentence and links then stand on the
+            frame's foot. The bottom padding clears the italic descenders, which hang below a 0.92 line box.
+            Below sm the sentence keeps a 24px floor: its unscrolled ghost (3.17:1) passes as large text. */}
         <div className="flex grow flex-col lg:[container-type:inline-size]">
-          <h1 className="pb-[0.14em] font-display text-display text-balance text-ink [font-size:min(clamp(2.75rem,1.1961rem_+_6.6298vw,6.5rem),15svh)] lg:-mt-[0.145em] lg:[font-size:min(10.5cqi,14svh)]">
+          <h1 className="pb-[0.14em] font-display text-display text-balance text-ink [font-size:min(clamp(2.75rem,1.1961rem_+_6.6298vw,6.5rem),15svh)] lg:-mt-[0.19em] lg:[font-size:min(13cqi,14svh)]">
             Rizky Haksono
           </h1>
           <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-          <HeroPortrait className="mt-[min(2rem,4svh)] size-[min(24svh,20rem)] sm:size-[min(30svh,20rem)] lg:hidden" />
+          <HeroPortrait className="mt-[min(2rem,4svh)] size-[min(max(22svh,100svh_-_34rem),20rem)] sm:size-[min(max(30svh,100svh_-_36rem),36rem)] lg:hidden" />
           <InkedSentence
-            className="mt-auto max-w-[24ch] pt-[min(2rem,4svh)] text-h2 font-normal text-ink"
+            className="mt-auto max-w-[24ch] pt-[min(2rem,4svh)] text-h2 text-ink max-sm:text-[1.5rem]"
             text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
           />
           <ul className="mt-[min(2rem,4svh)] flex flex-wrap gap-x-6 text-body">
