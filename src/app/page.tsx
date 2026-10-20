@@ -67,6 +67,7 @@ function SectionSkeleton({ className }: Readonly<{ className: string }>) {
 export default function Home() {
   return (
     <BaseLayout bleed={<Masthead />}>
+      <div aria-hidden data-print-hide className="reading-hairline" />
       <AboutSection />
       <SkillSection />
       <Suspense fallback={<SectionSkeleton className="h-[48rem]" />}>

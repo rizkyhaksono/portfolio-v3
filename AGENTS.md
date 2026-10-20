@@ -109,7 +109,7 @@ Shared details agents trip on:
 ### Motion
 
 - Tier 0 (no JS): native scroll, smooth anchor scroll, sticky layouts. `overflow-x: clip` on `html` and `main` only, never on `body`, never `overflow: hidden` / `auto` on a sticky ancestor.
-- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home wordscroll and the article reading hairline. Nothing else.
+- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home wordscroll and the reading hairline (articles and home). Nothing else.
 - Response motion only: underline, button press, tab underline, accordion, dialog and sheet fade, toasts, tracker drag.
 - **Banned:** parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up or reveal on sections, hover lifts, Lenis, GSAP, `motion` / framer-motion.
 

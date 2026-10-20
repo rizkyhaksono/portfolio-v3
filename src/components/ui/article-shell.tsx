@@ -31,7 +31,7 @@ export interface ArticleShellProps {
 
 /**
  * Article pattern (server, no cookies): head on a double rule, a 13rem sticky rail beside a 66ch column,
- * a tail-piece and previous / next. The reading hairline under the running head is CSS only (`.reading-hairline`).
+ * a tail-piece and previous / next. The reading hairline under the running head is CSS only (`.reading-hairline`); home renders it too.
  */
 export function ArticleShell({
   title,

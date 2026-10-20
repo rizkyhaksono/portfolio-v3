@@ -86,7 +86,7 @@ Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed 
 ## Motion
 
 - Tier 0 (no JS): native scroll, sticky layouts, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (never `scroll-padding-top` on `html`: it scrolls the page whenever focus lands in the sticky head). `overflow-x: clip` on `html` and `main` only; never on `body`; never `overflow: hidden` / `auto` or `content-visibility` on a sticky ancestor.
-- Tier 1 (CSS, `@supports (animation-timeline: view())` + no-preference): home wordscroll and article reading hairline. Nothing else is scroll-linked.
+- Tier 1 (CSS, `@supports (animation-timeline: view())` + no-preference): home wordscroll and the reading hairline (articles and home). Nothing else is scroll-linked.
 - Response motion only: underline, `active:translate-y-px`, tab underline, accordion, dialog and sheet fade + 4px, toasts, tracker drag.
 - **Banned:** parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, pulse skeletons, fade-up / reveal on sections, `BlurFade`, Lenis, GSAP, `motion` / framer-motion. Nothing autoplays.
 - Reduced motion: durations .01ms, wordscroll fully inked, sticky stays.
