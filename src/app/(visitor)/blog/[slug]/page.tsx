@@ -100,10 +100,13 @@ export default async function BlogArticlePage({ params }: Props) {
             </p>
             <p>
               First printed on{" "}
-              <InkLink href={post.url} external>
-                DEV Community
-              </InkLink>
-              .
+              {/* The link's hidden new-tab note is an inline-block, which lets the full stop wrap alone. */}
+              <span className="whitespace-nowrap">
+                <InkLink href={post.url} external>
+                  DEV Community
+                </InkLink>
+                .
+              </span>
             </p>
           </>
         }

@@ -15,7 +15,7 @@ function Figures({ rows }: Readonly<{ rows: Figure[] }>) {
       {rows
         .filter((row): row is [string, number] => row[1] != null)
         .map(([label, value]) => (
-          <div key={label} className="grid grid-cols-[minmax(0,1fr)_auto] gap-4 py-2">
+          <div key={label} className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-2">
             <dt className="text-small text-ink-soft">{label}</dt>
             <dd className="font-display text-body tabular-nums text-ink">{n(value)}</dd>
           </div>

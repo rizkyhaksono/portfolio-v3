@@ -154,10 +154,12 @@ export default async function BlogPage() {
       ) : (
         <p className="py-10 font-display text-lead text-ink-soft">
           No writing could be fetched just now. Try again in a few minutes, or read it on{" "}
-          <InkLink href="https://dev.to/rizkyhaksono" external>
-            DEV Community
-          </InkLink>
-          .
+          <span className="whitespace-nowrap">
+            <InkLink href="https://dev.to/rizkyhaksono" external>
+              DEV Community
+            </InkLink>
+            .
+          </span>
         </p>
       )}
     </div>

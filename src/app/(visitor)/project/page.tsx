@@ -92,7 +92,7 @@ export default async function ProjectPage() {
           <LedgerList className="mt-6">
             {rest.map((project) => (
               <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} meta={new Date(project.created_at).getFullYear() || null}>
-                <p className="line-clamp-2">{plainText(project.description)}</p>
+                <p className="line-clamp-2 max-w-[60ch]">{plainText(project.description)}</p>
                 <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
                 <ProjectLinks project={project} className="mt-1" />
               </LedgerRow>

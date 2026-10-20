@@ -26,14 +26,19 @@ export default function AboutSection() {
       </p>
       <p>
         The short version is my{" "}
-        <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "about" }}>
-          résumé
-        </InkLink>
-        ; the long one is the{" "}
-        <InkLink href={PORTFOLIO_PDF_GOOGLE_DRIVE_URL} external event="portfolio-open" eventData={{ area: "about" }}>
-          portfolio (PDF)
-        </InkLink>
-        .
+        <span className="whitespace-nowrap">
+          <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "about" }}>
+            résumé
+          </InkLink>
+          ;
+        </span>{" "}
+        the long one is the{" "}
+        <span className="whitespace-nowrap">
+          <InkLink href={PORTFOLIO_PDF_GOOGLE_DRIVE_URL} external event="portfolio-open" eventData={{ area: "about" }}>
+            portfolio (PDF)
+          </InkLink>
+          .
+        </span>
       </p>
     </PageSection>
   )
