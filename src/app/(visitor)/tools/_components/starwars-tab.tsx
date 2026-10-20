@@ -33,7 +33,7 @@ interface Entry {
   extra?: string
 }
 
-/** A page of portraits or ships, with a pager and an inline error. */
+/** A page of plates (portraits or ships), with a pager and an inline error. */
 function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => Promise<{ data: Entry[]; totalPages: number }>; aspect: string; label: string }>) {
   const [page, setPage] = useState(1)
   const list = useToolData(useCallback(() => load(page), [load, page]))

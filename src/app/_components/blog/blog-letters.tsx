@@ -31,7 +31,7 @@ interface BlogLettersProps {
   url: string
 }
 
-/** DEV comments shown as letters (server, no JS); replies sit behind a left rule. */
+/** DEV comments printed as letters (server, no JS); replies sit behind a left rule. */
 export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps>) {
   return (
     <section id="letters" aria-labelledby="letters-title" className="mt-12 border-t border-ink pt-6">
@@ -52,7 +52,7 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
         <InkLink href={url} external>
           DEV Community
         </InkLink>
-        ; new letters appear here within the hour.
+        ; new letters are printed here within the hour.
       </p>
     </section>
   )

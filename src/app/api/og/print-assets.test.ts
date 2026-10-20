@@ -1,12 +1,16 @@
-import { loadPrintAssets } from "./print-assets"
+import { readFileSync } from "node:fs"
+import { join } from "node:path"
+import { withoutVariations } from "./print-assets"
 
-it("loads IBM Plex Sans 400 and 600 as WOFF and the mark as an SVG data URI", async () => {
-  const { fonts, mark } = await loadPrintAssets()
+const tags = (font: Buffer) =>
+  Array.from({ length: font.readUInt16BE(4) }, (_, i) => font.toString("latin1", 12 + i * 16, 16 + i * 16))
 
-  expect(fonts.map(({ name, weight, style }) => [name, weight, style])).toEqual([
-    ["IBM Plex Sans", 400, "normal"],
-    ["IBM Plex Sans", 600, "normal"],
-  ])
-  for (const { data } of fonts) expect(data.subarray(0, 4).toString("latin1")).toBe("wOFF")
-  expect(mark.startsWith("data:image/svg+xml;base64,")).toBe(true)
+it("hides only the fvar table from satori and leaves the file buffer untouched", () => {
+  const font = readFileSync(join(__dirname, "../../../assets/fonts/literata-italic.ttf"))
+  const patched = withoutVariations(font)
+
+  expect(tags(font)).toContain("fvar")
+  expect(tags(patched)).not.toContain("fvar")
+  expect(tags(patched)).toEqual(tags(font).map((tag) => (tag === "fvar" ? "_var" : tag)))
+  expect(patched.length).toBe(font.length)
 })

@@ -9,14 +9,14 @@ interface ProjectImageViewerProps {
   alt: string
 }
 
-/** The cover image, cropped for the column; selecting it opens the whole image in a dialog. */
+/** The cover as a plate, cropped for the column; selecting it opens the whole image in a dialog. */
 export default function ProjectImageViewer({ src, alt }: Readonly<ProjectImageViewerProps>) {
   return (
     <Dialog>
       <PlateFigure caption="Select the image to see it uncropped.">
         <DialogTrigger asChild>
           <button type="button" aria-label={`View the full image: ${alt}`} className="relative block aspect-[16/10] w-full cursor-zoom-in">
-            {/* `!`: the figure already frames it, so `.prose img`'s own frame must not apply. */}
+            {/* `!`: the plate already frames it, so `.prose img`'s own frame must not apply. */}
             <Image src={src} alt="" fill sizes="(min-width: 1024px) 66ch, 100vw" className="!border-0 object-cover object-top !p-0" priority />
           </button>
         </DialogTrigger>

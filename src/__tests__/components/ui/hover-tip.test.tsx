@@ -9,7 +9,7 @@ describe('HoverTip', () => {
     render(
       <>
         <HoverTip />
-        <button type="button" aria-label="Dark theme" data-tip="Switch to dark" />
+        <button type="button" aria-label="Night theme" data-tip="Switch to night" />
         <p>Elsewhere</p>
       </>,
     )
@@ -17,7 +17,7 @@ describe('HoverTip', () => {
 
     fireEvent.pointerOver(screen.getByRole('button'))
     expect(tip()).toBeVisible()
-    expect(tip()).toHaveTextContent('Switch to dark')
+    expect(tip()).toHaveTextContent('Switch to night')
 
     fireEvent.pointerOut(screen.getByRole('button'), { relatedTarget: screen.getByText('Elsewhere') })
     expect(tip()).not.toBeVisible()

@@ -8,7 +8,7 @@ export default function BlogNotFound() {
     <>
       <NotFoundView title="Article not found">
         <p>
-          There is no article at this address. It may have moved, or the link has a typo;{" "}
+          No article is printed at this address. It may have moved, or the link has a typo;{" "}
           <InkLink href="/blog">the writing index</InkLink> lists everything.
         </p>
       </NotFoundView>

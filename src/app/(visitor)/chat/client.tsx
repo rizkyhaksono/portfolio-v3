@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils"
 import { PublicChatMessage } from "@/commons/types/public-chat"
 
 const JSON_HEADERS = { "Content-Type": "application/json" }
-// Fixed zone so the server and the browser render the same dateline.
+// Fixed zone so the server and the browser print the same dateline.
 const STAMP = new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jakarta" })
 
 async function chatRequest(

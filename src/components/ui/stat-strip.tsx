@@ -10,7 +10,7 @@ interface StatStripProps {
   className?: string
 }
 
-/** Row of figures: caption above a tabular numeral, split by hairlines. */
+/** Row of figures: italic caption above a tabular italic numeral, split by hairlines. */
 export function StatStrip({ items, className }: Readonly<StatStripProps>) {
   return (
     <dl className={cn("grid grid-cols-2 border-y border-rule sm:grid-cols-4", className)}>

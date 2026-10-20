@@ -61,8 +61,8 @@ const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: strin
 ]
 
 const THEMES = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
+  { value: "light", label: "Paper" },
+  { value: "dark", label: "Night" },
   { value: "system", label: "System" },
 ] as const
 
@@ -99,7 +99,7 @@ interface UserData {
 const PAPER: CSSProperties = { backgroundColor: PRINT_HEX.paper, color: PRINT_HEX.ink }
 const NIGHT: CSSProperties = { backgroundColor: PRINT_HEX.night, color: PRINT_HEX.nightInk }
 
-/** The mini logo in each theme's own colours: light, dark, or half of each. */
+/** The mini logo printed in each theme's own ink: paper, night, or half of each. */
 function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
   return (
     <span aria-hidden className="relative block size-16 shrink-0 border border-rule">

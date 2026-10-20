@@ -1,0 +1,30 @@
+import type { CSSProperties } from "react"
+
+import { cn } from "@/lib/utils"
+
+const PLATE_LABEL = "A rider on a country road, after Wenceslaus Hollar, 1650"
+
+// The Hollar plate is ~2.35:1 with the rider at about 63% across, in the lower half.
+// Each crop reserves its box up front (no CLS) and aims the `.engraving` mask with --pos.
+const CROPS = {
+  band: { "--pos": "62% 100%", aspectRatio: "100 / 26", minHeight: 200, maxHeight: 440 },
+  masthead: { "--pos": "62% 80%", aspectRatio: "5 / 1" },
+  riders: { "--pos": "80% 50%", aspectRatio: "4 / 3" },
+} as const
+
+export type EngravingCrop = keyof typeof CROPS
+
+interface EngravingProps {
+  crop: EngravingCrop
+  className?: string
+  /** Decorative (aria-hidden) unless set; `true` uses the plate's own description. */
+  label?: boolean | string
+}
+
+export function Engraving({ crop, className, label }: EngravingProps) {
+  const a11y = label
+    ? { role: "img", "aria-label": typeof label === "string" ? label : PLATE_LABEL }
+    : { "aria-hidden": true }
+
+  return <div className={cn("engraving w-full", className)} style={CROPS[crop] as CSSProperties} {...a11y} />
+}

@@ -1,6 +1,6 @@
 import { X } from "lucide-react"
 
-/** A form-level message from the server, set like a field error: ink with a cross, announced on change. */
+/** A form-level message from the server, set like a field error: italic ink with a cross, announced on change. */
 export function FormAlert({ children }: Readonly<{ children?: React.ReactNode }>) {
   if (!children) return null
   return (

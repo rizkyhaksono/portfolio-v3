@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google"
+import { Literata } from "next/font/google"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { HoverTip } from "@/components/ui/hover-tip"
@@ -11,22 +11,24 @@ import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
 import { PRINT_HEX } from "@/lib/print-hex"
+import { PlateFilters } from "@/components/ui/plate-filters"
 // import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
-// Plex Sans is variable in next/font, so it takes no weight list. Plex Mono is static and stays off the preload list.
-const fontSans = IBM_Plex_Sans({
+// Literata only. Two instances so roman and italic each get their own fallback metrics.
+const fontSerif = Literata({
   subsets: ["latin"],
-  variable: "--font-sans",
+  style: "normal",
+  variable: "--font-serif",
   display: "swap",
   adjustFontFallback: true,
 })
-const fontMono = IBM_Plex_Mono({
+const fontDisplay = Literata({
   subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
+  style: "italic",
+  variable: "--font-display",
   display: "swap",
-  preload: false,
+  adjustFontFallback: true,
 })
 
 const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC
@@ -78,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSans.variable, fontMono.variable)} suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSerif.variable, fontDisplay.variable)} suppressHydrationWarning>
       <head>
         <JsonLd />
         {umamiEnabled && (
@@ -98,6 +100,7 @@ export default function RootLayout({
         )}
       </head>
       <body className="font-sans antialiased">
+        <PlateFilters />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
           <UmamiRecorder />

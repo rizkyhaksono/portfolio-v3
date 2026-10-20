@@ -233,7 +233,7 @@ export default function TerminalOverlay() {
             ))}
             <div className="mt-1 flex items-center gap-2">
               <samp aria-hidden>$</samp>
-              {/* kbd carries Plex Mono to the input, which inherits its font. */}
+              {/* kbd carries the system mono to the input, which inherits its font. */}
               <kbd className="flex flex-1">
                 <input
                   ref={inputRef}

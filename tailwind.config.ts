@@ -8,14 +8,18 @@ const config = {
 	theme: {
 		fontFamily: {
 			sans: [
-				'var(--font-sans)',
-				...fontFamily.sans
+				'var(--font-serif)',
+				...fontFamily.serif
+			],
+			serif: [
+				'var(--font-serif)',
+				...fontFamily.serif
 			],
 			display: [
-				'var(--font-sans)',
-				...fontFamily.sans
+				'var(--font-display)',
+				...fontFamily.serif
 			],
-			mono: ['var(--font-mono)', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
+			mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 		},
 		container: {
 			center: true,
@@ -64,12 +68,9 @@ const config = {
 				paper: 'hsl(var(--paper) / <alpha-value>)',
 				tint: 'hsl(var(--tint) / <alpha-value>)',
 				rule: 'hsl(var(--rule) / <alpha-value>)',
-				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)',
-				mark: 'hsl(var(--mark) / <alpha-value>)',
-				'mark-text': 'hsl(var(--mark-text) / <alpha-value>)',
-				'on-mark': 'hsl(var(--on-mark) / <alpha-value>)'
+				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)'
 			},
-			// Fluid 375 -> 1280px. Balance lives on the elements, not here.
+			// Fluid 375 -> 1280px. Italic/balance live on the elements, not here.
 			fontSize: {
 				xs: ['0.75rem', { lineHeight: '1.4' }],
 				caption: ['0.75rem', { lineHeight: '1.4' }],
@@ -77,11 +78,11 @@ const config = {
 				body: ['clamp(0.9375rem, 0.9116rem + 0.1105vw, 1rem)', { lineHeight: '1.6' }],
 				prose: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.65' }],
 				lead: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.45' }],
-				h4: ['1rem', { lineHeight: '1.35', fontWeight: '600' }],
-				h3: ['clamp(1.125rem, 1.0732rem + 0.221vw, 1.25rem)', { lineHeight: '1.3', fontWeight: '600' }],
-				h2: ['clamp(1.375rem, 1.1678rem + 0.884vw, 1.875rem)', { lineHeight: '1.15', fontWeight: '600' }],
-				h1: ['clamp(1.875rem, 1.5124rem + 1.547vw, 2.75rem)', { lineHeight: '1.08', fontWeight: '600', letterSpacing: '-0.02em' }],
-				display: ['clamp(2.75rem, 1.1961rem + 6.6298vw, 6.5rem)', { lineHeight: '0.95', fontWeight: '600', letterSpacing: '-0.02em' }],
+				h4: ['1rem', { lineHeight: '1.35' }],
+				h3: ['clamp(1.125rem, 1.0732rem + 0.221vw, 1.25rem)', { lineHeight: '1.3' }],
+				h2: ['clamp(1.375rem, 1.1678rem + 0.884vw, 1.875rem)', { lineHeight: '1.15' }],
+				h1: ['clamp(1.875rem, 1.5124rem + 1.547vw, 2.75rem)', { lineHeight: '1.08' }],
+				display: ['clamp(2.75rem, 1.1961rem + 6.6298vw, 6.5rem)', { lineHeight: '0.92', fontWeight: '360' }],
 				numeral: ['clamp(2rem, 1.5856rem + 1.768vw, 3rem)', { lineHeight: '1' }]
 			},
 			// Radius 0 everywhere; `full` only for radio dots.

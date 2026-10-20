@@ -107,11 +107,11 @@ export function InkChart({
           <>
             <div aria-hidden className="absolute inset-x-0 top-0 border-t border-dotted border-rule-strong" />
             <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-dotted border-rule-strong" />
-            <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption tabular-nums text-muted-foreground">
+            <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption italic tabular-nums text-muted-foreground">
               {formatY(fromZero ? top : highest)}
             </span>
             {!fromZero && (
-              <span aria-hidden className="absolute bottom-1 left-0 z-10 bg-background pr-1 text-caption tabular-nums text-muted-foreground">
+              <span aria-hidden className="absolute bottom-1 left-0 z-10 bg-background pr-1 text-caption italic tabular-nums text-muted-foreground">
                 {formatY(lowest)}
               </span>
             )}
@@ -149,19 +149,13 @@ export function InkChart({
             <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-ink/10" />
           ))}
         </svg>
-        {/* An HTML square, not an SVG rect: the stretched viewBox would draw a rect as a flat bar. */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 bg-mark"
-          style={{ left: `${px(n - 1)}%`, top: `${py(points[n - 1].y)}%` }}
-        />
       </div>
 
       {compact ? (
         table("sr-only")
       ) : (
         <>
-          <div aria-hidden className="mt-1.5 flex justify-between text-caption tabular-nums text-muted-foreground">
+          <div aria-hidden className="mt-1.5 flex justify-between text-caption italic tabular-nums text-muted-foreground">
             <span>{formatX(points[0].x)}</span>
             {n > 1 && <span>{formatX(points[n - 1].x)}</span>}
           </div>

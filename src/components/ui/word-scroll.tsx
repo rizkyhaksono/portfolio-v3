@@ -26,7 +26,7 @@ export function WordScroll({ children, className }: Readonly<{ children: ReactNo
 }
 
 /**
- * A sentence that fills in word by word on the `.ws` timeline. Real text nodes (copy and find work);
+ * A sentence that inks itself word by word on the `.ws` timeline. Real text nodes (copy and find work);
  * Firefox, older Safari, reduced motion and short viewports get it static and fully inked.
  * Inline-block words reach screen readers as separate objects with no spaces, so assistive tech gets
  * the sentence once as one sr-only run (unselectable, so a copy is not doubled) and skips the words.

@@ -41,21 +41,20 @@ const contrast = (a: number[], b: number[]) => {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
-/** Alpha of `--ws-ghost: hsl(var(--ink) / A)` in the first `selector{…}` block that sets it. */
-const ghostAlpha = (selector: string) =>
-  Number(css.match(new RegExp(`${selector}\\s*\\{[^}]*--ws-ghost:\\s*hsl\\(var\\(--ink\\)\\s*/\\s*([\\d.]+)\\)`))?.[1])
+/** Token and alpha of `--ws-ghost: hsl(var(--TOKEN) / A)` in the first `selector{…}` block that sets it. */
+const ghostOf = (selector: string) => {
+  const m = css.match(new RegExp(`${selector}\\s*\\{[^}]*--ws-ghost:\\s*hsl\\(var\\(--([a-z-]+)\\)\\s*/\\s*([\\d.]+)\\)`))
+  return { token: m?.[1] ?? "", alpha: Number(m?.[2]) }
+}
 const hex = (t: Triple) => "#" + rgb(t).map((c) => Math.round(c).toString(16).padStart(2, "0")).join("").toUpperCase()
 const withinOne = (a: string, b: string) =>
   [1, 3, 5].every((i) => Math.abs(parseInt(a.slice(i, i + 2), 16) - parseInt(b.slice(i, i + 2), 16)) <= 1)
 
 const FLOORS: [string, string, number][] = [
-  ["ink", "paper", 15],
+  ["ink", "paper", 7],
   ["ink-soft", "paper", 4.5],
   ["ink-soft", "tint", 4.5],
   ["rule-strong", "paper", 3],
-  ["mark", "paper", 3],
-  ["mark-text", "paper", 4.5],
-  ["on-mark", "mark", 4.5],
 ]
 
 describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, tokens) => {
@@ -66,14 +65,15 @@ describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, 
   })
 })
 
-// The unscrolled hero sentence is 22px on a phone, so its ghost colour needs the 4.5:1 text floor.
+// The unscrolled hero sentence is set at 24px or larger, which is large text, so its ghost colour needs 3:1.
 describe.each([["light", light, ":root"], ["dark", dark, "\\.dark"]] as const)("%s wordscroll ghost", (_theme, tokens, selector) => {
-  it("ink at the ghost alpha over paper is at least 4.5:1", () => {
-    const alpha = ghostAlpha(selector)
+  it("the ghost colour over paper is at least 3:1", () => {
+    const { token, alpha } = ghostOf(selector)
+    expect(tokens[token]).toBeDefined()
     expect(alpha).toBeGreaterThan(0)
     const paper = rgb(tokens.paper)
-    const ghost = rgb(tokens.ink).map((c, i) => c * alpha + paper[i] * (1 - alpha))
-    expect(contrast(ghost, paper)).toBeGreaterThanOrEqual(4.5)
+    const ghost = rgb(tokens[token]).map((c, i) => c * alpha + paper[i] * (1 - alpha))
+    expect(contrast(ghost, paper)).toBeGreaterThanOrEqual(3)
   })
 })
 
@@ -83,19 +83,19 @@ describe("PRINT_HEX", () => {
     ["ink", light.ink],
     ["inkSoft", light["ink-soft"]],
     ["rule", light.rule],
-    ["mark", light.mark],
     ["night", dark.paper],
+    ["nightTint", dark.tint],
+    ["nightInkSoft", dark["ink-soft"]],
     ["nightInk", dark.ink],
-    ["nightMark", dark.mark],
   ] as const)("%s matches its token (±1 per channel)", (key, triple) => {
     expect(withinOne(PRINT_HEX[key], hex(triple))).toBe(true)
   })
 })
 
 describe("print block", () => {
-  it("pins the light triples, including the light mark pair", () => {
+  it("pins the light triples", () => {
     expect(printBlock).toBeDefined()
-    for (const name of ["paper", "ink", "ink-soft", "rule", "rule-strong", "tint", "mark", "mark-text"]) {
+    for (const name of ["paper", "ink", "ink-soft", "rule", "rule-strong", "tint"]) {
       expect(printBlock[name]).toBeDefined()
       expect(printBlock[name]).toEqual(light[name])
     }

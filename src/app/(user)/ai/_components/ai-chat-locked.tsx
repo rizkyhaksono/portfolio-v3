@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/ui/logo"
 
-/** Signed-out chat: a ruled sign-in slip with the logo mark. Chat history is per user, so nothing is previewed. */
+/** Signed-out chat: a ruled sign-in slip with the printer's mark. Chat history is per user, so nothing is previewed. */
 export default function AIChatLocked() {
   return (
     <section aria-labelledby="ai-signin-title" className="mx-auto max-w-[44rem] border border-ink p-[3px]">

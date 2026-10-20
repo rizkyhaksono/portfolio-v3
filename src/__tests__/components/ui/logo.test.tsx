@@ -15,14 +15,14 @@ describe('Logo', () => {
     expect(paths[0]).toHaveAttribute('d', LOGO_ART.glyph)
   })
 
-  it('adds the orange crop marks to the labelled mark', () => {
+  it('adds the ink crop marks to the labelled mark', () => {
     render(<Logo variant="mark" label="Rizky Haksono" />)
     const svg = screen.getByRole('img', { name: 'Rizky Haksono' })
     expect(svg).toHaveAttribute('viewBox', '-4 0 72 64')
     const paths = svg.querySelectorAll('path')
     expect(paths[0]).toHaveAttribute('d', LOGO_ART.glyph)
     expect(paths[1]).toHaveAttribute('d', LOGO_ART.marks)
-    expect(paths[1]).toHaveClass('stroke-mark')
+    expect(paths[1]).toHaveClass('stroke-ink', 'opacity-60')
   })
 
   it('reverses the glyph out of an ink tile', () => {

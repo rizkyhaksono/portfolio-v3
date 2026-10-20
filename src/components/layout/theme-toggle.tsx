@@ -7,15 +7,15 @@ import { buttonVariants } from "@/components/ui/button"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
 
-/** Flips light and dark. The pressed state waits for mount, since the server cannot know the theme. */
+/** Flips paper and night print. The pressed state waits for mount, since the server cannot know the theme. */
 export function ThemeToggle({ className }: Readonly<{ className?: string }>) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
-  const isDark = resolvedTheme === "dark"
+  const isNight = resolvedTheme === "dark"
   const toggle = () => {
-    const to = isDark ? "light" : "dark"
+    const to = isNight ? "light" : "dark"
     setTheme(to)
     track("theme-toggle", { to })
   }
@@ -24,9 +24,9 @@ export function ThemeToggle({ className }: Readonly<{ className?: string }>) {
     <button
       type="button"
       onClick={toggle}
-      aria-label="Dark theme"
-      aria-pressed={mounted ? isDark : undefined}
-      data-tip={mounted && isDark ? "Switch to light" : "Switch to dark"}
+      aria-label="Night theme"
+      aria-pressed={mounted ? isNight : undefined}
+      data-tip={mounted && isNight ? "Switch to paper" : "Switch to night"}
       className={cn(buttonVariants({ variant: "ghost", size: "icon" }), className)}
     >
       <Contrast strokeWidth={1.5} aria-hidden />
