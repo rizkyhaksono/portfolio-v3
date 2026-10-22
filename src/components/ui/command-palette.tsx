@@ -39,6 +39,8 @@ export function CommandPalette({ open, onOpenChange: setOpen, onCloseAutoFocus }
   const [query, setQuery] = React.useState("")
   const [docs, setDocs] = React.useState<SearchDoc[] | null>(null)
   const [loading, setLoading] = React.useState(false)
+  // A failed index stays unloaded, so the next time search opens it is fetched again.
+  const [failed, setFailed] = React.useState(false)
   const router = useRouter()
   const { setTheme } = useTheme()
 
@@ -60,14 +62,15 @@ export function CommandPalette({ open, onOpenChange: setOpen, onCloseAutoFocus }
   }, [docs])
 
   React.useEffect(() => {
-    if (!open || docs || loading) return
+    if (!open) setFailed(false)
+    if (!open || docs || loading || failed) return
     setLoading(true)
     fetch("/api/search-index")
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
       .then((json: { docs: SearchDoc[] }) => setDocs(json.docs ?? []))
-      .catch(() => setDocs([]))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false))
-  }, [open, docs, loading])
+  }, [open, docs, loading, failed])
 
   const runCommand = React.useCallback(
     (callback: () => void) => {
@@ -111,7 +114,11 @@ export function CommandPalette({ open, onOpenChange: setOpen, onCloseAutoFocus }
       />
       <CommandList>
         <CommandEmpty>
-          {loading ? "Loading the index…" : "Nothing matches that search."}
+          {loading
+            ? "Loading the index…"
+            : failed
+              ? "Search did not load. Close it and open it again to retry."
+              : "Nothing matches that search."}
         </CommandEmpty>
 
         {query.trim() && results.length > 0 && (

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
+import { StatusLine } from "@/components/ui/status-line"
 import { PublicChatMessage } from "@/commons/types/public-chat"
 
 const JSON_HEADERS = { "Content-Type": "application/json" }
@@ -268,7 +269,9 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
 
       <div ref={listRef} tabIndex={0} aria-label="Messages" className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-rule">
       {stream.length === 0 ? (
-        <p className="py-10 font-display text-lead text-ink-soft">No messages yet. Yours could be the first.</p>
+        <StatusLine kind="empty" className="py-10">
+          No messages yet. Yours could be the first.
+        </StatusLine>
       ) : (
         <ol role="list" className="divide-y divide-rule">
           {stream.map((m, index) => {

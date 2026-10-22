@@ -1,57 +1,47 @@
 import { PublicChatMessage } from "@/commons/types/public-chat";
-import { cookies } from "next/headers";
+import { serverApiUrl } from "@/lib/api-base";
+import { getSessionToken } from "@/lib/session";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const chatUrl = () => `${serverApiUrl()}/v3/public-chat/public-chat`;
 
 // Public chat is always fresh — never cache these reads.
-const NO_STORE = { cache: "no-store", next: { revalidate: 0 } } as const;
+const NO_STORE = { cache: "no-store" } as const;
 
-export async function getInitialMessages(): Promise<PublicChatMessage[]> {
+/** Null when the API did not answer, which the page shows differently from an empty room. */
+export async function getInitialMessages(): Promise<PublicChatMessage[] | null> {
   try {
-    const response = await fetch(`${API_URL}/v3/public-chat/public-chat/?page=1&limit=50`, {
-      method: "GET",
-      ...NO_STORE,
-    });
-    if (!response.ok) return [];
+    const response = await fetch(`${chatUrl()}?page=1&limit=50`, NO_STORE);
+    if (!response.ok) return null;
     const result = await response.json();
     const messages: PublicChatMessage[] = result.data || [];
 
-    const messagesWithReplies = await Promise.all(
+    return await Promise.all(
       messages.map(async (message) => {
         const hasReplies = (message.replyCount && message.replyCount > 0) || (message._count?.replies && message._count.replies > 0);
-
-        if (hasReplies) {
-          try {
-            const repliesResponse = await fetch(
-              `${API_URL}/v3/public-chat/public-chat/${message.id}/replies?page=1&limit=50`,
-              { method: "GET", ...NO_STORE }
-            );
-            if (repliesResponse.ok) {
-              const repliesResult = await repliesResponse.json();
-              return { ...message, replies: repliesResult.data || [] };
-            }
-          } catch {
+        if (!hasReplies) return { ...message, replies: [] };
+        try {
+          const repliesResponse = await fetch(`${chatUrl()}/${encodeURIComponent(message.id)}/replies?page=1&limit=50`, NO_STORE);
+          if (repliesResponse.ok) {
+            const repliesResult = await repliesResponse.json();
+            return { ...message, replies: repliesResult.data || [] };
           }
+        } catch {
+          // A thread whose replies fail still shows its first letter.
         }
         return { ...message, replies: [] };
       })
     );
-
-    return messagesWithReplies;
   } catch {
-    return [];
+    return null;
   }
 }
 
 export async function getCurrentUser(): Promise<{ id: string; name: string } | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("NATEE_V3_TOKEN")?.value;
-
+  const token = await getSessionToken();
   if (!token) return null;
 
   try {
-    const response = await fetch(`${API_URL}/v3/me`, {
-      method: "GET",
+    const response = await fetch(`${serverApiUrl()}/v3/me`, {
       headers: { Authorization: `Bearer ${token}` },
       ...NO_STORE,
     });

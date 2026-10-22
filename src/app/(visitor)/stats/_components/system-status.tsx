@@ -6,7 +6,7 @@ import { PageSection } from "@/components/ui/page-section"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const POLL_MS = 30_000
+const POLL_MS = 60_000
 
 // Status by shape and word, never colour: filled, dashed outline, empty outline.
 const SHAPE: Record<ServiceStatus, string> = {
@@ -45,29 +45,33 @@ function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
   )
 }
 
+const timeOf = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+
 /**
  * Live health of the portfolio API and its dependencies, the `#status` strip on /stats. Checks on mount,
- * then every 30 seconds while the tab is visible. AI "not configured" means GENERATIVE_AI_API_KEY
- * is missing on the API host (Portainer), not in the web app.
+ * then every minute while the tab is visible. A failed check keeps the last answer on screen.
  */
 export default function SystemStatus() {
   const [data, setData] = useState<HealthData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [checking, setChecking] = useState(true)
+  const [failed, setFailed] = useState(false)
   const requestId = useRef(0)
 
-  const load = useCallback(async () => {
+  // Only the first check and a press of the button show progress; background polls change nothing until they answer.
+  const load = useCallback(async (visible: boolean) => {
     const currentRequest = ++requestId.current
-    setLoading(true)
+    if (visible) setChecking(true)
     const d = await getHealth()
     if (currentRequest !== requestId.current) return
-    setData(d)
-    setLoading(false)
+    if (d) setData(d)
+    setFailed(!d)
+    setChecking(false)
   }, [])
 
   useEffect(() => {
-    load()
+    load(true)
     const id = setInterval(() => {
-      if (!document.hidden) load()
+      if (!document.hidden) load(false)
     }, POLL_MS)
     return () => {
       clearInterval(id)
@@ -80,10 +84,10 @@ export default function SystemStatus() {
     ? hasApiService
       ? data.services
       : [{ name: "API", status: data.overall, latencyMs: null }, ...data.services]
-    : loading
+    : checking
       ? []
       : [{ name: "API", status: "down", latencyMs: null, detail: "Unreachable" }]
-  const overall: ServiceStatus | null = data?.overall ?? (loading ? null : "down")
+  const overall: ServiceStatus | null = data?.overall ?? (checking ? null : "down")
 
   return (
     <PageSection
@@ -91,14 +95,14 @@ export default function SystemStatus() {
       heading={{ title: "Status" }}
       contentClassName="mt-6"
     >
-      <div aria-busy={loading}>
+      <div aria-busy={checking}>
         <div className="flex flex-wrap items-center justify-between gap-4 border-y border-ink py-4">
           <p className="flex items-center gap-3 font-display text-h4 text-ink">
             {overall && <StatusMark status={overall} />}
             {overall ? HEADLINE[overall] : "Checking the services"}
           </p>
-          <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            {loading ? "Checking…" : "Check again"}
+          <Button variant="outline" size="sm" onClick={() => load(true)} disabled={checking}>
+            {checking ? "Checking…" : "Check again"}
           </Button>
         </div>
 
@@ -112,9 +116,10 @@ export default function SystemStatus() {
 
         {data?.checkedAt && (
           <p className="mt-3 font-display text-caption text-ink-soft">
-            Checked at{" "}
-            {new Date(data.checkedAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}. It checks again every
-            30 seconds while this page is open.
+            {failed
+              ? `The last check did not reach the API, so this is the answer from ${timeOf(data.checkedAt)}.`
+              : `Checked at ${timeOf(data.checkedAt)}.`}{" "}
+            It checks again every minute while this page is open.
           </p>
         )}
       </div>
