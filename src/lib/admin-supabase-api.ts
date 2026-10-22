@@ -1,5 +1,7 @@
-import { cookies } from "next/headers"
 import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { z } from "zod"
+import { serverApiUrl } from "@/lib/api-base"
+import { getSessionToken } from "@/lib/session"
 
 /**
  * Server-side helpers for the /api/admin/supabase routes.
@@ -18,13 +20,33 @@ export function isAllowedTable(table: string): table is AllowedTable {
   return (ALLOWED_TABLES as readonly string[]).includes(table)
 }
 
+const text = (max: number) => z.string().trim().max(max)
+// Stored links become hrefs and image sources on public pages, so only http(s) or site paths are kept.
+const link = z
+  .string()
+  .trim()
+  .max(2048)
+  .refine((value) => value === "" || /^https?:\/\//i.test(value) || (value.startsWith("/") && !value.startsWith("//")))
+  .nullable()
+
+const ROW_SCHEMAS = {
+  projects: z.object({ title: text(200), description: text(20_000), url: link, source_code: link, image: link }),
+  career: z.object({ title: text(200), subtitle: text(200), duration: text(100), image: link }),
+  education: z.object({ title: text(200), subtitle: text(200), duration: text(100), image: link }),
+} satisfies Record<AllowedTable, z.AnyZodObject>
+
+/** Keeps only the columns the dashboard edits; anything else in the body is dropped. */
+export function parseRow(table: AllowedTable, body: unknown, { partial }: { partial: boolean }) {
+  const schema: z.AnyZodObject = partial ? ROW_SCHEMAS[table].partial() : ROW_SCHEMAS[table]
+  return schema.safeParse(body)
+}
+
 /** Verifies the caller is the signed-in ADMIN via the backend /v3/me. Returns an error message or null. */
 export async function requireAdmin(): Promise<string | null> {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("NATEE_V3_TOKEN")?.value
+  const token = await getSessionToken()
   if (!token) return "Not authenticated"
 
-  const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL
+  const apiUrl = serverApiUrl()
   if (!apiUrl) return "API_URL is not configured"
 
   try {

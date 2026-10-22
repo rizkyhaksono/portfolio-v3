@@ -10,6 +10,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** The URL when it is http(s), else null: links from data must never become `javascript:` hrefs. */
+export function httpUrl(value?: string | null) {
+  if (!value) return null
+  try {
+    const url = new URL(value)
+    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null
+  } catch {
+    return null
+  }
+}
+
 // Same-origin paths only. Resolve like the browser does: it treats "//host" and "/\host" as
 // protocol-relative and strips tab/CR/LF, so "/\t/host" also leaves the site.
 export function safeRedirect(path: string | null | undefined, fallback = "/") {

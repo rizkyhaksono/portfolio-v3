@@ -35,13 +35,4 @@ export function stripHtml(html?: string | null) {
     .trim()
 }
 
-/** The URL when it is http(s), else null: user-sent links must never become `javascript:` hrefs. */
-export function httpUrl(value?: string | null) {
-  if (!value) return null
-  try {
-    const url = new URL(value)
-    return url.protocol === "http:" || url.protocol === "https:" ? url.href : null
-  } catch {
-    return null
-  }
-}
+export { httpUrl } from "@/lib/utils"
