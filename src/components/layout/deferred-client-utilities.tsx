@@ -31,8 +31,8 @@ function useUmamiRecorder(pathname: string) {
       if (loaded) window.location.reload()
       return
     }
-    // Signed-in visitors are never recorded.
-    if (loaded || /(?:^|; )NATEE_V3_TOKEN=/.test(document.cookie)) return
+    // Signed-in visitors are never recorded. Sessions from before the httpOnly cookie still show the token itself.
+    if (loaded || /(?:^|; )(?:NATEE_SIGNED_IN|NATEE_V3_TOKEN)=/.test(document.cookie)) return
 
     const load = () => {
       const script = document.createElement("script")

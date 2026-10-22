@@ -2,7 +2,7 @@
 
 import { putProfile, uploadBannerImage } from "@/services/user/profile";
 
-export async function updateProfile(id: string, formData: FormData) {
+export async function updateProfile(formData: FormData) {
   const profileData = {
     email: formData.get("email") as string,
     name: formData.get("name") as string,
@@ -11,7 +11,7 @@ export async function updateProfile(id: string, formData: FormData) {
     about: formData.get("about") as string,
     bannerUrl: formData.get("bannerUrl") as string,
   };
-  return await putProfile(id, profileData);
+  return await putProfile(profileData);
 }
 
 export async function uploadProfileBanner(formData: FormData): Promise<{ bannerUrl: string }> {

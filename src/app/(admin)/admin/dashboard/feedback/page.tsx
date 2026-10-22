@@ -1,13 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
-import { getClientAuthorizationHeader } from "@/commons/helpers/client-auth-header"
-import { updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
+import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { formatDay, httpUrl, timeAgo } from "@/components/layout/admin/admin-format"
 
 type Filter = FeedbackStatus | "all"
@@ -21,19 +20,6 @@ const FILTERS: { label: string; value: Filter }[] = [
 ]
 const STATUS_MARK = { new: "filled", read: "outline", archived: "dashed" } as const
 
-// shortcut: services/admin/feedback.ts cannot ask for a page yet; move this there when that file is next touched.
-async function fetchFeedback(filter: Filter, page: number): Promise<{ items: AdminFeedback[]; total: number }> {
-  const query = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) })
-  if (filter !== "all") query.set("status", filter)
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/feedback?${query}`, {
-    headers: getClientAuthorizationHeader(),
-    cache: "no-store",
-  })
-  const json = await res.json().catch(() => null)
-  if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Feedback did not load (${res.status}).`)
-  return json.data
-}
-
 const sentence = (word: string) => word.charAt(0).toLocaleUpperCase("en") + word.slice(1)
 
 /** Correspondence: one letter per message, newest first, with its status as a tag and the two moves it allows. */
@@ -43,20 +29,25 @@ export default function FeedbackAdminPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [state, setState] = useState<"loading" | "more" | "ready" | "failed">("loading")
+  // Switching filters while a page loads must not let the older answer land on the new list.
+  const latest = useRef(0)
 
   const load = useCallback(async (next: number) => {
+    const request = ++latest.current
     setState(next === 1 ? "loading" : "more")
     try {
-      const data = await fetchFeedback(filter, next)
+      const data = await getFeedbackClient({ status: filter === "all" ? undefined : filter, page: next, limit: PAGE_SIZE })
+      if (request !== latest.current) return
       setItems((prev) => (next === 1 ? data.items : [...prev, ...data.items]))
       setTotal(data.total)
       setPage(next)
       setState("ready")
-    } catch (error) {
+    } catch {
+      if (request !== latest.current) return
       if (next === 1) setState("failed")
       else {
         setState("ready")
-        toast.error(error instanceof Error ? error.message : "Older feedback did not load.")
+        toast.error("Older feedback did not load. Try again.")
       }
     }
   }, [filter])
@@ -72,8 +63,8 @@ export default function FeedbackAdminPage() {
       const leaves = filter !== "all" && filter !== status
       setItems((prev) => (leaves ? prev.filter((f) => f.id !== item.id) : prev.map((f) => (f.id === item.id ? { ...f, status } : f))))
       if (leaves) setTotal((n) => n - 1)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "The status did not change. Try again.")
+    } catch {
+      toast.error("The status did not change. Try again.")
     }
   }
 
