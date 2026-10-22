@@ -33,16 +33,18 @@ function Images() {
   useEffect(() => () => request.current?.abort(), [])
 
   const generate = async () => {
-    request.current = new AbortController()
+    request.current?.abort()
+    const controller = new AbortController()
+    request.current = controller
     setLoading(true)
     setFailed(false)
     try {
-      const blob = await getAnimeImage(category, request.current.signal)
+      const blob = await getAnimeImage(category, controller.signal)
       setPicture({ url: URL.createObjectURL(blob), category, extension: blob.type.split("/")[1] || "png" })
     } catch {
-      setFailed(true)
+      if (!controller.signal.aborted) setFailed(true)
     } finally {
-      setLoading(false)
+      if (request.current === controller) setLoading(false)
     }
   }
 

@@ -42,7 +42,7 @@ function TaskCard({ task, lifted, canDelete, onDelete, onMove }: Readonly<TaskCa
 
   return (
     <article className={cn("group border bg-paper p-3", lifted ? "border-ink shadow-[3px_3px_0_hsl(var(--ink))]" : "border-rule")}>
-      <h3 className="text-body text-ink">{task.title}</h3>
+      <h3 className="font-display text-h4 text-ink">{task.title}</h3>
       <p className="mt-1 text-small text-ink-soft">
         <code>{task.key}</code>. {TYPE_LABEL[task.type] ?? "Task"}, {priority} priority.
       </p>
@@ -125,13 +125,13 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
   }
 
   const move = (task: TrackerTask, status: TrackerStatus, order: number) => {
-    const snapshot = tasks
     setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status, order } : t)))
     updateTrackerTaskClient(task.id, { status, order })
       .then(() => track("tracker-card-move", { from: task.status, to: status }))
-      .catch((err) => {
-        setTasks(snapshot)
-        toast.error(err instanceof Error ? err.message : "The card could not be moved.")
+      .catch(() => {
+        // Put back only this card, so a later move that succeeded is not undone with it.
+        setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: task.status, order: task.order } : t)))
+        toast.error("The card could not be moved. Try again.")
       })
   }
 
@@ -158,8 +158,8 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
       setTasks((prev) => [created, ...prev])
       setAddStatus(null)
       toast.success("Card added.")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "The card could not be added.")
+    } catch {
+      toast.error("The card could not be added. Try again.")
     } finally {
       setSaving(false)
     }
@@ -169,14 +169,13 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
     const task = pendingDelete
     if (!task) return
     setPendingDelete(null)
-    const snapshot = tasks
     setTasks((prev) => prev.filter((t) => t.id !== task.id))
     try {
       await deleteTrackerTaskClient(task.id)
       toast.success("Card deleted.")
-    } catch (err) {
-      setTasks(snapshot)
-      toast.error(err instanceof Error ? err.message : "The card could not be deleted.")
+    } catch {
+      setTasks((prev) => (prev.some((t) => t.id === task.id) ? prev : [...prev, task]))
+      toast.error("The card could not be deleted. Try again.")
     }
   }
 

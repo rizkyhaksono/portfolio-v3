@@ -16,6 +16,7 @@ import {
   downloadFromYouTube,
 } from "@/services/visitor/downloader"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
+import { httpUrl } from "@/lib/utils"
 import { ToolError } from "./tool-status"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
@@ -38,6 +39,13 @@ const DOWNLOADERS = {
 
 type Result = { type: "instagram"; data: InstagramDownloadData } | { type: "standard"; data: DownloadResult }
 
+const failure = (status?: number) =>
+  status === 429
+    ? "Too many downloads in a minute. Wait a moment, then try again."
+    : status === 400
+      ? "That link is not supported. Paste a public TikTok, Instagram, YouTube, X or Facebook link."
+      : "That link did not work. Check that the post is public and try again."
+
 // Matches InkLink: an absolute sr-only box would sit on the first letter of an inline-flex link.
 const NewTabNote = () => (
   <span className="-mr-px inline-block size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"> (opens in a new tab)</span>
@@ -52,6 +60,7 @@ export function DownloaderTab() {
   const [copied, setCopied] = useState(false)
 
   const platform = PLATFORMS.find((p) => p.id === platformId) ?? PLATFORMS[0]
+  const downloadLinks = result?.type === "standard" ? (result.data.downloadLinks ?? []).filter((link) => httpUrl(link.url)) : []
 
   const copyShortcode = (text: string) =>
     navigator.clipboard
@@ -75,7 +84,7 @@ export function DownloaderTab() {
       const data = response.data as DownloadResult | InstagramDownloadData
       setResult("embedUrl" in data ? { type: "instagram", data } : { type: "standard", data })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "That link did not work. Check it and try again.")
+      setError(failure((err as { status?: number }).status))
     } finally {
       setIsLoading(false)
     }
@@ -142,25 +151,29 @@ export function DownloaderTab() {
           </dl>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <Button variant="outline" className="w-full" asChild>
-              <a href={result.data.embedUrl} target="_blank" rel="noopener noreferrer">
-                View the embed
-                <NewTabNote />
-              </a>
-            </Button>
-            <Button className="w-full" asChild>
-              <a href={result.data.directUrl} target="_blank" rel="noopener noreferrer">
-                Open the direct link
-                <NewTabNote />
-              </a>
-            </Button>
+            {httpUrl(result.data.embedUrl) && (
+              <Button variant="outline" className="w-full" asChild>
+                <a href={httpUrl(result.data.embedUrl)!} target="_blank" rel="noopener noreferrer">
+                  View the embed
+                  <NewTabNote />
+                </a>
+              </Button>
+            )}
+            {httpUrl(result.data.directUrl) && (
+              <Button className="w-full" asChild>
+                <a href={httpUrl(result.data.directUrl)!} target="_blank" rel="noopener noreferrer">
+                  Open the direct link
+                  <NewTabNote />
+                </a>
+              </Button>
+            )}
           </div>
           <p className="font-display text-caption text-ink-soft">Open the direct link, then save the video or image from your browser.</p>
         </article>
       )}
 
       {result?.type === "standard" &&
-        (result.data.downloadLinks?.length ? (
+        (downloadLinks.length ? (
           <article className="border border-rule">
             {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
               <PlateFigure className="p-3 pb-0">
@@ -181,7 +194,7 @@ export function DownloaderTab() {
                 .
               </p>
               <ul role="list" className="space-y-2">
-                {result.data.downloadLinks.map((link, i) => (
+                {downloadLinks.map((link, i) => (
                   <li key={link.url}>
                     <Button variant={i === 0 ? "default" : "outline"} className="w-full justify-between" asChild>
                       <a href={link.url} download target="_blank" rel="noopener noreferrer">
