@@ -32,6 +32,7 @@ export async function getChessStats(): Promise<ChessStats | null> {
   try {
     const res = await fetch(`https://api.chess.com/pub/player/${username}/stats`, {
       next: { revalidate: 1800 },
+      signal: AbortSignal.timeout(5000),
     })
 
     if (!res.ok) return null

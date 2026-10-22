@@ -20,20 +20,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/stats" },
 }
 
-// shortcut: the render stops waiting after 5 s but the source fetch runs on; give leetcode.ts, chess.ts and npm.ts
-// their own AbortSignal.timeout(5000) when those services are next touched.
-const within5s = <T,>(promise: Promise<T>) =>
-  Promise.race([promise, new Promise<null>((resolve) => setTimeout(resolve, 5000, null))])
-
 export default async function StatsPage() {
+  // LeetCode, Chess.com and npm each give up after five seconds, so a slow source cannot hold the render.
   const [stats, daily, reads, leetcode, typing, chess, npm] = await Promise.all([
     getUmamiStats(),
     getDailyPageviews(30),
     getPathReads(),
-    within5s(getLeetCodeStats()),
+    getLeetCodeStats(),
     getMonkeyTypeData(),
-    within5s(getChessStats()),
-    within5s(getNpmStats()),
+    getChessStats(),
+    getNpmStats(),
   ])
 
   const strip: StatItem[] = [

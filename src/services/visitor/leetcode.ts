@@ -111,6 +111,7 @@ export async function getLeetCodeStats(): Promise<LeetCodeStats> {
       headers: { "Content-Type": "application/json", Referer: "https://leetcode.com" },
       body: JSON.stringify({ query: QUERY, variables: { username } }),
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
     })
     if (!res.ok) return null
 

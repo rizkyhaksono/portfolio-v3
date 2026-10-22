@@ -4,6 +4,9 @@ import { PRINT_HEX } from "@/lib/print-hex"
 
 export const RULE_HEX = PRINT_HEX.rule
 
+/** Card URLs carry `v=` (see ogImageUrl), so a design change gets a new URL and a long cache is safe. */
+export const CARD_HEADERS = { "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=604800" }
+
 /**
  * Satori's font parser throws on a variable font's `fvar` table. Renaming that one table tag in memory
  * makes it skip the variations and draw the default instance (opsz 12, wght 400); the file stays upstream.
