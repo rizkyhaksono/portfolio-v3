@@ -1,7 +1,59 @@
 import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
 
+const originOf = (url?: string) => {
+  try {
+    return url ? new URL(url).origin : undefined
+  } catch {
+    return undefined
+  }
+}
+
+const isDev = process.env.NODE_ENV !== 'production'
+const supabaseOrigin = originOf(process.env.NEXT_PUBLIC_SUPABASE_URL)
+const umamiOrigins = [originOf(process.env.NEXT_PUBLIC_UMAMI_SRC), originOf(process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC)]
+const TURNSTILE = 'https://challenges.cloudflare.com'
+const sources = (...list: (string | undefined)[]) => [...new Set(list.filter(Boolean))].join(' ')
+
+// Nonces would make every page dynamic, so inline scripts stay allowed; the value is in pinning
+// where scripts, connections and frames may come from, and in refusing to be framed.
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  `script-src ${sources("'self'", "'unsafe-inline'", isDev ? "'unsafe-eval'" : undefined, ...umamiOrigins, TURNSTILE)}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  `connect-src ${sources(
+    "'self'",
+    originOf(process.env.NEXT_PUBLIC_API_URL),
+    supabaseOrigin,
+    ...umamiOrigins,
+    'https://api.emailjs.com',
+    'https://api.dictionaryapi.dev',
+    TURNSTILE,
+    isDev ? 'ws: http://localhost:*' : undefined,
+  )}`,
+  "media-src 'self' blob: https:",
+  `frame-src ${TURNSTILE} https://www.youtube-nocookie.com`,
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ')
+
+const SECURITY_HEADERS = [
+  { key: 'Content-Security-Policy', value: CONTENT_SECURITY_POLICY },
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), payment=(), usb=(), microphone=(self)' },
+]
+
 const nextConfig: NextConfig = {
+  async headers() {
+    return [{ source: '/:path*', headers: SECURITY_HEADERS }]
+  },
   // Standalone output is required by the Docker image (Dockerfile copies .next/standalone).
   // Disabled on Windows only, where it triggers an EBUSY file-lock during local builds.
   output: process.platform === "win32" ? undefined : "standalone",
@@ -33,8 +85,10 @@ const nextConfig: NextConfig = {
     // Admin-entered images (blog covers, project shots) are rendered `unoptimized`, so any host works
     // without turning this server into an open image proxy.
     remotePatterns: [
-      // Project covers (Supabase Storage signed/public URLs)
-      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/**" },
+      // Project covers (Supabase Storage signed/public URLs), from this site's own project only
+      ...(supabaseOrigin
+        ? [{ protocol: "https" as const, hostname: new URL(supabaseOrigin).hostname, pathname: "/storage/v1/object/**" }]
+        : []),
       // DEV.to covers, comment avatars and article-body images
       { protocol: "https", hostname: "media2.dev.to" },
       { protocol: "https", hostname: "dev-to-uploads.s3.amazonaws.com" },
