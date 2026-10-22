@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
+import { StatusLine } from "@/components/ui/status-line"
 import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { formatDay, httpUrl, timeAgo } from "@/components/layout/admin/admin-format"
 
@@ -69,7 +70,7 @@ export default function FeedbackAdminPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[46rem]">
+    <div className="w-full max-w-[60rem]">
       <div role="group" aria-label="Show feedback" className="flex flex-wrap gap-x-6 border-b border-rule">
         {FILTERS.map((f) => (
           <button
@@ -97,19 +98,24 @@ export default function FeedbackAdminPage() {
       )}
 
       {state === "failed" && (
-        <div className="py-10 text-center">
-          <p className="text-small text-ink-soft">Feedback did not load. The API may be down for a moment.</p>
-          <Button variant="outline" size="sm" className="mt-3" onClick={() => void load(1)}>
-            Try again
-          </Button>
-        </div>
+        <StatusLine
+          kind="failed"
+          className="mt-6"
+          action={
+            <Button variant="outline" size="sm" onClick={() => void load(1)}>
+              Try again
+            </Button>
+          }
+        >
+          Feedback did not load. The API may be down for a moment.
+        </StatusLine>
       )}
 
       {(state === "ready" || state === "more") &&
         (items.length === 0 ? (
-          <p className="py-10 text-center font-display text-small text-ink-soft">
+          <StatusLine kind="empty" className="py-10">
             {filter === "all" ? "No feedback yet." : `Nothing marked ${filter === "new" ? "new" : filter}.`}
-          </p>
+          </StatusLine>
         ) : (
           <>
             <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
@@ -130,7 +136,7 @@ export default function FeedbackAdminPage() {
                       <p className="mt-2 font-display text-caption text-ink-soft">
                         Sent {formatDay(f.createdAt)}, {timeAgo(f.createdAt)}.
                       </p>
-                      <p className="mt-3 whitespace-pre-wrap break-words text-body text-ink">{f.message}</p>
+                      <p className="mt-3 max-w-[66ch] whitespace-pre-wrap break-words text-body text-ink">{f.message}</p>
                       {(f.email || f.pageUrl) && (
                         <div className="mt-3 space-y-1 border-l border-ink pl-4 text-small text-ink-soft">
                           {f.email && (
@@ -170,7 +176,7 @@ export default function FeedbackAdminPage() {
               })}
             </ol>
             {items.length < total && (
-              <div className="border-t border-rule pt-6 text-center">
+              <div className="border-t border-rule pt-6">
                 <Button variant="outline" onClick={() => void load(page + 1)} disabled={state === "more"} aria-busy={state === "more"}>
                   {state === "more" ? "Loading…" : "Load older feedback"}
                 </Button>

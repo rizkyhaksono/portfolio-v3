@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 /** Static ruled skeleton at roughly the final height: a figure strip and a ledger. No pulse. */
 export default function AdminLoading() {
   return (
-    <div aria-busy="true" className="mx-auto w-full max-w-[60rem]">
+    <div aria-busy="true" className="w-full max-w-[60rem]">
       <p className="sr-only">Loading</p>
       <div className="grid grid-cols-2 border-y border-rule sm:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (

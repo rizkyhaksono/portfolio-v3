@@ -169,8 +169,8 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
       </div>
 
       <fieldset>
-        <legend className="w-full py-4 text-center">
-          <span lang="ja" className="block text-h1 text-ink">
+        <legend className="w-full py-4">
+          <span lang="ja" className="block font-display text-h1 text-ink">
             {q.word}
           </span>
           <span lang="ja" className="mt-2 block text-h4 text-ink-soft">

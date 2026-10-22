@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { isSiteImage } from "@/lib/site-url"
 import { canOptimizeImage } from "@/lib/image-hosts"
+import { StatusLine } from "@/components/ui/status-line"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -84,7 +85,7 @@ export default async function BlogPage() {
     <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Writing</h1>
-        <p className="mt-4 text-small text-ink-soft">
+        <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
           {lead && `${sourcesSentence(posts)} `}
           {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
           <a
@@ -149,7 +150,7 @@ export default async function BlogPage() {
           ))}
         </>
       ) : (
-        <p className="py-10 font-display text-lead text-ink-soft">
+        <StatusLine kind="failed" className="mt-8">
           No writing could be fetched just now. Try again in a few minutes, or read it on{" "}
           <span className="whitespace-nowrap">
             <InkLink href="https://dev.to/rizkyhaksono" external>
@@ -157,7 +158,7 @@ export default async function BlogPage() {
             </InkLink>
             .
           </span>
-        </p>
+        </StatusLine>
       )}
     </div>
   )

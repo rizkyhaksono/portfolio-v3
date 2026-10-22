@@ -3,12 +3,13 @@ import { Search } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { navTrack } from "@/commons/constants/navigation-menu"
 import { cn } from "@/lib/utils"
+import { SHELL_WIDTH } from "@/lib/design-system"
 import { Logo } from "@/components/ui/logo"
 import { NavLinks } from "./nav-links"
 import { ThemeToggle } from "./theme-toggle"
 import { ContentsTrigger } from "./contents-trigger"
 
-export const SHELL_WIDTH = "mx-auto w-full max-w-[76rem] px-[clamp(20px,4vw,48px)]"
+export { SHELL_WIDTH }
 
 /** Sticky running head: wordmark, sections, search, theme, account; Contents below 1024px. */
 export function RunningHead() {

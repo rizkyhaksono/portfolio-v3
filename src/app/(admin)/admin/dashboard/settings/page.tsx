@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Logo } from "@/components/ui/logo"
 import { Skeleton } from "@/components/ui/skeleton"
+import { StatusLine } from "@/components/ui/status-line"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -237,7 +238,7 @@ export default function AdminSettingsPage() {
 
   if (state === "loading") {
     return (
-      <div aria-busy="true" className="mx-auto w-full max-w-[44rem] border border-ink p-[3px]">
+      <div aria-busy="true" className="w-full max-w-[44rem] border border-ink p-[3px]">
         <p className="sr-only">Loading settings</p>
         <div className="border border-rule p-5 sm:p-8">
           <div className="flex items-end gap-5 pb-6">
@@ -260,19 +261,24 @@ export default function AdminSettingsPage() {
 
   if (state === "failed" || !user) {
     return (
-      <div className="mx-auto w-full max-w-[44rem] border-y border-rule py-10 text-center">
-        <p className="text-small text-ink-soft">Your account did not load. The API may be down for a moment.</p>
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => void load()}>
-          Try again
-        </Button>
-      </div>
+      <StatusLine
+        kind="failed"
+        className="w-full max-w-[44rem]"
+        action={
+          <Button variant="outline" size="sm" onClick={() => void load()}>
+            Try again
+          </Button>
+        }
+      >
+        Your account did not load. The API may be down for a moment.
+      </StatusLine>
     )
   }
 
   const providers = (user.oauthAccounts ?? []).map((account) => sentence(account.provider || account.providerId || "OAuth"))
 
   return (
-    <div className="mx-auto w-full max-w-[44rem]">
+    <div className="w-full max-w-[44rem]">
       <article className="border border-ink p-[3px]">
         <div className="border border-rule p-5 sm:p-8">
           <header className="flex items-end gap-5 pb-6">

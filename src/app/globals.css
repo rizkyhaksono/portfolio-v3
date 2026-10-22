@@ -324,6 +324,10 @@
   @apply text-caption;
   color: hsl(var(--muted-foreground));
 }
+/* The typing test's passage is machine text: system mono, so every letter keeps its column. */
+.wpm-passage {
+  font-family: theme("fontFamily.mono");
+}
 .prose code {
   font-family: theme("fontFamily.mono");
   font-size: 0.85em;

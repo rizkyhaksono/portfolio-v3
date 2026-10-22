@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch"
 import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import {
   AlertDialog,
@@ -79,8 +80,6 @@ export interface CollectionProps<T extends { id: string }, V extends FormValues>
   /** Extra header actions (export, for example). */
   tools?: (items: T[]) => React.ReactNode
 }
-
-const message = (error: unknown, fallback: string) => (error instanceof Error && error.message ? error.message : fallback)
 
 function DeleteRow({ noun, title, onConfirm }: Readonly<{ noun: string; title: string; onConfirm: () => void }>) {
   return (
@@ -171,8 +170,8 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       toast.success(editing ? `Saved the ${noun}.` : `Added the ${noun}.`)
       close()
       await refresh()
-    } catch (error) {
-      toast.error(message(error, `Could not save the ${noun}. Try again.`))
+    } catch {
+      toast.error(`Could not save the ${noun}. Check the fields and try again.`)
     }
   }
 
@@ -182,8 +181,8 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       toast.success(`Deleted the ${noun}.`)
       if (editing?.id === item.id) close()
       await refresh()
-    } catch (error) {
-      toast.error(message(error, `Could not delete the ${noun}. Try again.`))
+    } catch {
+      toast.error(`Could not delete the ${noun}. Try again.`)
     }
   }
 
@@ -191,7 +190,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
   const submitting = form.formState.isSubmitting
 
   return (
-    <section className="mx-auto w-full max-w-[60rem]">
+    <section className="w-full max-w-[60rem]">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <h2 className="font-display text-h3 text-ink">{heading}</h2>
@@ -285,19 +284,24 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       )}
 
       {state === "failed" && (
-        <div className="mt-6 border-y border-rule py-8 text-center">
-          <p className="text-small text-ink-soft">The {plural} did not load. The API may be down for a moment.</p>
-          <Button variant="outline" size="sm" className="mt-3" onClick={() => void refresh()}>
-            Try again
-          </Button>
-        </div>
+        <StatusLine
+          kind="failed"
+          className="mt-6"
+          action={
+            <Button variant="outline" size="sm" onClick={() => void refresh()}>
+              Try again
+            </Button>
+          }
+        >
+          The {plural} did not load. The API may be down for a moment.
+        </StatusLine>
       )}
 
       {state === "ready" &&
         (shown.length === 0 ? (
-          <p className="mt-6 border-y border-rule py-8 text-center text-small text-ink-soft">
+          <StatusLine kind="empty" className="mt-6 border-y border-rule py-8">
             {items.length === 0 ? `No ${plural} yet. Add the first one above.` : `No ${plural} match this filter.`}
-          </p>
+          </StatusLine>
         ) : (
           <LedgerList className="mt-6">
             {shown.map((item) => {

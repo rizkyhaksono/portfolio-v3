@@ -50,7 +50,7 @@ export default async function AdminDashboardPage() {
     .slice(0, 5)
 
   return (
-    <div className="mx-auto w-full max-w-[60rem]">
+    <div className="w-full max-w-[60rem]">
       <StatStrip
         items={[
           { label: "Views today", value: figure(today?.pageviews) },

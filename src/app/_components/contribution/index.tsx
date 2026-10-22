@@ -89,7 +89,7 @@ export default async function ContributionSection() {
       )}
 
       {facts.length > 0 && (
-        <p className="max-w-[40ch] text-lead text-ink">
+        <p className="max-w-[40ch] text-body text-ink">
           Elsewhere, {facts[0]}
           {facts[1] && <> and {facts[1]}</>}.
         </p>
