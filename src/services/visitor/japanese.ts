@@ -1,11 +1,4 @@
-import type {
-  JLPTLevelsResponse,
-  JLPTVocabularyResponse,
-  JLPTQuizResponse,
-  JLPTVerifyRequest,
-  JLPTVerifyResponse,
-  JLPTRandomWordResponse,
-} from "@/commons/types/tools";
+import type { JLPTLevelsResponse, JLPTVocabularyResponse, JLPTQuizResponse } from "@/commons/types/tools";
 
 export async function getJLPTLevels(): Promise<JLPTLevelsResponse> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/japanese-quiz/levels`, {
@@ -28,23 +21,5 @@ export async function getJLPTQuiz(level: string, count = 100): Promise<JLPTQuizR
     method: "GET",
   });
   if (!response.ok) throw new Error("Failed to fetch JLPT quiz");
-  return await response.json();
-}
-
-export async function getJLPTQuizVerify(answer: JLPTVerifyRequest): Promise<JLPTVerifyResponse> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/japanese-quiz/verify`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(answer),
-  });
-  if (!response.ok) throw new Error("Failed to verify JLPT quiz answer");
-  return await response.json();
-}
-
-export async function getJLPTRandomWord(level: string): Promise<JLPTRandomWordResponse> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/japanese-quiz/random?level=${level}`, {
-    method: "GET",
-  });
-  if (!response.ok) throw new Error("Failed to fetch JLPT random word");
   return await response.json();
 }

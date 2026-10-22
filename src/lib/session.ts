@@ -1,3 +1,4 @@
+import "server-only"
 import { cookies } from "next/headers"
 
 export const SESSION_COOKIE = "NATEE_V3_TOKEN"

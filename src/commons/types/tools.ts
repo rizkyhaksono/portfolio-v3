@@ -41,24 +41,6 @@ export interface JLPTQuizResponse {
   questions: JLPTQuestion[];
 }
 
-export interface JLPTVerifyRequest {
-  questionId: number;
-  answer: string;
-  correct: string;
-}
-
-export interface JLPTVerifyResponse {
-  success: boolean;
-  questionId: number;
-  isCorrect: boolean;
-  message: string;
-}
-
-export interface JLPTRandomWordResponse {
-  success: boolean;
-  word: JLPTWord;
-}
-
 // Downloader Types
 export interface DownloadResult {
   title: string;

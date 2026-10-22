@@ -12,7 +12,6 @@ import JsonLd from "@/components/seo/json-ld"
 import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
 import { PRINT_HEX } from "@/lib/print-hex"
 import { PlateFilters } from "@/components/ui/plate-filters"
-// import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import "./globals.css"
 
 // Literata only. Two instances so roman and italic each get their own fallback metrics.
@@ -106,9 +105,6 @@ export default function RootLayout({
           <UmamiRecorder />
           <HoverTip />
           <Toaster />
-          {/* <div className="hidden sm:block">
-            <SmoothCursor />
-          </div> */}
         </ThemeProvider>
       </body>
     </html>
