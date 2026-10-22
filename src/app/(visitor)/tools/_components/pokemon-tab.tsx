@@ -85,7 +85,7 @@ export function PokemonTab() {
       )}
 
       {list.status === "error" && (
-        <ToolError onRetry={list.retry}>The Pokédex did not answer. Check your connection and try again.</ToolError>
+        <ToolError onRetry={list.retry}>The Pokédex did not load.</ToolError>
       )}
       {(list.status !== "error" || list.data) && (
         <>

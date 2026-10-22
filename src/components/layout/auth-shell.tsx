@@ -51,7 +51,7 @@ export function AuthShell({ variant = "split", title, standfirst, footer, childr
 
         <header className="mt-10 pb-6">
           <h1 className="font-display text-h2 text-balance text-ink">{title}</h1>
-          {standfirst && <p className="mt-3 max-w-[46ch] font-display text-lead text-ink-soft">{standfirst}</p>}
+          {standfirst && <p className="mt-3 max-w-[46ch] text-pretty font-display text-lead text-ink-soft">{standfirst}</p>}
         </header>
         <div aria-hidden className="border-t border-ink" />
 

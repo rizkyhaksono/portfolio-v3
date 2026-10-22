@@ -5,6 +5,12 @@ describe("excerpt", () => {
     expect(excerpt("<p>Fish &amp; chips</p>")).toBe("Fish & chips")
   })
 
+  it("turns a description DEV already cut into one clean ellipsis", () => {
+    expect(excerpt("Plan, requirements, design,...")).toBe("Plan, requirements, design…")
+    expect(excerpt("A boring promise:...")).toBe("A boring promise…")
+    expect(excerpt("Still thinking …")).toBe("Still thinking…")
+  })
+
   it("cuts at a word boundary within the limit", () => {
     const text = excerpt(`<p>${"word ".repeat(60)}</p>`, 160)
     expect(text.length).toBeLessThanOrEqual(160)

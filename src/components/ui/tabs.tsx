@@ -8,8 +8,9 @@ import { cn } from "@/lib/utils"
 const Tabs = TabsPrimitive.Root
 
 // The list scrolls sideways on phones, so the focus ring sits inside each trigger instead of being clipped.
+// The hairline is an inset line, not a border, so the active 2px underline prints over it instead of under it.
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(({ className, ...props }, ref) => (
-  <TabsPrimitive.List ref={ref} className={cn("items-end gap-6 border-b border-rule text-ink-soft", !className?.includes("grid") && "flex max-w-full overflow-x-auto", className)} {...props} />
+  <TabsPrimitive.List ref={ref} className={cn("items-end gap-6 text-ink-soft shadow-[inset_0_-1px_0_hsl(var(--rule))]", !className?.includes("grid") && "flex max-w-full overflow-x-auto", className)} {...props} />
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 

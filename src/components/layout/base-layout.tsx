@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import Footer from "@/components/layout/footer"
 import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
 import { RunningHead, SHELL_WIDTH } from "@/components/layout/running-head"
+import { cn } from "@/lib/utils"
 
 interface BaseLayoutProps {
   children: ReactNode
@@ -22,11 +23,11 @@ export default function BaseLayout({ children, bleed, footer = "full", fit = fal
         <RunningHead />
         <main id="main" className="flex min-h-0 flex-1 flex-col">
           {bleed}
-          <div className={`${SHELL_WIDTH} flex min-h-0 flex-1 flex-col overflow-hidden pt-6 sm:pt-8`}>{children}</div>
+          <div className={`${SHELL_WIDTH} flex min-h-0 flex-1 flex-col overflow-hidden pt-8 sm:pt-12`}>{children}</div>
         </main>
         {footer !== "none" && (
           <div className="hidden shrink-0 md:block">
-            <Footer variant={footer} />
+            <Footer variant={footer} backToTop={false} />
           </div>
         )}
         <DeferredClientUtilities />
@@ -34,10 +35,11 @@ export default function BaseLayout({ children, bleed, footer = "full", fit = fal
     )
   }
 
-  return (
+  const compact = footer === "compact"
+  const page = (
     <>
       <RunningHead />
-      <main id="main">
+      <main id="main" className={cn(compact && "flex-1")}>
         {bleed}
         <div className={`${SHELL_WIDTH} pb-16 pt-8 sm:pb-24 sm:pt-12`}>{children}</div>
       </main>
@@ -45,4 +47,6 @@ export default function BaseLayout({ children, bleed, footer = "full", fit = fal
       <DeferredClientUtilities />
     </>
   )
+  // The one-line colophon would float mid-window under a short page, so it is held to the bottom.
+  return compact ? <div className="flex min-h-svh flex-col">{page}</div> : page
 }

@@ -99,7 +99,7 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
         {tags.length > 0 && (
           <div>
             <h3 className="font-display text-h4 text-ink">Solved by topic</h3>
-            <ul role="list" className="mt-3">
+            <ul role="list" className="mt-3 border-t border-ink pt-3">
               {tags.map((t) => (
                 <HatchBar key={t.tagName} name={t.tagName} percent={(t.problemsSolved / maxTag) * 100} value={n(t.problemsSolved)} />
               ))}

@@ -50,7 +50,10 @@ function LegalLinks() {
 }
 
 /** Colophon: `full` everywhere, `compact` (one ruled line, no plate) on /ai and /chat. */
-export default function Footer({ variant = "full" }: Readonly<{ variant?: "full" | "compact" }>) {
+export default function Footer({
+  variant = "full",
+  backToTop = true,
+}: Readonly<{ variant?: "full" | "compact"; /** Off on pages that never scroll. */ backToTop?: boolean }>) {
   if (variant === "compact") {
     return (
       <footer className={cn(SHELL_WIDTH, "pb-6")}>
@@ -60,9 +63,9 @@ export default function Footer({ variant = "full" }: Readonly<{ variant?: "full"
           <ul className="flex gap-x-5">
             <LegalLinks />
           </ul>
-          <span className="ml-auto flex gap-x-5">
+          <span className="flex gap-x-5 md:ml-auto">
             <FeedbackButton />
-            <BackToTop />
+            {backToTop && <BackToTop />}
           </span>
         </div>
       </footer>

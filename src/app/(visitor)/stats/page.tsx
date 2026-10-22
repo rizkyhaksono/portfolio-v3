@@ -45,6 +45,9 @@ export default async function StatsPage() {
     <BaseLayout>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Stats</h1>
+        <p className="mt-4 text-balance font-display text-caption text-ink-soft">
+          Readers, status and practice figures, refreshed every fifteen minutes.
+        </p>
       </header>
       <div aria-hidden className="border-t border-ink" />
 

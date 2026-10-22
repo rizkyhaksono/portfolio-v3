@@ -29,7 +29,7 @@ export default function ChangelogPage() {
               href="/changelog.xml"
               data-track="rss-subscribe"
               data-track-feed="changelog"
-              className="text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2"
+              className="relative text-ink underline decoration-1 underline-offset-[0.18em] after:absolute after:-inset-3 hover:decoration-2"
             >
               RSS feed
             </a>

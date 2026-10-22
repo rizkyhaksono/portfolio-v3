@@ -249,8 +249,8 @@ const app = require("./app")
 const config = require("./config")
 
 const server = app.listen(config.port, () => {
-  console.log(`🚀 Server running on http://localhost:${config.port}`)
-  console.log(`📝 Environment: ${config.nodeEnv}`)
+  console.log(`Server running on http://localhost:${config.port}`)
+  console.log(`Environment: ${config.nodeEnv}`)
 })
 
 // Graceful shutdown

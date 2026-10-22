@@ -127,11 +127,11 @@ export default function WPMTest() {
           disabled={phase === "running"}
         />
         <ChoiceGroup label="Language" options={LANGUAGES} value={language} onChange={setLanguage} disabled={phase === "running"} />
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => restart(true)} disabled={phase === "running"}>
+        <div className="flex gap-x-6">
+          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(true)} disabled={phase === "running"}>
             New words
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => restart(false)} disabled={phase === "idle"}>
+          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(false)} disabled={phase === "idle"}>
             Restart
           </Button>
         </div>
@@ -157,7 +157,7 @@ export default function WPMTest() {
         })}
       </p>
 
-      <div className="max-w-[66ch] space-y-1">
+      <div className="space-y-1">
         <Label htmlFor="wpm-input">Type the words above. The clock starts with your first letter.</Label>
         <Input
           id="wpm-input"

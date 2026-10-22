@@ -273,7 +273,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
           No messages yet. Yours could be the first.
         </StatusLine>
       ) : (
-        <ol role="list" className="divide-y divide-rule">
+        <ol role="list">
           {stream.map((m, index) => {
             const isMine = currentUser?.id === m.userId
             const newest = index === stream.length - 1

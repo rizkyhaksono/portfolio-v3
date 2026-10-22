@@ -49,7 +49,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
         <>
           <ProjectLinks project={project} className="flex-col items-start" />
           <ReaderCount path={`/project/${project.id}`} reads={reads} />
-          <InkLink href="/project" className="inline-flex min-h-11 items-center md:min-h-0 no-underline hover:underline">
+          <InkLink href="/project" className="inline-flex min-h-11 items-center md:min-h-0">
             All projects
           </InkLink>
         </>

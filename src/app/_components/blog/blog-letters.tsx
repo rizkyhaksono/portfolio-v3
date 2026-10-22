@@ -1,5 +1,6 @@
 import type { CommentItemProps } from "@/commons/types/blog"
 import { InkLink } from "@/components/ui/ink-link"
+import { StatusLine } from "@/components/ui/status-line"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
 import { formatDay, toDate } from "./format"
 
@@ -45,7 +46,9 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
           ))}
         </ol>
       ) : (
-        <p className="mt-2 font-display text-caption text-ink-soft">No letters yet.</p>
+        <StatusLine kind="empty" className="mt-4">
+          No letters yet.
+        </StatusLine>
       )}
       <p className="mt-8 text-small text-ink-soft">
         Write one on{" "}

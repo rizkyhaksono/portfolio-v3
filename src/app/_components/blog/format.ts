@@ -18,7 +18,8 @@ export const yearOf = (date: Date) => YEAR.format(date)
 
 /** Plain text cut at a word boundary, at most `max` characters including the ellipsis. */
 export function excerpt(html: string, max = 160): string {
-  const text = plainText(html)
+  // DEV sends some descriptions already cut, as "design,..." or "promise:...": keep one clean ellipsis.
+  const text = plainText(html).replace(/[\s,;:–—-]*(?:\.{3}|…)\s*$/, "…")
   if (text.length <= max) return text
   const cut = text.slice(0, max)
   const end = cut.lastIndexOf(" ")
