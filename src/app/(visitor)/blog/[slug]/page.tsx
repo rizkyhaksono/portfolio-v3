@@ -13,7 +13,8 @@ import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import BlogLetters from "@/app/_components/blog/blog-letters"
 import { dateline } from "@/app/_components/blog/format"
-import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
+import { getSiteUrl, isSiteImage, ogImageUrl } from "@/lib/site-url"
+import { canOptimizeImage } from "@/lib/image-hosts"
 import { getBlogData, getBlogDetail, getComments } from "@/services/visitor/blog"
 import { getPathReads } from "@/services/visitor/umami"
 
@@ -114,8 +115,17 @@ export default async function BlogArticlePage({ params }: Props) {
       >
         {post.cover_image && (
           // `.prose img` frames body images; the plate brings its own frame.
-          <PlateFigure className="[&_img]:border-0 [&_img]:p-0">
-            <Image src={post.cover_image} alt="" width={1000} height={420} priority sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-[1000/420] w-full object-cover" />
+          <PlateFigure tone={isSiteImage(post.cover_image) ? "color" : "photo"} className="[&_img]:border-0 [&_img]:p-0">
+            <Image
+              src={post.cover_image}
+              alt=""
+              width={1000}
+              height={420}
+              priority
+              unoptimized={!canOptimizeImage(post.cover_image)}
+              sizes="(min-width: 1024px) 66ch, 100vw"
+              className="aspect-[1000/420] w-full object-cover"
+            />
           </PlateFigure>
         )}
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN}>

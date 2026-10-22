@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { isSiteImage } from "@/lib/site-url"
+import { canOptimizeImage } from "@/lib/image-hosts"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -105,7 +106,7 @@ export default async function BlogPage() {
             {lead.image && (
               <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
                 <div className="relative aspect-[1000/420]">
-                  <Image src={lead.image} alt="" fill priority unoptimized sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
+                  <Image src={lead.image} alt="" fill priority unoptimized={!canOptimizeImage(lead.image)} sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
                 </div>
               </PlateFigure>
             )}

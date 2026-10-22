@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
+import { OPTIMIZED_IMAGE_HOSTS, SUPABASE_IMAGE_HOST, SUPABASE_STORAGE_PATH } from './src/lib/image-hosts'
 
 const originOf = (url?: string) => {
   try {
@@ -10,7 +11,6 @@ const originOf = (url?: string) => {
 }
 
 const isDev = process.env.NODE_ENV !== 'production'
-const supabaseOrigin = originOf(process.env.NEXT_PUBLIC_SUPABASE_URL)
 const umamiOrigins = [originOf(process.env.NEXT_PUBLIC_UMAMI_SRC), originOf(process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC)]
 const TURNSTILE = 'https://challenges.cloudflare.com'
 const sources = (...list: (string | undefined)[]) => [...new Set(list.filter(Boolean))].join(' ')
@@ -26,7 +26,7 @@ const CONTENT_SECURITY_POLICY = [
   `connect-src ${sources(
     "'self'",
     originOf(process.env.NEXT_PUBLIC_API_URL),
-    supabaseOrigin,
+    originOf(process.env.NEXT_PUBLIC_SUPABASE_URL),
     ...umamiOrigins,
     'https://api.emailjs.com',
     'https://api.dictionaryapi.dev',
@@ -81,29 +81,13 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   images: {
-    // Only hosts that optimized <Image> sources actually use; `unoptimized` images skip this list.
-    // Admin-entered images (blog covers, project shots) are rendered `unoptimized`, so any host works
-    // without turning this server into an open image proxy.
+    // canOptimizeImage() reads the same list: images from any other host (admin-entered covers included)
+    // render `unoptimized`, so this server never becomes an open image proxy.
     remotePatterns: [
-      // Project covers (Supabase Storage signed/public URLs), from this site's own project only
-      ...(supabaseOrigin
-        ? [{ protocol: "https" as const, hostname: new URL(supabaseOrigin).hostname, pathname: "/storage/v1/object/**" }]
+      ...(SUPABASE_IMAGE_HOST
+        ? [{ protocol: "https" as const, hostname: SUPABASE_IMAGE_HOST, pathname: `${SUPABASE_STORAGE_PATH}**` }]
         : []),
-      // DEV.to covers, comment avatars and article-body images
-      { protocol: "https", hostname: "media2.dev.to" },
-      { protocol: "https", hostname: "dev-to-uploads.s3.amazonaws.com" },
-      { protocol: "https", hostname: "dev-to-uploads.s3.us-east-2.amazonaws.com" },
-      // Medium feed thumbnails and admin-entered onsite blog covers
-      { protocol: "https", hostname: "cdn-images-1.medium.com" },
-      { protocol: "https", hostname: "miro.medium.com" },
-      { protocol: "https", hostname: "img-s-msn-com.akamaized.net" },
-      // Education logos (Supabase `education` table)
-      { protocol: "https", hostname: "encrypted-tbn0.gstatic.com" },
-      { protocol: "https", hostname: "images.icon-icons.com" },
-      { protocol: "https", hostname: "media.licdn.com" },
-      // Signup illustration, roadmap images
-      { protocol: "https", hostname: "i.pinimg.com" },
-      { protocol: "https", hostname: "images.unsplash.com" },
+      ...OPTIMIZED_IMAGE_HOSTS.map((hostname) => ({ protocol: "https" as const, hostname })),
     ],
     formats: ["image/webp"],
     deviceSizes: [640, 828, 1200, 1600],
