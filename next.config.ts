@@ -42,17 +42,20 @@ const CONTENT_SECURITY_POLICY = [
   "frame-ancestors 'none'",
 ].join('; ')
 
-const SECURITY_HEADERS = [
+// Document policies only: on hashed static files they would add ~1 KB to every response for nothing.
+const DOCUMENT_HEADERS = [
   { key: 'Content-Security-Policy', value: CONTENT_SECURITY_POLICY },
   { key: 'X-Frame-Options', value: 'DENY' },
-  { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), payment=(), usb=(), microphone=(self)' },
 ]
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: '/:path*', headers: SECURITY_HEADERS }]
+    return [
+      { source: '/:path*', headers: [{ key: 'X-Content-Type-Options', value: 'nosniff' }] },
+      { source: '/:path((?!_next/static|_next/image).*)', headers: DOCUMENT_HEADERS },
+    ]
   },
   // Standalone output is required by the Docker image (Dockerfile copies .next/standalone).
   // Disabled on Windows only, where it triggers an EBUSY file-lock during local builds.

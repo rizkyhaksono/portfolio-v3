@@ -8,6 +8,7 @@ export const OPTIMIZED_IMAGE_HOSTS = [
   "cdn-images-1.medium.com",
   "miro.medium.com",
   "img-s-msn-com.akamaized.net",
+  "substackcdn.com",
   // Education logos (Supabase `education` table)
   "encrypted-tbn0.gstatic.com",
   "images.icon-icons.com",
