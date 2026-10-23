@@ -68,7 +68,8 @@ export function ArticleShell({
           </details>
         )}
 
-        <div className="min-w-0">
+        {/* The text's own measure, so the tail-piece, letters and next-reads line up with the prose. */}
+        <div className="min-w-0 max-w-[66ch]">
           <div className="prose">{children}</div>
 
           <div aria-hidden className="tail-piece" />

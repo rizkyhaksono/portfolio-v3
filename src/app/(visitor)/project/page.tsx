@@ -5,11 +5,21 @@ import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { ReaderCount } from "@/components/ui/reader-count"
+import { StatusLine } from "@/components/ui/status-line"
 import { SECTION_SPACING } from "@/lib/design-system"
+import { canOptimizeImage } from "@/lib/image-hosts"
 import { ProjectLinks, plateOf } from "./project-links"
 import { plainText } from "./safe-html"
 
 export const revalidate = 3600
+
+// The server runs in UTC; a project added on a Jakarta New Year's Eve belongs to the new year.
+const JAKARTA_YEAR = new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Asia/Jakarta" })
+/** Calendar year in Jakarta, or nothing when the date does not parse. */
+const yearOf = (iso: string) => {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? null : Number(JAKARTA_YEAR.format(date))
+}
 
 const FEATURED_PROJECTS = [
   ["info pangan jakarta", "info pangan"],
@@ -42,10 +52,19 @@ export default async function ProjectPage() {
     <div>
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Projects</h1>
+        {projects.length > 0 && (
+          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+            {projects.length.toLocaleString("en")} projects on record, the featured work first.
+          </p>
+        )}
       </header>
       <div aria-hidden className="border-t border-ink" />
 
-      {projects.length === 0 && <p className="mt-8 text-body text-ink-soft">No projects are published yet.</p>}
+      {projects.length === 0 && (
+        <StatusLine kind="empty" className="mt-8">
+          No projects are published yet.
+        </StatusLine>
+      )}
 
       {featured.length > 0 && (
         <section aria-labelledby="featured" className="mt-12">
@@ -70,7 +89,7 @@ export default async function ProjectPage() {
                   {plate && (
                     <PlateFigure className="order-first md:sticky md:order-none md:top-[calc(var(--head-h)+1.5rem)] md:self-start">
                       <div className="relative aspect-[16/10]">
-                        <Image src={plate} alt="" fill priority={project.id === leadPlateId} unoptimized sizes="(min-width: 768px) 20rem, 100vw" className="object-cover object-top" />
+                        <Image src={plate} alt="" fill priority={project.id === leadPlateId} unoptimized={!canOptimizeImage(plate)} sizes="(min-width: 768px) 20rem, 100vw" className="object-cover object-top" />
                       </div>
                     </PlateFigure>
                   )}
@@ -88,7 +107,7 @@ export default async function ProjectPage() {
           </h2>
           <LedgerList className="mt-6">
             {rest.map((project) => (
-              <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} meta={new Date(project.created_at).getFullYear() || null}>
+              <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} meta={yearOf(project.created_at)}>
                 <p className="line-clamp-2 max-w-[60ch]">{plainText(project.description)}</p>
                 <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
                 <ProjectLinks project={project} className="mt-1" />

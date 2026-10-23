@@ -67,7 +67,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
     const data = new FormData()
     for (const [key, value] of Object.entries(values)) data.append(key, value)
 
-    const result = await updateProfile(profile.id, data).catch(() => null)
+    const result = await updateProfile(data).catch(() => null)
     track("profile-save", { status: result?.ok ? "ok" : "error" })
     if (!result?.ok) {
       form.setError("root", { message: result?.message ?? "Your changes were not saved. Try again in a minute." })

@@ -2,6 +2,7 @@ import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationRow } from "@/app/_components/certification/certification-card"
 import { LedgerList } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 
 export const revalidate = 3600
 
@@ -28,7 +29,7 @@ export default async function CertificatesPage() {
       <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Certificates</h1>
         {certifications.length > 0 && (
-          <p className="mt-4 text-small text-ink-soft">
+          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
             {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.
           </p>
         )}
@@ -36,7 +37,9 @@ export default async function CertificatesPage() {
       <div aria-hidden className="border-t border-ink" />
 
       {certifications.length === 0 ? (
-        <p className="mt-8 text-body text-ink-soft">The record could not be loaded just now. Please try again in a few minutes.</p>
+        <StatusLine kind="failed" className="mt-8">
+          The record could not be loaded just now. Try again in a few minutes.
+        </StatusLine>
       ) : (
         // The head rule tops the first year, so its own top rule would stack under it.
         <div className="mt-8 [&>:first-child]:border-t-0">

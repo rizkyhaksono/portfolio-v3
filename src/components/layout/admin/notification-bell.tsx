@@ -6,6 +6,7 @@ import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { getAdminNotifications, type AdminNotification } from "@/services/admin/notifications"
+import { safeRedirect } from "@/lib/utils"
 import { timeAgo } from "./admin-format"
 
 const SEEN_KEY = "admin_notifs_seen_at"
@@ -134,7 +135,7 @@ export function NotificationBell() {
             items.map((n) => (
               <div key={n.id} className="border-b border-rule last:border-b-0">
                 <DropdownMenuItem asChild className="block px-3 py-2.5">
-                  <Link href={n.href}>
+                  <Link href={safeRedirect(n.href, "/admin/dashboard")}>
                     <span className="flex items-baseline gap-2">
                       {isUnread(n) && (
                         <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-ink">

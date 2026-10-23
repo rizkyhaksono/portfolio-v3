@@ -69,7 +69,7 @@ export function IeltsTab() {
     setFlipped(false)
   }
 
-  // Arrow keys only while the card has focus; Space and Enter already turn it, as on any button.
+  /** Arrow keys only while the card has focus; Space and Enter already turn it, as on any button. */
   const onCardKey = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault()
@@ -167,7 +167,7 @@ export function IeltsTab() {
           <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => go(1)} disabled={!card}>
             Next
           </Button>
-          <Button variant="ghost" size="sm" className="col-span-2 w-full sm:w-auto" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
+          <Button variant="outline" size="sm" className="col-span-2 w-full sm:w-auto" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
             Listen
           </Button>
         </div>
@@ -181,13 +181,14 @@ export function IeltsTab() {
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <Button variant="ghost" size="sm" onClick={() => restart(shuffle(IELTS_WORDS))}>
+      <div className="flex gap-x-6">
+        <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(shuffle(IELTS_WORDS))}>
           Shuffle
         </Button>
         <Button
           variant="ghost"
           size="sm"
+          className="px-0"
           onClick={() => {
             setKnown(new Set())
             setLearning(new Set())

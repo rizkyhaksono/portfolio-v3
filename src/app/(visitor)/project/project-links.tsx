@@ -1,5 +1,5 @@
 import { InkLink } from "@/components/ui/ink-link"
-import { cn } from "@/lib/utils"
+import { cn, httpUrl } from "@/lib/utils"
 import type { getAllProject } from "@/services/visitor/project"
 
 type Project = Awaited<ReturnType<typeof getAllProject>>[number]
@@ -10,16 +10,18 @@ export const plateOf = (project: Project) => (project.image && project.image !==
 
 /** The live site and the source, each tracked per project. Sits above the row's stretched link. */
 export function ProjectLinks({ project, className }: Readonly<{ project: Project; className?: string }>) {
-  if (!project.url && !project.source_code) return null
+  const site = httpUrl(project.url)
+  const source = httpUrl(project.source_code)
+  if (!site && !source) return null
   return (
     <span className={cn("relative z-10 flex flex-wrap gap-x-6", className)}>
-      {project.url && (
-        <InkLink href={project.url} external event="project-site" eventData={{ project: project.title }} className={TARGET}>
+      {site && (
+        <InkLink href={site} external event="project-site" eventData={{ project: project.title }} className={TARGET}>
           Visit the site
         </InkLink>
       )}
-      {project.source_code && (
-        <InkLink href={project.source_code} external event="project-source" eventData={{ project: project.title }} className={TARGET}>
+      {source && (
+        <InkLink href={source} external event="project-source" eventData={{ project: project.title }} className={TARGET}>
           Source code
         </InkLink>
       )}

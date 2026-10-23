@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Logo } from "@/components/ui/logo"
 import { Skeleton } from "@/components/ui/skeleton"
+import { StatusLine } from "@/components/ui/status-line"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -117,6 +118,35 @@ function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) 
   )
 }
 
+/** Portrait, name and the account lines on the settings card. */
+function AccountIdentity({ user, providers }: Readonly<{ user: UserData; providers: string[] }>) {
+  return (
+    <>
+      <header className="flex items-end gap-5 pb-6">
+        <Avatar className="size-20">
+          {(user.avatarUrl ?? user.image) && <AvatarImage src={user.avatarUrl ?? user.image} alt="" referrerPolicy="no-referrer" />}
+          <AvatarFallback className="font-display text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <h2 className="font-display text-h2 text-ink [overflow-wrap:anywhere]">{user.name || "Admin"}</h2>
+          {user.location && <p className="mt-1 font-display text-lead text-ink-soft">{user.location}</p>}
+        </div>
+      </header>
+      <div aria-hidden className="border-t border-ink" />
+      <dl className="mt-6">
+        <Leader term="Email">
+          {user.email || "None"}
+          {user.emailVerified && ", verified"}
+        </Leader>
+        <Leader term="Role">{sentence(user.role || "admin")}</Leader>
+        <Leader term="Member since">{formatDay(user.createdAt) || "Unknown"}</Leader>
+        <Leader term="Signs in with">{providers.length > 0 ? providers.join(", ") : "Email and password"}</Leader>
+        <Leader term="User ID">{user.id}</Leader>
+      </dl>
+    </>
+  )
+}
+
 /** A definition row with a dotted leader between term and value. */
 function Leader({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
   return (
@@ -130,6 +160,7 @@ function Leader({ term, children }: Readonly<{ term: string; children: React.Rea
   )
 }
 
+/** Sentence case for a role or a sign-in provider. */
 const sentence = (word = "") => word.charAt(0).toLocaleUpperCase("en") + word.slice(1).toLowerCase()
 
 export default function AdminSettingsPage() {
@@ -203,7 +234,7 @@ export default function AdminSettingsPage() {
     }
   }
 
-  // Theme is not saved here: next-themes is its one source, set the moment a swatch is chosen.
+  /** Theme is not saved here: next-themes is its one source, set the moment a swatch is chosen. */
   const onAppearance = async (values: z.infer<typeof appearanceSchema>) => {
     try {
       await updateAdminSettingsClient(values)
@@ -237,7 +268,7 @@ export default function AdminSettingsPage() {
 
   if (state === "loading") {
     return (
-      <div aria-busy="true" className="mx-auto w-full max-w-[44rem] border border-ink p-[3px]">
+      <div aria-busy="true" className="w-full max-w-[44rem] border border-ink p-[3px]">
         <p className="sr-only">Loading settings</p>
         <div className="border border-rule p-5 sm:p-8">
           <div className="flex items-end gap-5 pb-6">
@@ -260,43 +291,27 @@ export default function AdminSettingsPage() {
 
   if (state === "failed" || !user) {
     return (
-      <div className="mx-auto w-full max-w-[44rem] border-y border-rule py-10 text-center">
-        <p className="text-small text-ink-soft">Your account did not load. The API may be down for a moment.</p>
-        <Button variant="outline" size="sm" className="mt-3" onClick={() => void load()}>
-          Try again
-        </Button>
-      </div>
+      <StatusLine
+        kind="failed"
+        className="w-full max-w-[44rem]"
+        action={
+          <Button variant="outline" size="sm" onClick={() => { void load() }}>
+            Try again
+          </Button>
+        }
+      >
+        Your account did not load. The API may be down for a moment.
+      </StatusLine>
     )
   }
 
   const providers = (user.oauthAccounts ?? []).map((account) => sentence(account.provider || account.providerId || "OAuth"))
 
   return (
-    <div className="mx-auto w-full max-w-[44rem]">
+    <div className="w-full max-w-[44rem]">
       <article className="border border-ink p-[3px]">
         <div className="border border-rule p-5 sm:p-8">
-          <header className="flex items-end gap-5 pb-6">
-            <Avatar className="size-20">
-              {(user.avatarUrl ?? user.image) && <AvatarImage src={user.avatarUrl ?? user.image} alt="" referrerPolicy="no-referrer" />}
-              <AvatarFallback className="font-display text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h2 className="font-display text-h2 text-ink [overflow-wrap:anywhere]">{user.name || "Admin"}</h2>
-              {user.location && <p className="mt-1 font-display text-lead text-ink-soft">{user.location}</p>}
-            </div>
-          </header>
-          <div aria-hidden className="border-t border-ink" />
-
-          <dl className="mt-6">
-            <Leader term="Email">
-              {user.email || "None"}
-              {user.emailVerified && ", verified"}
-            </Leader>
-            <Leader term="Role">{sentence(user.role || "admin")}</Leader>
-            <Leader term="Member since">{formatDay(user.createdAt) || "Unknown"}</Leader>
-            <Leader term="Signs in with">{providers.length > 0 ? providers.join(", ") : "Email and password"}</Leader>
-            <Leader term="User ID">{user.id}</Leader>
-          </dl>
+          <AccountIdentity user={user} providers={providers} />
 
           <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
             <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} aria-busy={uploading}>

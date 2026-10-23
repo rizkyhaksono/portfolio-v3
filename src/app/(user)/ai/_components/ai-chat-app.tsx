@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { toast } from "sonner"
-import { renameAIChat, deleteAIChat } from "@/services/user/ai"
+import { getAIChatById, renameAIChat, deleteAIChat, type AIChatMessage, type AIChatSession } from "@/services/user/ai"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,8 +31,8 @@ import { setQuery } from "./set-query"
 const RATE_LIMIT = 10
 const RATE_WINDOW = 60 * 1000
 
-type Message = { id: string; msg: string; role: string; createdAt?: string }
-type Session = { id: string; title: string; createdAt?: string; messages: Message[] }
+type Message = AIChatMessage
+type Session = AIChatSession
 type ChatError = { message: string; signIn?: boolean }
 type PendingAction = { kind: "rename" | "delete"; session: Session }
 // `open` is separate so the dialog keeps its text while it fades out.
@@ -77,24 +77,33 @@ function Letter({ m }: Readonly<{ m: Message }>) {
 function SessionList({
   sessions,
   activeId,
+  busy,
   onSelect,
   onPending,
-}: Readonly<{ sessions: Session[]; activeId?: string; onSelect: (s: Session) => void; onPending: (p: PendingAction) => void }>) {
+}: Readonly<{
+  sessions: Session[]
+  activeId?: string
+  /** True while Etan writes: the reply belongs to the open chat, so no other chat may open or change. */
+  busy: boolean
+  onSelect: (s: Session) => void
+  onPending: (p: PendingAction) => void
+}>) {
   if (sessions.length === 0) {
     return <p className="p-3 font-display text-caption text-ink-soft">No conversations yet. Your first message starts one.</p>
   }
-  const action = "underline-offset-[0.18em] hover:underline [@media(pointer:coarse)]:min-h-11"
+  const action = "underline-offset-[0.18em] hover:underline disabled:no-underline disabled:opacity-60 [@media(pointer:coarse)]:min-h-11"
   return (
     <ul role="list" className="divide-y divide-rule border-b border-rule">
       {sessions.map((s) => {
-        const count = s.messages?.length ?? 0
+        const count = s.messages?.length ?? s.messageCount ?? 0
         return (
           <li key={s.id} className={cn("px-3 py-2.5", s.id === activeId && "bg-tint")}>
             <button
               type="button"
               onClick={() => onSelect(s)}
+              disabled={busy}
               aria-current={s.id === activeId || undefined}
-              className="block w-full truncate text-left text-small font-semibold text-ink underline-offset-[0.18em] hover:underline [@media(pointer:coarse)]:min-h-11"
+              className="block w-full truncate text-left text-small font-semibold text-ink underline-offset-[0.18em] hover:underline disabled:no-underline [@media(pointer:coarse)]:min-h-11"
             >
               {s.title || "Untitled conversation"}
             </button>
@@ -102,10 +111,10 @@ function SessionList({
               <span className="font-display tabular-nums">
                 {count} {count === 1 ? "message" : "messages"}
               </span>
-              <button type="button" onClick={() => onPending({ kind: "rename", session: s })} className={cn("ml-auto", action)}>
+              <button type="button" disabled={busy} onClick={() => onPending({ kind: "rename", session: s })} className={cn("ml-auto", action)}>
                 Rename<span className="sr-only"> {s.title || "Untitled conversation"}</span>
               </button>
-              <button type="button" onClick={() => onPending({ kind: "delete", session: s })} className={action}>
+              <button type="button" disabled={busy} onClick={() => onPending({ kind: "delete", session: s })} className={action}>
                 Delete<span className="sr-only"> {s.title || "Untitled conversation"}</span>
               </button>
             </div>
@@ -117,25 +126,43 @@ function SessionList({
 }
 
 /** Correspondence: saved conversations beside a letters column, replies set behind a left rule. */
-export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{ initialSessions: Session[]; initialChatId?: string }>) {
-  const opened = initialSessions?.find((s) => s.id === initialChatId)
-  const [sessions, setSessions] = useState<Session[]>(initialSessions ?? [])
-  const [activeChatId, setActiveChatId] = useState<string | undefined>(opened?.id)
-  const [messages, setMessages] = useState<Message[]>(opened?.messages ?? [])
+function openingError(chatId: string | undefined, listed: boolean, loaded: boolean): ChatError | null {
+  if (!chatId || loaded) return null
+  return {
+    message: listed
+      ? "That conversation did not open. Pick it from the list, or write below to start a new one."
+      : "That chat no longer exists. Write below to start a new one.",
+  }
+}
+
+/** Signed-in Etan correspondence: the list of chats and the letters of the open one. */
+export default function AIChatApp({
+  initialSessions,
+  initialChatId,
+  initialMessages,
+}: Readonly<{ initialSessions: Session[]; initialChatId?: string; initialMessages?: Message[] }>) {
+  const opened = initialSessions.find((s) => s.id === initialChatId)
+  const openedMessages = initialMessages ?? opened?.messages
+  const [sessions, setSessions] = useState<Session[]>(initialSessions)
+  const [activeChatId, setActiveChatId] = useState<string | undefined>(opened && openedMessages ? opened.id : undefined)
+  const [messages, setMessages] = useState<Message[]>(opened ? (openedMessages ?? []) : [])
   const [input, setInput] = useState("")
   const [loading, setLoading] = useState(false)
+  const [opening, setOpening] = useState(false)
   const [sent, setSent] = useState<number[]>([])
   const [now, setNow] = useState(0)
   const [ttsOn, setTtsOn] = useState(false)
-  const [error, setError] = useState<ChatError | null>(
-    initialChatId && !opened ? { message: "That chat no longer exists. Write below to start a new one." } : null,
-  )
+  const [error, setError] = useState<ChatError | null>(() => openingError(initialChatId, Boolean(opened), Boolean(opened && openedMessages)))
   const [sheetOpen, setSheetOpen] = useState(false)
   const [pending, setPending] = useState<Pending | null>(null)
   const tts = useSpeechSynthesis()
 
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const openRequest = useRef(0)
+  const stream = useRef<AbortController | null>(null)
+
+  useEffect(() => () => stream.current?.abort(), [])
 
   const recent = sent.filter((t) => now - t < RATE_WINDOW)
   const remaining = Math.max(0, RATE_LIMIT - recent.length)
@@ -159,15 +186,39 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
 
   const focusInput = () => setTimeout(() => inputRef.current?.focus(), 0)
 
-  const selectSession = (s: Session) => {
+  /** Opens a saved conversation, and ignores the click while a reply is still arriving. */
+  const selectSession = async (s: Session) => {
+    if (loading) return
+    const request = ++openRequest.current
     setActiveChatId(s.id)
-    setMessages(s.messages ?? [])
     setError(null)
     setSheetOpen(false)
+    if (s.messages) {
+      setOpening(false)
+      setMessages(s.messages)
+      focusInput()
+      return
+    }
+
+    setMessages([])
+    setOpening(true)
+    const chat = await getAIChatById(s.id).catch(() => null)
+    if (request !== openRequest.current) return
+    setOpening(false)
+    if (!chat?.messages) {
+      setError({ message: "That conversation did not open. Try again." })
+      return
+    }
+    const thread = chat.messages
+    setMessages(thread)
+    setSessions((prev) => prev.map((x) => (x.id === s.id ? { ...x, messages: thread } : x)))
     focusInput()
   }
 
   const newChat = () => {
+    if (loading) return
+    openRequest.current++
+    setOpening(false)
     setActiveChatId(undefined)
     setMessages([])
     setInput("")
@@ -205,11 +256,14 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
   const send = async (e: React.FormEvent) => {
     e.preventDefault()
     const text = input.trim()
-    if (!text || loading || remaining <= 0) return
+    if (!text || loading || opening || remaining <= 0) return
 
     const sentAt = Date.now()
     const userMsg: Message = { id: `u-${sentAt}`, msg: text, role: "user" }
     const aiId = `m-${sentAt}`
+    const history = messages
+    const controller = new AbortController()
+    stream.current = controller
     setMessages((prev) => [...prev, userMsg])
     setInput("")
     setNow(sentAt)
@@ -224,6 +278,7 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, chatId: activeChatId }),
+        signal: controller.signal,
       })
 
       const ct = res.headers.get("content-type") ?? ""
@@ -256,16 +311,17 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
       const aiMsg: Message = { id: aiId, msg: finalText, role: "model" }
       const chatId = chatIdMatch?.[1] ?? activeChatId
       if (chatId) {
+        const thread = [...history, userMsg, aiMsg]
         setActiveChatId(chatId)
-        setSessions((prev) => {
-          const existing = prev.find((s) => s.id === chatId)
-          if (existing) {
-            return prev.map((s) => (s.id === chatId ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s))
-          }
-          return [{ id: chatId, title: text.slice(0, 60), createdAt: new Date().toISOString(), messages: [userMsg, aiMsg] }, ...prev]
-        })
+        setSessions((prev) =>
+          prev.some((s) => s.id === chatId)
+            ? prev.map((s) => (s.id === chatId ? { ...s, messages: thread, messageCount: thread.length } : s))
+            : [{ id: chatId, title: text.slice(0, 60), createdAt: new Date().toISOString(), messages: thread, messageCount: thread.length }, ...prev],
+        )
       }
     } catch (err) {
+      // Leaving the page aborts the reply; nothing is left to show it to.
+      if (controller.signal.aborted) return
       // Remove the optimistic messages so the user can retry cleanly, and give back the rate-limit slot.
       setMessages((prev) => prev.filter((m) => m.id !== userMsg.id && m.id !== aiId))
       setInput(text)
@@ -280,8 +336,10 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
         setActiveChatId(undefined)
         setMessages([])
         setError({ message: "This chat no longer exists. Send again to start a new chat." })
+      } else if (status === 429) {
+        setError({ message: "Etan has answered as many messages as it can for now. Try again a little later." })
       } else {
-        setError({ message: status && err instanceof Error ? err.message : "Could not reach Etan AI. Try again in a minute." })
+        setError({ message: "Etan could not answer just now. Try again in a minute." })
       }
     } finally {
       reader?.cancel().catch(() => {})
@@ -296,8 +354,16 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
       : remaining < RATE_LIMIT
         ? `${remaining} of ${RATE_LIMIT} messages left this minute.`
         : null
-  const blocked = loading || remaining <= 0
-  const list = <SessionList sessions={sessions} activeId={activeChatId} onSelect={selectSession} onPending={(p) => setPending({ ...p, open: true })} />
+  const blocked = loading || opening || remaining <= 0
+  const list = (
+    <SessionList
+      sessions={sessions}
+      activeId={activeChatId}
+      busy={loading}
+      onSelect={(s) => { void selectSession(s) }}
+      onPending={(p) => setPending({ ...p, open: true })}
+    />
+  )
 
   return (
     <div
@@ -307,7 +373,7 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
       <aside aria-label="Conversations" className="hidden min-h-0 flex-col border-r border-rule md:flex">
         <div className="flex items-center justify-between gap-2 border-b border-rule p-3">
           <h2 className="font-display text-h4 text-ink">Conversations</h2>
-          <Button size="sm" variant="outline" onClick={newChat}>
+          <Button size="sm" variant="outline" onClick={newChat} disabled={loading}>
             New chat
           </Button>
         </div>
@@ -327,7 +393,7 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
               <div className="px-6">
                 <SheetTitle>Conversations</SheetTitle>
                 <SheetDescription className="sr-only">Open, rename or delete a saved conversation.</SheetDescription>
-                <Button className="mt-4" onClick={newChat}>
+                <Button className="mt-4" onClick={newChat} disabled={loading}>
                   New chat
                 </Button>
               </div>
@@ -336,9 +402,13 @@ export default function AIChatApp({ initialSessions, initialChatId }: Readonly<{
           </Sheet>
         </div>
 
-        <div ref={scrollRef} aria-busy={loading} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+        <div ref={scrollRef} aria-busy={loading || opening} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="max-w-[66ch] space-y-6">
-            {messages.length === 0 && !loading ? (
+            {opening ? (
+              <p role="status" className="font-display text-caption text-ink-soft">
+                Opening the conversation…
+              </p>
+            ) : messages.length === 0 && !loading ? (
               <div>
                 <h3 className="font-display text-h3 text-ink">Ask Etan anything</h3>
                 <p className="mt-2 max-w-[52ch] text-body text-ink-soft">

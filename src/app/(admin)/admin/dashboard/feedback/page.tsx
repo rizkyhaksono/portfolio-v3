@@ -1,13 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
-import { getClientAuthorizationHeader } from "@/commons/helpers/client-auth-header"
-import { updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
+import { StatusLine } from "@/components/ui/status-line"
+import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { formatDay, httpUrl, timeAgo } from "@/components/layout/admin/admin-format"
 
 type Filter = FeedbackStatus | "all"
@@ -21,19 +21,6 @@ const FILTERS: { label: string; value: Filter }[] = [
 ]
 const STATUS_MARK = { new: "filled", read: "outline", archived: "dashed" } as const
 
-// shortcut: services/admin/feedback.ts cannot ask for a page yet; move this there when that file is next touched.
-async function fetchFeedback(filter: Filter, page: number): Promise<{ items: AdminFeedback[]; total: number }> {
-  const query = new URLSearchParams({ page: String(page), limit: String(PAGE_SIZE) })
-  if (filter !== "all") query.set("status", filter)
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v3/feedback?${query}`, {
-    headers: getClientAuthorizationHeader(),
-    cache: "no-store",
-  })
-  const json = await res.json().catch(() => null)
-  if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Feedback did not load (${res.status}).`)
-  return json.data
-}
-
 const sentence = (word: string) => word.charAt(0).toLocaleUpperCase("en") + word.slice(1)
 
 /** Correspondence: one letter per message, newest first, with its status as a tag and the two moves it allows. */
@@ -43,20 +30,25 @@ export default function FeedbackAdminPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [state, setState] = useState<"loading" | "more" | "ready" | "failed">("loading")
+  // Switching filters while a page loads must not let the older answer land on the new list.
+  const latest = useRef(0)
 
   const load = useCallback(async (next: number) => {
+    const request = ++latest.current
     setState(next === 1 ? "loading" : "more")
     try {
-      const data = await fetchFeedback(filter, next)
+      const data = await getFeedbackClient({ status: filter === "all" ? undefined : filter, page: next, limit: PAGE_SIZE })
+      if (request !== latest.current) return
       setItems((prev) => (next === 1 ? data.items : [...prev, ...data.items]))
       setTotal(data.total)
       setPage(next)
       setState("ready")
-    } catch (error) {
+    } catch {
+      if (request !== latest.current) return
       if (next === 1) setState("failed")
       else {
         setState("ready")
-        toast.error(error instanceof Error ? error.message : "Older feedback did not load.")
+        toast.error("Older feedback did not load. Try again.")
       }
     }
   }, [filter])
@@ -72,13 +64,13 @@ export default function FeedbackAdminPage() {
       const leaves = filter !== "all" && filter !== status
       setItems((prev) => (leaves ? prev.filter((f) => f.id !== item.id) : prev.map((f) => (f.id === item.id ? { ...f, status } : f))))
       if (leaves) setTotal((n) => n - 1)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "The status did not change. Try again.")
+    } catch {
+      toast.error("The status did not change. Try again.")
     }
   }
 
   return (
-    <div className="mx-auto w-full max-w-[46rem]">
+    <div className="w-full max-w-[60rem]">
       <div role="group" aria-label="Show feedback" className="flex flex-wrap gap-x-6 border-b border-rule">
         {FILTERS.map((f) => (
           <button
@@ -106,19 +98,24 @@ export default function FeedbackAdminPage() {
       )}
 
       {state === "failed" && (
-        <div className="py-10 text-center">
-          <p className="text-small text-ink-soft">Feedback did not load. The API may be down for a moment.</p>
-          <Button variant="outline" size="sm" className="mt-3" onClick={() => void load(1)}>
-            Try again
-          </Button>
-        </div>
+        <StatusLine
+          kind="failed"
+          className="mt-6"
+          action={
+            <Button variant="outline" size="sm" onClick={() => { void load(1) }}>
+              Try again
+            </Button>
+          }
+        >
+          Feedback did not load. The API may be down for a moment.
+        </StatusLine>
       )}
 
       {(state === "ready" || state === "more") &&
         (items.length === 0 ? (
-          <p className="py-10 text-center font-display text-small text-ink-soft">
+          <StatusLine kind="empty" className="py-10">
             {filter === "all" ? "No feedback yet." : `Nothing marked ${filter === "new" ? "new" : filter}.`}
-          </p>
+          </StatusLine>
         ) : (
           <>
             <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
@@ -139,7 +136,7 @@ export default function FeedbackAdminPage() {
                       <p className="mt-2 font-display text-caption text-ink-soft">
                         Sent {formatDay(f.createdAt)}, {timeAgo(f.createdAt)}.
                       </p>
-                      <p className="mt-3 whitespace-pre-wrap break-words text-body text-ink">{f.message}</p>
+                      <p className="mt-3 max-w-[66ch] whitespace-pre-wrap break-words text-body text-ink">{f.message}</p>
                       {(f.email || f.pageUrl) && (
                         <div className="mt-3 space-y-1 border-l border-ink pl-4 text-small text-ink-soft">
                           {f.email && (
@@ -163,12 +160,12 @@ export default function FeedbackAdminPage() {
                       )}
                       <div className="mt-4 flex flex-wrap gap-3">
                         {f.status !== "read" && (
-                          <Button size="sm" variant="outline" onClick={() => void setStatus(f, "read")}>
+                          <Button size="sm" variant="outline" onClick={() => { void setStatus(f, "read") }}>
                             Mark as read
                           </Button>
                         )}
                         {f.status !== "archived" && (
-                          <Button size="sm" variant="ghost" onClick={() => void setStatus(f, "archived")}>
+                          <Button size="sm" variant="ghost" onClick={() => { void setStatus(f, "archived") }}>
                             Archive
                           </Button>
                         )}
@@ -179,8 +176,8 @@ export default function FeedbackAdminPage() {
               })}
             </ol>
             {items.length < total && (
-              <div className="border-t border-rule pt-6 text-center">
-                <Button variant="outline" onClick={() => void load(page + 1)} disabled={state === "more"} aria-busy={state === "more"}>
+              <div className="border-t border-rule pt-6">
+                <Button variant="outline" onClick={() => { void load(page + 1) }} disabled={state === "more"} aria-busy={state === "more"}>
                   {state === "more" ? "Loading…" : "Load older feedback"}
                 </Button>
               </div>

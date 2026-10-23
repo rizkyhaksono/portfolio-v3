@@ -1,6 +1,7 @@
-import { getClientAuthorizationHeader } from "@/commons/helpers/client-auth-header"
+import { serverApiUrl } from "@/lib/api-base"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API = "/api/v3"
+const JSON_HEADERS = { "Content-Type": "application/json" }
 
 export type TrackerStatus = "todo" | "in_progress" | "in_qa" | "done"
 
@@ -27,48 +28,40 @@ export const TRACKER_COLUMNS: { id: TrackerStatus; label: string }[] = [
   { id: "done", label: "Done" },
 ]
 
-/** Public read — used in the server component for the initial board. */
-export async function getTrackerTasks(): Promise<TrackerTask[]> {
+/** Public read for the server-rendered board. Null means the API did not answer, which is not an empty board. */
+export async function getTrackerTasks(): Promise<TrackerTask[] | null> {
   try {
-    const res = await fetch(`${API_URL}/v3/tracker/`, { cache: "no-store" })
-    if (!res.ok) return []
+    const res = await fetch(`${serverApiUrl()}/v3/tracker`, { cache: "no-store", signal: AbortSignal.timeout(5000) })
+    if (!res.ok) return null
     const json = await res.json()
     return (json.data ?? []) as TrackerTask[]
   } catch {
-    return []
+    return null
   }
 }
 
 type CreateInput = { title: string; description?: string; status?: TrackerStatus; priority?: string; type?: string }
 type UpdateInput = Partial<Pick<TrackerTask, "title" | "description" | "status" | "priority" | "type" | "order">>
 
-export async function createTrackerTaskClient(input: CreateInput): Promise<TrackerTask> {
-  const res = await fetch(`${API_URL}/v3/tracker/`, {
-    method: "POST",
-    headers: getClientAuthorizationHeader(),
-    body: JSON.stringify(input),
+/** One tracker write through the same-origin proxy. */
+async function send<T>(path: string, method: "POST" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
+  const res = await fetch(`${API}/tracker${path}`, {
+    method,
+    headers: JSON_HEADERS,
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   })
   const json = await res.json().catch(() => null)
-  if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Failed to create (${res.status})`)
-  return json.data as TrackerTask
+  if (!res.ok || json?.status >= 400) throw new Error(`Tracker request failed (${res.status})`)
+  return json?.data as T
 }
 
-export async function updateTrackerTaskClient(id: string, input: UpdateInput): Promise<TrackerTask> {
-  const res = await fetch(`${API_URL}/v3/tracker/${id}`, {
-    method: "PATCH",
-    headers: getClientAuthorizationHeader(),
-    body: JSON.stringify(input),
-  })
-  const json = await res.json().catch(() => null)
-  if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Failed to update (${res.status})`)
-  return json.data as TrackerTask
-}
+/** Adds a card. */
+export const createTrackerTaskClient = (input: CreateInput) => send<TrackerTask>("", "POST", input)
+
+/** Changes a card. */
+export const updateTrackerTaskClient = (id: string, input: UpdateInput) =>
+  send<TrackerTask>(`/${encodeURIComponent(id)}`, "PATCH", input)
 
 export async function deleteTrackerTaskClient(id: string): Promise<void> {
-  const res = await fetch(`${API_URL}/v3/tracker/${id}`, {
-    method: "DELETE",
-    headers: getClientAuthorizationHeader(),
-  })
-  const json = await res.json().catch(() => null)
-  if (!res.ok || json?.status >= 400) throw new Error(json?.message || `Failed to delete (${res.status})`)
+  await send(`/${encodeURIComponent(id)}`, "DELETE")
 }

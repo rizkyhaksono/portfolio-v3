@@ -20,7 +20,7 @@ function takeReturnPath() {
   }
 }
 
-/** Takes the session token out of the address bar at once, checks it, then returns to where sign-in started. */
+/** Takes the one-time sign-in code out of the address bar at once, trades it on the server, then returns to where sign-in started. */
 export function OAuthCallback() {
   const router = useRouter()
   // The sign-in page to go back to once the check fails (admin or visitor); null while checking.
@@ -28,15 +28,17 @@ export function OAuthCallback() {
   const started = useRef(false)
 
   useEffect(() => {
-    // Strict Mode runs effects twice; the token is single use once it leaves the URL.
+    // Strict Mode runs effects twice; the code is single use once it leaves the URL.
     if (started.current) return
     started.current = true
 
-    const token = new URLSearchParams(window.location.search).get("token") ?? ""
+    const params = new URLSearchParams(window.location.search)
+    const code = params.get("code") ?? undefined
+    const token = params.get("token") ?? undefined
     window.history.replaceState(null, "", window.location.pathname)
     const returnTo = takeReturnPath()
 
-    completeOAuthSignin(token)
+    completeOAuthSignin({ code, token })
       .catch(() => false)
       .then((ok) => {
         if (!ok) return setRetryHref(returnTo.startsWith("/admin") ? "/admin/auth/login" : "/auth")

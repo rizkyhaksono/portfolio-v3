@@ -127,11 +127,11 @@ export default function WPMTest() {
           disabled={phase === "running"}
         />
         <ChoiceGroup label="Language" options={LANGUAGES} value={language} onChange={setLanguage} disabled={phase === "running"} />
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={() => restart(true)} disabled={phase === "running"}>
+        <div className="flex gap-x-6">
+          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(true)} disabled={phase === "running"}>
             New words
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => restart(false)} disabled={phase === "idle"}>
+          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(false)} disabled={phase === "idle"}>
             Restart
           </Button>
         </div>
@@ -142,7 +142,7 @@ export default function WPMTest() {
         {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
       </p>
 
-      <p className="min-h-[9rem] border border-rule p-5 text-body leading-loose">
+      <p className="wpm-passage min-h-[9rem] border border-rule p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
           const wordIndex = start + k
           return (
@@ -157,7 +157,7 @@ export default function WPMTest() {
         })}
       </p>
 
-      <div className="mx-auto max-w-md space-y-1">
+      <div className="space-y-1">
         <Label htmlFor="wpm-input">Type the words above. The clock starts with your first letter.</Label>
         <Input
           id="wpm-input"
@@ -183,11 +183,11 @@ export default function WPMTest() {
       )}
 
       {phase === "done" && (
-        <div role="status" className="space-y-4 border-t border-ink pt-6 text-center">
+        <div role="status" className="space-y-4 border-t border-ink pt-6">
           <p className="font-display text-h3 text-ink">
             Time is up: {wpm} words a minute at {accuracy}% accuracy.
           </p>
-          <div className="flex justify-center gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button onClick={() => restart(false)}>Try again</Button>
             <Button variant="outline" onClick={() => restart(true)}>
               New words

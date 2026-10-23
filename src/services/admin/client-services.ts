@@ -1,10 +1,9 @@
-// Client-side admin services for use in client components
-// These services use document.cookie for authentication
+// Client-side admin services for use in client components.
+// Backend calls go through the same-origin /api/v3 proxy, which adds the session from its httpOnly cookie.
 // Supports both Backend API (Prisma) and Supabase databases
 
-import { getClientAuthorizationHeader } from "@/commons/helpers/client-auth-header"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API = "/api/v3"
+const JSON_HEADERS = { "Content-Type": "application/json" }
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -122,10 +121,10 @@ export async function getProjectsClient(query?: { page?: number; limit?: number 
   if (query?.page) params.append("page", query.page.toString())
   if (query?.limit) params.append("limit", query.limit.toString())
 
-  const url = buildUrl(`${API_URL}/v3/project/`, params)
+  const url = buildUrl(`${API}/project`, params)
   const response = await fetch(url, {
     method: "GET",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -136,9 +135,9 @@ export async function getProjectsClient(query?: { page?: number; limit?: number 
 }
 
 export async function createProjectClient(project: Omit<BackendProject, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${API_URL}/v3/project/`, {
+  const response = await fetch(`${API}/project`, {
     method: "POST",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(project),
   })
 
@@ -150,9 +149,9 @@ export async function createProjectClient(project: Omit<BackendProject, "id" | "
 }
 
 export async function updateProjectClient(id: string, project: Partial<BackendProject>) {
-  const response = await fetch(`${API_URL}/v3/project/${id}`, {
+  const response = await fetch(`${API}/project/${id}`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(project),
   })
 
@@ -164,9 +163,9 @@ export async function updateProjectClient(id: string, project: Partial<BackendPr
 }
 
 export async function deleteProjectClient(id: string) {
-  const response = await fetch(`${API_URL}/v3/project/${id}`, {
+  const response = await fetch(`${API}/project/${id}`, {
     method: "DELETE",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -182,10 +181,10 @@ export async function getWorkClient(query?: { page?: number; limit?: number }) {
   if (query?.page) params.append("page", query.page.toString())
   if (query?.limit) params.append("limit", query.limit.toString())
 
-  const url = buildUrl(`${API_URL}/v3/work/`, params)
+  const url = buildUrl(`${API}/work`, params)
   const response = await fetch(url, {
     method: "GET",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -196,9 +195,9 @@ export async function getWorkClient(query?: { page?: number; limit?: number }) {
 }
 
 export async function createWorkClient(work: Omit<BackendWork, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${API_URL}/v3/work/`, {
+  const response = await fetch(`${API}/work`, {
     method: "POST",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(work),
   })
 
@@ -210,9 +209,9 @@ export async function createWorkClient(work: Omit<BackendWork, "id" | "created_a
 }
 
 export async function updateWorkClient(id: string, work: Partial<BackendWork>) {
-  const response = await fetch(`${API_URL}/v3/work/${id}`, {
+  const response = await fetch(`${API}/work/${id}`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(work),
   })
 
@@ -224,9 +223,9 @@ export async function updateWorkClient(id: string, work: Partial<BackendWork>) {
 }
 
 export async function deleteWorkClient(id: string) {
-  const response = await fetch(`${API_URL}/v3/work/${id}`, {
+  const response = await fetch(`${API}/work/${id}`, {
     method: "DELETE",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -242,10 +241,10 @@ export async function getEducationClient(query?: { page?: number; limit?: number
   if (query?.page) params.append("page", query.page.toString())
   if (query?.limit) params.append("limit", query.limit.toString())
 
-  const url = buildUrl(`${API_URL}/v3/education/`, params)
+  const url = buildUrl(`${API}/education`, params)
   const response = await fetch(url, {
     method: "GET",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -256,9 +255,9 @@ export async function getEducationClient(query?: { page?: number; limit?: number
 }
 
 export async function createEducationClient(education: Omit<BackendEducation, "id" | "created_at" | "updated_at">) {
-  const response = await fetch(`${API_URL}/v3/education/`, {
+  const response = await fetch(`${API}/education`, {
     method: "POST",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(education),
   })
 
@@ -270,9 +269,9 @@ export async function createEducationClient(education: Omit<BackendEducation, "i
 }
 
 export async function updateEducationClient(id: string, education: Partial<BackendEducation>) {
-  const response = await fetch(`${API_URL}/v3/education/${id}`, {
+  const response = await fetch(`${API}/education/${id}`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(education),
   })
 
@@ -284,9 +283,9 @@ export async function updateEducationClient(id: string, education: Partial<Backe
 }
 
 export async function deleteEducationClient(id: string) {
-  const response = await fetch(`${API_URL}/v3/education/${id}`, {
+  const response = await fetch(`${API}/education/${id}`, {
     method: "DELETE",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -298,9 +297,9 @@ export async function deleteEducationClient(id: string) {
 
 // User Services - Backend
 export async function getCurrentUserClient() {
-  const response = await fetch(`${API_URL}/v3/me/`, {
+  const response = await fetch(`${API}/me`, {
     method: "GET",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -315,9 +314,9 @@ export async function updateUserClient(
   id: string,
   data: { name?: string; email?: string; about?: string; location?: string; headline?: string }
 ) {
-  const response = await fetch(`${API_URL}/v3/me/${id}`, {
+  const response = await fetch(`${API}/me/${id}`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(data),
   })
 
@@ -331,14 +330,7 @@ export async function updateUserClient(
 export async function uploadAvatarClient(file: File) {
   const formData = new FormData()
   formData.append("file", file)
-  const headers = { ...getClientAuthorizationHeader() } as Record<string, string>
-  delete headers["Content-Type"]
-
-  const response = await fetch(`${API_URL}/v3/me/avatar`, {
-    method: "POST",
-    headers,
-    body: formData,
-  })
+  const response = await fetch(`${API}/me/avatar`, { method: "POST", body: formData })
 
   if (!response.ok) {
     throw new Error(`Failed to upload avatar: ${response.status}`)
@@ -360,9 +352,9 @@ export interface AdminSettings {
 }
 
 export async function getAdminSettingsClient(): Promise<AdminSettings> {
-  const response = await fetch(`${API_URL}/v3/me/settings`, {
+  const response = await fetch(`${API}/me/settings`, {
     method: "GET",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
 
   if (!response.ok) {
@@ -374,9 +366,9 @@ export async function getAdminSettingsClient(): Promise<AdminSettings> {
 }
 
 export async function updateAdminSettingsClient(data: Partial<AdminSettings>) {
-  const response = await fetch(`${API_URL}/v3/me/settings`, {
+  const response = await fetch(`${API}/me/settings`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(data),
   })
 
@@ -402,8 +394,8 @@ export interface BlogPost {
 
 export async function getBlogPostsClient(publishedOnly = false) {
   const url = publishedOnly
-    ? `${API_URL}/v3/blog/?publishedOnly=true`
-    : `${API_URL}/v3/blog/`
+    ? `${API}/blog?publishedOnly=true`
+    : `${API}/blog`
   const response = await fetch(url, { method: "GET" })
   if (!response.ok) throw new Error(`Failed to fetch blog posts: ${response.status}`)
   const json = await response.json()
@@ -413,9 +405,9 @@ export async function getBlogPostsClient(publishedOnly = false) {
 export async function createBlogPostClient(
   post: Omit<BlogPost, "id" | "created_at" | "updated_at" | "publishedAt">
 ) {
-  const response = await fetch(`${API_URL}/v3/blog/`, {
+  const response = await fetch(`${API}/blog`, {
     method: "POST",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(post),
   })
   if (!response.ok) throw new Error(`Failed to create blog post: ${response.status}`)
@@ -423,9 +415,9 @@ export async function createBlogPostClient(
 }
 
 export async function updateBlogPostClient(id: string, post: Partial<BlogPost>) {
-  const response = await fetch(`${API_URL}/v3/blog/${id}`, {
+  const response = await fetch(`${API}/blog/${id}`, {
     method: "PATCH",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
     body: JSON.stringify(post),
   })
   if (!response.ok) throw new Error(`Failed to update blog post: ${response.status}`)
@@ -433,56 +425,20 @@ export async function updateBlogPostClient(id: string, post: Partial<BlogPost>) 
 }
 
 export async function deleteBlogPostClient(id: string) {
-  const response = await fetch(`${API_URL}/v3/blog/${id}`, {
+  const response = await fetch(`${API}/blog/${id}`, {
     method: "DELETE",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
   if (!response.ok) throw new Error(`Failed to delete blog post: ${response.status}`)
   return await response.json()
 }
 
 export async function reindexPortfolioClient() {
-  const response = await fetch(`${API_URL}/v3/ai/reindex`, {
+  const response = await fetch(`${API}/ai/reindex`, {
     method: "POST",
-    headers: getClientAuthorizationHeader(),
+    headers: JSON_HEADERS,
   })
   if (!response.ok) throw new Error(`Failed to reindex portfolio: ${response.status}`)
-  return await response.json()
-}
-
-export async function getUsersClient(query?: { page?: number; limit?: number }) {
-  const params = new URLSearchParams()
-  if (query?.page) params.append("page", query.page.toString())
-  if (query?.limit) params.append("limit", query.limit.toString())
-
-  const url = buildUrl(`${API_URL}/v3/user/`, params)
-  const response = await fetch(url, {
-    method: "GET",
-    headers: getClientAuthorizationHeader(),
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch users: ${response.status}`)
-  }
-
-  return await response.json()
-}
-
-// Public Chat Services - Backend
-export async function getPublicChatsClient(cursor?: string, limit: number = 10) {
-  const params = new URLSearchParams()
-  if (cursor) params.append("cursor", cursor)
-  if (limit) params.append("limit", limit.toString())
-
-  const url = buildUrl(`${API_URL}/v3/public-chat/public-chat/`, params)
-  const response = await fetch(url, {
-    method: "GET",
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch chats: ${response.status}`)
-  }
-
   return await response.json()
 }
 
@@ -567,47 +523,4 @@ export async function updateSupabaseEducationClient(id: string, education: Parti
 export async function deleteSupabaseEducationClient(id: string) {
   await adminSupabaseMutation<SupabaseEducation>(`education/${id}`, "DELETE")
   return { success: true }
-}
-
-// ==================== Analytics ====================
-
-export async function getBackendAnalyticsClient() {
-  const [projectsRes, workRes, educationRes, usersRes, chatsRes] = await Promise.all([
-    getProjectsClient({ page: 1, limit: 1 }),
-    getWorkClient({ page: 1, limit: 1 }),
-    getEducationClient({ page: 1, limit: 1 }),
-    getUsersClient({ page: 1, limit: 1 }).catch(() => ({ total: 0 })),
-    getPublicChatsClient(undefined, 1).catch(() => ({ total: 0 })),
-  ])
-
-  return {
-    projects: projectsRes.total || projectsRes.data?.length || 0,
-    work: workRes.total || workRes.data?.length || 0,
-    education: educationRes.total || educationRes.data?.length || 0,
-    users: usersRes.total || usersRes.data?.length || 0,
-    publicChats: chatsRes.total || chatsRes.data?.length || 0,
-  }
-}
-
-export async function getSupabaseAnalyticsClient() {
-  const [projects, careers, educations] = await Promise.all([
-    getSupabaseProjectsClient().catch(() => []),
-    getSupabaseCareersClient().catch(() => []),
-    getSupabaseEducationsClient().catch(() => []),
-  ])
-
-  return {
-    projects: projects.length,
-    careers: careers.length,
-    educations: educations.length,
-  }
-}
-
-export async function getDualDatabaseAnalyticsClient() {
-  const [backend, supabase] = await Promise.all([
-    getBackendAnalyticsClient().catch(() => ({ projects: 0, work: 0, education: 0, users: 0, publicChats: 0 })),
-    getSupabaseAnalyticsClient().catch(() => ({ projects: 0, careers: 0, educations: 0 })),
-  ])
-
-  return { backend, supabase }
 }

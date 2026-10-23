@@ -1,12 +1,25 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 
-// Loaded after hydration: every toast follows a user action or a fetch, and pages that call toast()
-// already ship sonner, so the Toaster is subscribed before their first toast.
 const SonnerToaster = dynamic(() => import("sonner").then((module) => module.Toaster), { ssr: false })
 
+// Mounted once the browser is idle: every toast follows a user action or a fetch, so the Toaster is
+// subscribed before the first one without competing with the page's first paint.
 export function Toaster() {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(() => setReady(true), { timeout: 3000 })
+      return () => window.cancelIdleCallback(id)
+    }
+    const id = window.setTimeout(() => setReady(true), 1500)
+    return () => window.clearTimeout(id)
+  }, [])
+
+  if (!ready) return null
   return (
     <SonnerToaster
       position="top-right"

@@ -1,46 +1,11 @@
-import { unstable_cache } from "next/cache"
 import { PageSection } from "@/components/ui/page-section"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { InkChart } from "@/components/ui/ink-chart"
 import { ReadingNow } from "@/components/ui/reading-now"
 import type { UmamiStats } from "@/commons/types/umami"
 import type { UmamiTimeseries } from "@/services/visitor/umami"
-import { getBlogData } from "@/services/visitor/blog"
-import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
+import { mostRead } from "@/services/visitor/most-read"
 import { cn } from "@/lib/utils"
-import { getAllProject } from "@/services/visitor/project"
-
-const MIN_READERS = 10
-const ARTICLE_PATH = /^\/(blog|project)\/./
-
-const listOf = <T,>(result: PromiseSettledResult<T[] | null | undefined>) =>
-  result.status === "fulfilled" ? (result.value ?? []) : []
-
-// shortcut: same lookup as the home Readers section (src/app/_components/site-stats), copied because that file
-// is out of this change's scope; move both into one shared module when either is next touched.
-const articleTitles = unstable_cache(
-  async (): Promise<[string, string][]> => {
-    const [devto, onsite, projects] = await Promise.allSettled([getBlogData(), getOnsiteBlogPosts(), getAllProject()])
-    return [
-      ...listOf(devto).map((post): [string, string] => [`/blog/${post.slug}`, post.title]),
-      ...listOf(onsite).map((post): [string, string] => [`/blog/onsite/${post.slug}`, post.title]),
-      ...listOf(projects).map((project): [string, string] => [`/project/${project.id}`, project.title]),
-    ]
-  },
-  ["stats-article-titles"],
-  { revalidate: 3600 },
-)
-
-async function mostRead(reads: Map<string, number>) {
-  const candidates = [...reads].filter(([path, n]) => n >= MIN_READERS && ARTICLE_PATH.test(path))
-  if (candidates.length === 0) return []
-  const titles = new Map(await articleTitles().catch(() => []))
-  return candidates
-    .filter(([path]) => titles.has(path))
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([path, readers]) => ({ path, readers, title: titles.get(path) as string }))
-}
 
 function change(delta: number | undefined) {
   if (delta === undefined) return ""

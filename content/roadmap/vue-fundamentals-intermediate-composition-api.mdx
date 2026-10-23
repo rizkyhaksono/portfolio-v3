@@ -89,10 +89,10 @@ import { reactive, toRefs } from "vue"
 
 const state = reactive({ x: 0, y: 0 })
 
-// ❌ x and y are plain numbers now — updates to state won't reflect
+// Breaks: x and y are plain numbers now — updates to state won't reflect
 const { x, y } = state
 
-// ✅ each stays connected to state
+// Works: each stays connected to state
 const { x: rx, y: ry } = toRefs(state)
 rx.value++ // also updates state.x
 ```

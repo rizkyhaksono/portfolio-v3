@@ -1,31 +1,29 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { StatusLine } from "@/components/ui/status-line"
 
 type Status = "loading" | "ready" | "error"
 
 /**
- * Runs `load` on mount and whenever it changes (memoise it with useCallback), ignores answers that
- * arrive after a newer request, and keeps the last data while reloading so pagers stay put.
+ * Runs `load` on mount and whenever it changes (memoise it with useCallback), aborts the request a newer
+ * one replaces, and keeps the last data while reloading or after a failure so pagers stay put.
  */
-export function useToolData<T>(load: () => Promise<T>) {
+export function useToolData<T>(load: (signal: AbortSignal) => Promise<T>) {
   const [state, setState] = useState<{ status: Status; data?: T }>({ status: "loading" })
   const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
-    let current = true
+    const controller = new AbortController()
     setState((s) => ({ status: "loading", data: s.data }))
-    load().then(
-      (data) => current && setState({ status: "ready", data }),
-      () => current && setState({ status: "error" }),
+    load(controller.signal).then(
+      (data) => !controller.signal.aborted && setState({ status: "ready", data }),
+      () => !controller.signal.aborted && setState((s) => ({ status: "error", data: s.data })),
     )
-    return () => {
-      current = false
-    }
+    return () => controller.abort()
   }, [load, attempt])
 
   return { ...state, retry: () => setAttempt((n) => n + 1) }
@@ -34,26 +32,27 @@ export function useToolData<T>(load: () => Promise<T>) {
 /** Inline failure: an italic ink line behind a cross, and a retry when one helps. */
 export function ToolError({ children, onRetry }: Readonly<{ children: React.ReactNode; onRetry?: () => void }>) {
   return (
-    <div role="alert" className="flex flex-col items-start gap-3 border border-ink p-4 sm:flex-row sm:items-center sm:justify-between">
-      <p className="flex gap-2 font-display text-body text-ink">
-        <X aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0" />
-        <span>{children}</span>
-      </p>
-      {onRetry && (
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          Try again
-        </Button>
-      )}
-    </div>
+    <StatusLine
+      kind="failed"
+      action={
+        onRetry && (
+          <Button variant="outline" size="sm" onClick={onRetry}>
+            Try again
+          </Button>
+        )
+      }
+    >
+      {children}
+    </StatusLine>
   )
 }
 
 /** A word, not a spinner. */
 export function ToolLoading({ children = "Loading…" }: Readonly<{ children?: React.ReactNode }>) {
   return (
-    <p role="status" className="py-8 font-display text-caption text-ink-soft">
+    <StatusLine kind="loading" className="py-8">
       {children}
-    </p>
+    </StatusLine>
   )
 }
 

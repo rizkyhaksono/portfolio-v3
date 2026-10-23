@@ -1,46 +1,11 @@
-import { unstable_cache } from "next/cache"
 import { PageSection } from "@/components/ui/page-section"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { InkChart } from "@/components/ui/ink-chart"
 import { InkLink } from "@/components/ui/ink-link"
 import { ReadingNow } from "@/components/ui/reading-now"
 import { getDailyPageviews, getPathReads, getUmamiStats } from "@/services/visitor/umami"
-import { getBlogData } from "@/services/visitor/blog"
-import { getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
-import { getAllProject } from "@/services/visitor/project"
+import { mostRead } from "@/services/visitor/most-read"
 import { DEFERRED_SECTION } from "../deferred"
-
-const MIN_READERS = 10
-const ARTICLE_PATH = /^\/(blog|project)\/./
-
-const listOf = <T,>(result: PromiseSettledResult<T[] | null | undefined>) =>
-  result.status === "fulfilled" ? (result.value ?? []) : []
-
-// Inside unstable_cache the source fetches (DEV is revalidate 60, onsite no-store) neither lower the page's
-// ISR window nor make it dynamic; titles change rarely, so one lookup an hour.
-const articleTitles = unstable_cache(
-  async (): Promise<[string, string][]> => {
-    const [devto, onsite, projects] = await Promise.allSettled([getBlogData(), getOnsiteBlogPosts(), getAllProject()])
-    return [
-      ...listOf(devto).map((post): [string, string] => [`/blog/${post.slug}`, post.title]),
-      ...listOf(onsite).map((post): [string, string] => [`/blog/onsite/${post.slug}`, post.title]),
-      ...listOf(projects).map((project): [string, string] => [`/project/${project.id}`, project.title]),
-    ]
-  },
-  ["home-article-titles"],
-  { revalidate: 3600 },
-)
-
-async function mostRead(reads: Map<string, number>) {
-  const candidates = [...reads].filter(([path, n]) => n >= MIN_READERS && ARTICLE_PATH.test(path))
-  if (candidates.length === 0) return []
-  const titles = new Map(await articleTitles().catch(() => []))
-  return candidates
-    .filter(([path]) => titles.has(path))
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5)
-    .map(([path, readers]) => ({ path, readers, title: titles.get(path) as string }))
-}
 
 function change(delta: number | undefined) {
   if (delta === undefined) return null

@@ -1,30 +1,39 @@
-import { cookies } from "next/headers"
 import { NextRequest } from "next/server"
+import { z } from "zod"
+import { serverApiUrl } from "@/lib/api-base"
+import { readJson } from "@/lib/read-json"
+import { getSessionToken } from "@/lib/session"
+import { apiProxyHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
+const ChatBody = z.object({
+  text: z.string().trim().min(1).max(4000),
+  chatId: z.string().regex(/^[\w-]{1,64}$/).optional(),
+})
+
 /**
- * Streaming proxy for Etan AI. Reads the (httpOnly) session cookie server-side,
+ * Streaming proxy for Etan AI. Reads the httpOnly session cookie server-side,
  * forwards to the backend `/v3/ai`, and passes the streamed response straight
- * through to the client so the answer types out like ChatGPT.
+ * through to the client as it is written.
  */
 export async function POST(req: NextRequest) {
-  const token = (await cookies()).get("NATEE_V3_TOKEN")?.value
+  const token = await getSessionToken()
   if (!token) {
     return Response.json({ message: "Authentication required." }, { status: 401 })
   }
 
-  const body = await req.json().catch(() => null)
-  if (!body?.text) {
-    return Response.json({ message: "Message text is required." }, { status: 400 })
+  const body = await readJson(req, ChatBody, 32_000)
+  if (!body.ok) {
+    return Response.json({ message: "Write a message of up to 4,000 characters." }, { status: body.status })
   }
 
-  const apiUrl = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL
+  const apiUrl = serverApiUrl()
   if (!apiUrl) {
     return Response.json({ message: "AI service is not configured." }, { status: 503 })
   }
 
-  // Time out only the wait for headers; the paced stream after that can legitimately run longer.
+  // Time out only the wait for headers; the stream after that can legitimately run longer.
   const headersTimeout = new AbortController()
   const timer = setTimeout(() => headersTimeout.abort(), 90_000)
   let backendRes: Response
@@ -34,11 +43,9 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
+        ...apiProxyHeaders(req.headers),
       },
-      body: JSON.stringify({
-        text: body.text,
-        ...(body.chatId ? { chatId: body.chatId } : {}),
-      }),
+      body: JSON.stringify(body.data),
       signal: AbortSignal.any([req.signal, headersTimeout.signal]),
     })
   } catch {

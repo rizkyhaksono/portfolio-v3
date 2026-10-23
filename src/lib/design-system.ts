@@ -24,6 +24,9 @@ export const SURFACE_PADDING = {
   cozy: "p-4",
 } as const
 
+/** The one page width every route shares (running head, pages, colophon, error page). */
+export const SHELL_WIDTH = "mx-auto w-full max-w-[76rem] px-[clamp(20px,4vw,48px)]"
+
 /** Section spacing used by PageSection / home blocks. */
 export const SECTION_SPACING = {
   section: "mt-12 sm:mt-16",

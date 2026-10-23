@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { InkChart } from "@/components/ui/ink-chart"
+import { StatusLine } from "@/components/ui/status-line"
 import type { FullUmamiAnalytics } from "@/services/visitor/umami"
 import type { UmamiMetric } from "@/commons/types/umami"
 
@@ -57,7 +58,7 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
   const here = data.activeVisitors
 
   return (
-    <div className="mx-auto w-full max-w-[60rem]">
+    <div className="w-full max-w-[60rem]">
       <nav aria-label="Range" className="flex flex-wrap gap-x-6 border-b border-rule">
         {(Object.keys(RANGES) as RangeId[]).map((id) => (
           <Link
@@ -103,9 +104,9 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
           </section>
         </>
       ) : (
-        <p className="mt-6 border-y border-rule py-8 text-center text-small text-ink-soft">
+        <StatusLine kind="failed" className="mt-6">
           Umami did not answer. The figures come back on the next load once it is reachable.
-        </p>
+        </StatusLine>
       )}
 
       <div className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">

@@ -43,7 +43,7 @@ export function LedgerRow({ title, href, external, event, eventData, meta, title
   return (
     <li className={cn("relative grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[minmax(0,1fr)_auto]", href && "transition-colors hover:bg-tint", className)}>
       <div className="min-w-0">
-        <Title className="font-display text-h4 text-pretty text-ink">
+        <Title className="font-display text-h4 text-balance text-ink">
           {href ? (
             <InkLink
               href={href}

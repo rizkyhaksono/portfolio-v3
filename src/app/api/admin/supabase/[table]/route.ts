@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { revalidateTag } from "next/cache"
-import { requireAdmin, getServiceClient, isAllowedTable } from "@/lib/admin-supabase-api"
+import { requireAdmin, getServiceClient, isAllowedTable, parseRow } from "@/lib/admin-supabase-api"
 
 export const dynamic = "force-dynamic"
 
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic"
 export async function POST(request: Request, { params }: { params: Promise<{ table: string }> }) {
   const { table } = await params
   if (!isAllowedTable(table)) {
-    return NextResponse.json({ error: `Unknown table: ${table}` }, { status: 400 })
+    return NextResponse.json({ error: "Unknown table" }, { status: 400 })
   }
 
   const authError = await requireAdmin()
@@ -16,15 +16,21 @@ export async function POST(request: Request, { params }: { params: Promise<{ tab
     return NextResponse.json({ error: authError }, { status: 401 })
   }
 
+  const row = parseRow(table, await request.json().catch(() => null), { partial: false })
+  if (!row.success) {
+    return NextResponse.json({ error: "Some fields are not valid. Check them and try again." }, { status: 400 })
+  }
+
   try {
-    const body = await request.json()
-    const { data, error } = await getServiceClient().from(table).insert(body).select().single()
+    const { data, error } = await getServiceClient().from(table).insert(row.data).select().single()
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error("Supabase insert failed:", error.message)
+      return NextResponse.json({ error: "The row was not saved. Try again." }, { status: 400 })
     }
     revalidateTag("supabase", "max")
     return NextResponse.json({ data }, { status: 201 })
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Create failed" }, { status: 500 })
+    console.error("Supabase insert failed:", e)
+    return NextResponse.json({ error: "The row was not saved. Try again." }, { status: 500 })
   }
 }

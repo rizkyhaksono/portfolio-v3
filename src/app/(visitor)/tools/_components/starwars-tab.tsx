@@ -38,11 +38,13 @@ function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => P
   const [page, setPage] = useState(1)
   const list = useToolData(useCallback(() => load(page), [load, page]))
   const loading = list.status === "loading"
+  const failure = list.status === "error" && <ToolError onRetry={list.retry}>The {label} did not load.</ToolError>
 
-  if (list.status === "error") return <ToolError onRetry={list.retry}>The {label} did not load.</ToolError>
+  if (failure && !list.data) return failure
 
   return (
     <div className="space-y-6">
+      {failure}
       <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 xl:grid-cols-5">
         {loading
           ? Array.from({ length: 10 }, (_, i) => (

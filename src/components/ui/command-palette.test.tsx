@@ -9,6 +9,8 @@ const docs = [
   { id: "b1", type: "blog", title: "Kanban notes", description: "Working in a team", url: "/blog/kanban", tags: [] },
 ]
 
+const fetchMock = jest.fn()
+
 beforeAll(() => {
   global.ResizeObserver = class {
     observe() {}
@@ -16,7 +18,12 @@ beforeAll(() => {
     disconnect() {}
   }
   Element.prototype.scrollIntoView = jest.fn()
-  global.fetch = jest.fn(async () => ({ json: async () => ({ docs }) })) as unknown as typeof fetch
+  global.fetch = fetchMock as unknown as typeof fetch
+})
+
+beforeEach(() => {
+  fetchMock.mockReset()
+  fetchMock.mockResolvedValue({ ok: true, json: async () => ({ docs }) })
 })
 
 it("finds a document by a tag without crashing (stored tags stay an array)", async () => {
@@ -28,4 +35,25 @@ it("finds a document by a tag without crashing (stored tags stay an array)", asy
 
   expect(await screen.findByText("React dashboard")).toBeInTheDocument()
   expect(screen.queryByText("Kanban notes")).not.toBeInTheDocument()
+})
+
+it("says the index failed, then fetches it again the next time search opens", async () => {
+  fetchMock.mockResolvedValueOnce({ ok: false, json: async () => ({}) })
+  let view!: ReturnType<typeof render>
+  await act(async () => {
+    view = render(<CommandPalette open onOpenChange={() => {}} />)
+  })
+  fireEvent.change(screen.getByPlaceholderText(/search pages/i), { target: { value: "charts" } })
+  expect(await screen.findByText(/search did not load/i)).toBeInTheDocument()
+
+  await act(async () => {
+    view.rerender(<CommandPalette open={false} onOpenChange={() => {}} />)
+  })
+  await act(async () => {
+    view.rerender(<CommandPalette open onOpenChange={() => {}} />)
+  })
+  fireEvent.change(screen.getByPlaceholderText(/search pages/i), { target: { value: "charts" } })
+
+  expect(await screen.findByText("React dashboard")).toBeInTheDocument()
+  expect(fetchMock).toHaveBeenCalledTimes(2)
 })

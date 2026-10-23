@@ -18,7 +18,7 @@ type projectType = {
 export const getAllProject = cache(async () => {
   const { data } = await supabaseUser
     .from("projects")
-    .select("*")
+    .select("id, title, description, url, source_code, image, created_at, updated_at")
     .order("created_at", {
       ascending: false,
     })

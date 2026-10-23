@@ -1,45 +1,48 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+import { serverApiUrl } from "@/lib/api-base"
+import { readJson } from "@/lib/read-json"
+import { apiProxyHeaders } from "@/lib/trusted-client-ip"
 
 export const dynamic = "force-dynamic"
 
-function apiBase(): string | undefined {
-  return process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL
-}
+const Target = z.object({
+  targetType: z.string().min(1).max(40),
+  targetId: z.string().min(1).max(200),
+})
 
-function fwdHeader(req: NextRequest): Record<string, string> {
-  const fwd = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? ""
-  return fwd ? { "x-forwarded-for": fwd } : {}
-}
+const NO_REACTIONS = { data: { count: 0, reacted: false } }
 
 export async function GET(req: NextRequest) {
-  const apiUrl = apiBase()
-  if (!apiUrl) return NextResponse.json({ data: { count: 0, reacted: false } })
-  const targetType = req.nextUrl.searchParams.get("targetType") ?? ""
-  const targetId = req.nextUrl.searchParams.get("targetId") ?? ""
+  const apiUrl = serverApiUrl()
+  const target = Target.safeParse({
+    targetType: req.nextUrl.searchParams.get("targetType"),
+    targetId: req.nextUrl.searchParams.get("targetId"),
+  })
+  if (!apiUrl || !target.success) return NextResponse.json(NO_REACTIONS)
   try {
-    const res = await fetch(`${apiUrl}/v3/reactions?targetType=${encodeURIComponent(targetType)}&targetId=${encodeURIComponent(targetId)}`, {
+    const query = new URLSearchParams(target.data)
+    const res = await fetch(`${apiUrl}/v3/reactions?${query}`, {
       cache: "no-store",
-      headers: { ...fwdHeader(req) },
+      headers: apiProxyHeaders(req.headers),
     })
     const text = await res.text()
     return new Response(text, { status: res.status, headers: { "Content-Type": "application/json" } })
   } catch {
-    return NextResponse.json({ data: { count: 0, reacted: false } })
+    return NextResponse.json(NO_REACTIONS)
   }
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null)
-  if (!body?.targetType || !body?.targetId) {
-    return Response.json({ message: "targetType and targetId are required." }, { status: 400 })
-  }
-  const apiUrl = apiBase()
+  const body = await readJson(req, Target, 2_000)
+  if (!body.ok) return Response.json({ message: "targetType and targetId are required." }, { status: body.status })
+  const apiUrl = serverApiUrl()
   if (!apiUrl) return Response.json({ message: "Service is not configured." }, { status: 503 })
   try {
     const res = await fetch(`${apiUrl}/v3/reactions`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...fwdHeader(req) },
-      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json", ...apiProxyHeaders(req.headers) },
+      body: JSON.stringify(body.data),
     })
     const text = await res.text()
     return new Response(text, { status: res.status, headers: { "Content-Type": "application/json" } })

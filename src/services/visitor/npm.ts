@@ -14,11 +14,13 @@ export type NpmStats = {
 
 export async function getNpmStats(): Promise<NpmStats | null> {
   const username = STATS_PROFILES.npm
+  // One deadline for the search and every download count, so the whole fan-out ends in five seconds.
+  const signal = AbortSignal.timeout(5000)
 
   try {
     const searchRes = await fetch(
       `https://registry.npmjs.org/-/v1/search?text=maintainer:${encodeURIComponent(username)}&size=20`,
-      { next: { revalidate: 3600 } },
+      { next: { revalidate: 3600 }, signal },
     )
 
     if (!searchRes.ok) return null
@@ -37,6 +39,7 @@ export async function getNpmStats(): Promise<NpmStats | null> {
         try {
           const dlRes = await fetch(`https://api.npmjs.org/downloads/point/last-month/${encodeURIComponent(name)}`, {
             next: { revalidate: 3600 },
+            signal,
           })
           if (!dlRes.ok) return { name, downloads: 0 }
           const dlData = await dlRes.json().catch(() => null)

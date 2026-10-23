@@ -5,6 +5,7 @@ import { Check, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { getJLPTLevels, getJLPTVoca, getJLPTQuiz } from "@/services/visitor/japanese"
@@ -18,15 +19,16 @@ export function JapaneseQuizTab() {
   const levels = useToolData(loadLevels)
   const [level, setLevel] = useState("N5")
 
+  // Levels and words come from the same API: when it is down, one failure says so instead of two.
+  if (levels.status === "error" && !levels.data) {
+    return <ToolError onRetry={levels.retry}>The Japanese quiz did not load.</ToolError>
+  }
+
   return (
     <div className="space-y-8">
       <fieldset>
         <legend className="text-small font-semibold text-ink">Level</legend>
-        {levels.status === "error" ? (
-          <div className="mt-2">
-            <ToolError onRetry={levels.retry}>The JLPT levels did not load.</ToolError>
-          </div>
-        ) : levels.status === "loading" && !levels.data ? (
+        {levels.status === "loading" && !levels.data ? (
           <ToolLoading>Loading levels…</ToolLoading>
         ) : (
           <div className="mt-2 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
@@ -68,7 +70,7 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
 
   if (words.status === "error") return <ToolError onRetry={words.retry}>The {level} word list did not load.</ToolError>
   if (words.status === "loading") return <ToolLoading>Loading {level} words…</ToolLoading>
-  if (!words.data?.length) return <p className="font-display text-body text-ink-soft">No words for {level} yet.</p>
+  if (!words.data?.length) return <StatusLine kind="empty">No words for {level} yet.</StatusLine>
 
   return (
     <section aria-labelledby="jlpt-words">
@@ -144,7 +146,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
   const q = questions[index]
   const right = choice === q.correct
 
-  // The quiz payload already carries the answer, so checking is local: no round trip that can fail mid-quiz.
+  /** The quiz payload already carries the answer, so checking is local: no round trip that can fail mid-quiz. */
   const check = () => {
     if (!choice) return
     setAnswered(true)
@@ -169,8 +171,8 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
       </div>
 
       <fieldset>
-        <legend className="w-full py-4 text-center">
-          <span lang="ja" className="block text-h1 text-ink">
+        <legend className="w-full py-4">
+          <span lang="ja" className="block font-display text-h1 text-ink">
             {q.word}
           </span>
           <span lang="ja" className="mt-2 block text-h4 text-ink-soft">

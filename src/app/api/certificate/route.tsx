@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 import { NextRequest } from "next/server"
 import { PRINT_HEX } from "@/lib/print-hex"
-import { loadPrintAssets, RULE_HEX } from "../og/print-assets"
+import { CARD_HEADERS, loadPrintAssets, RULE_HEX } from "../og/print-assets"
 
 // Node, not edge: the font and the mark are files read from disk.
 export const runtime = "nodejs"
@@ -102,6 +102,7 @@ export async function GET(req: NextRequest) {
         width: 1200,
         height: 800,
         fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
+        headers: CARD_HEADERS,
       },
     )
   } catch (error) {

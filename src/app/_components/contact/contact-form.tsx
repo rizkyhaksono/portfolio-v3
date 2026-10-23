@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { FieldMessage } from "@/components/ui/field-message"
 import { track } from "@/lib/analytics"
 import { checkContactRateLimit, formatRemainingTime, recordContactSubmission } from "@/commons/helpers/rate-limit"
 
@@ -15,20 +16,64 @@ import { checkContactRateLimit, formatRemainingTime, recordContactSubmission } f
 const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), { ssr: false })
 
 type Status = { kind: "idle" | "sending" | "sent" } | { kind: "error"; message: string }
+type Field = "email" | "name" | "message"
+type FieldElement = HTMLInputElement | HTMLTextAreaElement
+
+const FIELDS: Field[] = ["email", "name", "message"]
+const FIELD_ERRORS: Record<Field, (el: FieldElement) => string> = {
+  email: (el) => (el.validity.valueMissing ? "Enter your email, so the reply can reach you." : "Enter an email address, like you@example.com."),
+  name: () => "Enter your name.",
+  message: () => "Write the message first.",
+}
+
+/** The named control on the contact form. */
+const fieldOf = (form: HTMLFormElement, name: Field) => form.elements.namedItem(name) as FieldElement | null
 
 export function ContactForm() {
   const [armed, setArmed] = useState(false)
   const [token, setToken] = useState("")
   const [status, setStatus] = useState<Status>({ kind: "idle" })
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const sending = useRef(false)
   // The site theme, not the OS one: Night on a light OS must still get the dark widget.
   const { resolvedTheme } = useTheme()
+
+  /** The browser's own constraints decide; the messages are this site's, under each field. */
+  function validate(form: HTMLFormElement) {
+    const found: Partial<Record<Field, string>> = {}
+    for (const name of FIELDS) {
+      const el = fieldOf(form, name)
+      if (el && !el.checkValidity()) found[name] = FIELD_ERRORS[name](el)
+    }
+    setErrors(found)
+    const first = FIELDS.find((name) => found[name])
+    if (first) fieldOf(form, first)?.focus()
+    return !first
+  }
+
+  /** Clears a field's error once the browser accepts the value. */
+  function clearFixed(event: FormEvent<HTMLFormElement>) {
+    const el = event.target as FieldElement
+    const name = el.name as Field
+    if (errors[name] && el.checkValidity()) setErrors(({ [name]: _fixed, ...rest }) => rest)
+  }
+
+  /** Name and error wiring shared by the contact fields. */
+  const fieldProps = (name: Field) => ({
+    name,
+    "aria-invalid": Boolean(errors[name]),
+    "aria-describedby": errors[name] ? `contact-${name}-error` : undefined,
+  })
+  /** The message under a field, when that field failed. */
+  const fieldError = (name: Field) =>
+    errors[name] ? <FieldMessage id={`contact-${name}-error`}>{errors[name]}</FieldMessage> : null
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     // A ref, not state: a second click in the same tick must not send twice.
     if (sending.current) return
     const form = event.currentTarget
+    if (!validate(form)) return
 
     const limit = checkContactRateLimit()
     if (!limit.allowed) {
@@ -70,20 +115,31 @@ export function ContactForm() {
   const busy = status.kind === "sending"
 
   return (
-    <form onSubmit={onSubmit} onFocus={() => setArmed(true)} aria-describedby="contact-status" className="space-y-6">
+    <form
+      onSubmit={onSubmit}
+      onInput={clearFixed}
+      onFocus={() => setArmed(true)}
+      noValidate
+      data-private
+      aria-describedby="contact-status"
+      className="space-y-6"
+    >
       <div className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="contact-email">Your email</Label>
-          <Input id="contact-email" name="email" type="email" autoComplete="email" required disabled={busy} />
+          <Input id="contact-email" type="email" autoComplete="email" required disabled={busy} {...fieldProps("email")} />
+          {fieldError("email")}
         </div>
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="contact-name">Your name</Label>
-          <Input id="contact-name" name="name" autoComplete="name" required disabled={busy} />
+          <Input id="contact-name" autoComplete="name" required disabled={busy} {...fieldProps("name")} />
+          {fieldError("name")}
         </div>
       </div>
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label htmlFor="contact-message">Message</Label>
-        <Textarea id="contact-message" name="message" rows={6} maxLength={5000} required disabled={busy} className="resize-y" />
+        <Textarea id="contact-message" rows={6} maxLength={5000} required disabled={busy} className="resize-y" {...fieldProps("message")} />
+        {fieldError("message")}
       </div>
 
       {/* Reserved at the widget's height so mounting it does not shift the button. */}

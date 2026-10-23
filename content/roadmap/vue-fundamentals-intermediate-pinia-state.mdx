@@ -171,10 +171,10 @@ import { useCartStore } from "@/stores/cart"
 
 const cart = useCartStore()
 
-// ✅ reactive refs for state + getters
+// Works: reactive refs for state + getters
 const { items, subtotal, count } = storeToRefs(cart)
 
-// ✅ actions can be pulled off directly (they are bound)
+// Works: actions can be pulled off directly (they are bound)
 const { add, remove, clear } = cart
 ```
 

@@ -3,13 +3,12 @@
 import { useState, type ReactNode } from "react"
 import dynamic from "next/dynamic"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
+import { ToolSkeleton } from "@/app/(visitor)/tools/_components/tool-status"
 import { track } from "@/lib/analytics"
 import { setQuery } from "./set-query"
 
-const ToolLoading = () => <Skeleton aria-hidden className="h-72" />
-const OcrDemo = dynamic(() => import("./ocr-demo"), { loading: ToolLoading })
-const JdMatcher = dynamic(() => import("./jd-matcher"), { loading: ToolLoading })
+const OcrDemo = dynamic(() => import("./ocr-demo"), { loading: ToolSkeleton })
+const JdMatcher = dynamic(() => import("./jd-matcher"), { loading: ToolSkeleton })
 
 const TABS = [
   { id: "chat", label: "Chat" },
@@ -39,7 +38,7 @@ export default function AIHub({ chat, initialTab }: Readonly<{ chat: ReactNode; 
 
   return (
     <div>
-      <header className="pb-6 sm:pb-8">
+      <header className="pb-8">
         <h1 className="font-display text-h1 text-balance text-ink">Etan AI</h1>
       </header>
       <div aria-hidden className="border-t border-ink" />

@@ -69,7 +69,7 @@ export default async function ProfilePage() {
       {profile.about ? (
         <p className="max-w-[60ch] whitespace-pre-line text-body text-ink">{profile.about}</p>
       ) : (
-        <p className="font-display text-body text-ink-soft">No bio yet. Add a few lines from the edit page.</p>
+        <p className="text-body text-ink-soft">No bio yet. Add a few lines from the edit page.</p>
       )}
 
       <dl className="mt-8 flex flex-col">

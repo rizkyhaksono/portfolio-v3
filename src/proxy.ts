@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { isHaveValidToken } from "./app/actions/actions"
+import { SESSION_COOKIE } from "./lib/session"
 
 /** User API session (NATEE_V3_TOKEN) — not used for admin (Supabase cookie).
  * /ai is intentionally NOT gated: logged-out visitors see a preview of the chat UI,
@@ -12,15 +12,13 @@ function isAdminPublicPath(pathname: string): boolean {
 }
 
 function hasSessionToken(request: NextRequest): boolean {
-  const nateeToken = request.cookies.get("NATEE_V3_TOKEN")?.value
+  const nateeToken = request.cookies.get(SESSION_COOKIE)?.value
   const authHeader = request.headers.get("authorization")
   return Boolean(nateeToken || authHeader?.startsWith("Bearer "))
 }
 
 export async function proxy(request: NextRequest, _response: NextResponse) {
   const { pathname } = request.nextUrl
-  const isHaveToken = await isHaveValidToken()
-  const nateeToken = request.cookies.get("NATEE_V3_TOKEN")
 
   // Admin dashboard: require the main session (works for SSO/Google + email login).
   // The actual ADMIN role is enforced server-side in the dashboard layout.
@@ -50,16 +48,11 @@ export async function proxy(request: NextRequest, _response: NextResponse) {
   const isAuthPublicPath = AUTH_PUBLIC_PATHS.some((p) => pathname.includes(p))
   if (
     pathname.startsWith("/auth") &&
-    (nateeToken || hasSessionToken(request)) &&
+    hasSessionToken(request) &&
     !isAuthPublicPath &&
     !request.nextUrl.searchParams.has("redirect")
   ) {
     return NextResponse.redirect(new URL("/", request.url))
-  }
-
-  // Legacy profile check (server action validation)
-  if (pathname.startsWith("/profile") && !isHaveToken) {
-    return NextResponse.redirect(new URL("/auth", request.url))
   }
 
   return NextResponse.next()

@@ -28,6 +28,8 @@ const STAT_LABELS: Record<string, string> = {
 type Detail = { status: "loading" } | { status: "ready"; data: PokemonDetail } | { status: "error"; query: string | number }
 
 const numbered = (id: number) => `No. ${String(id).padStart(3, "0")}`
+/** The API sends names and types in lower case ("mr-mime", "grass"). */
+const sentence = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
 
 export function PokemonTab() {
   const [page, setPage] = useState(1)
@@ -82,15 +84,16 @@ export function PokemonTab() {
         </p>
       )}
 
-      {list.status === "error" ? (
-        <ToolError onRetry={list.retry}>The Pokédex did not answer. Check your connection and try again.</ToolError>
-      ) : (
+      {list.status === "error" && (
+        <ToolError onRetry={list.retry}>The Pokédex did not load.</ToolError>
+      )}
+      {(list.status !== "error" || list.data) && (
         <>
           <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
             {loading
               ? Array.from({ length: 12 }, (_, i) => (
                   <li key={i}>
-                    <Skeleton className="h-44" />
+                    <Skeleton className="h-48" />
                   </li>
                 ))
               : list.data?.data.map((p) => (
@@ -98,14 +101,16 @@ export function PokemonTab() {
                     <button
                       type="button"
                       onClick={() => openDetail(p.id)}
-                      className="flex h-44 w-full flex-col items-center gap-1 border border-rule p-3 text-center transition-colors hover:border-ink"
+                      className="flex h-48 w-full flex-col items-center gap-1 border border-rule p-3 text-center transition-colors hover:border-ink"
                     >
-                      <span className="relative block size-20 shrink-0">
-                        {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain grayscale" unoptimized />}
-                      </span>
-                      <span className="font-display text-caption tabular-nums text-ink-soft">{numbered(p.id)}</span>
-                      <span className="w-full truncate text-small font-semibold capitalize text-ink">{p.name}</span>
-                      <span className="w-full truncate text-caption capitalize text-ink-soft">{p.types.join(", ")}</span>
+                      <PlateFigure tone="color" className="w-20 shrink-0">
+                        <span className="relative block aspect-square w-full">
+                          {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
+                        </span>
+                      </PlateFigure>
+                      <span className="mt-1 font-display text-caption tabular-nums text-ink-soft">{numbered(p.id)}</span>
+                      <span className="w-full truncate text-small font-semibold text-ink">{sentence(p.name)}</span>
+                      <span className="w-full truncate text-caption text-ink-soft">{sentence(p.types.join(", "))}</span>
                     </button>
                   </li>
                 ))}
@@ -139,7 +144,7 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="capitalize">{p.name}</DialogTitle>
+        <DialogTitle>{sentence(p.name)}</DialogTitle>
         <p className="font-display text-caption tabular-nums text-ink-soft">{numbered(p.id)}</p>
       </DialogHeader>
 
@@ -153,7 +158,7 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
 
       <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-rule pt-3 text-small">
         <dt className="text-ink-soft">Types</dt>
-        <dd className="capitalize text-ink">{p.types.join(", ")}</dd>
+        <dd className="text-ink">{sentence(p.types.join(", "))}</dd>
         <dt className="text-ink-soft">Height</dt>
         <dd className="tabular-nums text-ink">{(p.height / 10).toFixed(1)} m</dd>
         <dt className="text-ink-soft">Weight</dt>

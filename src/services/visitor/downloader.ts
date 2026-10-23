@@ -14,7 +14,7 @@ async function download(url: string): Promise<SocialMediaDownloadResult> {
 
   const json = await response.json().catch(() => null);
   if (!response.ok || !json || json.status >= 400 || !json.data) {
-    throw new Error(json?.message || "Failed to download. Check the URL and try again.");
+    throw Object.assign(new Error("Download failed"), { status: response.ok ? Number(json?.status) || 502 : response.status });
   }
   return json;
 }

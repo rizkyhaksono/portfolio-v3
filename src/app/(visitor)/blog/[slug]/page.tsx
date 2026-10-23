@@ -13,7 +13,8 @@ import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import BlogLetters from "@/app/_components/blog/blog-letters"
 import { dateline } from "@/app/_components/blog/format"
-import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
+import { getSiteUrl, isSiteImage, ogImageUrl } from "@/lib/site-url"
+import { canOptimizeImage } from "@/lib/image-hosts"
 import { getBlogData, getBlogDetail, getComments } from "@/services/visitor/blog"
 import { getPathReads } from "@/services/visitor/umami"
 
@@ -31,13 +32,13 @@ const MARKDOWN: Components = {
   img: ({ src, alt }) => <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" decoding="async" />,
 }
 
-// DEV's v1 editor keeps the front matter inside body_markdown.
+/** DEV's v1 editor keeps the front matter inside body_markdown. */
 const withoutFrontMatter = (markdown: string) => markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "")
 
-// DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it.
-const isClipped = (description?: string) => /(\.\.\.|…)$/.test(description?.trim() ?? "")
+/** DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it. */
+const isClipped = (description?: string) => /(\.\.\.|…)$/u.test(description?.trim() ?? "")
 
-// Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI.
+/** Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI. */
 export async function generateStaticParams() {
   return []
 }
@@ -114,8 +115,17 @@ export default async function BlogArticlePage({ params }: Props) {
       >
         {post.cover_image && (
           // `.prose img` frames body images; the plate brings its own frame.
-          <PlateFigure className="[&_img]:border-0 [&_img]:p-0">
-            <Image src={post.cover_image} alt="" width={1000} height={420} priority sizes="(min-width: 1024px) 66ch, 100vw" className="aspect-[1000/420] w-full object-cover" />
+          <PlateFigure tone={isSiteImage(post.cover_image) ? "color" : "photo"} className="[&_img]:border-0 [&_img]:p-0">
+            <Image
+              src={post.cover_image}
+              alt=""
+              width={1000}
+              height={420}
+              priority
+              unoptimized={!canOptimizeImage(post.cover_image)}
+              sizes="(min-width: 1024px) 66ch, 100vw"
+              className="aspect-[1000/420] w-full object-cover"
+            />
           </PlateFigure>
         )}
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN}>

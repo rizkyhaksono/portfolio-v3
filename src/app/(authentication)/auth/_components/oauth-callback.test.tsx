@@ -13,19 +13,30 @@ const complete = completeOAuthSignin as jest.MockedFunction<typeof completeOAuth
 describe('OAuthCallback', () => {
   beforeEach(() => {
     replace.mockReset()
+    complete.mockReset()
     sessionStorage.clear()
-    window.history.replaceState(null, '', '/auth/callback?token=secret')
+    window.history.replaceState(null, '', '/auth/callback?code=one-time-code')
   })
 
-  it('clears the token from the address bar and returns to the stored path', async () => {
+  it('clears the code from the address bar, trades it on the server and returns to the stored path', async () => {
     complete.mockResolvedValue(true)
     sessionStorage.setItem(OAUTH_RETURN_KEY, '/admin/dashboard')
     render(<OAuthCallback />)
 
     expect(window.location.search).toBe('')
-    expect(complete).toHaveBeenCalledWith('secret')
+    expect(complete).toHaveBeenCalledWith({ code: 'one-time-code', token: undefined })
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/admin/dashboard'))
     expect(sessionStorage.getItem(OAUTH_RETURN_KEY)).toBeNull()
+  })
+
+  it('still accepts the older token hand-over until every API sends a code', async () => {
+    complete.mockResolvedValue(true)
+    window.history.replaceState(null, '', '/auth/callback?token=secret')
+    render(<OAuthCallback />)
+
+    expect(window.location.search).toBe('')
+    expect(complete).toHaveBeenCalledWith({ code: undefined, token: 'secret' })
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/'))
   })
 
   it('refuses an off-site return path', async () => {

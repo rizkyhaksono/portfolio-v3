@@ -1,31 +1,29 @@
-import { NextRequest } from "next/server"
+import { isIP } from "node:net"
+
+type HeaderSource = Pick<Headers, "get">
 
 /**
- * Client IP for backend rate limits. Never trust a raw X-Forwarded-For from the
- * browser — attackers spoof the first hop. Prefer Cloudflare / Azure headers,
- * otherwise the last hop (appended by the reverse proxy).
+ * Client IP for backend rate limits. Nginx Proxy Manager is the only proxy in front of this site:
+ * it overwrites X-Real-IP and appends the peer to X-Forwarded-For. Cloudflare does not front
+ * natee.my.id, so cf-connecting-ip (or any first XFF hop) is whatever the browser sent.
  */
-export function trustedClientIp(req: NextRequest): string {
-  const cf = req.headers.get("cf-connecting-ip")?.trim()
-  if (cf) return cf
+export function trustedClientIp(headers: HeaderSource): string {
+  const real = headers.get("x-real-ip")?.trim()
+  if (real && isIP(real)) return real
 
-  const azure =
-    req.headers.get("x-azure-clientip")?.trim() || req.headers.get("x-client-ip")?.trim()
-  if (azure) return azure
-
-  const xff = req.headers.get("x-forwarded-for")
-  if (xff) {
-    const hops = xff.split(",").map((h) => h.trim()).filter(Boolean)
-    const last = hops[hops.length - 1]
-    if (last) return last
-  }
-
-  return req.headers.get("x-real-ip")?.trim() ?? ""
+  const last = headers.get("x-forwarded-for")?.split(",").map((hop) => hop.trim()).filter(Boolean).at(-1)
+  return last && isIP(last) ? last : ""
 }
 
-/** Headers to send to the API so getClientIp() sees a proxy-trusted address. */
-export function trustedClientIpHeaders(req: NextRequest): Record<string, string> {
-  const ip = trustedClientIp(req)
-  if (!ip) return {}
-  return { "x-real-ip": ip, "x-forwarded-for": ip }
+/**
+ * Headers for server-to-server API calls made on a visitor's behalf. The API trusts x-client-ip only
+ * with a matching x-internal-key; x-real-ip keeps an API without that check keyed to the visitor too.
+ */
+export function apiProxyHeaders(headers: HeaderSource): Record<string, string> {
+  const ip = trustedClientIp(headers)
+  const key = process.env.INTERNAL_PROXY_SECRET
+  return {
+    ...(key ? { "x-internal-key": key } : {}),
+    ...(ip ? { "x-client-ip": ip, "x-real-ip": ip } : {}),
+  }
 }
