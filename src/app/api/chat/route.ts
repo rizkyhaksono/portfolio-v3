@@ -5,8 +5,10 @@ import { getSessionToken } from "@/lib/session";
 import { apiProxyHeaders } from "@/lib/trusted-client-ip";
 
 const CHAT_ID = /^[\w-]{1,64}$/;
+/** Public chat collection on the API. */
 const chatUrl = () => `${serverApiUrl()}/v3/public-chat/public-chat`;
 
+/** The latest public chat messages. */
 export async function GET() {
   try {
     const response = await fetch(chatUrl(), { cache: "no-store" });
@@ -20,6 +22,7 @@ export async function GET() {
   }
 }
 
+/** Posts a message, or a reply when `replyToId` is set. */
 export async function POST(request: Request) {
   const token = await getSessionToken();
   if (!token) {

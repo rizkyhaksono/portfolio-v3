@@ -102,7 +102,7 @@ export default function FeedbackAdminPage() {
           kind="failed"
           className="mt-6"
           action={
-            <Button variant="outline" size="sm" onClick={() => void load(1)}>
+            <Button variant="outline" size="sm" onClick={() => { void load(1) }}>
               Try again
             </Button>
           }
@@ -160,12 +160,12 @@ export default function FeedbackAdminPage() {
                       )}
                       <div className="mt-4 flex flex-wrap gap-3">
                         {f.status !== "read" && (
-                          <Button size="sm" variant="outline" onClick={() => void setStatus(f, "read")}>
+                          <Button size="sm" variant="outline" onClick={() => { void setStatus(f, "read") }}>
                             Mark as read
                           </Button>
                         )}
                         {f.status !== "archived" && (
-                          <Button size="sm" variant="ghost" onClick={() => void setStatus(f, "archived")}>
+                          <Button size="sm" variant="ghost" onClick={() => { void setStatus(f, "archived") }}>
                             Archive
                           </Button>
                         )}
@@ -177,7 +177,7 @@ export default function FeedbackAdminPage() {
             </ol>
             {items.length < total && (
               <div className="border-t border-rule pt-6">
-                <Button variant="outline" onClick={() => void load(page + 1)} disabled={state === "more"} aria-busy={state === "more"}>
+                <Button variant="outline" onClick={() => { void load(page + 1) }} disabled={state === "more"} aria-busy={state === "more"}>
                   {state === "more" ? "Loading…" : "Load older feedback"}
                 </Button>
               </div>

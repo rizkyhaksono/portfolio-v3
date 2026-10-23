@@ -30,6 +30,7 @@ const getAIChat = async (): Promise<{ status: number; data?: AIChatSession[] }> 
   return { status: response.status, data: response.ok ? json?.data : undefined };
 };
 
+/** One Etan conversation, including its messages. */
 const getAIChatById = async (id: string): Promise<AIChatSession | null> => {
   const response = await fetch(`${serverApiUrl()}/v3/ai/${encodeURIComponent(id)}`, {
     headers: await authHeaders(),

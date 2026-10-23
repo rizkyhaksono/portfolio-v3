@@ -15,6 +15,7 @@ export const revalidate = 3600
 
 // The server runs in UTC; a project added on a Jakarta New Year's Eve belongs to the new year.
 const JAKARTA_YEAR = new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Asia/Jakarta" })
+/** Calendar year in Jakarta, or nothing when the date does not parse. */
 const yearOf = (iso: string) => {
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? null : Number(JAKARTA_YEAR.format(date))

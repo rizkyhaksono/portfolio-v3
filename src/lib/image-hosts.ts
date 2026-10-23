@@ -20,6 +20,7 @@ export const OPTIMIZED_IMAGE_HOSTS = [
 
 export const SUPABASE_STORAGE_PATH = "/storage/v1/object/"
 
+/** Hostname of a URL, or nothing when the value is empty or not a URL. */
 const hostOf = (url?: string) => {
   try {
     return url ? new URL(url).hostname : undefined

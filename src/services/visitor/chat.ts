@@ -2,6 +2,7 @@ import { PublicChatMessage } from "@/commons/types/public-chat";
 import { serverApiUrl } from "@/lib/api-base";
 import { getSessionToken } from "@/lib/session";
 
+/** Public chat collection on the API. */
 const chatUrl = () => `${serverApiUrl()}/v3/public-chat/public-chat`;
 
 // Public chat is always fresh — never cache these reads.

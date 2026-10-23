@@ -11,7 +11,7 @@ import { adminSignIn } from "@/services/visitor/auth"
 
 const UNREACHABLE = "The account server is not answering. Try again in a minute."
 
-// Admin sign-in is email or Google only by design (smaller OAuth attack surface).
+/** Admin sign-in is email or Google only by design (smaller OAuth attack surface). */
 export function AdminLoginForm() {
   const router = useRouter()
   const [pending, setPending] = useState(false)

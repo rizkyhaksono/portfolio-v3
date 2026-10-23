@@ -135,7 +135,7 @@ export default function TrackerBoard({ initialTasks, currentUserId, isAdmin }: R
       })
   }
 
-  // The menu puts the card at the foot of its new column.
+  /** The menu puts the card at the foot of its new column. */
   const moveToEnd = (task: TrackerTask, status: TrackerStatus) => move(task, status, Math.max(0, ...column(status).map((t) => t.order)) + 1)
 
   const openAdd = (status: TrackerStatus) => {

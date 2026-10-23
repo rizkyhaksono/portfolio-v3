@@ -288,7 +288,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
           kind="failed"
           className="mt-6"
           action={
-            <Button variant="outline" size="sm" onClick={() => void refresh()}>
+            <Button variant="outline" size="sm" onClick={() => { void refresh() }}>
               Try again
             </Button>
           }
@@ -319,7 +319,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
                     <Button variant="outline" size="sm" onClick={() => open(item)}>
                       Edit<span className="sr-only"> {row.title}</span>
                     </Button>
-                    <DeleteRow noun={noun} title={row.title} onConfirm={() => void onDelete(item)} />
+                    <DeleteRow noun={noun} title={row.title} onConfirm={() => { void onDelete(item) }} />
                     {row.link && (
                       <InkLink href={row.link.href} external className="ml-2 text-small">
                         {row.link.label}

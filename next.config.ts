@@ -2,6 +2,7 @@ import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
 import { OPTIMIZED_IMAGE_HOSTS, SUPABASE_IMAGE_HOST, SUPABASE_STORAGE_PATH } from './src/lib/image-hosts'
 
+/** Origin of a URL, or nothing when the value is empty or not a URL. */
 const originOf = (url?: string) => {
   try {
     return url ? new URL(url).origin : undefined
@@ -13,6 +14,7 @@ const originOf = (url?: string) => {
 const isDev = process.env.NODE_ENV !== 'production'
 const umamiOrigins = [originOf(process.env.NEXT_PUBLIC_UMAMI_SRC), originOf(process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC)]
 const TURNSTILE = 'https://challenges.cloudflare.com'
+/** CSP source list with blanks and repeats removed. */
 const sources = (...list: (string | undefined)[]) => [...new Set(list.filter(Boolean))].join(' ')
 
 // Nonces would make every page dynamic, so inline scripts stay allowed; the value is in pinning
@@ -51,7 +53,7 @@ const DOCUMENT_HEADERS = [
 ]
 
 const nextConfig: NextConfig = {
-  async headers() {
+  headers() {
     return [
       { source: '/:path*', headers: [{ key: 'X-Content-Type-Options', value: 'nosniff' }] },
       { source: '/:path((?!_next/static|_next/image).*)', headers: DOCUMENT_HEADERS },

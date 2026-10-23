@@ -28,7 +28,7 @@ const STAT_LABELS: Record<string, string> = {
 type Detail = { status: "loading" } | { status: "ready"; data: PokemonDetail } | { status: "error"; query: string | number }
 
 const numbered = (id: number) => `No. ${String(id).padStart(3, "0")}`
-// The API sends names and types in lower case ("mr-mime", "grass").
+/** The API sends names and types in lower case ("mr-mime", "grass"). */
 const sentence = (value: string) => value.charAt(0).toUpperCase() + value.slice(1)
 
 export function PokemonTab() {

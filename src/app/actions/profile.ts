@@ -2,6 +2,7 @@
 
 import { putProfile, uploadBannerImage } from "@/services/user/profile";
 
+/** Saves the profile form. The session cookie stays on the server. */
 export async function updateProfile(formData: FormData) {
   const profileData = {
     email: formData.get("email") as string,

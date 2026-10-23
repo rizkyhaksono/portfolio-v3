@@ -39,6 +39,7 @@ const DOWNLOADERS = {
 
 type Result = { type: "instagram"; data: InstagramDownloadData } | { type: "standard"; data: DownloadResult }
 
+/** The sentence shown when a download is refused. */
 const failure = (status?: number) =>
   status === 429
     ? "Too many downloads in a minute. Wait a moment, then try again."
@@ -46,7 +47,7 @@ const failure = (status?: number) =>
       ? "That link is not supported. Paste a public TikTok, Instagram, YouTube, X or Facebook link."
       : "That link did not work. Check that the post is public and try again."
 
-// Matches InkLink: an absolute sr-only box would sit on the first letter of an inline-flex link.
+/** Matches InkLink: an absolute sr-only box would sit on the first letter of an inline-flex link. */
 const NewTabNote = () => (
   <span className="-mr-px inline-block size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"> (opens in a new tab)</span>
 )

@@ -22,6 +22,7 @@ const readable = (json: { name?: string; message?: string } | null) =>
 /** The API rate-limits sign-in by visitor, so it must see the visitor's address, not this server's. */
 const visitorHeaders = async () => ({ "Content-Type": "application/json", ...apiProxyHeaders(await headers()) });
 
+/** Whether this session belongs to an administrator. */
 const isAdminToken = async (token: string): Promise<boolean> => {
   const response = await fetch(`${serverApiUrl()}/v3/me`, {
     headers: { Authorization: `Bearer ${token}` },

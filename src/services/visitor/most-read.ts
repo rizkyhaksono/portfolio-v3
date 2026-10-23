@@ -6,6 +6,7 @@ import { getAllProject } from "@/services/visitor/project"
 const MIN_READERS = 10
 const ARTICLE_PATH = /^\/(blog|project)\/./
 
+/** The fulfilled list, or nothing when that source failed. */
 const listOf = <T,>(result: PromiseSettledResult<T[] | null | undefined>) =>
   result.status === "fulfilled" ? (result.value ?? []) : []
 

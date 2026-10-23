@@ -11,7 +11,7 @@ import { safeHtml } from "../safe-html"
 
 export const revalidate = 3600
 
-// Prerendered, so the route is ISR like the other articles (without this Next renders it on every request).
+/** Prerendered, so the route is ISR like the other articles (without this Next renders it on every request). */
 export async function generateStaticParams() {
   return (await getAllProject()).map((project) => ({ id: project.id }))
 }

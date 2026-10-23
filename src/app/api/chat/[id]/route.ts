@@ -16,6 +16,7 @@ async function postUrl({ params }: RouteParams): Promise<string | null> {
   return CHAT_ID.test(id) ? `${serverApiUrl()}/v3/public-chat/public-chat/${encodeURIComponent(id)}` : null;
 }
 
+/** Replies under one public chat message. */
 export async function GET(request: Request, context: RouteParams) {
   const url = await postUrl(context);
   if (!url) return NextResponse.json({ error: "Message not found" }, { status: 404 });
@@ -32,6 +33,7 @@ export async function GET(request: Request, context: RouteParams) {
   }
 }
 
+/** Replaces the text of one of your messages. */
 export async function PATCH(request: Request, context: RouteParams) {
   const url = await postUrl(context);
   if (!url) return NextResponse.json({ error: "Message not found" }, { status: 404 });
@@ -71,6 +73,7 @@ export async function PATCH(request: Request, context: RouteParams) {
   }
 }
 
+/** Removes one of your messages. */
 export async function DELETE(request: Request, context: RouteParams) {
   const url = await postUrl(context);
   if (!url) return NextResponse.json({ error: "Message not found" }, { status: 404 });

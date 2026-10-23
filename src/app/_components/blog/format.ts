@@ -19,11 +19,11 @@ export const yearOf = (date: Date) => YEAR.format(date)
 /** Plain text cut at a word boundary, at most `max` characters including the ellipsis. */
 export function excerpt(html: string, max = 160): string {
   // DEV sends some descriptions already cut, as "design,..." or "promise:...": keep one clean ellipsis.
-  const text = plainText(html).replace(/[\s,;:–—-]*(?:\.{3}|…)\s*$/, "…")
+  const text = plainText(html).replace(/[\s,;:–—-]*(?:\.{3}|…)\s*$/u, "…")
   if (text.length <= max) return text
   const cut = text.slice(0, max)
   const end = cut.lastIndexOf(" ")
-  return `${cut.slice(0, end > 0 ? end : max - 1).replace(/[\s.,;:!?–—-]+$/, "")}…`
+  return `${cut.slice(0, end > 0 ? end : max - 1).replace(/[\s.,;:!?–—-]+$/u, "")}…`
 }
 
 export const minutesToRead = (html: string) => Math.max(1, Math.round(plainText(html).split(" ").length / 200))

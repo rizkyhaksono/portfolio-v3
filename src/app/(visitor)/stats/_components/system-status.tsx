@@ -45,6 +45,7 @@ function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
   )
 }
 
+/** Clock time, hours and minutes, for a health check. */
 const timeOf = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
 
 /**

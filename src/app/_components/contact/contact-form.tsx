@@ -26,6 +26,7 @@ const FIELD_ERRORS: Record<Field, (el: FieldElement) => string> = {
   message: () => "Write the message first.",
 }
 
+/** The named control on the contact form. */
 const fieldOf = (form: HTMLFormElement, name: Field) => form.elements.namedItem(name) as FieldElement | null
 
 export function ContactForm() {
@@ -50,17 +51,20 @@ export function ContactForm() {
     return !first
   }
 
+  /** Clears a field's error once the browser accepts the value. */
   function clearFixed(event: FormEvent<HTMLFormElement>) {
     const el = event.target as FieldElement
     const name = el.name as Field
     if (errors[name] && el.checkValidity()) setErrors(({ [name]: _fixed, ...rest }) => rest)
   }
 
+  /** Name and error wiring shared by the contact fields. */
   const fieldProps = (name: Field) => ({
     name,
     "aria-invalid": Boolean(errors[name]),
     "aria-describedby": errors[name] ? `contact-${name}-error` : undefined,
   })
+  /** The message under a field, when that field failed. */
   const fieldError = (name: Field) =>
     errors[name] ? <FieldMessage id={`contact-${name}-error`}>{errors[name]}</FieldMessage> : null
 

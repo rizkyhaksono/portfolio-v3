@@ -43,6 +43,7 @@ export async function getTrackerTasks(): Promise<TrackerTask[] | null> {
 type CreateInput = { title: string; description?: string; status?: TrackerStatus; priority?: string; type?: string }
 type UpdateInput = Partial<Pick<TrackerTask, "title" | "description" | "status" | "priority" | "type" | "order">>
 
+/** One tracker write through the same-origin proxy. */
 async function send<T>(path: string, method: "POST" | "PATCH" | "DELETE", body?: unknown): Promise<T> {
   const res = await fetch(`${API}/tracker${path}`, {
     method,
@@ -54,8 +55,10 @@ async function send<T>(path: string, method: "POST" | "PATCH" | "DELETE", body?:
   return json?.data as T
 }
 
+/** Adds a card. */
 export const createTrackerTaskClient = (input: CreateInput) => send<TrackerTask>("", "POST", input)
 
+/** Changes a card. */
 export const updateTrackerTaskClient = (id: string, input: UpdateInput) =>
   send<TrackerTask>(`/${encodeURIComponent(id)}`, "PATCH", input)
 

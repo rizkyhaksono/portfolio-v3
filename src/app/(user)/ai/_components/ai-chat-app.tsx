@@ -135,6 +135,7 @@ function openingError(chatId: string | undefined, listed: boolean, loaded: boole
   }
 }
 
+/** Signed-in Etan correspondence: the list of chats and the letters of the open one. */
 export default function AIChatApp({
   initialSessions,
   initialChatId,
@@ -185,6 +186,7 @@ export default function AIChatApp({
 
   const focusInput = () => setTimeout(() => inputRef.current?.focus(), 0)
 
+  /** Opens a saved conversation, and ignores the click while a reply is still arriving. */
   const selectSession = async (s: Session) => {
     if (loading) return
     const request = ++openRequest.current
@@ -358,7 +360,7 @@ export default function AIChatApp({
       sessions={sessions}
       activeId={activeChatId}
       busy={loading}
-      onSelect={(s) => void selectSession(s)}
+      onSelect={(s) => { void selectSession(s) }}
       onPending={(p) => setPending({ ...p, open: true })}
     />
   )

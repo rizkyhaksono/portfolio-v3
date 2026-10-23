@@ -69,7 +69,7 @@ export function IeltsTab() {
     setFlipped(false)
   }
 
-  // Arrow keys only while the card has focus; Space and Enter already turn it, as on any button.
+  /** Arrow keys only while the card has focus; Space and Enter already turn it, as on any button. */
   const onCardKey = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       e.preventDefault()

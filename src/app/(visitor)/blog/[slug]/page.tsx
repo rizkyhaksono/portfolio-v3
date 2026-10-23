@@ -32,13 +32,13 @@ const MARKDOWN: Components = {
   img: ({ src, alt }) => <img src={typeof src === "string" ? src : undefined} alt={alt ?? ""} loading="lazy" decoding="async" />,
 }
 
-// DEV's v1 editor keeps the front matter inside body_markdown.
+/** DEV's v1 editor keeps the front matter inside body_markdown. */
 const withoutFrontMatter = (markdown: string) => markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "")
 
-// DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it.
-const isClipped = (description?: string) => /(\.\.\.|…)$/.test(description?.trim() ?? "")
+/** DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it. */
+const isClipped = (description?: string) => /(\.\.\.|…)$/u.test(description?.trim() ?? "")
 
-// Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI.
+/** Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI. */
 export async function generateStaticParams() {
   return []
 }

@@ -3,6 +3,7 @@ import { serverApiUrl } from "@/lib/api-base"
 
 export const dynamic = "force-dynamic"
 
+/** Health body used when the API cannot be asked. */
 const downNow = (detail: string) =>
   NextResponse.json({
     data: { overall: "down", services: [{ name: "API", status: "down", latencyMs: null, detail }], checkedAt: new Date().toISOString() },

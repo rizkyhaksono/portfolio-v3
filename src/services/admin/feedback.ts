@@ -13,6 +13,7 @@ export interface AdminFeedback {
   updatedAt: string
 }
 
+/** One page of feedback for the admin ledger. */
 export async function getFeedbackClient(
   { status, page = 1, limit = 20 }: { status?: FeedbackStatus; page?: number; limit?: number } = {},
 ): Promise<{ items: AdminFeedback[]; total: number }> {

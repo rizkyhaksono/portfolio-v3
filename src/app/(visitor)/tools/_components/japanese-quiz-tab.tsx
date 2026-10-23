@@ -146,7 +146,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
   const q = questions[index]
   const right = choice === q.correct
 
-  // The quiz payload already carries the answer, so checking is local: no round trip that can fail mid-quiz.
+  /** The quiz payload already carries the answer, so checking is local: no round trip that can fail mid-quiz. */
   const check = () => {
     if (!choice) return
     setAnswered(true)
