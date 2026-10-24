@@ -7,7 +7,6 @@ import CertificationSection from "@/app/_components/certification"
 import ReadersSection from "@/app/_components/site-stats"
 import RecommendationsSection from "@/app/_components/contact/linkedin-recommendations"
 import ContactSection from "@/app/_components/contact"
-import { IssueIndex } from "@/app/_components/issue-index"
 import BaseLayout from "@/components/layout/base-layout"
 import { SHELL_WIDTH } from "@/components/layout/running-head"
 import { InkLink } from "@/components/ui/ink-link"
@@ -26,45 +25,36 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
  * The text block is centred in the pinned stage, so the slack falls above and below it and never between
  * the job line and the sentence. The name is the display token under a 15svh cap (`--name`), so the stage still
  * fits 375x667 and 1280x600. Below sm the sentence keeps a 24px floor: its unscrolled ghost (3.17:1) passes as
- * large text. From lg the "In this issue" column sits beside the text, absolute in its grid area so it adds
- * no height.
+ * large text. The hero is text only at every width.
  */
 function Masthead() {
   return (
     <WordScroll className={cn(SHELL_WIDTH, "flex flex-col justify-center py-10 sm:py-[min(4rem,8svh)]")}>
-      <div className="relative gap-x-[clamp(2rem,5vw,5rem)] [--name:min(clamp(2.75rem,1.1961rem_+_6.6298vw,6.5rem),15svh)] lg:grid lg:grid-cols-[auto_minmax(0,1fr)]">
-        <div>
-          {/* The bottom padding clears the italic descenders, which hang below a 0.92 line box. */}
-          <h1 className="pb-[0.14em] font-display text-display text-balance text-ink [font-size:var(--name)]">Rizky Haksono</h1>
-          <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-          <InkedSentence
-            className="mt-[min(3rem,6svh)] max-w-[24ch] text-h2 text-ink max-sm:text-[1.5rem]"
-            text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
-          />
-          <ul className="mt-[min(2rem,4svh)] flex flex-wrap gap-x-6 text-body">
-            <li>
-              <InkLink href="/project" event="cta-click" eventData={{ target: "projects" }} className={CTA}>
-                See the projects
-              </InkLink>
-            </li>
-            <li>
-              <InkLink href="/blog" event="cta-click" eventData={{ target: "writing" }} className={CTA}>
-                Read the writing
-              </InkLink>
-            </li>
-            <li>
-              <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "masthead" }} className={CTA}>
-                Résumé (PDF)
-              </InkLink>
-            </li>
-          </ul>
-        </div>
-        {/* Absolute in its grid area: the column adds no height and never delays the h1. */}
-        <div className="absolute inset-0 hidden justify-end overflow-hidden pt-[0.5rem] lg:col-start-2 lg:row-start-1 lg:flex">
-          <Suspense fallback={null}>
-            <IssueIndex className="w-full max-w-[22rem]" />
-          </Suspense>
-        </div>
+      <div className="[--name:min(clamp(2.75rem,1.1961rem_+_6.6298vw,6.5rem),15svh)]">
+        {/* The bottom padding clears the italic descenders, which hang below a 0.92 line box. */}
+        <h1 className="pb-[0.14em] font-display text-display text-balance text-ink [font-size:var(--name)]">Rizky Haksono</h1>
+        <p className="mt-2 text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+        <InkedSentence
+          className="mt-[min(3rem,6svh)] max-w-[24ch] text-h2 text-ink max-sm:text-[1.5rem]"
+          text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
+        />
+        <ul className="mt-[min(2rem,4svh)] flex flex-wrap gap-x-6 text-body">
+          <li>
+            <InkLink href="/project" event="cta-click" eventData={{ target: "projects" }} className={CTA}>
+              See the projects
+            </InkLink>
+          </li>
+          <li>
+            <InkLink href="/blog" event="cta-click" eventData={{ target: "writing" }} className={CTA}>
+              Read the writing
+            </InkLink>
+          </li>
+          <li>
+            <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "masthead" }} className={CTA}>
+              Résumé (PDF)
+            </InkLink>
+          </li>
+        </ul>
       </div>
     </WordScroll>
   )

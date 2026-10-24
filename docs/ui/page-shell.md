@@ -65,7 +65,7 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 | Board | Ruled columns of index cards | `/tracker` |
 | Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
 | Admin | Ruled spine, `--admin-rail`, inverted active row | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx` (split or narrow) | `/auth/*`, `/admin/auth/login` |
+| Auth | `layout/auth-shell.tsx` (form beside a reversed ink `panel` on `/auth`; one narrow column without it) | `/auth/*`, `/admin/auth/login` |
 | Profile card | Double-rule sheet, definition list, dotted leaders | `/profile`, `/profile/edit`, admin settings |
 | Not found | `ui/not-found-view.tsx` (server) | 404s, `error.tsx`, empty states |
 
@@ -75,9 +75,8 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
 
-- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. From `lg` the "In this issue" column sits to the right (below). The stage carries no photo.
+- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. The stage is text only at every width: no photo, engraving or side column.
 - The text block is centred in the pinned stage, so the slack falls above and below the block, never between the job line and the sentence. The name is the `display` token capped at `15svh` (104px at 1280x800, 90px at 1280x600, 44px and one line at 375), so the stage fits 375x667 and 1280x600.
-- "In this issue" column (`IssueIndex`, `src/app/_components/issue-index.tsx`, server), from `lg` only: the text and the column share a grid (`auto` text column, the index takes the rest). It is absolute in its grid area inside `<Suspense fallback={null}>`, so it adds no height, never delays the h1 and causes no layout shift. One `rule` hairline on its left, no frame. Up to three entries, each an italic caption label, a roman title link (clamped to three lines) and an italic meta line: Latest writing (newest post from every source, with its date), Latest project (with a two-line excerpt), Most read (with readers this month). An entry whose source fails or is empty is dropped; with none left the column renders nothing. No motion. Below `lg` the hero is text only.
 - The hero sentence keeps a 24px floor below `sm` (it is `h2` size otherwise) so its unscrolled ghost still passes as large text (3.17:1).
 - About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with an italic drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
 - Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.

@@ -83,13 +83,11 @@ test.describe('Navigation', () => {
     await expect(page.locator('.ws__stage img')).toHaveCount(0);
   });
 
-  test('hero shows the issue column from lg and drops it on a phone', async ({ page }) => {
+  test('hero is text only on a wide screen', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
-    const column = page.locator('.ws__stage').getByRole('complementary', { name: 'In this issue' });
-    await expect(column).toBeVisible();
-    await page.setViewportSize({ width: 375, height: 812 });
-    await expect(column).toBeHidden();
+    await expect(page.locator('.ws__stage h1')).toBeVisible();
+    await expect(page.locator('.ws__stage img, .ws__stage aside, .ws__stage .engraving')).toHaveCount(0);
   });
 
   // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).

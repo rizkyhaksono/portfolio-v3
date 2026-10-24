@@ -42,7 +42,7 @@ Always read `prd/feature.md` and `prd/progress.md` before starting feature work;
 
 ## UI rules (mandatory)
 
-Design brief: the whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules, duotone plates, a Hollar engraving band in the colophon (its only appearance) and an "In this issue" column beside the home hero. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
+Design brief: the whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules, duotone plates, a Hollar engraving band in the colophon (its only appearance) and a text-only home hero. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
 
 - Docs: [`docs/ui/README.md`](docs/ui/README.md) (source of truth)
 - Agent rule: `.cursor/rules/ui-layout-consistency.mdc`
@@ -96,7 +96,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 
 Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
-Home: the masthead stage (`bleed` slot) holds the italic name (the LCP element), the job line, the wordscroll sentence, which keeps a 24px floor on phones, and the links, centred in the pinned stage. From `lg` the "In this issue" column (`IssueIndex`, `src/app/_components/issue-index.tsx`) sits to the right behind one `rule` hairline: latest writing, latest project and most read, live, each dropped when its source is empty; below `lg` the hero is text only. No photo or engraving in the hero; the Hollar band appears only in the colophon (auth and 404 carry no plate). No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with an italic drop cap.
+Home: the masthead stage (`bleed` slot) holds the italic name (the LCP element), the job line, the wordscroll sentence, which keeps a 24px floor on phones, and the links, centred in the pinned stage. The hero is text only at every width: no photo, engraving or side column. The Hollar band appears only in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with an italic drop cap.
 
 Shared details agents trip on:
 
