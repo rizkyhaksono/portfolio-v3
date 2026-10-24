@@ -26,7 +26,7 @@ test.describe('Navigation', () => {
     ).toHaveAttribute('aria-current', 'page');
   });
 
-  test('tablet head shows the short row, search and the menu', async ({ page }) => {
+  test('tablet head shows the short row and the menu, no search', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     const head = page.getByRole('navigation', { name: 'Sections' });
@@ -34,7 +34,7 @@ test.describe('Navigation', () => {
       await expect(head.getByRole('link', { name: label, exact: true })).toBeVisible();
     }
     await expect(head.getByRole('link', { name: 'Chat', exact: true })).toBeHidden();
-    await expect(page.getByRole('banner').getByRole('button', { name: /Search/ })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('button', { name: /Search/ })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Menu' })).toBeVisible();
   });
 
@@ -83,14 +83,13 @@ test.describe('Navigation', () => {
     await expect(page.locator('.ws__stage img')).toHaveCount(0);
   });
 
-  test('hero prints the press engraving from lg and drops it on a phone', async ({ page }) => {
+  test('hero shows the issue column from lg and drops it on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
-    const press = page.locator('.ws__stage .engraving-press');
-    await expect(press).toBeVisible();
-    await expect(press).toHaveAttribute('aria-hidden', 'true');
+    const column = page.locator('.ws__stage').getByRole('complementary', { name: 'In this issue' });
+    await expect(column).toBeVisible();
     await page.setViewportSize({ width: 375, height: 812 });
-    await expect(press).toBeHidden();
+    await expect(column).toBeHidden();
   });
 
   // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).

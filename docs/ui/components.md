@@ -13,7 +13,7 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 | `LedgerList`, `LedgerRow` | `components/ui/ledger.tsx` | Ledger pattern |
 | `PlateFigure` | `components/ui/plate-figure.tsx` | Framed figure with italic caption: duotone by default, `tone="color"` keeps the picture's colour |
 | `Logo` | `components/ui/logo.tsx` | The RH mark: `mini`, `mark`, `tile`, see [README.md](./README.md#brand) |
-| `Engraving` | `components/ui/engraving.tsx` | The engraving band (colophon), the riders crop (404, auth) and the press plate (home hero, from `lg`) |
+| `Engraving` | `components/ui/engraving.tsx` | The Hollar engraving band, colophon only |
 | `HoverTip` | `components/ui/hover-tip.tsx` | The one tooltip for every `data-tip`, mounted once in the root layout |
 | `WordScroll` | `components/ui/word-scroll.tsx` | Home masthead sentence |
 | `StatStrip` | `components/ui/stat-strip.tsx` | `dt` caption, `dd` numeral, `tabular-nums` |
@@ -65,7 +65,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 
 | Event | Where | Data |
 |---|---|---|
-| `nav-click`, `menu-open`, `search-open` | Head, menu, colophon, command palette | `item`, `area` / none / `via` |
+| `nav-click`, `menu-open` | Head, menu, colophon | `item`, `area` / none |
 | `theme-toggle` | ThemeToggle | `to` |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
 | `cta-click`, `resume-open`, `portfolio-open` | Masthead, About | `target` / `area` |

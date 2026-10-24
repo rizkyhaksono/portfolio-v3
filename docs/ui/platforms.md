@@ -10,7 +10,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 | Route | Pattern |
 |---|---|
-| `/` | Masthead stage (`bleed`; the press engraving beside the text from `lg`, text only below) then the home story, with the duotone portrait in About, see [page-shell.md](./page-shell.md) |
+| `/` | Masthead stage (`bleed`; the "In this issue" column beside the text from `lg`, text only below) then the home story, with the duotone portrait in About, see [page-shell.md](./page-shell.md) |
 | `/blog`, `/certificates`, `/changelog`, `/project` index | Ledger (projects add three featured Plates rows) |
 | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
 | `/roadmap` | Ledger |
@@ -36,7 +36,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 **Routes:** `/admin/dashboard/*`
 
-**Shell:** its own ruled spine (`--admin-rail`) with an inverted active row, not `BaseLayout`. No command palette, terminal or feedback widget.
+**Shell:** its own ruled spine (`--admin-rail`) with an inverted active row, not `BaseLayout`. No terminal or feedback widget.
 
 **Patterns:** Figures for the dashboard and analytics, Ledger for lists, frame form slips for editing, Correspondence for feedback, Profile card for settings. Same tokens, same three surfaces.
 

@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 export default function AdminAuthLoginPage() {
   return (
     <AuthShell
-      variant="narrow"
       title="Admin sign in"
       standfirst="Projects, writing and the records behind the site."
       footer={<InkLink href="/" className="inline-flex min-h-11 items-center md:min-h-0">Back to the portfolio</InkLink>}

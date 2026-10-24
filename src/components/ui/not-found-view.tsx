@@ -1,4 +1,3 @@
-import { Engraving } from "@/components/ui/engraving"
 import { InkLink } from "@/components/ui/ink-link"
 import { Logo } from "@/components/ui/logo"
 import { cn } from "@/lib/utils"
@@ -10,11 +9,11 @@ interface NotFoundViewProps {
   className?: string
 }
 
-/** Not found pattern: the mark, italic title, one standfirst, two ways back, and the riders cut from the plate. */
+/** Not found pattern: the mark, italic title, one standfirst, two ways back. */
 export function NotFoundView({ title = "Page not found", children, className }: Readonly<NotFoundViewProps>) {
   return (
-    <section className={cn("grid w-full items-center gap-10 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] md:py-24", className)}>
-      <div>
+    <section className={cn("w-full py-8 md:py-24", className)}>
+      <div className="max-w-[40rem]">
         <Logo variant="mark" label="Rizky Haksono" className="mb-6 w-20 sm:w-24" />
         <h1 className="speckle font-display text-h1 text-balance text-ink">{title}</h1>
         <div className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
@@ -29,7 +28,6 @@ export function NotFoundView({ title = "Page not found", children, className }: 
           </li>
         </ul>
       </div>
-      <Engraving crop="riders" />
     </section>
   )
 }

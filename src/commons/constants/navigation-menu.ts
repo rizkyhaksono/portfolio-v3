@@ -7,7 +7,7 @@ export interface NavSection {
   label: string
   /** One roman line under the italic label in Contents. */
   note: string
-  /** Running head: `md` shows from 768px, `lg` from 1024px; absent means Contents, colophon and ⌘K only. */
+  /** Running head: `md` shows from 768px, `lg` from 1024px; absent means Contents and colophon only. */
   head?: "md" | "lg"
   column: "read" | "try" | "site"
 }

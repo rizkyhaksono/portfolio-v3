@@ -4,7 +4,6 @@ type EventData = Record<string, string | number | boolean>
 export type EventName =
   | 'nav-click'
   | 'menu-open'
-  | 'search-open'
   | 'theme-toggle'
   | 'outbound-click'
   | 'cta-click'

@@ -3,12 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
-import { installTrackDelegation, track } from "@/lib/analytics"
+import { installTrackDelegation } from "@/lib/analytics"
 
-const CommandPalette = dynamic(
-  () => import("@/components/ui/command-palette").then((module) => module.CommandPalette),
-  { ssr: false },
-)
 const TerminalOverlay = dynamic(() => import("@/components/ui/terminal-overlay"), { ssr: false })
 const FeedbackWidget = dynamic(() => import("@/components/ui/feedback-widget"), { ssr: false })
 
@@ -65,19 +61,14 @@ function focusOrigin(from: Element | null): HTMLElement | null {
 }
 
 /**
- * BaseLayout's client tools. The `data-track` listener installs at mount; the command palette loads on
- * ⌘K or a `[data-open-search]` click, the feedback dialog on a `[data-open-feedback]` click; the terminal
- * waits for the page to settle.
+ * BaseLayout's client tools. The `data-track` listener installs at mount; the feedback dialog loads on a
+ * `[data-open-feedback]` click; the terminal waits for the page to settle.
  */
 export function DeferredClientUtilities() {
   const [ready, setReady] = useState(settledOnce)
-  const [paletteLoaded, setPaletteLoaded] = useState(false)
-  const [paletteOpen, setPaletteOpen] = useState(false)
   const [feedbackLoaded, setFeedbackLoaded] = useState(false)
   const [feedbackOpen, setFeedbackOpen] = useState(false)
-  const paletteOpenRef = useRef(false)
-  paletteOpenRef.current = paletteOpen
-  // Neither dialog has a Radix trigger, so focus goes back to the element that opened it by hand.
+  // The dialog has a Radix trigger, so focus goes back to the element that opened it by hand.
   const returnFocus = useRef<HTMLElement | null>(null)
   const restoreFocus = useCallback((event: Event) => {
     event.preventDefault()
@@ -87,23 +78,8 @@ export function DeferredClientUtilities() {
   useEffect(() => installTrackDelegation(), [])
 
   useEffect(() => {
-    const openPalette = (via: string, from: Element | null) => {
-      returnFocus.current = focusOrigin(from)
-      setPaletteLoaded(true)
-      setPaletteOpen(true)
-      track("search-open", { via })
-    }
-    const onKeyDown = (event: KeyboardEvent) => {
-      // Autofill fires keydown without a key.
-      if (event.key?.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey)) return
-      event.preventDefault()
-      if (paletteOpenRef.current) setPaletteOpen(false)
-      else openPalette("keyboard", document.activeElement)
-    }
     const onClick = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null
-      const search = target?.closest<HTMLElement>("[data-open-search]")
-      if (search) openPalette(search.dataset.openSearch || "button", search)
       const feedback = target?.closest<HTMLElement>("[data-open-feedback]")
       if (feedback) {
         returnFocus.current = focusOrigin(feedback)
@@ -111,10 +87,8 @@ export function DeferredClientUtilities() {
         setFeedbackOpen(true)
       }
     }
-    document.addEventListener("keydown", onKeyDown)
     document.addEventListener("click", onClick)
     return () => {
-      document.removeEventListener("keydown", onKeyDown)
       document.removeEventListener("click", onClick)
     }
   }, [])
@@ -130,7 +104,6 @@ export function DeferredClientUtilities() {
 
   return (
     <>
-      {paletteLoaded && <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} onCloseAutoFocus={restoreFocus} />}
       {feedbackLoaded && <FeedbackWidget open={feedbackOpen} onOpenChange={setFeedbackOpen} onCloseAutoFocus={restoreFocus} />}
       {ready && <TerminalOverlay />}
     </>

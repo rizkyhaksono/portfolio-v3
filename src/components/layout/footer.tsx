@@ -4,7 +4,6 @@ import { Logo } from "@/components/ui/logo"
 import { JOB_TITLE } from "@/commons/constants/author"
 import { LEGAL_LINKS, NAV_SECTIONS, navTrack } from "@/commons/constants/navigation-menu"
 import { cn } from "@/lib/utils"
-import { SHELL_WIDTH } from "./running-head"
 
 const EMAIL = "mrizkyhaksono@gmail.com"
 const [MAILBOX, MAIL_DOMAIN] = EMAIL.split("@")
@@ -14,6 +13,9 @@ const COLUMNS = [
   { column: "try", heading: "Try" },
   { column: "site", heading: "Site" },
 ] as const
+
+// Edge to edge like the plate band below it: the shell's gutters, no max width.
+const FOOTER_WIDTH = "w-full px-[clamp(20px,4vw,48px)]"
 
 const linkClass =
   "inline-flex min-h-11 items-center text-ink decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
@@ -56,7 +58,7 @@ export default function Footer({
 }: Readonly<{ variant?: "full" | "compact"; /** Off on pages that never scroll. */ backToTop?: boolean }>) {
   if (variant === "compact") {
     return (
-      <footer className={cn(SHELL_WIDTH, "pb-6")}>
+      <footer className={cn(FOOTER_WIDTH, "pb-6")}>
         <InkRule />
         <div className="flex flex-wrap items-center gap-x-6 pt-2 text-small">
           <p className="font-display text-ink">Rizky Haksono</p>
@@ -74,7 +76,7 @@ export default function Footer({
 
   return (
     <footer>
-      <div className={SHELL_WIDTH}>
+      <div className={FOOTER_WIDTH}>
         <InkRule />
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="col-span-2 flex items-start gap-5 sm:col-span-3 lg:col-span-1">
@@ -117,8 +119,7 @@ export default function Footer({
         <div className="mt-12 flex flex-col gap-3 border-t border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
           <p className="max-w-[62ch] text-small text-ink-soft">
             Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar,{" "}
-            <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain). Press after Jan van der
-            Straet, <cite>Impressio librorum</cite>, c. 1600, Museum Plantin-Moretus (public domain).
+            <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain).
           </p>
           <div className="flex shrink-0 gap-x-5">
             <FeedbackButton />

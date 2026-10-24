@@ -4,7 +4,6 @@ import Link from "next/link"
 import type { RefObject } from "react"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Search } from "lucide-react"
 import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
@@ -46,18 +45,6 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
       >
         <div className="flex min-h-12 items-center px-5 pr-14 md:min-h-[var(--head-h)]">
           <SheetTitle className="sr-only">Menu</SheetTitle>
-          {/* The running head's search button is hidden on phones; DeferredClientUtilities opens the palette. */}
-          <SheetClose asChild>
-            <button
-              type="button"
-              data-open-search="menu"
-              aria-haspopup="dialog"
-              className="inline-flex min-h-11 items-center gap-2 text-small text-ink-soft decoration-1 underline-offset-[0.18em] hover:text-ink hover:underline"
-            >
-              <Search className="size-4" strokeWidth={1.5} aria-hidden />
-              Search the site
-            </button>
-          </SheetClose>
         </div>
 
         <nav aria-label="Menu" className="px-5">

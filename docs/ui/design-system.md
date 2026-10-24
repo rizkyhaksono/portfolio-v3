@@ -117,19 +117,19 @@ Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones 
 2. **Ink speckle.** A small mask, only on numerals 48px and up below the fold, inverted blocks, and the 404 line.
 3. **Hatching.** 45 degree hatching (`repeating-linear-gradient(135deg, ...)`) for chart areas and `HatchBar`. This is the only permitted use of a gradient function, and it lives in CSS, not in class names.
 
-Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The engravings (the Hollar band and its crops; the press plate in the home hero, `.engraving-press`) are CSS masks painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. `scripts/engrave.mjs` makes both from scans kept outside the repo. Engravings never go through `next/image`.
+Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The Hollar engraving band (colophon only) is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. `scripts/engrave.mjs` makes it from a scan kept outside the repo. Engravings never go through `next/image`.
 
 ## Motion: the press moves once
 
 | Tier | What | Rules |
 |---|---|---|
 | 0 (no JS) | Native scroll, `data-scroll-behavior="smooth"` on `<html>`, `scroll-behavior: smooth` under no-preference, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (not `scroll-padding-top` on `html`, which scrolls the page whenever focus lands in the sticky head), sticky layouts (skills deck, ledger years, article rail, project figure column, stats chart, tools index, chat composer) | `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky. |
-| 1 (CSS scroll-driven) | Home wordscroll (`.ws`) with the hero press plate's ink-in (`press-ink` on the same timeline: .15 opacity and 0.06em off register to full ink, in step with the sentence), reading hairline on articles and home (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
+| 1 (CSS scroll-driven) | Home wordscroll (`.ws`), reading hairline on articles and home (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
 | Response | Underline 1px to 2px, button `translateY(1px)`, tab underline slide, accordion, dialog and sheet fade plus 4px, toasts, tracker drag lift | Use `--dur-press`, `--dur-ui`, `--dur-sheet`, `--ease-print`. |
 
 **Banned:** parallax, marquees and infinite scrollers, typing effects, smooth cursors, page transitions, pulsing dots and pulse skeletons, fade-up or reveal-on-scroll on sections, hover lifts (`hover:-translate-y`), Lenis, GSAP, `motion` / framer-motion, any scroll animation library on any route.
 
-**Reduced motion:** durations drop to .01ms and the wordscroll and press plate print fully inked. Sticky stays, because it is layout.
+**Reduced motion:** durations drop to .01ms and the wordscroll prints fully inked. Sticky stays, because it is layout.
 
 **Media:** nothing autoplays. YouTube is a click-to-load facade.
 

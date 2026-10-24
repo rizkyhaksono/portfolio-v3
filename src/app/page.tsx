@@ -7,9 +7,9 @@ import CertificationSection from "@/app/_components/certification"
 import ReadersSection from "@/app/_components/site-stats"
 import RecommendationsSection from "@/app/_components/contact/linkedin-recommendations"
 import ContactSection from "@/app/_components/contact"
+import { IssueIndex } from "@/app/_components/issue-index"
 import BaseLayout from "@/components/layout/base-layout"
 import { SHELL_WIDTH } from "@/components/layout/running-head"
-import { Engraving } from "@/components/ui/engraving"
 import { InkLink } from "@/components/ui/ink-link"
 import { InkedSentence, WordScroll } from "@/components/ui/word-scroll"
 import { JOB_TITLE } from "@/commons/constants/author"
@@ -26,9 +26,8 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
  * The text block is centred in the pinned stage, so the slack falls above and below it and never between
  * the job line and the sentence. The name is the display token under a 15svh cap (`--name`), so the stage still
  * fits 375x667 and 1280x600. Below sm the sentence keeps a 24px floor: its unscrolled ghost (3.17:1) passes as
- * large text. From lg the press plate fills the column beside the text: it adds no height (absolute in its grid
- * area), runs from the name's cap line to the link row, takes its width from its aspect ratio and prints in with
- * the sentence.
+ * large text. From lg the "In this issue" column sits beside the text, absolute in its grid area so it adds
+ * no height.
  */
 function Masthead() {
   return (
@@ -60,10 +59,12 @@ function Masthead() {
             </li>
           </ul>
         </div>
-        <Engraving
-          crop="press"
-          className="absolute bottom-[0.3rem] right-0 top-[0.17em] hidden w-auto max-w-full [font-size:var(--name)] lg:col-start-2 lg:row-start-1 lg:block"
-        />
+        {/* Absolute in its grid area: the column adds no height and never delays the h1. */}
+        <div className="absolute inset-0 hidden justify-end overflow-hidden pt-[0.5rem] lg:col-start-2 lg:row-start-1 lg:flex">
+          <Suspense fallback={null}>
+            <IssueIndex className="w-full max-w-[22rem]" />
+          </Suspense>
+        </div>
       </div>
     </WordScroll>
   )

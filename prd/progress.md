@@ -188,3 +188,4 @@
 
 ### Source of truth for copy
 - Public LinkedIn: https://www.linkedin.com/in/rizkyhaksono
+- ✅ 2026-10-24 owner feedback: hero press plate replaced by the "In this issue" column (latest writing, latest project, most read; live, `IssueIndex`); Hollar plate now colophon-only (auth is one column with the mark, 404 has no plate); footer runs edge to edge; site search (command palette, ⌘K, `/api/search-index`, `cmdk`) removed

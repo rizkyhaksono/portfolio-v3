@@ -5,7 +5,7 @@
 ```
 1024px and up
   Running head (sticky, 52px, paper + grain, 1px rule below):
-    [RH mark] Rizky Haksono   Projects Writing Etan AI Chat Tracker Roadmap Tools Stats   [Search ⌘K] [theme] [Account]
+    [RH mark] Rizky Haksono   Projects Writing Etan AI Chat Tracker Roadmap Tools Stats   [theme] [Account]
   Bleed slot (home masthead only)
   main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
   Ink rule (single, 1px)
@@ -17,10 +17,10 @@ under 768px       wordmark, [menu icon]   (48px head, 44px targets)
 ```
 
 - If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
-- Certificates and Changelog live in the colophon, the menu and the command palette.
+- Certificates and Changelog live in the colophon and the menu.
 - **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section in italic at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
-- The colophon credit line: "Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum (public domain). Press after Jan van der Straet, *Impressio librorum*, c. 1600, Museum Plantin-Moretus (public domain)."
-- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon, command palette and terminal overlay all import it.
+- The colophon credit line: "Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum (public domain)."
+- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon and terminal overlay all import it.
 
 ### BaseLayout
 
@@ -32,7 +32,7 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 | `footer?` | `'full'` (default), `'compact'`, `'none'` | `compact` on `/ai` and `/chat` |
 
 - The old `sidebar` and `rightSidebar` props, the navbar, sidebars, right-sidebar windows and visitor panel are gone. Do not bring them back.
-- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger (a two-rule menu icon labelled "Menu"). `DeferredClientUtilities` (command palette, terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. The palette opens from `[data-open-search]` buttons and ⌘K, the feedback dialog from `[data-open-feedback]` buttons (colophon); nothing floats over the page.
+- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger (a two-rule menu icon labelled "Menu"). `DeferredClientUtilities` (terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. There is no site search. The feedback dialog opens from `[data-open-feedback]` buttons (colophon); nothing floats over the page.
 - There is no scroll-to-top button; the colophon has a "Back to top" link.
 - Do not add horizontal padding inside BaseLayout. The wrapper already pads.
 
@@ -75,9 +75,9 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
 
-- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. From `lg` the press engraving sits to the right (below). The stage carries no photo.
+- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. From `lg` the "In this issue" column sits to the right (below). The stage carries no photo.
 - The text block is centred in the pinned stage, so the slack falls above and below the block, never between the job line and the sentence. The name is the `display` token capped at `15svh` (104px at 1280x800, 90px at 1280x600, 44px and one line at 375), so the stage fits 375x667 and 1280x600.
-- Press plate (`<Engraving crop="press">`, decorative, `aria-hidden`), from `lg` only: the text and the plate share a grid (`auto` text column, the plate's column takes the rest). The plate is absolute in its grid area, so it adds no height and no layout shift: its top sits on the name's cap line (`0.17em` of the name size), its bottom on the link row, and its width comes from its aspect ratio (1870:2300), right-aligned to the shell. It prints in on the `.ws` timeline with the sentence (contain 4% to 50%): a ghost at .15 opacity, 0.06em off register, comes into register at full ink. Without scroll timelines, with reduced motion or under 561px tall it is static and fully printed. Below `lg` the hero is text only.
+- "In this issue" column (`IssueIndex`, `src/app/_components/issue-index.tsx`, server), from `lg` only: the text and the column share a grid (`auto` text column, the index takes the rest). It is absolute in its grid area inside `<Suspense fallback={null}>`, so it adds no height, never delays the h1 and causes no layout shift. One `rule` hairline on its left, no frame. Up to three entries, each an italic caption label, a roman title link (clamped to three lines) and an italic meta line: Latest writing (newest post from every source, with its date), Latest project (with a two-line excerpt), Most read (with readers this month). An entry whose source fails or is empty is dropped; with none left the column renders nothing. No motion. Below `lg` the hero is text only.
 - The hero sentence keeps a 24px floor below `sm` (it is `h2` size otherwise) so its unscrolled ghost still passes as large text (3.17:1).
 - About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with an italic drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
 - Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.

@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Search } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { navTrack } from "@/commons/constants/navigation-menu"
 import { cn } from "@/lib/utils"
@@ -11,7 +10,7 @@ import { ContentsTrigger } from "./contents-trigger"
 
 export { SHELL_WIDTH }
 
-/** Sticky running head: wordmark, sections, search, theme, account; Contents below 1024px. */
+/** Sticky running head: wordmark, sections, theme, account; Contents below 1024px. */
 export function RunningHead() {
   return (
     <header data-print-hide className="bg-paper-grain sticky top-0 z-40 border-b border-rule">
@@ -30,18 +29,6 @@ export function RunningHead() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <button
-            type="button"
-            data-open-search="head"
-            aria-keyshortcuts="Meta+K Control+K"
-            className="hidden h-9 items-center gap-2 border border-input px-3 text-small text-ink-soft hover:border-ink hover:text-ink md:inline-flex [@media(pointer:coarse)]:min-h-11"
-          >
-            <Search className="size-4" strokeWidth={1.5} aria-hidden />
-            Search
-            <kbd className="text-caption" aria-hidden>
-              ⌘K
-            </kbd>
-          </button>
           <ThemeToggle className="hidden lg:inline-flex" />
           <Link
             href="/profile"

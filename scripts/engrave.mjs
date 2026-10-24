@@ -1,19 +1,17 @@
 // Prints the one-ink plates and paper textures (plan §4).
-// Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> [<path/to/impressio-librorum-3840.jpg>] > speckle-uri.txt
-// Sources: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0);
-// Impressio librorum, Nova Reperta, after Jan van der Straet, publ. Galle, c. 1600, Museum Plantin-Moretus PK.OPB.0186.005 (PDM).
-// The source scans live in art-src/ outside the repo and are never committed.
-// Writes src/assets/plates/hollar-band-1600.webp, press-<w>.webp (when the second scan is given) and
-// src/assets/paper/grain-{light,dark}.webp, prints the speckle mask data URI to stdout (sizes go to stderr).
+// Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> > speckle-uri.txt
+// Source: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0).
+// The source scan lives in art-src/ outside the repo and are never committed.
+// Writes src/assets/plates/hollar-band-1600.webp and src/assets/paper/grain-{light,dark}.webp, prints the speckle mask data URI to stdout (sizes go to stderr).
 // Exits non-zero if any budget is blown.
 import assert from "node:assert/strict"
 import fs from "node:fs"
 import path from "node:path"
 import sharp from "sharp"
 
-const [src, pressSrc] = process.argv.slice(2)
-if (!src || !fs.existsSync(src) || (pressSrc && !fs.existsSync(pressSrc))) {
-  console.error("usage: bun scripts/engrave.mjs <hollar-landschap-met-ruiter-1650.jpg> [<impressio-librorum-3840.jpg>]")
+const [src] = process.argv.slice(2)
+if (!src || !fs.existsSync(src)) {
+  console.error("usage: bun scripts/engrave.mjs <hollar-landschap-met-ruiter-1650.jpg>")
   process.exit(2)
 }
 
@@ -23,10 +21,6 @@ const INK = [0x1e, 0x3c, 0x9e] // --ink, light
 const CREAM = [0xef, 0xe6, 0xd2] // --ink, dark (cream)
 const CROP = { left: 330, top: 1500, width: 6150, height: 2620 } // excludes the plate caption line
 const THRESHOLD = 140
-// Press, both pressmen, the paper carrier and the proofreader; inside the plate border, above the signatures and caption.
-const PRESS_CROP = { left: 1790, top: 115, width: 1870, height: 2300 }
-const PRESS_THRESHOLD = 130
-const PRESS_WIDTH = 800 // 2.7x its widest render (~300 CSS px from lg); at 1200 the hatching costs ~165 KB
 
 // Smallest of lossless + lossy [80,70,60]; throws (non-zero exit) when even that is over budget.
 async function encode(rgba, width, height, budget, label) {
@@ -80,7 +74,6 @@ async function engrave(file, crop, threshold, sizes, name) {
 }
 
 await engrave(src, CROP, THRESHOLD, [[1600, 72 * KB]], "hollar-band")
-if (pressSrc) await engrave(pressSrc, PRESS_CROP, PRESS_THRESHOLD, [[PRESS_WIDTH, 70 * KB]], "press")
 
 // --- Paper textures ---------------------------------------------------------
 // Seeded so re-runs give byte-identical tiles. Per-pixel noise is seamless when tiled.
