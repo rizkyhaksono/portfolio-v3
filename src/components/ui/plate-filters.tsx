@@ -6,7 +6,7 @@ type Stop = readonly [at: number, hex: string]
 // so midtones print as ink (a straight ink-to-paper blend passes through neutral grey).
 export const PLATE_RAMPS: Record<"plate-paper" | "plate-night", readonly Stop[]> = {
   "plate-paper": [[0, PRINT_HEX.ink], [0.16, PRINT_HEX.inkSoft], [0.79, PRINT_HEX.rule], [0.95, PRINT_HEX.paper], [1, PRINT_HEX.paper]],
-  "plate-night": [[0, PRINT_HEX.night], [0.13, PRINT_HEX.nightTint], [0.8, PRINT_HEX.nightInkSoft], [0.97, PRINT_HEX.nightInk], [1, PRINT_HEX.nightInk]],
+  "plate-night": [[0, PRINT_HEX.nightTint], [0.13, PRINT_HEX.night], [0.8, PRINT_HEX.nightInkSoft], [0.97, PRINT_HEX.nightInk], [1, PRINT_HEX.nightInk]],
 }
 
 const STEPS = 20

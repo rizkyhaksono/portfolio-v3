@@ -141,7 +141,7 @@ portfolio-v3/
 
 - **Portfolio Showcase** - Projects, skills, and professional experience
 - **Blog** - Technical writing with MDX support for rich content
-- **Paper and Night print** - The site opens in Paper (light); Night print is the same sheet reversed, cream ink on night paper, and the menu offers Paper, Night and System
+- **Paper and Night print** - The site opens in Paper (light); Night print is the same sheet reversed, cream ink on the hero's cobalt, and the menu offers Paper, Night and System
 - **Responsive Design** - Works seamlessly on all devices
 - **Performance** - Lightning-fast page loads with Next.js 16
 - **One-ink print design** - Cobalt ink on cream paper, square corners, hairline rules, no animation library
@@ -418,7 +418,7 @@ In code, always use the component: `<Logo variant="mini" | "mark" | "tile" label
 
 Files in `public/brand/`:
 
-- `mark-light.svg`, `mark-dark.svg`, `tile-light.svg`, `tile-dark.svg`, `lockup-light.svg`, `lockup-dark.svg`: standalone art on paper or night paper. `global-error.tsx` (which has no CSS) reads `mark-light.svg`; the rest are for use outside the site
+- `mark-light.svg`, `mark-dark.svg`, `tile-light.svg`, `tile-dark.svg`, `lockup-light.svg`, `lockup-dark.svg`: standalone art on paper or on the night cobalt. `global-error.tsx` (which has no CSS) reads `mark-light.svg`; the rest are for use outside the site
 - `og-mark.svg`: the glyph and ticks with no background, read by the OG and certificate images
 
 The same run also writes `src/app/icon.svg` (the tile, legible at 16px), `src/app/apple-icon.png` (the glyph at 70% of an ink tile, 180px), `src/app/favicon.ico` (16 and 32px; keep it at that path, the container healthcheck fetches `/favicon.ico`) and `src/components/ui/logo-art.ts`. All of them are generated; do not edit them by hand. To regenerate, use Node 22.18 or newer (the script imports `src/lib/print-hex.ts` directly); it needs no other input:

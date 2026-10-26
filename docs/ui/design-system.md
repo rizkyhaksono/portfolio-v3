@@ -6,12 +6,12 @@ Tokens are HSL triples in `src/app/globals.css` so every shadcn part re-inks fro
 
 | Token | Tailwind class | Paper hex (light) | Night hex (dark) | Role |
 |---|---|---|---|---|
-| `--paper` | `paper` | F3ECDC | 0D1433 | Page, card, text on solid ink |
-| `--ink` | `ink` | 1E3C9E | EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `--ink-soft` | `ink-soft` | 445BAA | A9B5E3 | Secondary text, on paper or tint only |
-| `--rule` | `rule` | BFC6DE | 2C3870 | Decorative hairlines only |
-| `--rule-strong` | `rule-strong` | 6476B2 | 7383C4 | Control boundaries (3:1 or better) |
-| `--tint` | `tint` | E2E4EB | 162868 | Hover row, code ground, inset |
+| `--paper` | `paper` | F3ECDC | 1E3C9E | Page, card, text on solid ink |
+| `--ink` | `ink` | 1E3C9E | F3ECDC | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `--ink-soft` | `ink-soft` | 445BAA | E6D9BC | Secondary text, on paper or tint only |
+| `--rule` | `rule` | BFC6DE | 4E67BC | Decorative hairlines only |
+| `--rule-strong` | `rule-strong` | 6476B2 | 90A3DF | Control boundaries (3:1 or better) |
+| `--tint` | `tint` | E2E4EB | 142C7B | Hover row, code ground, inset |
 
 The six Tailwind colours are defined as `hsl(var(--x) / <alpha-value>)`. Hex values above are rounded from the HSL triples; the few copies code needs live in `src/lib/print-hex.ts`.
 
@@ -47,7 +47,7 @@ Rules that keep it that way:
 - Night print never uses full cobalt as a ground behind text.
 - Text never takes an opacity modifier (a slash opacity on a text colour fails the gate). Use `text-ink-soft`.
 - Status is shape plus word, never colour. There is no red, green or amber anywhere.
-- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost`: ink at .6 on paper, 3.17:1; ink-soft at .7 at night, 4.98:1, a colour so night print stays blue, not grey). The hero sentence keeps a 24px floor on phones so the unscrolled ghost still counts as large text.
+- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost`: ink at .6 on paper, 3.17:1; ink-soft at .7 on the night cobalt, 4.15:1). The hero sentence keeps a 24px floor on phones so the unscrolled ghost still counts as large text.
 
 **Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples out of `globals.css` and fails the build below these floors, in Paper and in Night: ink on paper 7:1, ink-soft on paper 4.5:1, ink-soft on tint 4.5:1, rule-strong on paper 3:1, the wordscroll ghost over paper 3:1. It also checks that every hex in `src/lib/print-hex.ts` matches its token (within one per channel) and that the `@media print` block pins the Paper triples. Change a token and the test tells you which copy to update.
 
@@ -141,7 +141,7 @@ Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the defau
 - Token flip on `<html class="dark">`, driven by next-themes. The default is Paper (`ThemeProvider defaultTheme="light" enableSystem`), so the first visit is light; the menu sheet offers Paper, Night and System, and the running head has a Night toggle from 1024px.
 - Do not write dark-variant classes. Every colour already flips through the tokens; existing ones are deleted as files are touched.
 - The colophon band flips through `--plate-alpha`; the hero plate does not flip; photos keep the `.plate` duotone; the grain tile swaps.
-- `color-scheme` follows the theme. Viewport `themeColor` is paper by day and night paper at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
+- `color-scheme` follows the theme. Viewport `themeColor` is paper by day, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
 - OG and certificate images are always printed on paper.
 
 ## Print

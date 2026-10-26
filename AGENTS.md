@@ -42,7 +42,7 @@ Always read `prd/feature.md` and `prd/progress.md` before starting feature work;
 
 ## UI rules (mandatory)
 
-Design brief: the whole site is one cobalt ink printed on cream paper, set in Plus Jakarta Sans, with riso grain, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
+Design brief: the whole site is one cobalt ink printed on cream paper, set in Plus Jakarta Sans, with riso grain, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on the hero's cobalt, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
 
 - Docs: [`docs/ui/README.md`](docs/ui/README.md) (source of truth)
 - Agent rule: `.cursor/rules/ui-layout-consistency.mdc`
@@ -51,12 +51,12 @@ Design brief: the whole site is one cobalt ink printed on cream paper, set in Pl
 
 | Tailwind colour | Paper | Night | Role |
 |---|---|---|---|
-| `paper` | #F3ECDC | #0D1433 | Page, card, text on solid ink |
-| `ink` | #1E3C9E | #EFE6D2 | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `ink-soft` | #445BAA | #A9B5E3 | Secondary text (on paper or tint only) |
-| `rule` | #BFC6DE | #2C3870 | Decorative hairlines |
-| `rule-strong` | #6476B2 | #7383C4 | Control boundaries |
-| `tint` | #E2E4EB | #162868 | Hover row, code ground, inset |
+| `paper` | #F3ECDC | #1E3C9E | Page, card, text on solid ink |
+| `ink` | #1E3C9E | #F3ECDC | Text, icons, strong rules, solid button, focus, charts, engraving |
+| `ink-soft` | #445BAA | #E6D9BC | Secondary text (on paper or tint only) |
+| `rule` | #BFC6DE | #4E67BC | Decorative hairlines |
+| `rule-strong` | #6476B2 | #90A3DF | Control boundaries |
+| `tint` | #E2E4EB | #142C7B | Hover row, code ground, inset |
 
 shadcn names (`background`, `foreground`, `muted`, `border`, `input`, `primary`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes (tokens flip on `<html class="dark">`). Status is shape plus word, never colour.
 

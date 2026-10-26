@@ -6,10 +6,10 @@ const ends = (table: string) => {
 }
 
 describe("plate ramps", () => {
-  it("runs from ink to paper in paper print, night to cream in night print", () => {
-    // Blue channel: ink 0x9E, paper 0xDC; night 0x33, cream 0xD2.
+  it("runs from ink to paper in paper print, deep cobalt to cream in night print", () => {
+    // Blue channel: ink 0x9E, paper 0xDC; night tint 0x7B, cream 0xDC.
     expect(ends(rampTable(PLATE_RAMPS["plate-paper"], 2))).toEqual([0.62, 0.863, 21])
-    expect(ends(rampTable(PLATE_RAMPS["plate-night"], 2))).toEqual([0.2, 0.824, 21])
+    expect(ends(rampTable(PLATE_RAMPS["plate-night"], 2))).toEqual([0.482, 0.863, 21])
   })
 
   it("keeps the midtone blue, not grey", () => {
