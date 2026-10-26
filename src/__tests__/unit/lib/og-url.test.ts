@@ -7,7 +7,7 @@ describe("ogImageUrl", () => {
     const url = ogImageUrl({ type: "blog", title: "x" })
 
     expect(url.startsWith("/api/og?")).toBe(true)
-    expect(parse(url).searchParams.get("v")).toBe("3")
+    expect(parse(url).searchParams.get("v")).toBe("4")
   })
 
   it("round-trips awkward values and ignores a caller-supplied v", () => {
@@ -15,13 +15,13 @@ describe("ogImageUrl", () => {
 
     expect(searchParams.get("title")).toBe("Q&A: 100% #1")
     expect(searchParams.get("subtitle")).toBe("")
-    expect(searchParams.getAll("v")).toEqual(["3"])
+    expect(searchParams.getAll("v")).toEqual(["4"])
   })
 
   it("serves the certificate from the same helper", () => {
     const url = parse(ogImageUrl({ course: "mcp-fundamentals", name: "Ada" }, "/api/certificate"))
 
     expect(url.pathname).toBe("/api/certificate")
-    expect(url.searchParams.get("v")).toBe("3")
+    expect(url.searchParams.get("v")).toBe("4")
   })
 })

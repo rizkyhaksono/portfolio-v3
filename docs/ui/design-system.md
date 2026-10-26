@@ -27,7 +27,7 @@ shadcn names map onto the same ink, so existing components keep working:
 | `input` | rule-strong |
 | `--radius` | `0rem` |
 
-Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted wordscroll colour), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
+Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted colour of the lede sentence), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
 
 ### Contrast
 
@@ -51,17 +51,16 @@ Rules that keep it that way:
 
 **Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples out of `globals.css` and fails the build below these floors, in Paper and in Night: ink on paper 7:1, ink-soft on paper 4.5:1, ink-soft on tint 4.5:1, rule-strong on paper 3:1, the wordscroll ghost over paper 3:1. It also checks that every hex in `src/lib/print-hex.ts` matches its token (within one per channel) and that the `@media print` block pins the Paper triples. Change a token and the test tells you which copy to update.
 
-## Type: Literata
+## Type: Plus Jakarta Sans
 
-One family, Literata (variable, OFL), roman and italic, loaded with `next/font/google` in `src/app/layout.tsx` (`subsets: ['latin']`, `display: 'swap'`, `adjustFontFallback`). No committed font binaries. Machine text uses the system mono stack `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`, which costs 0 bytes.
+One family, Plus Jakarta Sans (Tokotype, variable, OFL), roman and italic, loaded with `next/font/google` in `src/app/layout.tsx` (`subsets: ['latin']`, `style: ['normal', 'italic']`, `display: 'swap'`, `adjustFontFallback`). The only committed font binary is the static 600 WOFF the OG and certificate cards read (`src/assets/fonts/plus-jakarta-sans-latin-600-normal.woff`). Machine text uses the system mono stack `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`, which costs 0 bytes.
 
 | Variable | Tailwind | Use |
 |---|---|---|
-| `--font-serif` | `font-sans`, `font-serif` | Literata for body, prose, UI |
-| `--font-display` | `font-display` | Literata for headings, display, numerals |
+| `--font-sans` | `font-sans`, `font-display` (same face) | Everything: body, prose, UI, headings, display, numerals |
 | system mono | `font-mono` (code-block and kbd only) | Code, slugs, keys such as TRK-12, raw JSON, WPM passage, kbd |
 
-Italic is rationed. Italic: h1 to h4, the masthead, an article's standfirst (page heads carry none), captions, datelines, pull quotes, numerals. Roman: body, prose, nav, buttons (15px / 600), labels (13px / 600), table heads (12px / 600, ink-soft), tags (12px), form values.
+Weight and tracking carry the hierarchy and live on the size tokens (`tailwind.config.ts`), never in `tracking-[…]` classes: display 600 at -0.04em, h1 700 at -0.025em, h2 700 at -0.02em, h3 600 at -0.01em, h4 600, numerals 600 at -0.02em, body and prose 400. Buttons 15px / 600, labels 13px / 600, table heads 12px / 600 in ink-soft. Italic only for pull quotes (prose `blockquote`) and cited titles.
 
 ### Scale
 
@@ -81,14 +80,14 @@ Compact and fluid between 375px and 1280px, defined as `fontSize` keys in `tailw
 | `display` | 44 to 104 / 0.92 | Italic, weight 360, `text-wrap: balance` |
 | `numeral` | 32 to 48 / 1 | Italic, `tabular-nums` |
 
-Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones (`SECTION_SPACING.section = 'mt-12 sm:mt-16'`, `sectionGap = 'mt-3'`). The home hero is sized in `svh` so the pinned stage still fits 375x667 and 1280x600.
+Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones (`SECTION_SPACING.section = 'mt-12 sm:mt-16'`, `sectionGap = 'mt-3'`). The home hero fills the first screen (`100svh` minus the running head, 30rem floor) and caps the name by `svh`, so the name always fits the first screen.
 
 ### Type rules
 
-- `font-synthesis: none`. Never fake a weight or an italic.
-- No upper-case text transform, no letter-spacing utilities, no small caps labels.
+- `font-synthesis: none`. Never fake a weight or an italic: both come from the variable font.
+- No upper-case text transform, no letter-spacing utilities (tight tracking lives on the size tokens), no small caps labels.
 - Headings are literal and sentence case ("Career", not "Where I've been").
-- Eyebrows only when they carry information, and then as an italic caption `<p>`, never all-caps.
+- Eyebrows only when they carry information, and then as a caption `<p>` in ink-soft, never all-caps.
 - No middle-dot meta strings. Datelines are sentences: "Published 3 March 2026, six minute read."
 - Numbers only for real sequences: changelog versions, roadmap stages, legal sections. No "01 / 02 / 03" section markers.
 - Links: underline 1px at offset .18em, 2px on hover. No "→" or arrow glyph after link text.
@@ -117,19 +116,23 @@ Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones 
 2. **Ink speckle.** A small mask, only on numerals 48px and up below the fold, inverted blocks, and the 404 line.
 3. **Hatching.** 45 degree hatching (`repeating-linear-gradient(135deg, ...)`) for chart areas and `HatchBar`. This is the only permitted use of a gradient function, and it lives in CSS, not in class names.
 
-Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The Hollar engraving band (colophon only) is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night. `scripts/engrave.mjs` makes it from a scan kept outside the repo. Engravings never go through `next/image`.
+Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The Hollar engraving band (colophon only) is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night; masks never go through `next/image`.
+
+**The hero plate.** The home masthead is a `.print-plate`: a local token swap to Paper's ink and paper, reversed (cobalt `--paper`, cream `--ink`, a cream `--ink-soft`), identical in Paper and Night, so the hero reads as one printed plate. Its sky carries `.halftone`, a 4px dot screen in the element's own text colour (`radial-gradient` with `color-mix`, a pattern rather than a visible gradient); the `/auth` ink panel uses the same class. The landscape is `src/assets/plates/bromo-2400.webp`: J. C. Greive after A. Salm, *Gezicht op de Bromo vulkaan*, 1869 (Rijksmuseum RP-P-1975-194, public domain), re-cut by `scripts/engrave.mjs` as a horizontal line screen bent along the broad tones, with solid ink for the riders, rocks and shadow edges, the sky cut away to transparency. It is a two-ink RGBA raster in fixed Paper colours, served through `next/image` with `unoptimized` because the lossless file (about 150 KB) is smaller than the optimizer's lossy copies. The guard test checks cream on cobalt at 7:1 and cream ink-soft on cobalt at 4.5:1.
+
+`scripts/engrave.mjs` makes both plates from scans kept outside the repo (`art-src/`).
 
 ## Motion: the press moves once
 
 | Tier | What | Rules |
 |---|---|---|
 | 0 (no JS) | Native scroll, `data-scroll-behavior="smooth"` on `<html>`, `scroll-behavior: smooth` under no-preference, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (not `scroll-padding-top` on `html`, which scrolls the page whenever focus lands in the sticky head), sticky layouts (skills deck, ledger years, article rail, project figure column, stats chart, tools index, chat composer) | `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky. |
-| 1 (CSS scroll-driven) | Home wordscroll (`.ws`), reading hairline on articles and home (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
+| 1 (CSS scroll-driven) | Home lede wordscroll (`.ws`, the sentence on its own view timeline), reading hairline on articles and home (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
 | Response | Underline 1px to 2px, button `translateY(1px)`, tab underline slide, accordion, dialog and sheet fade plus 4px, toasts, tracker drag lift | Use `--dur-press`, `--dur-ui`, `--dur-sheet`, `--ease-print`. |
 
 **Banned:** parallax, marquees and infinite scrollers, typing effects, smooth cursors, page transitions, pulsing dots and pulse skeletons, fade-up or reveal-on-scroll on sections, hover lifts (`hover:-translate-y`), Lenis, GSAP, `motion` / framer-motion, any scroll animation library on any route.
 
-**Reduced motion:** durations drop to .01ms and the wordscroll prints fully inked. Sticky stays, because it is layout.
+**Reduced motion:** durations drop to .01ms and the lede sentence prints fully inked. Sticky stays, because it is layout.
 
 **Media:** nothing autoplays. YouTube is a click-to-load facade.
 
@@ -137,13 +140,13 @@ Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the defau
 
 - Token flip on `<html class="dark">`, driven by next-themes. The default is Paper (`ThemeProvider defaultTheme="light" enableSystem`), so the first visit is light; the menu sheet offers Paper, Night and System, and the running head has a Night toggle from 1024px.
 - Do not write dark-variant classes. Every colour already flips through the tokens; existing ones are deleted as files are touched.
-- Engravings flip through `--plate-alpha`; photos keep the `.plate` duotone; the grain tile swaps.
+- The colophon band flips through `--plate-alpha`; the hero plate does not flip; photos keep the `.plate` duotone; the grain tile swaps.
 - `color-scheme` follows the theme. Viewport `themeColor` is paper by day and night paper at night, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
 - OG and certificate images are always printed on paper.
 
 ## Print
 
-The print stylesheet forces paper tokens, hides the running head, menu sheet and engravings, stops the wordscroll, and prints link URLs.
+The print stylesheet forces paper tokens, hides the running head, menu sheet and engravings, stops the lede wordscroll, and prints link URLs.
 
 ## Shared class tokens
 

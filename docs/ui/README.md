@@ -2,7 +2,7 @@
 
 **This folder is the source of truth for every UI decision in Portfolio v3.** The agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, `.github/copilot-instructions.md`, `.cursor/rules/*.mdc`) only summarise it. When a summary and these docs disagree, these docs win. Code tokens live in `src/app/globals.css`, `tailwind.config.ts` and `src/lib/design-system.ts`.
 
-The site is one printed publication: one cobalt ink on cream paper with riso grain, Literata italic headings, square corners, hairline rules, duotone plates, and an engraving band (Wenceslaus Hollar, *Landscape with a Rider*, 1650) at the foot of every page that has the full colophon (the compact footer on `/ai` and `/chat` has none). That band is the only engraving on the site; the home hero is text only. The site opens in Paper (light). Dark mode, "Night print", is the same sheet reversed: cream ink on night paper; the menu sheet offers Paper, Night and System. Hierarchy comes from size, italic against roman, and rules. Never from extra colour, capitals or mono labels.
+The site is one printed publication: one cobalt ink on cream paper set in Plus Jakarta Sans, with riso grain, square corners, hairline rules, duotone plates, and an engraving band (Wenceslaus Hollar, *Landscape with a Rider*, 1650) at the foot of every page that has the full colophon (the compact footer on `/ai` and `/chat` has none). The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light). Dark mode, "Night print", is the same sheet reversed: cream ink on night paper; the menu sheet offers Paper, Night and System. Hierarchy comes from size, weight and rules. Never from extra colour, capitals or mono labels.
 
 The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels, glass surfaces) is retired. Do not reintroduce any of it.
 
@@ -10,7 +10,7 @@ The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesq
 
 | Doc | Covers |
 |---|---|
-| [design-system.md](./design-system.md) | Ink and paper tokens, contrast and its guard test, Literata roles, compact type scale, lines, texture, motion tiers, banned list, dark mode, print |
+| [design-system.md](./design-system.md) | Ink and paper tokens, contrast and its guard test, Plus Jakarta Sans weights, compact type scale, the print plate and halftone, lines, texture, motion tiers, banned list, dark mode, print |
 | [surfaces.md](./surfaces.md) | The three surfaces: frame, inset, lift |
 | [page-shell.md](./page-shell.md) | BaseLayout, running head, menu sheet, colophon, page patterns, widths |
 | [components.md](./components.md) | Primitive rules, links, fields, plates, hover tips, data viz, Umami event rules |
@@ -19,13 +19,13 @@ The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesq
 ## The rules in one screen
 
 1. **One ink.** Colour classes are `ink`, `ink-soft`, `paper`, `tint`, `rule`, `rule-strong`, or the shadcn names that map onto them (`background`, `foreground`, `muted`, `border`, `primary`, ...). No other hue, no hex, no `white` / `black`, no dark-variant classes.
-2. **One family.** Literata roman and italic. System mono only inside code, kbd and raw data.
+2. **One family.** Plus Jakarta Sans, roman and italic; weight and size carry the hierarchy. System mono only inside code, kbd and raw data.
 3. **Radius 0.** The radio dot is the only circle.
 4. **Three surfaces.** Frame, inset, lift. Nothing else.
 5. **No decoration from the screen.** No gradients, glass, blur, glows or soft shadows. The only shadow is the ink lift on floating layers.
 6. **The press moves once.** Native scroll and sticky layouts; two CSS scroll-driven effects; response motion on input. No scroll animation library.
 7. **State by shape and word.** Errors, destructive actions and status never rely on colour.
-8. **Plain copy.** Sentence case, no upper-case transform, no letter-spacing, no middle-dot meta strings, no "→" on links, numbers only for real sequences.
+8. **Plain copy.** Sentence case, no upper-case transform, no letter-spacing utilities (tight tracking lives on the size tokens), no middle-dot meta strings, no "→" on links, numbers only for real sequences.
 9. **Umami events.** `data-umami-event` only on `<button>` and external `target="_blank"` links. Internal links use `data-track`.
 10. **Grep gate at 0** on every path you touch.
 
@@ -47,7 +47,7 @@ The mark is an RH monogram in one ink, so Night print reverses it for free. On a
 - Size it with a width or `size-*` class only; the viewBox keeps the proportions.
 - Standalone art on paper or night paper: `public/brand/{mark,tile,lockup}-{light,dark}.svg`. `og-mark.svg` is the glyph and ticks with no background, read by `src/app/api/og/print-assets.ts` for the OG and certificate images. `global-error.tsx` (no CSS there) uses `mark-light.svg`.
 - Generated, never hand-edited: `public/brand/*.svg`, `src/app/icon.svg`, `src/app/apple-icon.png` (glyph at 70% of the tile, 180px), `src/app/favicon.ico` (16 and 32px) and `src/components/ui/logo-art.ts`. `favicon.ico` must stay at that path: the container healthcheck fetches `/favicon.ico`.
-- Regenerate with `node scripts/logo/make.mjs` (Node 22.18 or newer: it imports `src/lib/print-hex.ts` directly). The one geometry source is the `GLYPH` and `MARKS` constants at the top of the script. Colours are written as `rgb()` from `PRINT_HEX` because the grep gate bans hex literals in `src/`. The lockup's name is live `<text>` in Literata italic that falls back to Georgia italic where Literata is not installed.
+- Regenerate with `node scripts/logo/make.mjs` (Node 22.18 or newer: it imports `src/lib/print-hex.ts` directly). The one geometry source is the `GLYPH` and `MARKS` constants at the top of the script. Colours are written as `rgb()` from `PRINT_HEX` because the grep gate bans hex literals in `src/`. The lockup's name is live `<text>` in Plus Jakarta Sans 600 that falls back to a system sans where the font is not installed.
 
 ## Grep gate
 
@@ -63,7 +63,7 @@ The exclusions are deliberate: `radio-group.tsx` owns the one circle, code block
 ## Source of truth in code
 
 - Tokens: `src/app/globals.css` (`:root`, `.dark`, print), `tailwind.config.ts` (colours, `fontSize`, radius), `src/lib/design-system.ts` (`SURFACE`, `SECTION_SPACING`)
-- Fonts: `src/app/layout.tsx` (Literata via `next/font/google`)
+- Fonts: `src/app/layout.tsx` (Plus Jakarta Sans via `next/font/google`); card font `src/assets/fonts/plus-jakarta-sans-latin-600-normal.woff`
 - Shell: `src/components/layout/base-layout.tsx`
 - Primitives: `src/components/ui/`
 - Logo: `src/components/ui/logo.tsx`, art from `scripts/logo/make.mjs`

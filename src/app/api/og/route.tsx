@@ -34,8 +34,7 @@ export async function GET(request: Request) {
             padding: "56px 72px",
             backgroundColor: PRINT_HEX.paper,
             color: PRINT_HEX.ink,
-            fontFamily: "Literata",
-            fontStyle: "italic",
+            fontFamily: "Plus Jakarta Sans",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
@@ -67,7 +66,7 @@ export async function GET(request: Request) {
       {
         width: 1200,
         height: 630,
-        fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
+        fonts: [{ name: "Plus Jakarta Sans", data: font, style: "normal", weight: 600 }],
         headers: CARD_HEADERS,
       },
     )

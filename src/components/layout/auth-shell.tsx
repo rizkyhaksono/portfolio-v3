@@ -27,7 +27,7 @@ export function AuthShell({ title, standfirst, footer, panel, children }: Readon
     >
       {panel && (
         // Reversed out of the ink like a cut in a newspaper: paper type on ink, which flips with the theme.
-        <aside className="hidden bg-ink p-8 text-paper md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
+        <aside className="halftone hidden bg-ink p-8 text-paper md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
           <Logo variant="mini" className="w-20" />
           {panel}
         </aside>

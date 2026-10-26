@@ -11,7 +11,7 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 | `Card`, `Surface` | `components/ui/card.tsx`, `surface.tsx` | Frame and inset, see [surfaces.md](./surfaces.md) |
 | `InkLink` | `components/ui/ink-link.tsx` | Every text link, internal or external |
 | `LedgerList`, `LedgerRow` | `components/ui/ledger.tsx` | Ledger pattern |
-| `PlateFigure` | `components/ui/plate-figure.tsx` | Framed figure with italic caption: duotone by default, `tone="color"` keeps the picture's colour |
+| `PlateFigure` | `components/ui/plate-figure.tsx` | Framed figure with a caption: duotone by default, `tone="color"` keeps the picture's colour |
 | `Logo` | `components/ui/logo.tsx` | The RH mark: `mini`, `mark`, `tile`, see [README.md](./README.md#brand) |
 | `Engraving` | `components/ui/engraving.tsx` | The Hollar engraving band, colophon only |
 | `HoverTip` | `components/ui/hover-tip.tsx` | The one tooltip for every `data-tip`, mounted once in the root layout |
@@ -29,22 +29,22 @@ Restyle shared primitives in place; do not fork a second version. Prefer these o
 - **Fields** (input, textarea, select). Baseline only: `border-0 border-b border-input`, 16px text, 2px ink baseline on focus, label above. Errors: italic ink text with an SVG cross, wired with `aria-describedby`.
 - **Tabs.** Bottom rule; the active tab gets a 2px ink underline. State lives in the URL (`?tab=`).
 - **Tag** (Chip and Badge merged). 1px `rule-strong`, 12px roman (`text-xs`). Status is an 8px square, filled, outline or dashed, plus a word.
-- **Eyebrow.** An italic caption `<p>`, only when it adds information. Never all-caps, never mono.
+- **Eyebrow.** A caption `<p>` in ink-soft, only when it adds information. Never all-caps, never mono.
 - **Table.** `th` 12px / 600 in ink-soft (sticky in admin), numbers right-aligned with `tabular-nums`, hover row `bg-tint`.
-- **Plates.** `PlateFigure` is a double-rule frame (1px ink, 3px paper, 1px rule) around the picture with an italic caption. `tone="photo"` (default) prints it in duotone. `tone="color"` skips the duotone for pictures that must keep their colour: anime and Pokémon pictures, the OCR upload, and site-generated `/api/og` covers (the blog passes `tone={isSiteImage(src) ? "color" : "photo"}`). The photo clips its own focus outline, so the frame draws it (2px ring outline) when an interactive child is focused. Size the picture in the caller so the frame reserves its space.
+- **Plates.** `PlateFigure` is a double-rule frame (1px ink, 3px paper, 1px rule) around the picture with a caption. `tone="photo"` (default) prints it in duotone. `tone="color"` skips the duotone for pictures that must keep their colour: anime and Pokémon pictures, the OCR upload, and site-generated `/api/og` covers (the blog passes `tone={isSiteImage(src) ? "color" : "photo"}`). The photo clips its own focus outline, so the frame draws it (2px ring outline) when an interactive child is focused. Size the picture in the caller so the frame reserves its space.
 - **Generated cards.** Build `/api/og` and `/api/certificate` URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=3`, so a changed card design reaches crawlers and CDNs that cache the old one; raise the number when a card changes.
 - **Hover tips.** `data-tip="..."` on any element shows an instant lift tip (`ui/hover-tip.tsx`, mounted once in the root layout). SVG marks follow the cursor, other elements anchor below; touch shows it on tap. Never use the native `title` attribute: it waits about a second. The tip is `aria-hidden`, so keep an `aria-label` or text table beside it.
 - **Floating layers.** Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command and Sonner toasts use the lift surface and an ink scrim. No backdrop blur.
 - **Controls.** Square switch and checkbox, round radio dot (the only circle), static ruled skeleton with no pulse, square duotone avatar.
 - **Icons.** lucide only, stroke 1.5, 16px or 20px, functional only. `react-icons` and `@radix-ui/react-icons` are removed; do not add them back.
 - **Code.** Server `<pre>` specimen box (inset ground, system mono 13.5px, `tabIndex={0}`), no syntax colours. The client `CopyButton` keeps the `Click Copy Code` event.
-- **Prose.** `.prose` in `globals.css` (no typography plugin): 66ch, display `h2` and `h3`, ink links, 22px italic blockquote, SVG fleuron `hr`, en-dash bullets, ledger tables, framed images. `.prose--chat` for chat replies.
+- **Prose.** `.prose` in `globals.css` (no typography plugin): 66ch, bold `h2` and `h3`, ink links, italic blockquote at the lead size, SVG fleuron `hr`, en-dash bullets, ledger tables, framed images. `.prose--chat` for chat replies.
 
 ## Data viz
 
 All charts are server-rendered SVG in ink. Recharts is removed; do not add a chart library.
 
-- `InkChart`: 1.5px ink line, hatched area, dotted grid, italic tabular axes, a `data-tip` per point, and a `<details>` table as the text alternative. `preserveAspectRatio="none"` with `vector-effect="non-scaling-stroke"`. Sessions as a dashed line.
+- `InkChart`: 1.5px ink line, hatched area, dotted grid, tabular axes, a `data-tip` per point, and a `<details>` table as the text alternative. `preserveAspectRatio="none"` with `vector-effect="non-scaling-stroke"`. Sessions as a dashed line.
 - `InkHeatmap`: five levels with a `rule-strong` outline and a `data-tip` per cell.
 - `HatchBar`: `repeating-linear-gradient(135deg, ...)` in CSS.
 

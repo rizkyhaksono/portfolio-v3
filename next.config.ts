@@ -80,8 +80,8 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: { '*': ['node_modules/typescript/**'] },
   // print-assets.ts reads this font from disk at runtime, which tracing cannot see.
   outputFileTracingIncludes: {
-    '/api/og': ['./src/assets/fonts/literata-italic.ttf'],
-    '/api/certificate': ['./src/assets/fonts/literata-italic.ttf'],
+    '/api/og': ['./src/assets/fonts/plus-jakarta-sans-latin-600-normal.woff'],
+    '/api/certificate': ['./src/assets/fonts/plus-jakarta-sans-latin-600-normal.woff'],
   },
   compress: true,
   poweredByHeader: false,

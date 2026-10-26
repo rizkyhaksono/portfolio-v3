@@ -10,7 +10,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 | Route | Pattern |
 |---|---|
-| `/` | Masthead stage (`bleed`, text only) then the home story, with the duotone portrait in About, see [page-shell.md](./page-shell.md) |
+| `/` | Masthead print plate (`bleed`: dotted cobalt sky, name in cream, the Bromo plate) and the lede on paper, then the home story, with the duotone portrait in About, see [page-shell.md](./page-shell.md) |
 | `/blog`, `/certificates`, `/changelog`, `/project` index | Ledger (projects add three featured Plates rows) |
 | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
 | `/roadmap` | Ledger |

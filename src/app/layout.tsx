@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
-import { Literata } from "next/font/google"
-import { cn } from "@/lib/utils"
+import { Plus_Jakarta_Sans } from "next/font/google"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { HoverTip } from "@/components/ui/hover-tip"
 import { Toaster } from "@/components/layout/toaster"
@@ -14,18 +13,11 @@ import { PRINT_HEX } from "@/lib/print-hex"
 import { PlateFilters } from "@/components/ui/plate-filters"
 import "./globals.css"
 
-// Literata only. Two instances so roman and italic each get their own fallback metrics.
-const fontSerif = Literata({
+// Plus Jakarta Sans only (Tokotype, OFL): one variable family, roman and italic.
+const fontSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  style: "normal",
-  variable: "--font-serif",
-  display: "swap",
-  adjustFontFallback: true,
-})
-const fontDisplay = Literata({
-  subsets: ["latin"],
-  style: "italic",
-  variable: "--font-display",
+  style: ["normal", "italic"],
+  variable: "--font-sans",
   display: "swap",
   adjustFontFallback: true,
 })
@@ -79,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={cn(fontSerif.variable, fontDisplay.variable)} suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={fontSans.variable} suppressHydrationWarning>
       <head>
         <JsonLd />
         {umamiEnabled && (

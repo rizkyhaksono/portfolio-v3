@@ -42,7 +42,7 @@ Always read `prd/feature.md` and `prd/progress.md` before starting feature work;
 
 ## UI rules (mandatory)
 
-Design brief: the whole site is one cobalt ink printed on cream paper, with riso grain, Literata italic headings, radius 0, hairline rules, duotone plates, a Hollar engraving band in the colophon (its only appearance) and a text-only home hero. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
+Design brief: the whole site is one cobalt ink printed on cream paper, set in Plus Jakarta Sans, with riso grain, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on night paper, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
 
 - Docs: [`docs/ui/README.md`](docs/ui/README.md) (source of truth)
 - Agent rule: `.cursor/rules/ui-layout-consistency.mdc`
@@ -62,7 +62,7 @@ shadcn names (`background`, `foreground`, `muted`, `border`, `input`, `primary`,
 
 ### Type
 
-Literata only (`next/font/google`, roman and italic). Italic for h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals. Roman for body, prose, nav, buttons, labels, table heads, tags, form values. System mono only for code, slugs, keys, raw JSON and kbd.
+Plus Jakarta Sans only (`next/font/google`, one variable family, roman and italic, `--font-sans`; `font-display` is the same face). Weight and tracking carry the hierarchy, set on the size tokens: display 600 at -0.04em, h1 700 at -0.025em, h2 700 at -0.02em, h3 and h4 600, numerals 600, body and prose 400. Italic only for pull quotes and cited titles. System mono only for code, slugs, keys, raw JSON and kbd. The OG and certificate cards use a static Plus Jakarta Sans 600 WOFF from `src/assets/fonts/`.
 
 The scale is compact and fluid (375 to 1280px), set as `fontSize` keys in `tailwind.config.ts`: `body` 15 to 16px, `prose` 16 to 17, `lead` 17 to 19, `h3` 18 to 20, `h2` 22 to 30, `h1` 30 to 44, `display` 44 to 104, `small` 13, `caption` and `xs` 12. Section rhythm is `SECTION_SPACING.section` (`mt-12 sm:mt-16`, 48px on phones, 64px from `sm`). Use the keys, never ad-hoc sizes. Full table: [`docs/ui/design-system.md`](docs/ui/design-system.md).
 
@@ -96,7 +96,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 
 Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
-Home: the masthead stage (`bleed` slot) holds the italic name (the LCP element), the job line, the wordscroll sentence, which keeps a 24px floor on phones, and the links, centred in the pinned stage. The hero is text only at every width: no photo, engraving or side column. The Hollar band appears only in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with an italic drop cap.
+Home: the masthead (`bleed` slot) is a `.print-plate halftone` section filling the first screen, printed in Paper's ink and paper reversed in both themes: the job line and the name (the LCP element, one line from `sm`, two below) centred in cream on a dotted cobalt sky, and the Bromo plate (`src/assets/plates/bromo-2400.webp`, served unoptimized) along the bottom 56%, layered over the name so the peaks cut the foot of the letters. The positioning sentence (24px floor on phones) and the three links sit just below on paper, and the sentence inks on its own view timeline. The Hollar band appears in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with a bold drop cap.
 
 Shared details agents trip on:
 
@@ -109,7 +109,7 @@ Shared details agents trip on:
 ### Motion
 
 - Tier 0 (no JS): native scroll, smooth anchor scroll, sticky layouts. `overflow-x: clip` on `html` and `main` only, never on `body`, never `overflow: hidden` / `auto` on a sticky ancestor.
-- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home wordscroll and the reading hairline (articles and home). Nothing else.
+- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home lede wordscroll (on its own view timeline) and the reading hairline (articles and home). Nothing else.
 - Response motion only: underline, button press, tab underline, accordion, dialog and sheet fade, toasts, tracker drag.
 - **Banned:** parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up or reveal on sections, hover lifts, Lenis, GSAP, `motion` / framer-motion.
 
@@ -148,7 +148,7 @@ Every route is migrated and both commands print nothing over `src content`. Neve
 - [ ] Route uses one page pattern from the table above
 - [ ] Colours from ink / paper tokens only; no hex, palette colours, `white` / `black` or `dark:`
 - [ ] Only frame, inset or lift; no glass, gradients, blur or soft shadows
-- [ ] Literata roles respected; mono only for machine text
+- [ ] Plus Jakarta Sans weights from the size tokens; mono only for machine text
 - [ ] No banned motion; reduced motion prints everything fully
 - [ ] Umami attributes follow the button / external-link rule
 - [ ] Pictures use `PlateFigure` (`tone="color"` only for pictures that keep their colour); the logo goes through `<Logo>`

@@ -26,7 +26,7 @@ This is my third iteration of my personal portfolio website, showcasing my work 
 
 - **[Tailwind CSS 3](https://tailwindcss.com/)** - Utility classes over the ink and paper tokens
 - **[Shadcn/ui](https://ui.shadcn.com/)** - Radix primitives restyled to the one-ink system
-- **[Literata](https://fonts.google.com/specimen/Literata)** - The only typeface, roman and italic, via `next/font`
+- **[Plus Jakarta Sans](https://fonts.google.com/specimen/Plus+Jakarta+Sans)** - The only typeface (Tokotype), roman and italic, via `next/font`
 - **Server SVG figures** - `ink-chart` and `ink-heatmap` draw every chart; no chart library
 - **[Lucide React](https://lucide.dev/)** - Functional icons only, stroke 1.5
 
@@ -396,7 +396,7 @@ For your specific schema, check Supabase dashboard or migration files.
 - Create custom styles in `globals.css` only when necessary
 - Leverage Shadcn/ui components for consistency
 - Use CSS modules for scoped styles if needed: `styles.module.css`
-- **UI system (one ink):** one cobalt ink printed on cream paper, Literata only, a compact fluid type scale, radius 0, hairline rules, duotone plates, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
+- **UI system (one ink):** one cobalt ink printed on cream paper, Plus Jakarta Sans only, a compact fluid type scale, radius 0, hairline rules, duotone plates, three surfaces (frame, inset, lift), and a reversed Night print for dark mode. [`docs/ui/README.md`](./docs/ui/README.md) is the source of truth, including the grep gate every UI change must pass.
 
 ### Error Handling
 

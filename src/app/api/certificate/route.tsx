@@ -34,8 +34,7 @@ export async function GET(req: NextRequest) {
             padding: 40,
             backgroundColor: PRINT_HEX.paper,
             color: PRINT_HEX.ink,
-            fontFamily: "Literata",
-            fontStyle: "italic",
+            fontFamily: "Plus Jakarta Sans",
           }}
         >
           {/* Double-rule frame: ink outside, a 3px gap, a hairline inside. */}
@@ -101,7 +100,7 @@ export async function GET(req: NextRequest) {
       {
         width: 1200,
         height: 800,
-        fonts: [{ name: "Literata", data: font, style: "italic", weight: 400 }],
+        fonts: [{ name: "Plus Jakarta Sans", data: font, style: "normal", weight: 600 }],
         headers: CARD_HEADERS,
       },
     )

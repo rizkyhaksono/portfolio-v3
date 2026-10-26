@@ -3,16 +3,16 @@ import { PageSection } from "@/components/ui/page-section"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { InkLink } from "@/components/ui/ink-link"
 import { PORTFOLIO_PDF_GOOGLE_DRIVE_URL, RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
+import { SECTION_SPACING } from "@/lib/design-system"
 
 const DROP_CAP =
-  "first-letter:float-left first-letter:mr-2 first-letter:mt-[0.06em] first-letter:font-display first-letter:text-[5.6em] first-letter:italic first-letter:leading-[0.74] first-letter:text-ink"
+  "first-letter:float-left first-letter:mr-2 first-letter:mt-[0.06em] first-letter:font-display first-letter:text-[4.6em] first-letter:font-bold first-letter:leading-[0.78] first-letter:text-ink"
 
 export default function AboutSection() {
   return (
     <PageSection
       id="about"
-      // The stage's bottom padding already closes it, so a 3rem gap (wrapper padding plus mt-4 on phones) is enough.
-      className="mt-4 sm:mt-0"
+      className={SECTION_SPACING.section}
       heading={{ title: "About" }}
       contentClassName="mt-6 grid gap-8 md:grid-cols-[18rem_minmax(0,1fr)] md:gap-12"
     >

@@ -47,9 +47,9 @@ export function isSiteImage(src: string): boolean {
 }
 
 /**
- * Relative URL of a generated card (`/api/og` by default). Always carries `v=3`: crawlers and CDNs cache cards hard,
+ * Relative URL of a generated card (`/api/og` by default). Always carries `v=4`: crawlers and CDNs cache cards hard,
  * so a changed design needs a new URL to reach shared and cached copies.
  */
 export function ogImageUrl(params: Record<string, string>, path: "/api/og" | "/api/certificate" = "/api/og"): string {
-  return `${path}?${new URLSearchParams({ ...params, v: "3" })}`
+  return `${path}?${new URLSearchParams({ ...params, v: "4" })}`
 }

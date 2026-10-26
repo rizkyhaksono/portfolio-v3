@@ -101,3 +101,21 @@ describe("print block", () => {
     }
   })
 })
+
+// The home hero is printed in Paper's ink and paper reversed, in either theme (globals.css `.print-plate`).
+describe("print plate", () => {
+  const [plate] = tokenBlocks("\\.print-plate")
+
+  it("reverses Paper's ink and paper", () => {
+    expect(plate.paper).toEqual(light.ink)
+    expect(plate.ink).toEqual(light.paper)
+  })
+
+  it.each([
+    ["ink", 7],
+    ["ink-soft", 4.5],
+  ] as const)("cream %s on the cobalt sky is at least %d:1", (fg, floor) => {
+    expect(plate[fg]).toBeDefined()
+    expect(contrast(rgb(plate[fg]), rgb(plate.paper))).toBeGreaterThanOrEqual(floor)
+  })
+})

@@ -118,8 +118,9 @@ export default function Footer({
 
         <div className="mt-12 flex flex-col gap-3 border-t border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
           <p className="max-w-[62ch] text-small text-ink-soft">
-            Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar,{" "}
-            <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum (public domain).
+            Set in Plus Jakarta Sans by Tokotype. Printed in one ink in Malang, East Java. Hero plate after Johan Conrad
+            Greive and Abraham Salm, <cite>Gezicht op de Bromo vulkaan</cite>, 1869, Rijksmuseum. Plate after Wenceslaus
+            Hollar, <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum. Both public domain.
           </p>
           <div className="flex shrink-0 gap-x-5">
             <FeedbackButton />

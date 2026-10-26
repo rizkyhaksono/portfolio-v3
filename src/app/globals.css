@@ -77,23 +77,6 @@
     outline-offset: 2px;
   }
 
-  .font-display {
-    font-style: italic;
-    font-weight: 420;
-  }
-
-  /* Literata roman and italic are separate families, so emphasis must switch family (no synthesis). */
-  em,
-  i,
-  cite {
-    font-family: var(--font-display);
-    font-style: italic;
-  }
-  :is(.font-display, .prose h2, .prose h3, .prose blockquote) :is(em, i, cite) {
-    font-family: var(--font-serif);
-    font-style: normal;
-  }
-
   * {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--border)) transparent;
@@ -141,10 +124,8 @@
   mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
 }
 
-/* Wordscroll: static and fully inked unless scroll timelines, motion and a tall enough viewport all exist. */
-.ws__stage {
-  min-height: calc(100svh - var(--head-h));
-}
+/* Wordscroll: the lede sentence inks word by word on its own view timeline. Static and fully inked without
+   scroll timelines or with reduced motion. */
 /* The ghost is a colour, not opacity: faded cream over night paper reads as neutral grey. */
 @keyframes ws-ink {
   from {
@@ -157,15 +138,9 @@
   }
 }
 @supports (animation-timeline: view()) {
-  /* min-height, not range syntax: Lightning CSS rewrites (height > 560px) into a query browsers drop. */
-  @media (prefers-reduced-motion: no-preference) and (min-height: 561px) {
+  @media (prefers-reduced-motion: no-preference) {
     .ws {
-      height: 180svh;
       view-timeline: --ws block;
-    }
-    .ws__stage {
-      position: sticky;
-      top: var(--head-h);
     }
     .ws__w {
       display: inline-block;
@@ -173,11 +148,28 @@
       animation-timeline: --ws;
     }
   }
-  @media (prefers-reduced-motion: no-preference) and (min-height: 561px) and (max-width: 767px) {
-    .ws {
-      height: 150svh;
-    }
-  }
+}
+
+/* Print plate: the home hero, printed in Paper's ink and paper in either theme with the two reversed:
+   cream type on a cobalt sky. Tokens are re-declared here because :root's derived ones resolve on :root. */
+.print-plate {
+  --paper: 226 68% 36.9%;
+  --ink: 42 49% 90.8%;
+  --ink-soft: 42 45% 82%;
+  --rule: 226 40% 58%;
+  --foreground: var(--ink);
+  --muted-foreground: var(--ink-soft);
+  --ring: var(--ink);
+  --ws-ghost: hsl(var(--ink) / 0.6);
+  color-scheme: light;
+  background-color: hsl(var(--paper));
+  color: hsl(var(--ink));
+}
+
+/* Halftone: a fine dot screen in the element's own text colour, for fields printed in solid ink. */
+.halftone {
+  background-image: radial-gradient(color-mix(in srgb, currentColor 16%, transparent) 0.6px, transparent 0.9px);
+  background-size: 4px 4px;
 }
 
 /* Ink speckle: pinholes where the ink did not take. Below-fold numerals ≥48px, inverted blocks, the 404 line. */
@@ -203,9 +195,8 @@
   margin-top: 0;
 }
 .prose :is(h2, h3) {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 420;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 /* An em ladder on the prose body (1em): h3 one step up, h2 clearly above it. */
@@ -241,7 +232,6 @@
 .prose blockquote {
   border-left: 1px solid hsl(var(--ink));
   padding-left: 1.25rem;
-  font-family: var(--font-display);
   font-style: italic;
   @apply text-lead;
 }
@@ -299,8 +289,6 @@
 }
 .prose figcaption {
   margin-top: 0.5em;
-  font-family: var(--font-display);
-  font-style: italic;
   @apply text-caption;
   color: hsl(var(--muted-foreground));
 }
@@ -417,8 +405,6 @@
   .dark{--paper:42 49% 90.8%;--ink:226 68% 36.9%;--ink-soft:226 43% 46.5%;--rule:226 32% 81%;--rule-strong:226 34% 54.5%;--tint:226 18% 90.4%;--plate-alpha:1;color-scheme:light}
   body { background: none; }
   nav, [role="dialog"], .engraving, [data-print-hide] { display: none !important; }
-  .ws { height: auto !important; }
-  .ws__stage { position: static !important; min-height: 0; }
   .ws__w { animation: none !important; }
   main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; overflow-wrap: anywhere; }
   pre, blockquote, figure, img, tr { break-inside: avoid; }

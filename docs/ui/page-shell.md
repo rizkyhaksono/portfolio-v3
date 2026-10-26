@@ -18,8 +18,8 @@ under 768px       wordmark, [menu icon]   (48px head, 44px targets)
 
 - If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
 - Certificates and Changelog live in the colophon and the menu.
-- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section in italic at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
-- The colophon credit line: "Set in Literata. Printed in one ink in Malang, East Java. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum (public domain)."
+- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
+- The colophon credit line: "Set in Plus Jakarta Sans by Tokotype. Printed in one ink in Malang, East Java. Hero plate after Johan Conrad Greive and Abraham Salm, *Gezicht op de Bromo vulkaan*, 1869, Rijksmuseum. Plate after Wenceslaus Hollar, *Landscape with a Rider*, 1650, after Jan Wildens, Rijksmuseum. Both public domain."
 - `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon and terminal overlay all import it.
 
 ### BaseLayout
@@ -41,7 +41,7 @@ File: `src/components/layout/base-layout.tsx`. It is a server component and read
 | Primitive | File | Role |
 |---|---|---|
 | `PageSection` | `src/components/ui/page-section.tsx` | Section rhythm (`SECTION_SPACING.section`) and an optional `SectionHeading` |
-| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title in italic. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. `description` is for figures only (the LeetCode summary), never a standfirst. |
+| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. `description` is for figures only (the LeetCode summary), never a standfirst. |
 
 One width for every page. Every visitor and user route fills BaseLayout's wrapper (`SHELL_WIDTH` in `layout/running-head.tsx`), so the page head starts on the logo's left edge and the widest rule or row ends under "Account". Pages never narrow or centre their outer container: no `mx-auto max-w-*` wrapper, no width preset. Admin keeps its own shell, and Auth keeps `AuthShell`.
 
@@ -59,7 +59,7 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 |---|---|---|
 | Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
 | Article | `ui/article-shell.tsx` (server; 13rem sticky rail beside a 66ch column; rail becomes `<details>` under `lg`) | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, italic caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
+| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | A column of letters, replies set behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Board | Ruled columns of index cards | `/tracker` |
@@ -75,10 +75,10 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
 
-- Masthead stage in the `bleed` slot (`Masthead` in `src/app/page.tsx`): the `h1` "Rizky Haksono" in display italic (never animated, the LCP element), the job line, the positioning sentence that inks itself word by word while pinned (`ui/word-scroll.tsx`, server, 0 JS), and three ink links visible at first paint. The stage is text only at every width: no photo, engraving or side column.
-- The text block is centred in the pinned stage, so the slack falls above and below the block, never between the job line and the sentence. The name is the `display` token capped at `15svh` (104px at 1280x800, 90px at 1280x600, 44px and one line at 375), so the stage fits 375x667 and 1280x600.
-- The hero sentence keeps a 24px floor below `sm` (it is `h2` size otherwise) so its unscrolled ghost still passes as large text (3.17:1).
-- About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with an italic drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
+- Masthead in the `bleed` slot (`Masthead` in `src/app/page.tsx`): a `.print-plate halftone` section at least the first screen tall (`100svh` minus the running head, 30rem floor), fixed cobalt and cream in Paper and Night. The job line (`text-lead`, cream ink-soft) and the `h1` "Rizky Haksono" (never animated, the LCP element) are centred in cream with their bottom on the plate's top edge. The name is the `display` token at `min(12vw, 22svh, 11rem)` on one line from `sm`, and `min(21vw, 13svh)` on two lines below.
+- The Bromo plate (`next/image`, `fill`, `object-cover`, focus `45% 0%`, `priority`, `unoptimized`, `alt=""`) fills the bottom 56%, layered above the name and nudged so the peaks cut the foot of the letters (the `h1` sits 0.2em low), as in the specimen.
+- The lede follows on paper inside the shell (`Lede`): the positioning sentence at `h1` size (24px floor below `sm`, where its unscrolled ghost passes as large text at 3.17:1), inking word by word on its own `.ws` view timeline, then three ink links.
+- About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with a bold drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
 - Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.
 - Sections with no data hide. They never show zeros, `NaN` or `-Infinity`.
 - `content-visibility: auto` only on Activity, Certificates, Readers and Recommendations, never on or around sticky content.

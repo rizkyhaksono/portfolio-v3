@@ -73,36 +73,35 @@ test.describe('Navigation', () => {
     await page.goto('/');
     const portrait = { name: 'Portrait of Rizky Haksono', exact: true };
     await expect(page.locator('#about').getByRole('img', portrait)).toBeVisible();
-    await expect(page.locator('.ws__stage').getByRole('img', portrait)).toHaveCount(0);
+    await expect(page.locator('.print-plate').getByRole('img', portrait)).toHaveCount(0);
   });
 
-  test('hero stage has no image on a phone', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/');
-    await expect(page.locator('.ws__stage h1')).toBeVisible();
-    await expect(page.locator('.ws__stage img')).toHaveCount(0);
-  });
-
-  test('hero is text only on a wide screen', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/');
-    await expect(page.locator('.ws__stage h1')).toBeVisible();
-    await expect(page.locator('.ws__stage img, .ws__stage aside, .ws__stage .engraving')).toHaveCount(0);
+  test.describe('hero plate', () => {
+    for (const viewport of [{ width: 1280, height: 800 }, { width: 375, height: 812 }]) {
+      test(`prints the name over the Bromo plate at ${viewport.width}`, async ({ page }) => {
+        await page.setViewportSize(viewport);
+        await page.goto('/');
+        const hero = page.locator('section.print-plate');
+        await expect(hero.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeInViewport({ ratio: 1 });
+        await expect(hero.locator('img')).toBeVisible();
+      });
+    }
   });
 
   // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).
-  test('home hero sentence keeps the 24px large-text floor on a phone', async ({ page }) => {
+  test('lede sentence keeps the 24px large-text floor on a phone', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    const sentence = page.locator('.ws__stage p', { has: page.locator('.ws__w') });
+    const sentence = page.locator('.ws p', { has: page.locator('.ws__w') });
     const size = await sentence.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     expect(size).toBeGreaterThanOrEqual(24);
   });
 
-  test('home hero fits the first screen of a short phone', async ({ page }) => {
+  test('hero fills a short phone without sideways scroll, with the links just below', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-    await expect(page.locator('.ws__stage').getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeInViewport({ ratio: 1 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.ws').getByRole('link', { name: /^Résumé \(PDF\)/ })).toBeAttached();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
   });
 });

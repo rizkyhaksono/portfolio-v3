@@ -1,26 +1,30 @@
-// Prints the one-ink plates and paper textures (plan §4).
-// Usage: bun scripts/engrave.mjs <path/to/hollar-landschap-met-ruiter-1650.jpg> > speckle-uri.txt
-// Source: Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum RP-P-OB-11.335 (CC0).
-// The source scan lives in art-src/ outside the repo and are never committed.
-// Writes src/assets/plates/hollar-band-1600.webp and src/assets/paper/grain-{light,dark}.webp, prints the speckle mask data URI to stdout (sizes go to stderr).
+// Prints the plates and the paper textures.
+// Usage: bun scripts/engrave.mjs <path/to/bromo-greive-salm-1869.jpg> [<path/to/hollar-landschap-met-ruiter-1650.jpg>] > speckle-uri.txt
+// Sources: Johan Conrad Greive after Abraham Salm, Gezicht op de Bromo vulkaan, 1869, Rijksmuseum RP-P-1975-194
+// (public domain), for the home hero; Wenceslaus Hollar after Jan Wildens, Landscape with a Rider, 1650, Rijksmuseum
+// RP-P-OB-11.335 (CC0), for the colophon band. The scans live in art-src/ outside the repo and are never committed.
+// Writes src/assets/plates/bromo-<w>.webp, hollar-band-1600.webp (when the second scan is given) and
+// src/assets/paper/grain-{light,dark}.webp, prints the speckle mask data URI to stdout (sizes go to stderr).
 // Exits non-zero if any budget is blown.
 import assert from "node:assert/strict"
 import fs from "node:fs"
 import path from "node:path"
 import sharp from "sharp"
 
-const [src] = process.argv.slice(2)
-if (!src || !fs.existsSync(src)) {
-  console.error("usage: bun scripts/engrave.mjs <hollar-landschap-met-ruiter-1650.jpg>")
+const [src, hollarSrc] = process.argv.slice(2)
+if (!src || !fs.existsSync(src) || (hollarSrc && !fs.existsSync(hollarSrc))) {
+  console.error("usage: bun scripts/engrave.mjs <bromo-greive-salm-1869.jpg> [<hollar-landschap-met-ruiter-1650.jpg>]")
   process.exit(2)
 }
 
 const root = path.join(import.meta.dirname, "..")
 const KB = 1024
 const INK = [0x1e, 0x3c, 0x9e] // --ink, light
+const PAPER = [0xf3, 0xec, 0xdc] // --paper, light
 const CREAM = [0xef, 0xe6, 0xd2] // --ink, dark (cream)
-const CROP = { left: 330, top: 1500, width: 6150, height: 2620 } // excludes the plate caption line
-const THRESHOLD = 140
+const CROP = { left: 300, top: 270, width: 6320, height: 4570 } // the picture inside the mat, pencil number and label
+const HOLLAR_CROP = { left: 330, top: 1500, width: 6150, height: 2620 } // excludes the plate caption line
+const HOLLAR_THRESHOLD = 140
 
 // Smallest of lossless + lossy [80,70,60]; throws (non-zero exit) when even that is over budget.
 async function encode(rgba, width, height, budget, label) {
@@ -50,7 +54,78 @@ async function write(rel, buf) {
   fs.writeFileSync(file, buf)
 }
 
-// --- Plates -----------------------------------------------------------------
+// --- Hero plate ---------------------------------------------------------------
+// The lithograph is tone, not line, so it is re-cut as an engraving: a horizontal line screen whose lines
+// thicken with darkness and bend with the broad tones (contour hatching), plus solid ink wherever a pixel is
+// much darker than its surroundings (riders, rocks, shadow edges). The sky is cut away (transparent), so the
+// hero's dotted cobalt shows through above the ridge.
+const PERIOD = 6 // line pitch in px at 1600 wide; scaled with the width
+const BEND = 50 // how far broad tones bend the lines, px at 1600
+const DETAIL = 14 // darker than the 5px neighbourhood by this much = solid ink
+
+// Skyline as a fraction of the height per column: walk down from just under the clouds until the colour
+// breaks from the running sky colour, then median- and box-smooth across columns.
+async function skyline(width) {
+  const w = 800
+  const { data, info } = await sharp(src).extract(CROP).resize(w).blur(1.2).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const h = info.height
+  const px = (x, y, c) => data[(y * w + x) * 3 + c]
+  const ridge = Array.from({ length: w }, (_, x) => {
+    let y = Math.round(h * 0.47)
+    const avg = [0, 1, 2].map((c) => px(x, y, c))
+    for (let run = 0; y < h * 0.62; y++) {
+      const d = Math.max(...[0, 1, 2].map((c) => Math.abs(px(x, y, c) - avg[c])))
+      if (d <= 14) {
+        run = 0
+        for (let c = 0; c < 3; c++) avg[c] = avg[c] * 0.85 + px(x, y, c) * 0.15
+      } else if (++run >= 3) {
+        y -= 2
+        break
+      }
+    }
+    return y / h
+  })
+  const median = ridge.map((_, x) => ridge.slice(Math.max(0, x - 8), x + 9).sort((a, b) => a - b)[8] ?? ridge[x])
+  const smooth = median.map((_, x) => {
+    const win = median.slice(Math.max(0, x - 3), x + 4)
+    return win.reduce((a, b) => a + b) / win.length
+  })
+  return Array.from({ length: width }, (_, x) => smooth[Math.min(w - 1, Math.round((x / width) * w))])
+}
+
+async function bromo(width, budget) {
+  const k = width / 1600
+  const gray = (img) => img.extract(CROP).resize(width).greyscale()
+  const tone = await gray(sharp(src)).clahe({ width: 50, height: 50, maxSlope: 4 }).normalise({ lower: 1, upper: 99 }).raw().toBuffer({ resolveWithObject: true })
+  const { width: W, height: H } = tone.info
+  const base = await gray(sharp(src)).normalise({ lower: 1, upper: 99 }).raw().toBuffer()
+  const local = await sharp(base, { raw: { width: W, height: H, channels: 1 } }).blur(5 * k).extractChannel(0).raw().toBuffer()
+  const soft = await gray(sharp(src)).blur(18 * k).extractChannel(0).raw().toBuffer()
+  for (const buf of [tone.data, base, local, soft]) assert.equal(buf.length, W * H, "plate layers must be single-channel")
+
+  const ridge = (await skyline(W)).map((r) => r * H)
+  const top = Math.max(0, Math.floor(Math.min(...ridge)) - Math.round(8 * k)) // drop the empty sky above the peaks
+  const rows = H - top
+  const rgba = Buffer.alloc(W * rows * 4)
+  for (let y = top; y < H; y++)
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x
+      const o = ((y - top) * W + x) * 4
+      if (y < ridge[x]) continue // transparent sky (zeroed buffer)
+      const dark = Math.pow(Math.max(0, (1 - tone.data[i] / 255 - 0.25) / 0.75), 1.5) * 0.5
+      const wobble = Math.sin(x / (37 * k) + y / (211 * k)) * 0.6 * k + Math.sin(x / (13.7 * k)) * 0.25 * k
+      const yy = y + (soft[i] / 255) * BEND * k + wobble
+      const screen = (1 - Math.cos((2 * Math.PI * yy) / (PERIOD * k))) / 2 // 0 on a line's centre
+      const ink = screen < dark || local[i] - base[i] > DETAIL
+      rgba.set([...(ink ? INK : PAPER), 255], o)
+    }
+  const buf = await encode(rgba, W, rows, budget, `bromo-${width}`)
+  await write(`src/assets/plates/bromo-${width}.webp`, buf)
+}
+
+await bromo(2400, 180 * KB)
+
+// --- Colophon band -----------------------------------------------------------------
 // Greyscale via max(R,G,B) so any hand colouring or paper stain reads as paper, not ink.
 async function engrave(file, crop, threshold, sizes, name) {
   const { data, info } = await sharp(file).extract(crop).removeAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -73,7 +148,7 @@ async function engrave(file, crop, threshold, sizes, name) {
   }
 }
 
-await engrave(src, CROP, THRESHOLD, [[1600, 72 * KB]], "hollar-band")
+if (hollarSrc) await engrave(hollarSrc, HOLLAR_CROP, HOLLAR_THRESHOLD, [[1600, 72 * KB]], "hollar-band")
 
 // --- Paper textures ---------------------------------------------------------
 // Seeded so re-runs give byte-identical tiles. Per-pixel noise is seamless when tiled.

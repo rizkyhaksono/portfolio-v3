@@ -27,11 +27,11 @@ const marks = ink => `<path fill="none" stroke="${ink}" stroke-opacity="0.6" str
 const mark = ({ ink, paper }) => svg('-4 0 72 64', `<rect x="-4" width="72" height="64" fill="${paper}"/>${glyph(ink)}${marks(ink)}`)
 const tile = ({ ink, paper }, inset = 1) =>
   svg('0 0 64 64', `<rect width="64" height="64" fill="${ink}"/>${glyph(paper, inset === 1 ? '' : ` transform="translate(${32 * (1 - inset)} ${32 * (1 - inset)}) scale(${inset})"`)}`)
-// Literata cap height is .700em (OS/2 sCapHeight and the R and H outlines): cap height = half the glyph (24) so size = 24 / .7 = 34.3,
-// cap centre on the glyph centre (32) so baseline = 32 + 12 = 44, gap = one counter (16). The name is 6.73em wide, so the box is 316 wide.
-// shortcut: live <text>, so it falls back to Georgia italic where Literata is not installed; outline it if the lockup ships anywhere.
-const lockup = ({ ink, paper }) => svg('0 0 316 64', `<rect width="316" height="64" fill="${paper}"/>${glyph(ink)}`
-  + `<text x="76" y="44" fill="${ink}" font-family="Literata, Georgia, serif" font-style="italic" font-weight="420" font-size="34.3">Rizky Haksono</text>`)
+// Plus Jakarta Sans 600 cap height is .745em (measured on the H): cap height = half the glyph (24) so size = 24 / .745 = 32.2,
+// cap centre on the glyph centre (32) so baseline = 32 + 12 = 44, gap = one counter (16). The name is 6.70em wide at -0.02em, so the box is 300.
+// shortcut: live <text>, so it falls back to a system sans where Plus Jakarta Sans is not installed; outline it if the lockup ships anywhere.
+const lockup = ({ ink, paper }) => svg('0 0 300 64', `<rect width="300" height="64" fill="${paper}"/>${glyph(ink)}`
+  + `<text x="76" y="44" fill="${ink}" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="600" font-size="32.2" letter-spacing="-0.64">Rizky Haksono</text>`)
 
 const written = []
 const write = (rel, data) => { writeFileSync(ROOT + rel, data); written.push(`${rel} (${data.length} B)`) }

@@ -1,11 +1,9 @@
-import { Fragment, type ReactNode } from "react"
-
-import { cn } from "@/lib/utils"
+import { Fragment } from "react"
 
 const pct = (v: number) => `${Math.round(v * 100) / 100}%`
 
 /**
- * Per-word `animation-range` (contain %, on the `.ws` runway) so the last word is inked at 50%:
+ * Per-word `animation-range` (contain %, on the `.ws` view timeline) so the last word is inked at 50%:
  * w = 46 × 2.4 / n, a_i = 4 + i(46 − w)/(n − 1), b_i = a_i + w. Neighbouring windows overlap.
  */
 export function wordRanges(n: number): [number, number][] {
@@ -16,17 +14,8 @@ export function wordRanges(n: number): [number, number][] {
   })
 }
 
-/** Runway (`.ws`) and the stage pinned below the running head while it scrolls past. CSS only, 0 JS. */
-export function WordScroll({ children, className }: Readonly<{ children: ReactNode; className?: string }>) {
-  return (
-    <div className="ws">
-      <div className={cn("ws__stage", className)}>{children}</div>
-    </div>
-  )
-}
-
 /**
- * A sentence that inks itself word by word on the `.ws` timeline. Real text nodes (copy and find work);
+ * A sentence that inks itself word by word on the `.ws` view timeline (put `.ws` on a wrapper). Real text nodes (copy and find work);
  * Firefox, older Safari, reduced motion and short viewports get it static and fully inked.
  * Inline-block words reach screen readers as separate objects with no spaces, so assistive tech gets
  * the sentence once as one sr-only run (unselectable, so a copy is not doubled) and skips the words.
