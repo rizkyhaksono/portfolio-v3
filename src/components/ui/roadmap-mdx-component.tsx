@@ -86,7 +86,8 @@ const Alert = ({ children }: AsideProps) => <Note>{children}</Note>
 const AlertTitle = ({ children }: AsideProps) => <p className="font-display text-h4 text-ink">{children}</p>
 const AlertDescription = ({ children }: AsideProps) => <div>{children}</div>
 
-function LearningObjectives({ objectives }: Readonly<{ objectives: string[] }>) {
+function LearningObjectives({ objectives = [] }: Readonly<{ objectives?: string[] }>) {
+  if (objectives.length === 0) return null
   return (
     <section className="my-6 border-y border-rule py-4">
       <p className="font-display text-h4 text-ink">Learning objectives</p>
@@ -104,7 +105,8 @@ interface Resource {
   href: string
 }
 
-function Resources({ title = "Further reading", resources }: Readonly<{ title?: string; resources: Resource[] }>) {
+function Resources({ title = "Further reading", resources = [] }: Readonly<{ title?: string; resources?: Resource[] }>) {
+  if (resources.length === 0) return null
   return (
     <section className="my-6">
       <p className="font-display text-h4 text-ink">{title}</p>

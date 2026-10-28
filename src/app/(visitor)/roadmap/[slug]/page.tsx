@@ -32,10 +32,12 @@ export default async function RoadmapLessonPage({ params }: Readonly<Props>) {
   const video = videoId(meta.video)
 
   const headings: { id: string; text: string; depth: number }[] = []
+  // Lessons are authored in this repo. blockJS would strip the literal arrays those
+  // components take (objectives, resources), so the page prerender crashes.
   const { content: body } = await compileMDX({
     source: content,
     components: getMDXComponents(),
-    options: { mdxOptions: { remarkPlugins: [remarkGfm, headingIds(headings)] } },
+    options: { blockJS: false, mdxOptions: { remarkPlugins: [remarkGfm, headingIds(headings)] } },
   })
 
   const dateline = [

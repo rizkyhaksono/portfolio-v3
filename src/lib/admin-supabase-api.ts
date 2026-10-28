@@ -33,11 +33,11 @@ const ROW_SCHEMAS = {
   projects: z.object({ title: text(200), description: text(20_000), url: link, source_code: link, image: link }),
   career: z.object({ title: text(200), subtitle: text(200), duration: text(100), image: link }),
   education: z.object({ title: text(200), subtitle: text(200), duration: text(100), image: link }),
-} satisfies Record<AllowedTable, z.AnyZodObject>
+} satisfies Record<AllowedTable, z.ZodType>
 
 /** Keeps only the columns the dashboard edits; anything else in the body is dropped. */
 export function parseRow(table: AllowedTable, body: unknown, { partial }: { partial: boolean }) {
-  const schema: z.AnyZodObject = partial ? ROW_SCHEMAS[table].partial() : ROW_SCHEMAS[table]
+  const schema: z.ZodType<Record<string, unknown>> = partial ? ROW_SCHEMAS[table].partial() : ROW_SCHEMAS[table]
   return schema.safeParse(body)
 }
 
