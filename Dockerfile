@@ -1,26 +1,27 @@
 # syntax=docker/dockerfile:1.7
 # Next.js standalone image for Swarm stack portfolio-natee-v3 (service: web).
-# Bun 1.2 to match portfolio-natee-v3-api. Build env (NEXT_PUBLIC_* + build-time
-# server keys) comes from a BuildKit secret mounted as .env.production.local,
-# so it never lands in an image layer:
+# Bun 1.4.4: the 1.2 image's CommonJS loader crashes on Next 16.4 webpack chunks
+# ("Expected CommonJS module to have a function wrapper") while collecting page
+# data and again under `bun server.js`. That loader bug is fixed in Bun 1.3.5
+# (oven-sh/bun#25398). --webpack stays; Turbopack chunks hit the same loader on
+# older Bun. Build env (NEXT_PUBLIC_* + build-time server keys) comes from a
+# BuildKit secret mounted as .env.production.local, so it never lands in an image layer:
 #   docker build --secret id=buildenv,src=.env -t portfolio-v3-web .
 
-FROM oven/bun:1.2-alpine AS deps
+FROM oven/bun:1.4.4-alpine AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-FROM oven/bun:1.2-alpine AS builder
+FROM oven/bun:1.4.4-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# --webpack: Turbopack's chunk loader crashes under Bun 1.2 ("Expected CommonJS module
-# to have a function wrapper"), both at prerender and at runtime under `bun server.js`.
 RUN --mount=type=secret,id=buildenv,target=/app/.env.production.local,required=false \
   bun run build --webpack
 
-FROM oven/bun:1.2-alpine AS runner
+FROM oven/bun:1.4.4-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=builder --chown=bun:bun /app/public ./public
