@@ -67,7 +67,7 @@ export interface CollectionProps<T extends { id: string }, V extends FormValues>
   heading: string
   /** Where the rows live and who reads them. */
   note?: string
-  schema: z.ZodType<V, z.ZodTypeDef, unknown>
+  schema: z.ZodType<V>
   blank: V
   fields: Field<V>[]
   load: () => Promise<T[]>
