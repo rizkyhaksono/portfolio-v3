@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js"
 // "admin" client here would silently fall back to anon in the browser.
 export const supabaseUser = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+  // The publishable key (sb_publishable_…; a legacy anon JWT also works).
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "", {
   auth: {
     autoRefreshToken: false,

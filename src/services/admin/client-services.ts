@@ -5,6 +5,7 @@
 const API = "/api/v3"
 const JSON_HEADERS = { "Content-Type": "application/json" }
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+// The publishable key (sb_publishable_…; a legacy anon JWT also works). Browser-safe: RLS limits it to reads.
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 // ==================== Types ====================
@@ -89,11 +90,11 @@ function buildUrl(base: string, params: URLSearchParams): string {
   return base
 }
 
+// New-style keys are not JWTs and belong on `apikey` only; PostgREST then runs the request as anon.
 function getSupabaseHeaders(): HeadersInit {
   return {
     "Content-Type": "application/json",
     apikey: SUPABASE_ANON_KEY || "",
-    Authorization: `Bearer ${SUPABASE_ANON_KEY || ""}`,
   }
 }
 
