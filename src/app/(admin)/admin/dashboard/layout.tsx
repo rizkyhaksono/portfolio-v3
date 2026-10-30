@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import { redirect } from "next/navigation"
-import { getProfile } from "@/services/user/profile"
+import { requireAdminPage } from "@/lib/admin-page"
 import { AdminSpine } from "@/components/layout/admin/admin-spine"
 import { AdminTopHeader } from "@/components/layout/admin/admin-top-header"
 
@@ -14,15 +13,12 @@ export const dynamic = "force-dynamic"
 
 export default async function AdminDashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   // Only ADMIN users may access the dashboard (works with the main SSO/email session).
-  const profile = await getProfile().catch(() => null)
-  if (profile?.data?.role !== "ADMIN") {
-    redirect("/")
-  }
+  const profile = await requireAdminPage()
 
   const user = {
-    name: profile.data.name ?? "Admin",
-    email: profile.data.email ?? "",
-    avatarUrl: profile.data.avatarUrl ?? profile.data.iconUrl ?? undefined,
+    name: profile.name ?? "Admin",
+    email: profile.email ?? "",
+    avatarUrl: profile.avatarUrl ?? profile.iconUrl ?? undefined,
   }
 
   // data-private: Umami's block selector keeps the admin out of session replays.

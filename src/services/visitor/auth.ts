@@ -82,21 +82,20 @@ const authSignup = async (email: string, password: string, name: string): Promis
 };
 
 /**
- * Finishes Google sign-in. The API hands over a one-time `code`, exchanged here for the session;
- * `token` is the older hand-over that put the session itself in the URL, kept until that API is gone.
+ * Finishes Google sign-in: the API hands over a one-time `code`, exchanged here for the session.
+ * A raw session token is never accepted from the URL: a link carrying one would sign the visitor
+ * into someone else's account.
  */
-const completeOAuthSignin = async ({ code, token }: { code?: string; token?: string }): Promise<boolean> => {
-  let session = token;
-  if (code) {
-    const response = await fetch(`${serverApiUrl()}/v3/auth/oauth/exchange`, {
-      method: "POST",
-      headers: await visitorHeaders(),
-      body: JSON.stringify({ code }),
-      cache: "no-store",
-    }).catch(() => null);
-    const json = response?.ok ? await response.json().catch(() => null) : null;
-    session = typeof json?.token === "string" ? json.token : undefined;
-  }
+const completeOAuthSignin = async ({ code }: { code?: string }): Promise<boolean> => {
+  if (!code) return false;
+  const exchange = await fetch(`${serverApiUrl()}/v3/auth/oauth/exchange`, {
+    method: "POST",
+    headers: await visitorHeaders(),
+    body: JSON.stringify({ code }),
+    cache: "no-store",
+  }).catch(() => null);
+  const json = exchange?.ok ? await exchange.json().catch(() => null) : null;
+  const session = typeof json?.token === "string" ? json.token : undefined;
   if (!session) return false;
 
   const response = await fetch(`${serverApiUrl()}/v3/me`, {

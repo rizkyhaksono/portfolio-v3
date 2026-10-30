@@ -1,3 +1,4 @@
+import { requireAdminPage } from "@/lib/admin-page"
 import { fillDays, floorTo, getFullUmamiAnalytics, getUmamiMetrics } from "@/services/visitor/umami"
 import AnalyticsDashboard, { RANGES, type RangeId } from "./_components/analytics-dashboard"
 import { fillHours } from "./_components/fill-hours"
@@ -9,6 +10,7 @@ const HOUR = 60 * MINUTE
 const DAY = 24 * HOUR
 
 export default async function AdminAnalyticsPage({ searchParams }: Readonly<{ searchParams: Promise<{ range?: string }> }>) {
+  await requireAdminPage()
   const { range: param } = await searchParams
   const range: RangeId = param && Object.hasOwn(RANGES, param) ? (param as RangeId) : "30d"
   const { unit, points } = RANGES[range]

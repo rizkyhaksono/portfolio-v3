@@ -22,12 +22,14 @@ export function httpUrl(value?: string | null) {
 }
 
 // Same-origin paths only. Resolve like the browser does: it treats "//host" and "/\host" as
-// protocol-relative and strips tab/CR/LF, so "/\t/host" also leaves the site.
+// protocol-relative and strips tab/CR/LF, so "/\t/host" also leaves the site. Dot segments can
+// also collapse into "//host" ("/.//host"), so the resolved path is checked again.
 export function safeRedirect(path: string | null | undefined, fallback = "/") {
   if (!path?.startsWith("/")) return fallback
   try {
     const url = new URL(path, "http://x")
-    return url.origin === "http://x" ? url.pathname + url.search + url.hash : fallback
+    const out = url.pathname + url.search + url.hash
+    return url.origin === "http://x" && !out.startsWith("//") ? out : fallback
   } catch {
     return fallback
   }

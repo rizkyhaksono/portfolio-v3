@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { requireAdminPage } from "@/lib/admin-page"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { InkLink } from "@/components/ui/ink-link"
@@ -30,6 +31,7 @@ const figure = (n: number | null | undefined) => (n == null ? "–" : n.toLocale
 
 /** Today's figures, what needs attention (feedback, drafts) and the most read pieces. */
 export default async function AdminDashboardPage() {
+  await requireAdminPage()
   // Floor to five minutes so the Umami caches hit; the day starts at midnight in Malang (UTC+7, no DST).
   const end = floorTo(Date.now(), 5 * MINUTE)
   const todayStart = floorTo(end + 7 * HOUR, DAY) - 7 * HOUR

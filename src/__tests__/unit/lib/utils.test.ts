@@ -50,6 +50,8 @@ describe('safeRedirect', () => {
   it('rejects external and protocol-relative targets', () => {
     for (const bad of [
       '//evil.com',
+      '/.//evil.com',
+      '/project/.././/evil.example',
       '/\\evil.com',
       '/\t/evil.com',
       '/\n/evil.com',

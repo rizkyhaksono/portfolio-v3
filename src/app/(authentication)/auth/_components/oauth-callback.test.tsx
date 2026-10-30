@@ -24,19 +24,28 @@ describe('OAuthCallback', () => {
     render(<OAuthCallback />)
 
     expect(window.location.search).toBe('')
-    expect(complete).toHaveBeenCalledWith({ code: 'one-time-code', token: undefined })
+    expect(complete).toHaveBeenCalledWith({ code: 'one-time-code' })
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/admin/dashboard'))
     expect(sessionStorage.getItem(OAUTH_RETURN_KEY)).toBeNull()
   })
 
-  it('still accepts the older token hand-over until every API sends a code', async () => {
-    complete.mockResolvedValue(true)
+  it('never passes a session token from the URL to the exchange', async () => {
+    complete.mockResolvedValue(false)
+    sessionStorage.setItem(OAUTH_RETURN_KEY, '/')
     window.history.replaceState(null, '', '/auth/callback?token=secret')
     render(<OAuthCallback />)
 
     expect(window.location.search).toBe('')
-    expect(complete).toHaveBeenCalledWith({ code: undefined, token: 'secret' })
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/'))
+    expect(complete).toHaveBeenCalledWith({ code: undefined })
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+
+  it('refuses a callback that did not start in this tab', async () => {
+    render(<OAuthCallback />)
+
+    expect(window.location.search).toBe('')
+    expect(await screen.findByRole('alert')).toHaveTextContent(/did not finish/)
+    expect(complete).not.toHaveBeenCalled()
   })
 
   it('refuses an off-site return path', async () => {

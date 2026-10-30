@@ -10,12 +10,14 @@ import { safeRedirect } from "@/lib/utils"
 import { FormAlert } from "./form-alert"
 import { OAUTH_RETURN_KEY } from "./google-button"
 
-function takeReturnPath() {
+/** Where sign-in started, or null when it did not start in this tab (a callback link sent by someone else). */
+function takeReturnPath(): string | null {
   try {
     const path = sessionStorage.getItem(OAUTH_RETURN_KEY)
     sessionStorage.removeItem(OAUTH_RETURN_KEY)
-    return safeRedirect(path)
+    return path === null ? null : safeRedirect(path)
   } catch {
+    // Storage unavailable: there is no way to tell, so sign-in is not blocked.
     return "/"
   }
 }
@@ -34,11 +36,11 @@ export function OAuthCallback() {
 
     const params = new URLSearchParams(window.location.search)
     const code = params.get("code") ?? undefined
-    const token = params.get("token") ?? undefined
     window.history.replaceState(null, "", window.location.pathname)
     const returnTo = takeReturnPath()
+    if (returnTo === null) return setRetryHref("/auth")
 
-    completeOAuthSignin({ code, token })
+    completeOAuthSignin({ code })
       .catch(() => false)
       .then((ok) => {
         if (!ok) return setRetryHref(returnTo.startsWith("/admin") ? "/admin/auth/login" : "/auth")
