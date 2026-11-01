@@ -4,7 +4,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 ## Visitor (public portfolio)
 
-**Routes:** `/`, `/blog`, `/project`, `/certificates`, `/changelog`, `/roadmap`, `/tools`, `/tracker`, `/stats`, `/chat`, `/legal/*`
+**Routes:** `/`, `/blog`, `/project`, `/certificates`, `/changelog`, `/roadmap`, `/tools`, `/stats`, `/chat`, `/legal/*`
 
 **Shell:** `BaseLayout` with the running head, menu sheet and colophon. No sidebars.
 
@@ -15,7 +15,6 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
 | `/roadmap` | Ledger |
 | `/tools` | Cabinet. The anime generator (`?tab=anime-generator`, group Play) has images by mood (cringe, blush, dance; waifu and neko stay hidden) and a quote tab; pictures sit in a `tone="color"` plate |
-| `/tracker` | Board |
 | `/stats` | Figures |
 | `/chat` | Correspondence, `footer="compact"` |
 

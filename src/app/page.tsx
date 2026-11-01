@@ -22,24 +22,26 @@ export const revalidate = 900
 const CTA = "inline-flex min-h-11 items-center md:min-h-0"
 
 /**
- * Masthead: a plate printed in Paper's ink and paper in either theme, reversed (`.print-plate`): the job line and
- * the name in cream on a dotted cobalt sky, and the Bromo plate along the bottom with its sky cut away, so the
- * peaks rise in front of the foot of the letters. The h1 is the LCP element and never animates. The name is
- * capped by width (one line from sm, two below), height (short screens) and size.
+ * Masthead: the job line and the name in the theme's ink on its paper (cobalt on cream, cream on cobalt at
+ * night), and the Bromo plate along the bottom with its sky cut away, its two inks swapped to match, so the
+ * peaks rise in front of the foot of the letters. Scrolling away, the plate rises and the name sinks behind it
+ * (`.masthead` in globals.css); the h1 itself, the LCP element, never animates. The name is capped by width
+ * (one line from sm, two below), height (short screens) and size.
  */
 function Masthead() {
   return (
-    <section aria-labelledby="masthead-name" className="print-plate halftone relative isolate min-h-[max(calc(100svh-var(--head-h)),30rem)] overflow-hidden">
-      <div className="absolute inset-x-0 bottom-[56%] px-[clamp(20px,4vw,48px)] text-center">
-        <p className="text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+    <section aria-labelledby="masthead-name" className="masthead relative isolate min-h-[max(calc(100svh-var(--head-h)),30rem)] overflow-hidden">
+      <div className="masthead__name absolute inset-x-0 bottom-[56%] px-[clamp(20px,4vw,48px)] text-center">
+        <p className="masthead__job text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
         <h1
           id="masthead-name"
-          className="mt-[0.15em] translate-y-[0.2em] font-display text-display text-ink [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
+          className="speckle mt-[0.15em] translate-y-[0.2em] font-display text-display text-ink [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
         >
           Rizky Haksono
         </h1>
       </div>
-      <div className="absolute inset-x-0 bottom-0 z-10 h-[56%]">
+      {/* Runs 20% below the fold so the rising plate never shows its foot. */}
+      <div className="masthead__plate absolute inset-x-0 -bottom-[20%] z-10 h-[76%]">
         {/* Served as is: the lossless two-ink plate (about 150 KB) beats the optimizer's lossy copies. */}
         <Image src={bromoPlate} alt="" fill priority unoptimized className="object-cover object-[45%_0%]" />
       </div>
@@ -71,7 +73,7 @@ function Lede() {
         </li>
         <li>
           <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "masthead" }} className={CTA}>
-            Résumé (PDF)
+            CV
           </InkLink>
         </li>
       </ul>

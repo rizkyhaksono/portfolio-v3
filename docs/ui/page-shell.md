@@ -5,7 +5,7 @@
 ```
 1024px and up
   Running head (sticky, 52px, paper + grain, 1px rule below):
-    [RH mark] Rizky Haksono   Projects Writing Etan AI Chat Tracker Roadmap Tools Stats   [theme] [Account]
+    [RH mark]   Projects Writing Etan AI Chat Roadmap Tools Stats   [theme] [Account]
   Bleed slot (home masthead only)
   main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
   Ink rule (single, 1px)
@@ -62,7 +62,6 @@ Every route uses one of these patterns. Pick the pattern first, then the primiti
 | Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | A column of letters, replies set behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Board | Ruled columns of index cards | `/tracker` |
 | Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
 | Admin | Ruled spine, `--admin-rail`, inverted active row | `/admin/dashboard/*` |
 | Auth | `layout/auth-shell.tsx` (form beside a reversed ink `panel` on `/auth`; one narrow column without it) | `/auth/*`, `/admin/auth/login` |
@@ -75,7 +74,7 @@ Every route already uses one of these patterns. New routes pick one; never add l
 
 The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
 
-- Masthead in the `bleed` slot (`Masthead` in `src/app/page.tsx`): a `.print-plate halftone` section at least the first screen tall (`100svh` minus the running head, 30rem floor), fixed cobalt and cream in Paper and Night. The job line (`text-lead`, cream ink-soft) and the `h1` "Rizky Haksono" (never animated, the LCP element) are centred in cream with their bottom on the plate's top edge. The name is the `display` token at `min(12vw, 22svh, 11rem)` on one line from `sm`, and `min(21vw, 13svh)` on two lines below.
+- Masthead in the `bleed` slot (`Masthead` in `src/app/page.tsx`): a `.masthead` section at least the first screen tall (`100svh` minus the running head, 30rem floor) in the theme's ink and paper. The job line (`text-lead`, ink-soft) and the speckled `h1` "Rizky Haksono" (never animated itself, the LCP element) are centred with their bottom on the plate's top edge. The name is the `display` token at `min(12vw, 22svh, 11rem)` on one line from `sm`, and `min(21vw, 13svh)` on two lines below.
 - The Bromo plate (`next/image`, `fill`, `object-cover`, focus `45% 0%`, `priority`, `unoptimized`, `alt=""`) fills the bottom 56%, layered above the name and nudged so the peaks cut the foot of the letters (the `h1` sits 0.2em low), as in the specimen.
 - The lede follows on paper inside the shell (`Lede`): the positioning sentence at `h1` size (24px floor below `sm`, where its unscrolled ghost passes as large text at 3.17:1), inking word by word on its own `.ws` view timeline, then three ink links.
 - About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with a bold drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.

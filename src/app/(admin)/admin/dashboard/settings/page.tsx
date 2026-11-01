@@ -53,11 +53,10 @@ type NotificationValues = z.infer<typeof notificationSchema>
 
 // The API reuses older AdminSettings columns for the bell's four sources (portfolio-v3-api
 // controller/notifications/getNotifications.ts), so each switch is labelled by the source it controls,
-// not by its column name. weeklyDigest controls nothing and stays hidden.
+// not by its column name. weeklyDigest controls nothing and projectUpdates (tracker) has no page any more; both stay hidden.
 const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: string }[] = [
   { name: "emailNotifications", label: "Feedback", note: "New messages from the feedback form." },
   { name: "pushNotifications", label: "Chat", note: "New messages in the public chat." },
-  { name: "projectUpdates", label: "Tracker", note: "New cards on the tracker board." },
   { name: "securityAlerts", label: "Claps", note: "New claps on posts and projects." },
 ]
 

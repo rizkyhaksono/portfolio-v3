@@ -5,7 +5,7 @@ import { getMetadataBaseUrl } from "@/lib/site-url"
 
 export const metadata: Metadata = {
   title: "Terms of service | Rizky Haksono",
-  description: "The rules for using natee.my.id, its public chat, tracker, Etan AI and roadmap certificates.",
+  description: "The rules for using natee.my.id, its public chat, Etan AI and roadmap certificates.",
   metadataBase: getMetadataBaseUrl(),
   alternates: { canonical: "/legal/terms" },
 }
@@ -40,7 +40,7 @@ const sections = [
     title: "What you post",
     body: (
       <p>
-        Messages in the public chat, cards on the tracker and feedback notes are yours, and anyone can read the first two.
+        Messages in the public chat and feedback notes are yours, and anyone can read the chat.
         Keep them civil and lawful. I may edit or remove anything abusive, misleading or off topic, and close accounts that
         keep posting it.
       </p>

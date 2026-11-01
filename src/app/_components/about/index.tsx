@@ -2,7 +2,7 @@ import Image from "next/image"
 import { PageSection } from "@/components/ui/page-section"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { InkLink } from "@/components/ui/ink-link"
-import { PORTFOLIO_PDF_GOOGLE_DRIVE_URL, RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
+import { RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
 import { SECTION_SPACING } from "@/lib/design-system"
 
 const DROP_CAP =
@@ -32,20 +32,11 @@ export default function AboutSection() {
           graduated cum laude, with a GPA of 3.91 out of 4.
         </p>
         <p>
-          The short version is my{" "}
-          <span className="whitespace-nowrap">
-            <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "about" }}>
-              résumé
-            </InkLink>
-            ;
-          </span>{" "}
-          the long one is the{" "}
-          <span className="whitespace-nowrap">
-            <InkLink href={PORTFOLIO_PDF_GOOGLE_DRIVE_URL} external event="portfolio-open" eventData={{ area: "about" }}>
-              portfolio (PDF)
-            </InkLink>
-            .
-          </span>
+          My experience in full is in my{" "}
+          <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "about" }}>
+            CV
+          </InkLink>
+          .
         </p>
       </div>
     </PageSection>

@@ -33,7 +33,7 @@ export function SectionHeading({
   return (
     <div className={cn("flex flex-col gap-2", align === "center" && "items-center text-center", className)}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Tag className={cn("font-display text-balance text-ink", TITLE_SIZE[as], titleClassName)}>
+      <Tag className={cn("speckle font-display text-balance text-ink", TITLE_SIZE[as], titleClassName)}>
         {title}
         {accent && <> <em>{accent}</em></>}
       </Tag>

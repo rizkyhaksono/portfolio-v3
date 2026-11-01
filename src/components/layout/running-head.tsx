@@ -17,11 +17,11 @@ export function RunningHead() {
       <div className={cn(SHELL_WIDTH, "flex h-[var(--head-h)] items-center gap-4 xl:gap-6")}>
         <Link
           href="/"
-          className="inline-flex min-h-11 shrink-0 items-center gap-2.5 font-display text-[1.25rem] leading-none text-ink"
+          aria-label="Rizky Haksono, home"
+          className="inline-flex min-h-11 min-w-11 shrink-0 items-center text-ink"
           {...navTrack("/", "head")}
         >
           <Logo variant="mini" className="size-8" />
-          Rizky Haksono
         </Link>
 
         <nav aria-label="Sections" className="hidden md:block">

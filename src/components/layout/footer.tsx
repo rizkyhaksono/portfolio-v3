@@ -3,6 +3,7 @@ import { Engraving } from "@/components/ui/engraving"
 import { Logo } from "@/components/ui/logo"
 import { JOB_TITLE } from "@/commons/constants/author"
 import { LEGAL_LINKS, NAV_SECTIONS, navTrack } from "@/commons/constants/navigation-menu"
+import { SHELL_WIDTH } from "@/lib/design-system"
 import { cn } from "@/lib/utils"
 
 const EMAIL = "mrizkyhaksono@gmail.com"
@@ -13,9 +14,6 @@ const COLUMNS = [
   { column: "try", heading: "Try" },
   { column: "site", heading: "Site" },
 ] as const
-
-// Edge to edge like the plate band below it: the shell's gutters, no max width.
-const FOOTER_WIDTH = "w-full px-[clamp(20px,4vw,48px)]"
 
 const linkClass =
   "inline-flex min-h-11 items-center text-ink decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
@@ -58,7 +56,7 @@ export default function Footer({
 }: Readonly<{ variant?: "full" | "compact"; /** Off on pages that never scroll. */ backToTop?: boolean }>) {
   if (variant === "compact") {
     return (
-      <footer className={cn(FOOTER_WIDTH, "pb-6")}>
+      <footer className={cn(SHELL_WIDTH, "pb-6")}>
         <InkRule />
         <div className="flex flex-wrap items-center gap-x-6 pt-2 text-small">
           <p className="font-display text-ink">Rizky Haksono</p>
@@ -76,13 +74,13 @@ export default function Footer({
 
   return (
     <footer>
-      <div className={FOOTER_WIDTH}>
+      <div className={SHELL_WIDTH}>
         <InkRule />
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="col-span-2 flex items-start gap-5 sm:col-span-3 lg:col-span-1">
             <Logo variant="mark" className="w-20 shrink-0 sm:w-28" />
             <div>
-              <p className="font-display text-h3 text-ink">Rizky Haksono</p>
+              <p className="speckle font-display text-h3 text-ink">Rizky Haksono</p>
               <p className="mt-1 text-pretty text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
               <a
                 href={`mailto:${EMAIL}`}

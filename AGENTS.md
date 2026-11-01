@@ -87,7 +87,6 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 | Plates | `ui/plate-figure.tsx` | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
 | Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
 | Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Board | Ruled columns of index cards | `/tracker` |
 | Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
 | Admin | Ruled spine, `--admin-rail` | `/admin/dashboard/*` |
 | Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` |
@@ -96,7 +95,7 @@ Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or
 
 Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
 
-Home: the masthead (`bleed` slot) is a `.print-plate halftone` section filling the first screen, printed in Paper's ink and paper reversed in both themes: the job line and the name (the LCP element, one line from `sm`, two below) centred in cream on a dotted cobalt sky, and the Bromo plate (`src/assets/plates/bromo-2400.webp`, served unoptimized) along the bottom 56%, layered over the name so the peaks cut the foot of the letters. The positioning sentence (24px floor on phones) and the three links sit just below on paper, and the sentence inks on its own view timeline. The Hollar band appears in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with a bold drop cap.
+Home: the masthead (`bleed` slot) is a `.masthead` section filling the first screen in the theme's own ink and paper (cobalt on cream in Paper, cream on cobalt in Night): the job line and the speckled name (the LCP element, one line from `sm`, two below) centred, and the Bromo plate (`src/assets/plates/bromo-2400.webp`, served unoptimized; Paper swaps its two inks through `#plate-swap`) along the bottom 56%, layered over the name so the peaks cut the foot of the letters and rise over it as the hero scrolls away. The positioning sentence (24px floor on phones) and the three links sit just below on paper, and the sentence inks on its own view timeline. The Hollar band appears in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink, `.ink-grain`) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with a bold drop cap.
 
 Shared details agents trip on:
 
@@ -109,9 +108,9 @@ Shared details agents trip on:
 ### Motion
 
 - Tier 0 (no JS): native scroll, smooth anchor scroll, sticky layouts. `overflow-x: clip` on `html` and `main` only, never on `body`, never `overflow: hidden` / `auto` on a sticky ancestor.
-- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home lede wordscroll (on its own view timeline) and the reading hairline (articles and home). Nothing else.
-- Response motion only: underline, button press, tab underline, accordion, dialog and sheet fade, toasts, tracker drag.
-- **Banned:** parallax, marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up or reveal on sections, hover lifts, Lenis, GSAP, `motion` / framer-motion.
+- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home lede wordscroll (on its own view timeline), the masthead cover (plate rises, name sinks, on the hero's own view timeline) and the reading hairline (articles and home). Nothing else.
+- Response motion only: underline, button press, tab underline, accordion, dialog and sheet fade, toasts.
+- **Banned:** parallax (beyond the masthead cover), marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up or reveal on sections, hover lifts, Lenis, GSAP, `motion` / framer-motion.
 
 ### Copy
 

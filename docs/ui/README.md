@@ -10,7 +10,7 @@ The earlier monochrome / grayscale language (Instrument Serif, Bricolage Grotesq
 
 | Doc | Covers |
 |---|---|
-| [design-system.md](./design-system.md) | Ink and paper tokens, contrast and its guard test, Plus Jakarta Sans weights, compact type scale, the print plate and halftone, lines, texture, motion tiers, banned list, dark mode, print |
+| [design-system.md](./design-system.md) | Ink and paper tokens, contrast and its guard test, Plus Jakarta Sans weights, compact type scale, the masthead plate and ink grain, lines, texture, motion tiers, banned list, dark mode, print |
 | [surfaces.md](./surfaces.md) | The three surfaces: frame, inset, lift |
 | [page-shell.md](./page-shell.md) | BaseLayout, running head, menu sheet, colophon, page patterns, widths |
 | [components.md](./components.md) | Primitive rules, links, fields, plates, hover tips, data viz, Umami event rules |

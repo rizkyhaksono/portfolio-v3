@@ -14,7 +14,6 @@ const ROUTES = [
   '/tools?tab=web3-crypto',
   '/ai',
   '/chat',
-  '/tracker',
   '/roadmap',
   '/legal/privacy',
   '/auth',

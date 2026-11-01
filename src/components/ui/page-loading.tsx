@@ -13,7 +13,7 @@ export function PageLoading({ title, children }: Readonly<PageLoadingProps>) {
       {title && (
         <>
           <header className="pb-8">
-            <h1 className="font-display text-h1 text-balance text-ink">{title}</h1>
+            <h1 className="speckle font-display text-h1 text-balance text-ink">{title}</h1>
           </header>
           <div aria-hidden className="border-t border-ink" />
         </>

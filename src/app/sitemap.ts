@@ -19,7 +19,6 @@ const staticRoutes: Array<{ path: string; changeFrequency: Frequency; priority: 
   { path: "/changelog", changeFrequency: "weekly", priority: 0.6 },
   { path: "/stats", changeFrequency: "daily", priority: 0.5 },
   { path: "/tools", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/tracker", changeFrequency: "weekly", priority: 0.4 },
   { path: "/chat", changeFrequency: "monthly", priority: 0.4 },
   { path: "/ai", changeFrequency: "monthly", priority: 0.4 },
   { path: "/legal/privacy", changeFrequency: "yearly", priority: 0.2 },

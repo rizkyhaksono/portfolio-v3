@@ -51,7 +51,7 @@ export default async function ProjectPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="font-display text-h1 text-balance text-ink">Projects</h1>
+        <h1 className="speckle font-display text-h1 text-balance text-ink">Projects</h1>
         {projects.length > 0 && (
           <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
             {projects.length.toLocaleString("en")} projects on record, the featured work first.

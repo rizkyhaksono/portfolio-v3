@@ -27,7 +27,7 @@ export default async function CertificatesPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="font-display text-h1 text-balance text-ink">Certificates</h1>
+        <h1 className="speckle font-display text-h1 text-balance text-ink">Certificates</h1>
         {certifications.length > 0 && (
           <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
             {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.

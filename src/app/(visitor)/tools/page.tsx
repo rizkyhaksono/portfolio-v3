@@ -7,7 +7,7 @@ export default function ToolsPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="font-display text-h1 text-balance text-ink">Tools</h1>
+        <h1 className="speckle font-display text-h1 text-balance text-ink">Tools</h1>
       </header>
       <div aria-hidden className="border-t border-ink" />
 

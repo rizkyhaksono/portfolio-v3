@@ -68,7 +68,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `nav-click`, `menu-open` | Head, menu, colophon | `item`, `area` / none |
 | `theme-toggle` | ThemeToggle | `to` |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
-| `cta-click`, `resume-open`, `portfolio-open` | Masthead, About | `target` / `area` |
+| `cta-click`, `resume-open` | Masthead, About | `target` / `area` |
 | `social-click`, `email-click` | Contact (both), colophon (email only) | `network`, `area` |
 | `cert-verify` | Certificates rows, `/certificates` | `issuer` |
 | `contact-send` | Contact form | `status`: `ok`, `error`, `limited` |
@@ -77,7 +77,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `blog-open`, `rss-subscribe`, `Click Copy Code`, `clap` | Blog | `source` / `feed` / `lang` / `kind` |
 | `project-site`, `project-source` | Project rows and detail | `project` |
 | `roadmap-lesson-complete`, `video-play` | Roadmap | `course` / `lesson` |
-| `tool-open`, `chat-send`, `tracker-card-move`, `stats-profile-open` | Tools, chat, tracker, stats | `tool` / `reply` / `from`, `to` / `platform` |
+| `tool-open`, `chat-send`, `stats-profile-open` | Tools, chat, stats | `tool` / `reply` / `platform` |
 | `anime-generate`, `anime-quote` | Anime generator buttons (`/tools?tab=anime-generator`) | `category` (cringe, blush, dance) / none |
 | `ai-tab`, `ai-chat-send`, `ai-ocr-run`, `ai-jd-run`, `hirefit-share` | `/ai` | `tab` / `status` / `mode`, `status` / `band`, `status` |
 | `signin-start`, `signin-complete`, `signup-complete`, `profile-save` | Auth, profile | `method` / `status` |

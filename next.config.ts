@@ -70,6 +70,7 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       { source: '/signal', destination: '/', permanent: true },
+      { source: '/tracker', destination: '/', permanent: true },
       { source: '/status', destination: '/stats#status', permanent: true },
       { source: '/playground', destination: '/ai', permanent: true },
       { source: '/admin', destination: '/admin/dashboard', permanent: true },

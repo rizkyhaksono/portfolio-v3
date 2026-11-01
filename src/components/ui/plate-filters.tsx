@@ -25,7 +25,10 @@ export function rampTable(stops: readonly Stop[], channel: number): string {
   }).join(" ")
 }
 
-/** Mounted once in the root layout; globals.css points `.plate img` at these by id. */
+// Swaps ink and paper in a two-ink plate printed for Night: v' = (ink + paper) - v, per channel.
+const swapIntercept = (channel: number) => (channelOf(PRINT_HEX.ink, channel) + channelOf(PRINT_HEX.paper, channel)).toFixed(4)
+
+/** Mounted once in the root layout; globals.css points `.plate img` and the masthead plate at these by id. */
 export function PlateFilters() {
   return (
     <svg aria-hidden focusable="false" width="0" height="0" className="absolute">
@@ -39,6 +42,13 @@ export function PlateFilters() {
           </feComponentTransfer>
         </filter>
       ))}
+      <filter id="plate-swap" colorInterpolationFilters="sRGB">
+        <feComponentTransfer>
+          {(["feFuncR", "feFuncG", "feFuncB"] as const).map((Func, channel) => (
+            <Func key={Func} type="linear" slope="-1" intercept={swapIntercept(channel)} />
+          ))}
+        </feComponentTransfer>
+      </filter>
     </svg>
   )
 }

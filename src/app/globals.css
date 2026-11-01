@@ -116,6 +116,17 @@
 .dark .plate img {
   filter: url(#plate-night);
 }
+/* Hover or focus pulls the photo off the press: its own colours. */
+.plate:hover img,
+.plate:has(:focus-visible) img {
+  filter: none;
+}
+
+/* Pictures are not drag sources (Firefox: the dragstart guard in deferred-client-utilities). */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
 
 /* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
 .engraving {
@@ -150,29 +161,61 @@
   }
 }
 
-/* Print plate: the home hero, printed in Paper's ink and paper in either theme with the two reversed:
-   cream type on a cobalt sky. Tokens are re-declared here because :root's derived ones resolve on :root. */
-.print-plate {
-  --paper: 226 68% 36.9%;
-  --ink: 42 49% 90.8%;
-  --ink-soft: 42 45% 82%;
-  --rule: 226 40% 58%;
-  --foreground: var(--ink);
-  --muted-foreground: var(--ink-soft);
-  --ring: var(--ink);
-  --ws-ghost: hsl(var(--ink) / 0.6);
-  color-scheme: light;
-  background-color: hsl(var(--paper));
-  color: hsl(var(--ink));
+/* Masthead cover: as the hero scrolls away the Bromo plate rises and the name sinks behind the peaks. */
+@keyframes masthead-plate {
+  to {
+    translate: 0 -38%;
+  }
+}
+@keyframes masthead-name {
+  to {
+    translate: 0 18%;
+  }
+}
+@keyframes masthead-job {
+  to {
+    opacity: 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .masthead {
+      view-timeline: --masthead block;
+    }
+    .masthead__plate,
+    .masthead__name,
+    .masthead__job {
+      will-change: translate, opacity;
+      animation: masthead-plate auto linear both;
+      animation-timeline: --masthead;
+      animation-range: exit 0% exit 70%;
+    }
+    .masthead__name {
+      animation-name: masthead-name;
+    }
+    .masthead__job {
+      animation-name: masthead-job;
+      animation-range: exit 0% exit 30%;
+    }
+  }
 }
 
-/* Halftone: a fine dot screen in the element's own text colour, for fields printed in solid ink. */
-.halftone {
-  background-image: radial-gradient(color-mix(in srgb, currentColor 16%, transparent) 0.6px, transparent 0.9px);
-  background-size: 4px 4px;
+/* Ink grain: a reversed field (bg-ink) takes the other theme's paper grain, so it shares the page's texture. */
+.ink-grain {
+  background-image: url("../assets/paper/grain-dark.webp");
+  background-size: 128px 128px;
+}
+.dark .ink-grain {
+  background-image: url("../assets/paper/grain-light.webp");
 }
 
-/* Ink speckle: pinholes where the ink did not take. Below-fold numerals ≥48px, inverted blocks, the 404 line. */
+/* The Bromo plate is printed cream-on-cobalt for Night; Paper swaps its two inks (#plate-swap, ui/plate-filters). */
+html:not(.dark) .masthead__plate img {
+  filter: url(#plate-swap);
+}
+
+/* Ink speckle: pinholes where the ink did not take. Display type h3 and up: the masthead name, page and section
+   titles, the colophon name, numerals ≥48px, the 404 line. Never body or small text. */
 .speckle {
   --speckle: url("data:image/webp;base64,UklGRsoCAABXRUJQVlA4TL0CAAAvf8AfEA8QEfMfgo50W48kJbCwWQCRJqY0VS4BE7PXgNb8aMwyMXMJKEsnusHSwpr4Rxc6u8gY/q75838fqrNhBxH9V9i2bUOl85SCTfRhpckmRuxWGKFizx7jDLbOMZel2ZECv1AAngyApRRVjC4kOgADia4HlQEc3OqUDq57F945YS79AM3nLFwA7PNkwjwD5wAKkZj442UN5j2QAL+Bop8AjCM6gMn41oqJiWYCKYAz8ARUIOMNPldpn2OEQsWG0teAtvu3c/19QEOHMVkpSxyuUGA6oVYyfiMtEhXbf8mlOAYfGoFuweDZ9HkGGQagYBN4GTDSeCQ2YLyxo7FbJtBt0XA8KbSH7oYEZtyTKHrwGo5QgQLHDdCkCGmBlypXEJipL9bMiCxQO0hBrjOqis/hwg5U8qGvKTtb9qJkYG+7DJVds9JwE3YnFC1dw9EMfleQaLUCBdidWJOVCMnuNFHHdX3saSALmAHMoXBFU2GsGeZU2DHgCpZr/4DGqKFuggQj6VMmcBWkACkI/6cAE0xOMN8AUpcTmA9BvwxgmEGk2OCcDWSRvAxygABwJwJ6JKlJEVQJvc8yoaGgUxFQK9gj+qssPxdoMMAFqMcAikNqbE/woa2fqxQwMylWmuXvc1PxcoGfZSooCA7wOgIjSfreBSCu1+4C0Qd0bChEgs+xYbYSIwb/IUwunCCnRSo+pAsEdZuZSSiZqqMipNI5pTKsYAsa0ikXx7A1ZaCe61b+YG8lk7EgVjTwLrcF2gShD7eFAqBfCAoqQABU48sr3KZqmQKNTnUGmATwLTBe1YFMxnhkACaoADYF6IHtZj6FAvh8dEoSeqZDgDuCZtoCUscGW7aOkSiNQgEUKAAOCIAExrpiPJV+sRKJHTAAbGEwHgPtRSRi+fcyIi2zAHuQnjzC5+R9Qac/QjbkCgA=");
   -webkit-mask: var(--speckle) 0 0 / 128px 128px repeat;

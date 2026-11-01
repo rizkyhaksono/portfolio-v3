@@ -18,7 +18,7 @@ export function ProfileSheet({ title, standfirst, portrait, cover, children }: R
         <header className="flex items-end gap-5 pb-6">
           {portrait}
           <div className="min-w-0">
-            <h1 className="font-display text-h2 text-balance text-ink [overflow-wrap:anywhere]">{title}</h1>
+            <h1 className="speckle font-display text-h2 text-balance text-ink [overflow-wrap:anywhere]">{title}</h1>
             {standfirst && <p className="mt-2 font-display text-lead text-ink-soft">{standfirst}</p>}
           </div>
         </header>

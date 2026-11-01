@@ -35,8 +35,7 @@ const sections = [
             Turnstile checks that a person sent it.
           </li>
           <li>
-            The public chat and the tracker board: what you post there is public, shown with your name and picture, until you
-            or I delete it.
+            The public chat: what you post there is public, shown with your name and picture, until you or I delete it.
           </li>
           <li>The feedback note: your message and the path of the page you sent it from.</li>
         </ul>

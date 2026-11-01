@@ -77,6 +77,15 @@ export function DeferredClientUtilities() {
 
   useEffect(() => installTrackDelegation(), [])
 
+  // Pictures are not drag sources; Chromium and Safari take this from CSS, Firefox needs the event.
+  useEffect(() => {
+    const onDragStart = (event: DragEvent) => {
+      if (event.target instanceof HTMLImageElement) event.preventDefault()
+    }
+    document.addEventListener("dragstart", onDragStart)
+    return () => document.removeEventListener("dragstart", onDragStart)
+  }, [])
+
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null

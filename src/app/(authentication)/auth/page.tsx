@@ -21,7 +21,6 @@ function AuthTabsFallback() {
 const ACCOUNT_USES = [
   { title: "Etan AI keeps your chats", detail: "Pick up any conversation where you left it." },
   { title: "Write in the public chat", detail: "Post and reply under your own name." },
-  { title: "Move cards on the tracker", detail: "Drag tasks between the columns of the board." },
 ] as const
 
 /** The reversed block beside the form: what an account is for. */
