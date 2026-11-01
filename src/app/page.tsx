@@ -24,7 +24,7 @@ const CTA = "inline-flex min-h-11 items-center md:min-h-0"
 /**
  * Masthead: the job line and the name in the theme's ink on its paper (cobalt on cream, cream on cobalt at
  * night), and the Bromo plate along the bottom with its sky cut away, its two inks swapped to match, so the
- * peaks rise in front of the foot of the letters. Scrolling away, the plate rises and the name sinks behind it
+ * peaks rise in front of the foot of the letters. Scrolling away, the name lags the page and sinks behind the peaks
  * (`.masthead` in globals.css); the h1 itself, the LCP element, never animates. The name is capped by width
  * (one line from sm, two below), height (short screens) and size.
  */
@@ -40,8 +40,7 @@ function Masthead() {
           Rizky Haksono
         </h1>
       </div>
-      {/* Runs 20% below the fold so the rising plate never shows its foot. */}
-      <div className="masthead__plate absolute inset-x-0 -bottom-[20%] z-10 h-[76%]">
+      <div data-plate className="absolute inset-x-0 bottom-0 z-10 h-[56%]">
         {/* Served as is: the lossless two-ink plate (about 150 KB) beats the optimizer's lossy copies. */}
         <Image src={bromoPlate} alt="" fill priority unoptimized className="object-cover object-[45%_0%]" />
       </div>

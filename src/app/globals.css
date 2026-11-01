@@ -161,15 +161,10 @@ img {
   }
 }
 
-/* Masthead cover: as the hero scrolls away the Bromo plate rises and the name sinks behind the peaks. */
-@keyframes masthead-plate {
-  to {
-    translate: 0 -38%;
-  }
-}
+/* Masthead cover: as the hero scrolls away the name lags the page, so the Bromo plate rises over it. */
 @keyframes masthead-name {
   to {
-    translate: 0 18%;
+    translate: 0 45svh;
   }
 }
 @keyframes masthead-job {
@@ -182,16 +177,12 @@ img {
     .masthead {
       view-timeline: --masthead block;
     }
-    .masthead__plate,
     .masthead__name,
     .masthead__job {
       will-change: translate, opacity;
-      animation: masthead-plate auto linear both;
+      animation: masthead-name auto linear both;
       animation-timeline: --masthead;
       animation-range: exit 0% exit 70%;
-    }
-    .masthead__name {
-      animation-name: masthead-name;
     }
     .masthead__job {
       animation-name: masthead-job;
@@ -210,7 +201,7 @@ img {
 }
 
 /* The Bromo plate is printed cream-on-cobalt for Night; Paper swaps its two inks (#plate-swap, ui/plate-filters). */
-html:not(.dark) .masthead__plate img {
+html:not(.dark) .masthead [data-plate] img {
   filter: url(#plate-swap);
 }
 
