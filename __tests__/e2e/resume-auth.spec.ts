@@ -19,9 +19,9 @@ test.describe("Auth & public pages", () => {
     await expect(page.locator('main a[href^="/blog/onsite/"]').first()).toBeVisible();
   });
 
-  test("ai page shows a sign-in gate that returns to /ai", async ({ page }) => {
+  test("ai page opens on the document reader with the chat tab hidden", async ({ page }) => {
     await page.goto("/ai");
-    await expect(page.getByRole("heading", { name: /sign in to write to etan/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /^sign in$/i })).toHaveAttribute("href", "/auth?redirect=/ai");
+    await expect(page.getByRole("tab", { name: "Document reader" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("tab", { name: "Chat", exact: true })).toHaveCount(0);
   });
 });
