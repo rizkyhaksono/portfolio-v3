@@ -68,7 +68,7 @@ const sections = [
       <p>
         On about 15 in every 100 visits, Umami also records how the page is used, such as clicks, scrolling and moves between
         pages, so I can see where the layout gets in the way. It starts only once the page is idle, and never on the sign-in,
-        account, admin or Etan AI pages, or while you are signed in. The recordings stay on the same Umami server.
+        account or admin pages, or while you are signed in. The recordings stay on the same Umami server.
       </p>
     ),
   },
@@ -77,10 +77,8 @@ const sections = [
     title: "Etan AI and Google Gemini",
     body: (
       <p>
-        Etan AI, the document reader and the job description matcher send what you type or upload to Google&rsquo;s Gemini
-        API, which writes the answer; Google handles that data under its Gemini API terms. Chats you have while signed in are
-        saved with your account so you can come back to them. Please do not paste passwords, keys or anyone else&rsquo;s
-        personal details.
+        Etan AI, which sent what you typed or uploaded to Google&rsquo;s Gemini API, is switched off for now. Chats saved
+        with an account before then are still stored with it; ask me and I will delete them.
       </p>
     ),
   },
@@ -107,7 +105,7 @@ const sections = [
     title: "Who else handles it",
     body: (
       <p>
-        Google (sign-in and Gemini), Cloudflare (Turnstile), EmailJS (contact messages) and the company that hosts my
+        Google (sign-in), Cloudflare (Turnstile), EmailJS (contact messages) and the company that hosts my
         server process data for these features only. I may also disclose information when the law requires it, or to stop
         abuse of the site.
       </p>

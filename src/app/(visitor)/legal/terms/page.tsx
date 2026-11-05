@@ -5,7 +5,7 @@ import { getMetadataBaseUrl } from "@/lib/site-url"
 
 export const metadata: Metadata = {
   title: "Terms of service | Rizky Haksono",
-  description: "The rules for using natee.my.id, its public chat, Etan AI and roadmap certificates.",
+  description: "The rules for using natee.my.id, its public chat and roadmap certificates.",
   metadataBase: getMetadataBaseUrl(),
   alternates: { canonical: "/legal/terms" },
 }
@@ -43,16 +43,6 @@ const sections = [
         Messages in the public chat and feedback notes are yours, and anyone can read the chat.
         Keep them civil and lawful. I may edit or remove anything abusive, misleading or off topic, and close accounts that
         keep posting it.
-      </p>
-    ),
-  },
-  {
-    id: "etan-ai",
-    title: "Etan AI answers",
-    body: (
-      <p>
-        Etan AI and the other AI tools write their answers with Google Gemini. The answers can be wrong or out of date, and
-        they are not professional advice. Check anything that matters before you rely on it.
       </p>
     ),
   },

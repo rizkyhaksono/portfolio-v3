@@ -23,7 +23,7 @@ export function LogoutButton() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Log out of this browser?</AlertDialogTitle>
-          <AlertDialogDescription>Your session ends here. Sign in again to use Etan AI and the public chat.</AlertDialogDescription>
+          <AlertDialogDescription>Your session ends here. Sign in again to use the public chat.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Stay signed in</AlertDialogCancel>
