@@ -19,7 +19,6 @@ function AuthTabsFallback() {
 }
 
 const ACCOUNT_USES = [
-  { title: "Etan AI keeps your chats", detail: "Pick up any conversation where you left it." },
   { title: "Write in the public chat", detail: "Post and reply under your own name." },
 ] as const
 

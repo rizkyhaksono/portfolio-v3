@@ -19,9 +19,9 @@ test.describe("Auth & public pages", () => {
     await expect(page.locator('main a[href^="/blog/onsite/"]').first()).toBeVisible();
   });
 
-  test("ai page opens on the document reader with the chat tab hidden", async ({ page }) => {
-    await page.goto("/ai");
-    await expect(page.getByRole("tab", { name: "Document reader" })).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("tab", { name: "Chat", exact: true })).toHaveCount(0);
+  test("Etan AI is hidden: /ai goes home and nothing links to it", async ({ page }) => {
+    await page.goto("/ai?tab=hirefit");
+    expect(new URL(page.url()).pathname).toBe('/');
+    await expect(page.locator('a[href^="/ai"]')).toHaveCount(0);
   });
 });

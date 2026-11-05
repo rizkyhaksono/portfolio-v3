@@ -10,7 +10,7 @@ import { setQuery } from "./set-query"
 const OcrDemo = dynamic(() => import("./ocr-demo"), { loading: ToolSkeleton })
 const JdMatcher = dynamic(() => import("./jd-matcher"), { loading: ToolSkeleton })
 
-// The chat tab is hidden for now (owner, 2026-11-03); its components stay in this folder for when it returns.
+// The whole /ai page is hidden for now (redirected home in next.config.ts). The chat tab is hidden too (owner, 2026-11-03); its components stay in this folder for when it returns.
 const TABS = [
   { id: "document", label: "Document reader" },
   { id: "hirefit", label: "Hire fit" },

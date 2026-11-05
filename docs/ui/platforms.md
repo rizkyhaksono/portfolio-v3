@@ -18,7 +18,7 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 | `/stats` | Figures |
 | `/chat` | Correspondence, `footer="compact"` |
 
-`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/ai`). Do not rebuild them.
+`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/`). `/ai` (Etan AI) is hidden since 2026-11-05: a temporary redirect home, its `/api/ai/*` proxies answer 404 and the API no longer registers `/v3/ai`; the code stays. Do not rebuild them.
 
 ## User (signed in)
 

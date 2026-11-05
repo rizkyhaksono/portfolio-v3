@@ -8,6 +8,7 @@ import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { JOB_TITLE } from "@/commons/constants/author"
 import { NAV_SECTIONS } from "@/commons/constants/navigation-menu"
+import { RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
 
 type Line = { kind: "in" | "out"; text: string }
 
@@ -61,7 +62,7 @@ const COMMANDS: Command[] = [
   {
     name: "open",
     usage: "open <path>",
-    description: "Navigate to a page (e.g. open /ai)",
+    description: "Navigate to a page (e.g. open /project)",
     run: (args, ctx) => {
       const raw = args[0]
       if (!raw) return ["usage: open <path>"]
@@ -78,10 +79,10 @@ const COMMANDS: Command[] = [
   },
   {
     name: "resume",
-    description: "Open my resume",
-    run: (_a, ctx) => {
-      ctx.navigate("/ai")
-      return ["Opening Etan AI, which answers from my résumé…"]
+    description: "Open my CV",
+    run: () => {
+      window.open(RESUME_GOOGLE_DRIVE_URL, "_blank", "noopener,noreferrer")
+      return ["Opening my CV in a new tab…"]
     },
   },
   {

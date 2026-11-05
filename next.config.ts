@@ -72,7 +72,10 @@ const nextConfig: NextConfig = {
       { source: '/signal', destination: '/', permanent: true },
       { source: '/tracker', destination: '/', permanent: true },
       { source: '/status', destination: '/stats#status', permanent: true },
-      { source: '/playground', destination: '/ai', permanent: true },
+      { source: '/playground', destination: '/', permanent: true },
+      // Etan AI is hidden for now (owner, 2026-11-05); temporary so it can come back.
+      { source: '/ai', destination: '/', permanent: false },
+      { source: '/ai/:path*', destination: '/', permanent: false },
       { source: '/admin', destination: '/admin/dashboard', permanent: true },
       { source: '/admin/auth', destination: '/admin/auth/login', permanent: true },
     ]

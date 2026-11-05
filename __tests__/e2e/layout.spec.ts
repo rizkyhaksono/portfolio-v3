@@ -12,7 +12,6 @@ const ROUTES = [
   '/tools?tab=wpm',
   '/tools?tab=downloader',
   '/tools?tab=web3-crypto',
-  '/ai',
   '/chat',
   '/roadmap',
   '/legal/privacy',

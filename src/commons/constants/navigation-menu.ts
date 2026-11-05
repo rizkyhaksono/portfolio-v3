@@ -15,7 +15,6 @@ export interface NavSection {
 export const NAV_SECTIONS: readonly NavSection[] = [
   { href: "/project", label: "Projects", note: "Systems I have built and shipped.", head: "md", column: "read" },
   { href: "/blog", label: "Writing", note: "Essays and notes on AI and engineering.", head: "md", column: "read" },
-  { href: "/ai", label: "Etan AI", note: "Read a document, match a job.", head: "md", column: "try" },
   { href: "/chat", label: "Chat", note: "A public room for leaving a message.", head: "lg", column: "try" },
   { href: "/roadmap", label: "Roadmap", note: "Learning paths, from first principles up.", head: "lg", column: "read" },
   { href: "/tools", label: "Tools", note: "Quizzes, a typing test and small utilities.", head: "lg", column: "try" },

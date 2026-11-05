@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { ETAN_AI_ENABLED } from "@/lib/etan-ai"
 import { z } from "zod"
 import { serverApiUrl } from "@/lib/api-base"
 import { readJson } from "@/lib/read-json"
@@ -18,6 +19,7 @@ const ChatBody = z.object({
  * through to the client as it is written.
  */
 export async function POST(req: NextRequest) {
+  if (!ETAN_AI_ENABLED) return new Response(null, { status: 404 })
   const token = await getSessionToken()
   if (!token) {
     return Response.json({ message: "Authentication required." }, { status: 401 })

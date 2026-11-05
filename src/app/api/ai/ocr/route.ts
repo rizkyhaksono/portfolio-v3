@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server"
+import { ETAN_AI_ENABLED } from "@/lib/etan-ai"
 import { z } from "zod"
 import { serverApiUrl } from "@/lib/api-base"
 import { readJson } from "@/lib/read-json"
@@ -17,6 +18,7 @@ const OcrBody = z.object({
 
 /** Public (no-auth) proxy for the Gemini-Vision document OCR / extraction demo. */
 export async function POST(req: NextRequest) {
+  if (!ETAN_AI_ENABLED) return new Response(null, { status: 404 })
   const body = await readJson(req, OcrBody, MAX_BODY_BYTES)
   if (!body.ok) {
     return body.status === 413
