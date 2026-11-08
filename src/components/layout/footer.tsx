@@ -72,9 +72,9 @@ export default function Footer({
     )
   }
 
-  // One field, after a printed endpaper: Night tokens in both themes, no rules, the Hollar plate fading up into it.
+  // One field with the page: the theme's own paper, no rules, the Hollar plate fading up into it.
   return (
-    <footer className="dark colophon text-ink">
+    <footer className="text-ink">
       <div className={cn(SHELL_WIDTH, "grid grid-cols-3 gap-x-6 gap-y-10 pt-16 sm:gap-x-12 sm:pt-24 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-x-20")}>
         <div className="col-span-3 flex items-start gap-5 lg:col-span-1">
           <Logo variant="mark" className="w-16 shrink-0 sm:w-20" />

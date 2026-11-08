@@ -19,7 +19,7 @@ under 768px       wordmark, [menu icon]   (48px head, 44px targets)
 - If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
 - Certificates and Changelog live in the colophon and the menu.
 - **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
-- The colophon (full variant) is one field: `<footer className="dark colophon">` prints Night tokens in both themes on Night grain, no rules; mark, name, job line, email, Send feedback and Back to top on the left, the Read / Try / Site columns on the right, and the Hollar plate (`<Engraving crop="band" fade />`) fading up into the field at the bottom. The type and plate credits live in the Colophon section at the foot of `/changelog`.
+- The colophon (full variant) is one field with the page: the theme's own paper and grain, no rules; mark, name, job line, email, Send feedback and Back to top on the left, the Read / Try / Site columns on the right, and the Hollar plate (`<Engraving crop="band" fade />`) fading up into the field at the bottom. The type and plate credits live in the Colophon section at the foot of `/changelog`.
 - `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon and terminal overlay all import it.
 
 ### BaseLayout
