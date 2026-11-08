@@ -18,16 +18,18 @@ interface EngravingProps {
   className?: string
   /** Decorative (aria-hidden) unless set; `true` uses the plate's own description. */
   label?: boolean | string
+  /** Fade the plate's top edge into the field behind it (the colophon). */
+  fade?: boolean
 }
 
-export function Engraving({ crop, className, label }: EngravingProps) {
+export function Engraving({ crop, className, label, fade }: EngravingProps) {
   const a11y = label
     ? { role: "img", "aria-label": typeof label === "string" ? label : PLATE_LABEL }
     : { "aria-hidden": true }
 
   return (
     <div
-      className={cn("engraving w-full", className)}
+      className={cn("engraving w-full", fade && "engraving--fade", className)}
       style={CROPS[crop] as CSSProperties}
       {...a11y}
     />

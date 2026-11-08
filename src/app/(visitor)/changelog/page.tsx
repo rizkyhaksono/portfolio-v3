@@ -68,6 +68,15 @@ export default function ChangelogPage() {
             </LedgerList>
           ))}
         </div>
+
+        <section aria-labelledby="colophon" className="mt-8 border-t border-ink pt-6">
+          <h2 id="colophon" className="font-display text-h3 text-ink">Colophon</h2>
+          <p className="mt-2 max-w-[62ch] text-body text-ink-soft">
+            Set in Plus Jakarta Sans by Tokotype. Printed in one ink in Malang, East Java. Hero plate after Johan Conrad
+            Greive and Abraham Salm, <cite>Gezicht op de Bromo vulkaan</cite>, 1869, Rijksmuseum. Footer plate after
+            Wenceslaus Hollar, <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum. Both public domain.
+          </p>
+        </section>
       </div>
     </BaseLayout>
   )

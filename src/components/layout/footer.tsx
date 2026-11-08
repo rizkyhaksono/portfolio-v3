@@ -49,7 +49,7 @@ function LegalLinks() {
   ))
 }
 
-/** Colophon: `full` everywhere, `compact` (one ruled line, no plate) on /ai and /chat. */
+/** Colophon: `full` everywhere, `compact` (one ruled line, no plate) on /chat. */
 export default function Footer({
   variant = "full",
   backToTop = true,
@@ -72,61 +72,51 @@ export default function Footer({
     )
   }
 
+  // One field, after a printed endpaper: Night tokens in both themes, no rules, the Hollar plate fading up into it.
   return (
-    <footer>
-      <div className={SHELL_WIDTH}>
-        <InkRule />
-        <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-10 sm:grid-cols-3 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
-          <div className="col-span-2 flex items-start gap-5 sm:col-span-3 lg:col-span-1">
-            <Logo variant="mark" className="w-20 shrink-0 sm:w-28" />
-            <div>
-              <p className="speckle font-display text-h3 text-ink">Rizky Haksono</p>
-              <p className="mt-1 text-pretty text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-              <a
-                href={`mailto:${EMAIL}`}
-                data-track="email-click"
-                data-track-area="colophon"
-                className="mt-2 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
-              >
-                {/* Below ~360px the address cannot fit beside the mark; it may break before the @, never mid-word. */}
-                {MAILBOX}
-                <wbr />@{MAIL_DOMAIN}
-              </a>
+    <footer className="dark colophon text-ink">
+      <div className={cn(SHELL_WIDTH, "grid grid-cols-3 gap-x-6 gap-y-10 pt-16 sm:gap-x-12 sm:pt-24 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-x-20")}>
+        <div className="col-span-3 flex items-start gap-5 lg:col-span-1">
+          <Logo variant="mark" className="w-16 shrink-0 sm:w-20" />
+          <div>
+            <p className="speckle font-display text-h3 text-ink">Rizky Haksono</p>
+            <p className="mt-1 max-w-[34ch] text-pretty text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+            <a
+              href={`mailto:${EMAIL}`}
+              data-track="email-click"
+              data-track-area="colophon"
+              className="mt-3 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
+            >
+              {/* Below ~360px the address cannot fit beside the mark; it may break before the @, never mid-word. */}
+              {MAILBOX}
+              <wbr />@{MAIL_DOMAIN}
+            </a>
+            <div className="mt-4 flex gap-x-5">
+              <FeedbackButton />
+              <BackToTop />
             </div>
           </div>
-
-          {COLUMNS.map(({ column, heading }) => (
-            <nav key={column} aria-labelledby={`colophon-${column}`} className={cn(column === "site" && "col-span-2 sm:col-span-1")}>
-              <p id={`colophon-${column}`} className="font-display text-caption text-ink-soft">
-                {heading}
-              </p>
-              <ul className={cn("mt-2", column === "site" && "columns-2 gap-x-6 sm:columns-1")}>
-                {NAV_SECTIONS.filter((section) => section.column === column).map(({ href, label }) => (
-                  <li key={href}>
-                    <Link href={href} className={linkClass} {...navTrack(href, "colophon")}>
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-                {column === "site" && <LegalLinks />}
-              </ul>
-            </nav>
-          ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-rule py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
-          <p className="max-w-[62ch] text-small text-ink-soft">
-            Set in Plus Jakarta Sans by Tokotype. Printed in one ink in Malang, East Java. Hero plate after Johan Conrad
-            Greive and Abraham Salm, <cite>Gezicht op de Bromo vulkaan</cite>, 1869, Rijksmuseum. Plate after Wenceslaus
-            Hollar, <cite>Landscape with a Rider</cite>, 1650, after Jan Wildens, Rijksmuseum. Both public domain.
-          </p>
-          <div className="flex shrink-0 gap-x-5">
-            <FeedbackButton />
-            <BackToTop />
-          </div>
-        </div>
+        {COLUMNS.map(({ column, heading }) => (
+          <nav key={column} aria-labelledby={`colophon-${column}`}>
+            <p id={`colophon-${column}`} className="font-display text-small font-semibold text-ink">
+              {heading}
+            </p>
+            <ul className="mt-3">
+              {NAV_SECTIONS.filter((section) => section.column === column).map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className={cn(linkClass, "text-ink-soft hover:text-ink")} {...navTrack(href, "colophon")}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+              {column === "site" && <LegalLinks />}
+            </ul>
+          </nav>
+        ))}
       </div>
-      <Engraving crop="band" className="mt-6" />
+      <Engraving crop="band" fade className="mt-10 sm:mt-16" />
     </footer>
   )
 }
