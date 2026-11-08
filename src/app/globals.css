@@ -134,6 +134,17 @@ img {
   -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
   mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
 }
+/* The plate dissolves upward into the field: a gradient mask intersected with the plate. */
+.engraving--fade {
+  -webkit-mask:
+    linear-gradient(to bottom, transparent, rgb(0 0 0) 55%),
+    url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
+  -webkit-mask-composite: source-in;
+  mask:
+    linear-gradient(to bottom, transparent, rgb(0 0 0) 55%),
+    url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
+  mask-composite: intersect;
+}
 
 /* Wordscroll: the lede sentence inks word by word on its own view timeline. Static and fully inked without
    scroll timelines or with reduced motion. */
