@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { buildContentSecurityPolicy } from "@/lib/content-security-policy"
 import { SESSION_COOKIE } from "./lib/session"
 
 /** User API session (NATEE_V3_TOKEN) — not used for admin (Supabase cookie).
@@ -17,7 +18,19 @@ function hasSessionToken(request: NextRequest): boolean {
   return Boolean(nateeToken || authHeader?.startsWith("Bearer "))
 }
 
-export async function proxy(request: NextRequest, _response: NextResponse) {
+/** Forwards the request with a per-response CSP nonce (see Next.js CSP guide). */
+function continueWithCsp(request: NextRequest): NextResponse {
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
+  const csp = buildContentSecurityPolicy(nonce)
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set("x-nonce", nonce)
+  requestHeaders.set("Content-Security-Policy", csp)
+  const response = NextResponse.next({ request: { headers: requestHeaders } })
+  response.headers.set("Content-Security-Policy", csp)
+  return response
+}
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Admin dashboard: require the main session (works for SSO/Google + email login).
@@ -30,17 +43,15 @@ export async function proxy(request: NextRequest, _response: NextResponse) {
   }
 
   // User routes: /profile, /ai (API session token). Admin uses Supabase only (see above).
-  if (isAdminPublicPath(pathname)) {
-    return NextResponse.next()
-  }
-
-  const needsUserAuth = USER_PROTECTED_PREFIXES.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`)
-  )
-  if (needsUserAuth && !hasSessionToken(request)) {
-    const login = new URL("/auth", request.url)
-    login.searchParams.set("redirect", pathname)
-    return NextResponse.redirect(login)
+  if (!isAdminPublicPath(pathname)) {
+    const needsUserAuth = USER_PROTECTED_PREFIXES.some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    )
+    if (needsUserAuth && !hasSessionToken(request)) {
+      const login = new URL("/auth", request.url)
+      login.searchParams.set("redirect", pathname)
+      return NextResponse.redirect(login)
+    }
   }
 
   // Logged-in users skip login/signup (allow password reset flows). A `redirect` param means the
@@ -55,11 +66,18 @@ export async function proxy(request: NextRequest, _response: NextResponse) {
     return NextResponse.redirect(new URL("/", request.url))
   }
 
-  return NextResponse.next()
+  return continueWithCsp(request)
 }
 
 export const config = {
   matcher: [
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|ico|webp|png|jpg|jpeg|gif|woff|woff2)$).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
     "/admin/:path*",
     "/auth/:path*",
     "/chat/:path*",

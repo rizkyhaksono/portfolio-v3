@@ -2,51 +2,8 @@ import type { NextConfig } from 'next'
 import { RESUME_GOOGLE_DRIVE_URL } from './src/commons/constants/external-links'
 import { OPTIMIZED_IMAGE_HOSTS, SUPABASE_IMAGE_HOST, SUPABASE_STORAGE_PATH } from './src/lib/image-hosts'
 
-/** Origin of a URL, or nothing when the value is empty or not a URL. */
-const originOf = (url?: string) => {
-  try {
-    return url ? new URL(url).origin : undefined
-  } catch {
-    return undefined
-  }
-}
-
-const isDev = process.env.NODE_ENV !== 'production'
-const umamiOrigins = [originOf(process.env.NEXT_PUBLIC_UMAMI_SRC), originOf(process.env.NEXT_PUBLIC_UMAMI_RECORDER_SRC)]
-const TURNSTILE = 'https://challenges.cloudflare.com'
-/** CSP source list with blanks and repeats removed. */
-const sources = (...list: (string | undefined)[]) => [...new Set(list.filter(Boolean))].join(' ')
-
-// Nonces would make every page dynamic, so inline scripts stay allowed; the value is in pinning
-// where scripts, connections and frames may come from, and in refusing to be framed.
-const CONTENT_SECURITY_POLICY = [
-  "default-src 'self'",
-  `script-src ${sources("'self'", "'unsafe-inline'", isDev ? "'unsafe-eval'" : undefined, ...umamiOrigins, TURNSTILE)}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  `connect-src ${sources(
-    "'self'",
-    originOf(process.env.NEXT_PUBLIC_API_URL),
-    originOf(process.env.NEXT_PUBLIC_SUPABASE_URL),
-    ...umamiOrigins,
-    'https://api.emailjs.com',
-    'https://api.dictionaryapi.dev',
-    TURNSTILE,
-    isDev ? 'ws: http://localhost:*' : undefined,
-  )}`,
-  "media-src 'self' blob: https:",
-  `frame-src ${TURNSTILE} https://www.youtube-nocookie.com`,
-  "worker-src 'self' blob:",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-].join('; ')
-
-// Document policies only: on hashed static files they would add ~1 KB to every response for nothing.
+// CSP (nonce-based script-src) is set per request in src/proxy.ts.
 const DOCUMENT_HEADERS = [
-  { key: 'Content-Security-Policy', value: CONTENT_SECURITY_POLICY },
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), geolocation=(), payment=(), usb=(), microphone=(self)' },

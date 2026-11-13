@@ -1,5 +1,27 @@
-const ALLOWED = new Set(["p", "br", "strong", "b", "em", "i", "u", "s", "ul", "ol", "li", "a", "h2", "h3", "h4", "blockquote", "code", "pre", "hr"])
-const VOID = new Set(["br", "hr"])
+import sanitizeHtml from "sanitize-html"
+
+const ALLOWED_TAGS = [
+  "p",
+  "br",
+  "strong",
+  "b",
+  "em",
+  "i",
+  "u",
+  "s",
+  "ul",
+  "ol",
+  "li",
+  "a",
+  "h2",
+  "h3",
+  "h4",
+  "blockquote",
+  "code",
+  "pre",
+  "hr",
+]
+
 const SAFE_HREF = /^(https?:|mailto:|\/(?!\/)|#)/i
 
 // Figures go too: Medium leads with an image and its caption, which would open every excerpt.
@@ -10,24 +32,33 @@ const TYPED_BULLET = "(?:\\s|&nbsp;)*●(?:\\s|&nbsp;)*"
 const BULLET_RUN = new RegExp(`(?:<p>${TYPED_BULLET}[\\s\\S]*?</p>\\s*)+`, "g")
 const BULLET_ITEM = new RegExp(`<p>${TYPED_BULLET}([\\s\\S]*?)</p>\\s*`, "g")
 
+const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: ALLOWED_TAGS,
+  allowedAttributes: { a: ["href"] },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowProtocolRelative: false,
+  disallowedTagsMode: "discard",
+  transformTags: {
+    a: (tagName, attribs): sanitizeHtml.Tag => {
+      const href = (attribs.href ?? "").trim()
+      if (href && SAFE_HREF.test(href)) {
+        return { tagName, attribs: { href } }
+      }
+      return { tagName, attribs: {} as sanitizeHtml.Attributes }
+    },
+  },
+}
+
+function normalizeTypedBullets(html: string): string {
+  return html.replace(UNPRINTED, "").replace(BULLET_RUN, (run) => `<ul>${run.replace(BULLET_ITEM, "<li>$1</li>")}</ul>`)
+}
+
 /**
- * Re-prints the admin's rich-text HTML through an allowlist: only the tags above survive, with no
- * attributes except a safe `href`, and every other `<` is escaped, so the output holds only tags printed here.
+ * Re-prints the admin's rich-text HTML through a maintained sanitizer: only allowed tags survive,
+ * with no attributes except a safe `href` on anchors.
  */
 export function safeHtml(html: string): string {
-  return html
-    .replace(UNPRINTED, "")
-    .replace(/<(\/?)([a-z][a-z0-9]*)\b([^>]*)>|</gi, (match, close: string, name: string, attrs: string) => {
-      if (match === "<") return "&lt;"
-      const tag = name.toLowerCase()
-      if (!ALLOWED.has(tag)) return ""
-      if (close) return VOID.has(tag) ? "" : `</${tag}>`
-      if (tag !== "a") return `<${tag}>`
-      const found = /\shref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(attrs)
-      const href = (found?.[1] ?? found?.[2] ?? found?.[3] ?? "").trim()
-      return SAFE_HREF.test(href) ? `<a href="${href.replaceAll('"', "&quot;")}">` : "<a>"
-    })
-    .replace(BULLET_RUN, (run) => `<ul>${run.replace(BULLET_ITEM, "<li>$1</li>")}</ul>`)
+  return sanitizeHtml(normalizeTypedBullets(html), SANITIZE_OPTIONS)
 }
 
 const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'", nbsp: " " }

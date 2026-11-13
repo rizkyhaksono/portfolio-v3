@@ -1,7 +1,12 @@
 import { MetadataConstants } from "@/commons/constants/metadata"
+import { escapeJsonLd } from "@/lib/escape-json-ld"
 import { getSiteUrl } from "@/lib/site-url"
 
-export default function JsonLd() {
+interface JsonLdProps {
+  nonce?: string
+}
+
+export default function JsonLd({ nonce }: Readonly<JsonLdProps>) {
   const siteUrl = getSiteUrl()
 
   const person = {
@@ -29,11 +34,13 @@ export default function JsonLd() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+        nonce={nonce}
+        dangerouslySetInnerHTML={{ __html: escapeJsonLd(person) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
+        nonce={nonce}
+        dangerouslySetInnerHTML={{ __html: escapeJsonLd(website) }}
       />
     </>
   )

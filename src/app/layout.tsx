@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next"
+import { headers } from "next/headers"
 import Script from "next/script"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import { ThemeProvider } from "@/components/layout/theme-provider"
@@ -65,21 +66,24 @@ export const viewport: Viewport = {
   themeColor: PRINT_HEX.paper,
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined
+
   return (
     <html lang="en" data-scroll-behavior="smooth" className={fontSans.variable} suppressHydrationWarning>
       <head>
-        <JsonLd />
+        <JsonLd nonce={nonce} />
         {umamiEnabled && (
           <>
-            <script dangerouslySetInnerHTML={{ __html: UMAMI_BEFORE_SEND }} />
+            <script nonce={nonce} dangerouslySetInnerHTML={{ __html: UMAMI_BEFORE_SEND }} />
             <Script
               defer
               src={umamiSrc}
+              nonce={nonce}
               data-website-id={umamiWebsiteId}
               data-domains="natee.my.id"
               data-exclude-hash="true"
