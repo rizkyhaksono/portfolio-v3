@@ -76,7 +76,7 @@ test.describe('Navigation', () => {
 });
 
 test.describe('Home', () => {
-  test('opens on the sky cover and lists projects as a gallery with a link to all of them', async ({ page }) => {
+  test('opens on the cover and lists projects as a gallery with a link to all of them', async ({ page }) => {
     await page.goto('/');
     const main = page.getByRole('main');
     await expect(main.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeAttached();
@@ -94,24 +94,24 @@ test.describe('Home', () => {
   });
 });
 
-test.describe('Footer and cover', () => {
-  test('the page ends on the address, and the cover keeps a hidden pause control at 1280', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
+test.describe('Footer and sidebar', () => {
+  test('the page ends on the address', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('contentinfo').getByRole('link', { name: EMAIL })).toHaveAttribute('href', `mailto:${EMAIL}`);
-    // No visible button: sr-only (a 1x1 box) until keyboard focus, so keyboard and screen readers can stop the sky.
-    const pause = page.getByRole('button', { name: 'Pause the sky' });
-    await expect(pause).toBeAttached();
-    expect((await pause.boundingBox())?.width).toBeLessThanOrEqual(1);
-    await pause.focus();
-    await expect.poll(async () => (await pause.boundingBox())?.width ?? 0).toBeGreaterThan(1);
   });
 
-  test('drops the pause control below 640, where the cover stands still', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 812 });
+  test('the sidebar folds to its icons and stays folded after a reload', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
-    await expect(page.getByRole('contentinfo').getByRole('link', { name: EMAIL })).toBeVisible();
-    // display:none takes it out of the accessibility tree, so look it up with hidden elements included.
-    await expect(page.getByRole('button', { name: 'Pause the sky', includeHidden: true })).toHaveCSS('display', 'none');
+    const sidebar = page.getByRole('complementary', { name: 'Site' });
+    const wide = (await sidebar.boundingBox())?.width ?? 0;
+    await page.getByRole('button', { name: 'Collapse the sidebar' }).click();
+    await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeLessThan(wide / 2);
+    // The links keep their names for screen readers while only the icons show.
+    await expect(sidebar.getByRole('link', { name: 'Writing', exact: true })).toBeAttached();
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Expand the sidebar' })).toBeVisible();
+    await page.getByRole('button', { name: 'Expand the sidebar' }).click();
+    await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeGreaterThan(200);
   });
 });

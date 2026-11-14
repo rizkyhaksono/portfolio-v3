@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { getJLPTLevels, getJLPTVoca, getJLPTQuiz } from "@/services/visitor/japanese"
 import type { JLPTQuestion } from "@/commons/types/tools"
-import { ToolError, ToolLoading, useToolData } from "./tool-status"
+import { Skeleton } from "@/components/ui/skeleton"
+import { GROUP_LABEL, TableSkeleton, ToolError, useToolData } from "./tool-status"
 
 const QUIZ_LENGTH = 10
 const loadLevels = () => getJLPTLevels().then((res) => res.levels)
@@ -27,11 +28,18 @@ export function JapaneseQuizTab() {
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="text-small text-foreground">Level</legend>
+        <legend className={GROUP_LABEL}>Level</legend>
         {levels.status === "loading" && !levels.data ? (
-          <ToolLoading>Loading levels…</ToolLoading>
+          <div aria-busy="true" className="grid grid-cols-3 gap-2 sm:flex">
+            <span role="status" className="sr-only">
+              Loading levels…
+            </span>
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-14 w-full sm:w-28" />
+            ))}
+          </div>
         ) : (
-          <div className="mt-2 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
             {levels.data?.map((l) => (
               <Button
                 key={l.code}
@@ -57,7 +65,7 @@ export function JapaneseQuizTab() {
         <TabsContent value="vocabulary">
           <Vocabulary level={level} />
         </TabsContent>
-        <TabsContent value="quiz">
+        <TabsContent value="quiz" className="max-w-xl">
           <Quiz level={level} />
         </TabsContent>
       </Tabs>
@@ -69,7 +77,7 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
   const words = useToolData(useCallback(() => getJLPTVoca(level, 20).then((res) => res.words), [level]))
 
   if (words.status === "error") return <ToolError onRetry={words.retry}>The {level} word list did not load.</ToolError>
-  if (words.status === "loading") return <ToolLoading>Loading {level} words…</ToolLoading>
+  if (words.status === "loading") return <TableSkeleton label={`Loading ${level} words…`} rows={8} />
   if (!words.data?.length) return <StatusLine kind="empty">No words for {level} yet.</StatusLine>
 
   return (
@@ -82,7 +90,7 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
         <TableHeader>
           <TableRow>
             <TableHead>Word</TableHead>
-            <TableHead>Reading</TableHead>
+            <TableHead className="hidden sm:table-cell">Reading</TableHead>
             <TableHead>Meaning</TableHead>
             <TableHead className="hidden sm:table-cell">Part of speech</TableHead>
           </TableRow>
@@ -90,17 +98,18 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
         <TableBody>
           {words.data.map((w, i) => (
             <TableRow key={`${w.word}-${i}`}>
-              <TableCell lang="ja" className="whitespace-nowrap text-body font-medium text-foreground">
+              <TableCell lang="ja" className="whitespace-nowrap align-top text-body font-medium text-foreground">
                 {w.word}
+                {w.reading !== w.word && <span className="block text-caption font-normal text-muted-foreground sm:hidden">{w.reading}</span>}
               </TableCell>
-              <TableCell lang="ja" className="text-muted-foreground">
+              <TableCell lang="ja" className="hidden whitespace-nowrap align-top text-muted-foreground sm:table-cell">
                 {w.reading}
               </TableCell>
-              <TableCell className="text-foreground">
+              <TableCell className="align-top text-foreground">
                 {w.meaning}
                 {w.partOfSpeech && <span className="text-muted-foreground sm:hidden">, {w.partOfSpeech}</span>}
               </TableCell>
-              <TableCell className="hidden text-muted-foreground sm:table-cell">{w.partOfSpeech}</TableCell>
+              <TableCell className="hidden align-top text-muted-foreground sm:table-cell">{w.partOfSpeech}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -114,10 +123,30 @@ function Quiz({ level }: Readonly<{ level: string }>) {
 
   if (quiz.status === "error") return <ToolError onRetry={quiz.retry}>The {level} quiz did not load.</ToolError>
   // Loading unmounts the round, so each new set starts from a clean score.
-  if (quiz.status === "loading" || !quiz.data) return <ToolLoading>Dealing {level} questions…</ToolLoading>
+  if (quiz.status === "loading" || !quiz.data) return <QuizSkeleton level={level} />
   if (quiz.data.length === 0) return <StatusLine kind="empty">No questions for {level} yet.</StatusLine>
 
   return <QuizRound questions={quiz.data} onAgain={quiz.retry} />
+}
+
+function QuizSkeleton({ level }: Readonly<{ level: string }>) {
+  return (
+    <div aria-busy="true" className="space-y-6">
+      <span role="status" className="sr-only">
+        Dealing {level} questions…
+      </span>
+      <Skeleton className="h-1.5 w-full rounded-full" />
+      <div className="space-y-3 py-4">
+        <Skeleton className="h-9 w-32" />
+        <Skeleton className="h-5 w-20" />
+      </div>
+      <div className="grid gap-2">
+        {Array.from({ length: 4 }, (_, i) => (
+          <Skeleton key={i} className="h-11 w-full" />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[]; onAgain: () => void }>) {
@@ -181,9 +210,11 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
           <span lang="ja" className="block text-h1 text-foreground">
             {q.word}
           </span>
-          <span lang="ja" className="mt-2 block text-h4 text-muted-foreground">
-            {q.reading}
-          </span>
+          {q.reading && q.reading !== q.word && (
+            <span lang="ja" className="mt-2 block text-h4 text-muted-foreground">
+              {q.reading}
+            </span>
+          )}
           <span className="mt-4 block text-small text-muted-foreground">What does this word mean?</span>
         </legend>
 

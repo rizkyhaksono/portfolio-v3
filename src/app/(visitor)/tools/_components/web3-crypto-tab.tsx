@@ -6,7 +6,8 @@ import { InkChart } from "@/components/ui/ink-chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getCryptoChart, getCryptoPrice, getTrendingCrypto } from "@/services/visitor/web3"
-import { ToolError, ToolLoading, useToolData } from "./tool-status"
+import { Skeleton } from "@/components/ui/skeleton"
+import { GROUP_LABEL, TableSkeleton, ToolError, useToolData } from "./tool-status"
 
 const COINS = "bitcoin,ethereum,binancecoin,cardano,solana,polkadot"
 const loadPrices = () => getCryptoPrice(COINS).then((res) => res.data)
@@ -55,7 +56,7 @@ export function Web3CryptoTab() {
 function Prices() {
   const prices = useToolData(loadPrices)
   if (prices.status === "error") return <ToolError onRetry={prices.retry}>Prices did not load.</ToolError>
-  if (prices.status === "loading" || !prices.data) return <ToolLoading>Loading prices…</ToolLoading>
+  if (prices.status === "loading" || !prices.data) return <TableSkeleton label="Loading prices…" />
 
   return (
     <Table>
@@ -89,7 +90,7 @@ function Prices() {
 function Trending() {
   const trending = useToolData(loadTrending)
   if (trending.status === "error") return <ToolError onRetry={trending.retry}>Trending coins did not load.</ToolError>
-  if (trending.status === "loading" || !trending.data) return <ToolLoading>Loading trending coins…</ToolLoading>
+  if (trending.status === "loading" || !trending.data) return <TableSkeleton label="Loading trending coins…" rows={10} />
 
   return (
     <Table>
@@ -155,27 +156,43 @@ function Chart() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <div role="group" aria-label="Coin" className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-x-6">
+        <div role="group" aria-labelledby="chart-coin">
+          <p id="chart-coin" className={GROUP_LABEL}>
+            Coin
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:flex">
           {CHART_COINS.map(([id, label]) => (
-            <Button key={id} type="button" size="sm" variant={coin === id ? "default" : "outline"} aria-pressed={coin === id} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
+            <Button key={id} type="button" variant={coin === id ? "default" : "outline"} aria-pressed={coin === id} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
               {label}
             </Button>
           ))}
+          </div>
         </div>
-        <div role="group" aria-label="Period" className="flex gap-2">
+        <div role="group" aria-labelledby="chart-period">
+          <p id="chart-period" className={GROUP_LABEL}>
+            Period
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:flex">
           {RANGES.map((d) => (
-            <Button key={d} type="button" size="sm" variant={days === d ? "default" : "outline"} aria-pressed={days === d} onClick={() => setDays(d)}>
+            <Button key={d} type="button" variant={days === d ? "default" : "outline"} aria-pressed={days === d} onClick={() => setDays(d)}>
               {d} days
             </Button>
           ))}
+          </div>
         </div>
       </div>
 
       {chart.status === "error" ? (
         <ToolError onRetry={chart.retry}>The price history did not load.</ToolError>
       ) : points.length < 2 ? (
-        <ToolLoading>Loading the price history…</ToolLoading>
+        <div aria-busy="true" className="space-y-5">
+          <span role="status" className="sr-only">
+            Loading the price history…
+          </span>
+          <Skeleton className="h-5 w-full max-w-xl" />
+          <Skeleton className="h-56 w-full rounded-lg" />
+        </div>
       ) : (
         <>
           <p className="max-w-[60ch] text-body text-foreground">
@@ -191,7 +208,7 @@ function Chart() {
             height={220}
             className={chart.status === "loading" ? "opacity-60" : undefined}
           />
-          <p className="text-caption text-muted-foreground">In US dollars, from CoinGecko through this site's API. Not financial advice.</p>
+          <p className="text-caption text-muted-foreground">In US dollars, from CoinGecko through this site&apos;s API. Not financial advice.</p>
         </>
       )}
     </div>

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getAnimeImage, getAnimeQuote, type AnimeImageType, type AnimeQuote } from "@/services/visitor/anime"
-import { ToolError } from "./tool-status"
+import { StatusLine } from "@/components/ui/status-line"
+import { GROUP_LABEL, ToolError } from "./tool-status"
 
 // Waifu and neko are hidden on purpose (the owner's call in 55c7fa7); the service still serves them, so add them back here.
 const CATEGORIES: { id: AnimeImageType; name: string }[] = [
@@ -50,36 +51,43 @@ function Images() {
 
   return (
     <div className="space-y-6">
-      <div role="group" aria-label="Category" className="flex flex-wrap gap-2">
-        {CATEGORIES.map((c) => (
-          <Button key={c.id} type="button" size="sm" variant={category === c.id ? "default" : "outline"} aria-pressed={category === c.id} onClick={() => setCategory(c.id)}>
-            {c.name}
-          </Button>
-        ))}
-      </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
+        <div role="group" aria-labelledby="anime-category">
+          <p id="anime-category" className={GROUP_LABEL}>
+            Category
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:flex">
+            {CATEGORIES.map((c) => (
+              <Button key={c.id} type="button" variant={category === c.id ? "default" : "outline"} aria-pressed={category === c.id} onClick={() => setCategory(c.id)}>
+                {c.name}
+              </Button>
+            ))}
+          </div>
+        </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="button" onClick={generate} disabled={loading} aria-busy={loading} data-umami-event="anime-generate" data-umami-event-category={category}>
-          {loading ? "Generating…" : "Generate image"}
-        </Button>
-        {picture && (
-          <Button variant="outline" asChild>
-            <a href={picture.url} download={`anime-${picture.category}.${picture.extension}`}>
-              Download
-            </a>
+        <div className="flex gap-2">
+          <Button type="button" onClick={generate} disabled={loading} aria-busy={loading} data-umami-event="anime-generate" data-umami-event-category={category} className="flex-1 sm:flex-none">
+            {loading ? "Generating…" : "Generate image"}
           </Button>
-        )}
+          {picture && (
+            <Button variant="outline" asChild className="flex-1 sm:flex-none">
+              <a href={picture.url} download={`anime-${picture.category}.${picture.extension}`}>
+                Download
+              </a>
+            </Button>
+          )}
+        </div>
       </div>
 
       {failed && <ToolError onRetry={generate}>The image did not load. Try again in a moment.</ToolError>}
 
       {picture ? (
-        <PlateFigure className="w-fit max-w-full">
+        <PlateFigure className="w-fit max-w-full sm:max-w-xl">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={picture.url} alt={`A random ${picture.category} image`} className="mx-auto h-auto max-h-[32rem] w-auto max-w-full" />
         </PlateFigure>
       ) : (
-        !failed && <p className="text-body text-muted-foreground">Pick a category, then press Generate image.</p>
+        !failed && <StatusLine kind="empty">Pick a category, then press Generate image.</StatusLine>
       )}
     </div>
   )
@@ -105,7 +113,7 @@ function Quotes() {
 
   return (
     <div className="space-y-6">
-      <Button type="button" onClick={fetchQuote} disabled={loading} aria-busy={loading} data-umami-event="anime-quote">
+      <Button type="button" onClick={fetchQuote} disabled={loading} aria-busy={loading} data-umami-event="anime-quote" className="w-full sm:w-auto">
         {loading ? "Fetching…" : "Get a quote"}
       </Button>
 
@@ -120,7 +128,7 @@ function Quotes() {
           </figcaption>
         </figure>
       ) : (
-        !error && <p className="text-body text-muted-foreground">Press Get a quote for a random line from an anime.</p>
+        !error && <StatusLine kind="empty">Press Get a quote for a random line from an anime.</StatusLine>
       )}
     </div>
   )

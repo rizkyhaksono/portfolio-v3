@@ -2,9 +2,11 @@ import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationRow } from "@/app/_components/certification/certification-card"
 import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN } from "@/components/ui/page-loading"
 import { StatusLine } from "@/components/ui/status-line"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { SectionIcon } from "@/components/layout/section-icons"
+import { cn } from "@/lib/utils"
 
 export const revalidate = 3600
 
@@ -38,7 +40,7 @@ export default async function CertificatesPage() {
       {certifications.length === 0 ? (
         <StatusLine kind="failed">The record could not be loaded just now. Try again in a few minutes.</StatusLine>
       ) : (
-        <div className="space-y-8">
+        <div className={cn("space-y-8", FADE_IN)}>
           {[...years].map(([year, rows]) => (
             <section key={year} aria-labelledby={`year-${year}`}>
               <h2 id={`year-${year}`} className="mb-2 flex items-baseline gap-2 text-small font-medium text-foreground">

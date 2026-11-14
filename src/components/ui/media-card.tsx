@@ -53,7 +53,7 @@ export function MediaCard({ href, image, title, description, meta, priority, ext
     </>
   )
 
-  const linkClass = "block h-full overflow-hidden rounded-lg border border-border bg-background transition-colors duration-ui ease-out hover:bg-tint"
+  const linkClass = "block h-full overflow-hidden rounded-lg border border-border bg-background transition-colors duration-75 ease-out hover:bg-tint"
   return (
     <article className={cn("h-full", className)}>
       {external ? (
@@ -72,7 +72,7 @@ export function MediaCard({ href, image, title, description, meta, priority, ext
 
 /** Notion's gallery view: two columns of cards on phones and tablets, three beside the sidebar. */
 export function Gallery({ children, className }: Readonly<{ children: ReactNode; className?: string }>) {
-  return <ul role="list" className={cn("grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3 [&>li]:min-w-0", className)}>{children}</ul>
+  return <ul role="list" className={cn("grid grid-cols-2 gap-2 max-[359px]:grid-cols-1 sm:gap-3 lg:grid-cols-3 [&>li]:min-w-0", className)}>{children}</ul>
 }
 
 export default MediaCard

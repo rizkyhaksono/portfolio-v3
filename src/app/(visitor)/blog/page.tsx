@@ -5,6 +5,7 @@ import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { Gallery, MediaCard } from "@/components/ui/media-card"
 import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN, GALLERY_NARROW } from "@/components/ui/page-loading"
 import { ReaderCount } from "@/components/ui/reader-count"
 import { formatDay, formatDayMonth, yearOf } from "@/app/_components/blog/format"
 import { getPosts, type Post, type Source } from "@/app/_components/blog/posts"
@@ -55,13 +56,13 @@ export default async function BlogPage() {
       </PageHeader>
 
       {posts.length > 0 ? (
-        <>
+        <div className={FADE_IN}>
           {latest.length > 0 && (
             <section aria-labelledby="latest" className="mb-10">
               <h2 id="latest" className="mb-2 text-small font-medium text-muted-foreground">
                 Latest
               </h2>
-              <Gallery>
+              <Gallery className={GALLERY_NARROW}>
                 {latest.map((post, index) => (
                   // The listener reads the nearest data-track, so the card reports like the rows below.
                   <li key={post.id} data-track="blog-open" data-track-source={post.source}>
@@ -113,7 +114,7 @@ export default async function BlogPage() {
               ))}
             </LedgerList>
           ))}
-        </>
+        </div>
       ) : (
         <StatusLine kind="failed">
           No writing could be fetched just now. Try again in a few minutes, or read it on{" "}

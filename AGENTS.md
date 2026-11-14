@@ -34,7 +34,7 @@ Read `prd/feature.md` and `prd/progress.md` before feature work; update `prd/pro
    - Feature code belongs in `components/[feature]/` or `app/_components/`.
 3. **TypeScript:** explicit `interface` or `type` for all props and state. No `any`.
 4. **Styling:**
-   - Tailwind utilities and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, the `.sky` block, view transitions) lives in `src/app/globals.css`.
+   - Tailwind utilities and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, the collapsible sidebar's `.app-sidebar` rules, view transitions) lives in `src/app/globals.css`.
    - `cn()` from `@/lib/utils` for conditional classes.
    - Mobile first; no horizontal scroll at 320 or 375px.
 5. **Code quality:** small functions; repeated logic goes into hooks or `lib/`. Comment only the why the code cannot show.
@@ -46,13 +46,13 @@ Full detail: [`docs/ui/README.md`](docs/ui/README.md) (source of truth), [`desig
 
 ### Identity: a Notion workspace
 
-The site is laid out like a Notion workspace, equally good in light and dark: a grey sidebar with the page tree, a thin top bar with the page's path, then each page in Notion's 708px column as an icon, a 40px bold title, properties and Notion blocks and views. Everything is monochrome (ink, grey and translucent tints) in one sans, Onest. The one coloured element is **the home cover**: the Langit Malang sky, a painted Malang sky whose colour follows the time of day in Malang (WIB), and the night sky in dark mode.
+The site is laid out like a Notion workspace, equally good in light and dark: a grey sidebar with the page tree, a thin top bar with the page's path, then each page in Notion's 708px column as an icon, a 40px bold title, properties and Notion blocks and views. Everything is monochrome (ink, grey and translucent tints) in one sans, Onest. The home page has a photo as Notion's page cover; the only blue left is the text selection fill.
 
-- **Public site:** every page uses `BaseLayout`. From `lg`, a sticky grey sidebar (`bg-muted`, 15rem) holds the owner's row (portrait and "Rizky Haksono", linking home), Home and the main pages with their 16px lucide icons from `SECTION_ICONS`, a "More" group (Certificates, Changelog, Account, RSS feed), the contact rows (Send feedback, Email, GitHub, LinkedIn), a Light, Dark and System segmented control and the legal links. Below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet. The top bar is 44px, sticky and opaque: the breadcrumb (home, then the section) and the theme toggle. Then the page column (`PROSE_WIDTH`, 708px), centred right of the sidebar, every line left-aligned. `/tools` and `/chat` use the full-width page (`width="wide"`). The page ends on one quiet line: the year, the hour in Malang and the email.
+- **Public site:** every page uses `BaseLayout`. From `lg`, a sticky grey sidebar (`bg-muted`, 15rem) holds the owner's row (portrait and "Rizky Haksono", linking home), Home and the main pages with their 16px lucide icons from `SECTION_ICONS`, a "More" group (Certificates, Changelog, Account, RSS feed), the contact rows (Send feedback, Email, GitHub, LinkedIn), then one line with the legal links (Privacy, Terms) beside the theme control: three icon radios, Sun (light), Moon (dark) and Monitor (the device's choice). From `lg`, `CollapseToggle` (the « button in the owner's row, `sidebar-nav.tsx`) folds the sidebar to a 3.25rem icon rail and back: the width eases over 280ms, the labels (`.sidebar-label`) drop to screen-reader text, and the group label and the legal and theme line (`.sidebar-expanded-only`) hide. The state is `<html data-sidebar="collapsed">`, set before paint by an inline nonce script in `src/app/layout.tsx` and kept in localStorage `sidebar`. Below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet. The top bar is 44px, sticky and opaque: the breadcrumb (home, then the section) and the theme toggle. Then the page column (`PROSE_WIDTH`, 708px), centred right of the sidebar, every line left-aligned. `/tools` and `/chat` use the full-width page (`width="wide"`). The page ends on one quiet line: the year, the hour in Malang and the email.
 - **Colour use:** page text, titles and links in `text-foreground`; secondary text (sidebar rows, descriptions, property names, meta, table heads) in `text-muted-foreground`. Hover is `bg-tint`, never colour. Links go through `InkLink`: ink with a grey underline that turns full ink on hover.
-- **Admin:** keeps its own shell for now; its rebuild (full width, Notion sidebar) comes later. No sky.
+- **Admin:** the same Notion shell (`components/layout/admin/*`): a grey sidebar with grouped pages, a 44px top bar with the breadcrumb, the notifications bell (opens on click) and the theme toggle, then full-width content. Collections are Notion tables with an inline editor above the table. No blue.
 - **Auth:** laid out like notion.so/login, see below.
-- **Themes:** `defaultTheme="system"`; labels Light, Dark and System; every change goes through `switchTheme()`.
+- **Themes:** `defaultTheme="system"`; the sidebar's radios are labelled "Light theme", "Dark theme" and "Theme from the device", the top bar's toggle "Dark theme"; every change goes through `switchTheme()`.
 - **Name and icon:** the owner's portrait and name as text. The favicon is a plain "R" tile. There is no logo mark and no handwritten face.
 
 ### Tokens
@@ -69,14 +69,14 @@ HSL triples in `src/app/globals.css` (`:root` light, `.dark` dark), exposed in `
 | `--input` | `border-input` | #8F8E8A | #6E6E6E | Field borders (3:1) |
 | `--popover` | `bg-popover` | #FFFFFF | #252525 | Floating layers |
 | `--destructive` | `text-destructive` | #C4321F | #F27166 | Destructive actions and errors, always with a word |
-| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the home cover |
+| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent kept in the tokens, `THEME_HEX` and the contrast test; no component uses it |
 | `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the text selection fill |
 
 Tints (in `tailwind.config.ts`, from the text colour): `bg-tint` (6%) for hover on rows, buttons and menu items, callouts and skeletons; `bg-tint-strong` (10%) for tags and selected items.
 
 Derived: `--card` is background; `--primary` and `--ring` are foreground; `--secondary` and `--accent` are muted; `--radius` is `.625rem` (10px). Motion variables: `--dur-press` 120ms, `--dur-ui` 200ms, `--dur-sheet` 280ms, `--ease-out` `cubic-bezier(.25,.1,.25,1)` (class `ease-out`). `--head-h` is 2.75rem (the top bar). `--scrim` fills the backdrop behind modals.
 
-- **Blue lives in the home cover** (and the `::selection` fill). Never links, buttons, focus, charts, icons, tags or hover. The primary button is ink. The cover's grass greens and mountain haze are an illustration-only exception to the colour cap: they live only in the `.sky` block of `globals.css` and are never UI colour.
+- **Blue lives only in the `::selection` fill** (`sky-wash`). Never links, buttons, focus, charts, icons, tags or hover. The primary button is ink.
 - No hex, no `white` / `black`, no palette colours (`gray-500`, `blue-600`), no `dark:` classes: every token flips on `<html class="dark">`.
 - Text never takes an opacity modifier; use `text-muted-foreground`. Fields use `border-input`, not `border-border`.
 - State is an icon plus a word (`StatusLine`, the `Badge` status square), never colour alone.
@@ -112,27 +112,29 @@ One sans, **Onest** (variable, OFL), loaded once with `next/font/google` in `src
 - **Surfaces** ([surfaces.md](docs/ui/surfaces.md)): page (no box), sidebar (`bg-muted`), tile (`bg-muted`, for pictures and code), frame (hairline `border-border`, for gallery cards and forms), float (`bg-popover`, hairline), inverted (`bg-foreground text-background`, for the tooltip and toasts). One surface per level.
 - **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, sheet, menu, popover, select content, terminal overlay) are set apart by a hairline `border-border`; the hover tip and toasts are inverted, with no border. Applied inside the shared primitives.
 - **No blur.** The top bar is opaque. Scrims are a fixed fill, never blurred.
-- **Gradients** only in `globals.css` and the cover (`sky.tsx`).
+- **No gradients.** None is left in the code. The gate's R6 allowlist still names `globals.css` and the deleted `sky.tsx`; that is not a licence to add one.
 
 ### The home cover
 
-`SkyCover` (`src/components/ui/sky.tsx`) is Notion's page cover on the home page only, passed as `BaseLayout`'s `cover`: the painted Langit Malang scene, edge to edge above the column, 30% of the viewport tall, built from CSS and inline SVG (no image file), `aria-hidden`. Back to front: a sky gradient, the sun or the moon, soft clouds drifting slowly, Arjuno and Semeru in haze, rolling grass hills with blades that sway, a fine grain. The phase (`skyPhase()` in `src/lib/malang-time.ts`: dawn, day, dusk, evening in WIB) sets `data-sky` on mount; the server renders the day stop. Dark mode is always the night sky with a few static stars. Phones (below 640px) and `prefers-reduced-motion: reduce` get a still scene. There is no visible pause button: `SkyToggle` sits in the cover as `sr-only`, shows on keyboard focus, and lets keyboard and screen-reader users stop the motion (WCAG 2.2.2; the choice is saved in localStorage). The round portrait overlaps the cover's lower edge like a page icon. There is no footer sky and no sky on any other page. Stop colours and the grass greens live only in the `.sky` block of `globals.css`.
+`PageCover` (`src/components/ui/page-cover.tsx`) is Notion's page cover, passed as `BaseLayout`'s `cover` on the home page only: the photo `src/assets/cover/home.webp` through `next/image` (`fill`, `priority`, a blur placeholder, `object-cover` at `50% 45%` unless `position` says otherwise), edge to edge above the column, 30% of the viewport tall (at least 11rem, at most 20rem) on the `bg-muted` ground, with `alt=""` and `data-print-hide`. Nothing in it moves. The round portrait overlaps its lower edge like a page icon. The hour in Malang lives on in the closing line (`MalangClock`, `src/components/ui/malang-clock.tsx`).
 
 ### Motion
 
-All CSS or platform native. The complete list:
+All CSS or platform native, quick and Notion-like. The complete list:
 
-1. **Hover tint:** `bg-tint` fades in on rows, buttons and sidebar items (`--dur-ui`, buttons `--dur-press`).
+1. **Hover tint:** `bg-tint` comes in fast on rows: sidebar rows, list rows, gallery cards, the breadcrumb and mentions use `duration-75`; buttons use `--dur-press`.
 2. **Link underline:** the grey underline turns full ink, 200ms.
 3. **Toggle:** the triangle turns 90 degrees; accordion content opens by height.
 4. **View tabs:** the 2px ink bar follows the open tab.
 5. **Theme crossfade:** `switchTheme()` wraps the change in a view transition.
 6. **Skeleton:** a soft pulse on `bg-tint`, only under `motion-safe`.
-7. **The home cover:** slow clouds and swaying grass, playing at once, with a pause toggle that stays visually hidden until keyboard focus.
+7. **Content fade-in:** `FADE_IN` (`src/components/ui/page-loading.tsx`) fades in the part of a page that replaces its skeleton over 300ms, never the head.
+8. **Sidebar fold:** the desktop sidebar's width eases over 280ms.
+9. **Mention preview:** the hover card fades in and rises 4px over 150ms.
 
-Floating layers keep their Radix fade (150 to 280ms). Anything else that responds to input uses `--dur-*` and `ease-out`.
+Floating layers, after Notion: dropdown menus (`--dur-ui`) and select content (150ms) fade with a small zoom from 0.97; dialogs and alert dialogs fade and zoom the same way over `--dur-sheet`; sheets slide fully in from their edge over `--dur-sheet`. Anything else that responds to input uses `--dur-*` and `ease-out`.
 
-**Reduced motion:** the global kill switch stays; every `::view-transition-*` gets `animation: none`; `switchTheme()` skips the view transition; the cover is still; skeletons do not pulse. With `reducedMotion: 'reduce'`, `document.getAnimations().length` must be 0.
+**Reduced motion:** the global kill switch stays; every `::view-transition-*` gets `animation: none`; `switchTheme()` skips the view transition; skeletons do not pulse; `FADE_IN` is `motion-safe` only; the sidebar folds and layers open at once. With `reducedMotion: 'reduce'`, `document.getAnimations().length` must be 0.
 
 **Banned:** scroll reveal and fade-up on sections, parallax, scroll-jacking or anything tied to scroll position, marquees, typing effects, custom cursors, `animate-ping`, `animate-bounce`, hover lifts, hover scaling, autoplaying media, framer-motion, `motion`, GSAP, Lenis or any other animation library.
 
@@ -140,13 +142,13 @@ Floating layers keep their Radix fade (150 to 280ms). Anything else that respond
 
 - `dark:` classes
 - Raw hex, `white` / `black` and Tailwind palette colours in components
-- Blue anywhere but the home cover and the selection; a blue or coloured primary button
-- Gradients outside `globals.css` and `sky.tsx`; blur anywhere
+- Blue anywhere but the text selection; a blue or coloured primary button
+- Gradients and blur anywhere
 - `uppercase`, `tracking-[…]`, `text-[Npx]`, `rounded-[…]`
 - framer-motion, `motion`, GSAP, Lenis
 - Em dashes in UI copy, generic CTAs, buzzwords
 - Glass cards, boxed sections, shadows of any kind, hover lifts, window chrome
-- A footer sky band, the old handle header with its short rule, a translucent or blurred top bar, a handwritten face
+- A footer sky band or a painted sky cover, the old handle header with its short rule, a translucent or blurred top bar, a handwritten face
 - Any class, variable or asset from the old designs (see gate rules R1, R1b and R1c)
 
 ### Page patterns
@@ -156,19 +158,19 @@ Floating layers keep their Radix fade (150 to 280ms). Anything else that respond
 | Page | `ui/page-header.tsx` (icon above a 40px bold title via `text-title sm:text-display`, muted description), `ui/properties.tsx` | Every visitor page |
 | List view | `ui/ledger.tsx` (`LedgerList`, `LedgerRow`): an optional 16px icon, the title in ink at weight 500, one muted line, meta on the right, the whole row a link that tints on hover, a small muted group label | Home Writing, `/blog` rows, `/roadmap` lessons |
 | Gallery view | `MediaCard` in `Gallery` (`ui/media-card.tsx`): hairline cards, 10px, the picture on the grey ground, title and a property under it, two columns (three from `lg`) | Home Projects, `/project`, the newest `/blog` posts |
-| Table view | `ui/table.tsx`: hairline cells, grey head cells | Home Work experience, `/certificates` |
+| Table view | `ui/table.tsx`: hairline cells, grey head cells | Home Work experience and Education, `/certificates`, admin collections |
 | Article | `ui/article-shell.tsx`: cover picture, icon, title, properties, a hairline, `.prose`, previous and next | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Cabinet | `tools/_components/tool-shell.tsx`, `ui/pager.tsx`, `width="wide"`, view tabs | `/tools`, `/ai` |
+| Cabinet | `tools/_components/tool-shell.tsx` (`ToolCabinet`: a gallery of tool cards grouped Play, Practise and Look things up, above the open tool, state in `?tab=`), `ui/pager.tsx`, `width="wide"`; view tabs on `/ai` | `/tools`, `/ai` |
 | Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar`: solid fills, text alternatives | `/stats`, admin Home and Analytics |
-| Admin | `components/layout/admin/*`: its own shell until the rebuild | `/admin/dashboard/*` |
+| Admin | `components/layout/admin/*` and `app/(admin)/**`: the Notion shell (grey grouped sidebar, 44px top bar, full-width content), a `PageHeader` per page, collections as Notion tables with an inline editor | `/admin/dashboard/*` |
 | Auth | `layout/auth-shell.tsx`: notion.so/login | `/auth/*`, `/admin/auth/login` |
 | Profile card | A definition list in a frame | `/profile`, `/profile/edit`, admin Settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-Blocks: `Callout` (one per page at most), the Notion toggle (`Accordion` or a `<details>` with the rotating triangle), view tabs (`Tabs`, an ink bar under the open one), quotes with a 3px ink bar, `text-h2` section headings (`SectionHeading`, `PageSection`). `StatusLine` for empty and failed states; `Skeleton` for loading.
+Blocks: `Callout` (one per page at most), the Notion toggle (`Accordion` or a `<details>` with the rotating triangle), view tabs (`Tabs`, an ink bar under the open one), quotes with a 3px ink bar, `text-h2` section headings (`SectionHeading`, `PageSection`). `StatusLine` for empty and failed states. Every route's `loading.tsx` mirrors its page through `PageLoading` (`ui/page-loading.tsx`: the real icon and title, then skeletons in the page's own shapes).
 
-Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `footer?: 'full' | 'compact' | 'none'`, `cover?`) with the sidebar, the top bar, the menu sheet and the closing line. One `PageHeader` per page. The home is the cover, the round portrait, the h1 "Rizky Haksono", properties (Role, Based in, Email, Elsewhere), a short bio in ink, then Projects (gallery), Writing (list), Work experience (a table of every career and education entry, newest first), Recommendations (only with real data) and Contact (one callout and the form in a toggle). Details: [`page-shell.md`](docs/ui/page-shell.md), [`platforms.md`](docs/ui/platforms.md).
+Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `footer?: 'full' | 'compact' | 'none'`, `cover?`) with the sidebar, the top bar, the menu sheet and the closing line. One `PageHeader` per page. The home is the photo cover, the round portrait, the h1 "Rizky Haksono", properties (Role, Based in, Email, Elsewhere), a short bio in ink whose names are Notion mentions with a hover preview card (`app/_components/home/mention.tsx`), then Projects (gallery), Writing (list), Work experience and Education (two tables, every entry, newest first), Recommendations (only with real data) and Contact (a line with the email, then the form shown directly as a bordered Notion form). Details: [`page-shell.md`](docs/ui/page-shell.md), [`platforms.md`](docs/ui/platforms.md).
 
 **Auth** (`/auth`, `/admin/auth/login`), after notion.so/login: the owner's name top left, one 320px centred column, a two-line title (ink line, grey line), Email and Password, a full-width ink button, an "or continue with" divider, "Continue with Google", then "New here? Create an account" switching the form in place (`?tab=signup`), and the small print under it.
 
@@ -206,13 +208,13 @@ The gate is the jest test `src/__tests__/unit/lib/ui-gate.test.ts`, run by `bun 
 | R1c | Old identity classes: `speckle`, `engraving`, `masthead`, `ws__w`, `plate-paper`, `tail-piece`, `article-rail`, `reading-hairline` and so on | old changelog entries |
 | R2 | `dark:` | nowhere |
 | R3 | Raw colour: hex and palette colours | `src/lib/theme-hex.ts` (CSS is not scanned) |
-| R4 | Arbitrary values: `rounded-[…]`, `text-[Npx]`, `tracking-[…]`, plus `uppercase` | nowhere (four admin files stay listed until the admin rebuild) |
+| R4 | Arbitrary values: `rounded-[…]`, `text-[Npx]`, `tracking-[…]`, plus `uppercase` | nowhere |
 | R5 | Motion libraries: `framer-motion`, `motion`, `gsap`, `lenis`, `animate-bounce`, `animate-ping` | nowhere |
-| R6 | Gradients and blur | `globals.css`, `sky.tsx` |
+| R6 | Gradients and blur | `globals.css`, `sky.tsx` (a stale entry: the file is deleted and neither holds a gradient) |
 | R7 | Em dash in UI strings | `src/app/_components/blog/format.ts` |
 | R8 | Shadows: `shadow-*` utility classes (except `shadow-none`) and `box-shadow` | `box-shadow` in `globals.css` only |
 
-Some rules carry a shrinking allowlist of files that still break them while the redesign lands. Each PR removes the files it fixes; only the admin files on R4 and the OG font file on R1b are left. Never add a file to an allowlist or loosen a pattern: fix the file.
+Some rules carry a shrinking allowlist of files that still break them while the redesign lands. Each PR removes the files it fixes; only the OG font file on R1b is left (plus R6's stale `sky.tsx` entry). Never add a file to an allowlist or loosen a pattern: fix the file.
 
 ## Development workflow
 
@@ -226,7 +228,7 @@ Some rules carry a shrinking allowlist of files that still break them while the 
 ## Acceptance checklist (UI)
 
 - [ ] The route sits in `BaseLayout` and uses one page pattern from the table above, with one `PageHeader`
-- [ ] Colours from the tokens and tints only; ink text, grey secondary text, `bg-tint` hover; blue only in the home cover
+- [ ] Colours from the tokens and tints only; ink text, grey secondary text, `bg-tint` hover; blue only in the text selection
 - [ ] Onest sizes from the `fontSize` keys; weights 400 to 700 as the keys set them; mono only for code
 - [ ] Notion radii (4, 6, 10px, full); no boxed sections, at most one callout; no shadows (floating layers get a hairline, tooltip and toast are inverted); no blur
 - [ ] Only the listed motion; reduced motion stops all of it

@@ -7,11 +7,12 @@ Restyle shared primitives in place; never fork a second version. Prefer them ove
 | Primitive | Path | Role |
 |---|---|---|
 | `BaseLayout` | `components/layout/base-layout.tsx` | Visitor and user shell, see [page-shell.md](./page-shell.md) |
-| `Sidebar`, `SidebarNav` | `components/layout/sidebar.tsx`, `sidebar-nav.tsx` | The grey page tree (lg and up), also used inside the menu sheet |
+| `Sidebar`, `SidebarNav` | `components/layout/sidebar.tsx`, `sidebar-nav.tsx` | The grey page tree (lg and up), also used inside the menu sheet. `CollapseToggle` folds the desktop one to an icon rail; `ThemeChoice` is the three theme radios |
 | `TopBar`, `Breadcrumb` | `components/layout/top-bar.tsx`, `breadcrumb.tsx` | The 44px bar with the Menu button, the path and the theme toggle |
 | `ContentsTrigger`, `ContentsSheet` | `components/layout/contents-trigger.tsx`, `contents-sheet.tsx` | "Menu" below lg: the sidebar tree in a left sheet |
 | `SECTION_ICONS`, `SectionIcon` | `components/layout/section-icons.tsx` | One lucide icon per page, shared by the sidebar, the breadcrumb and page headers |
 | `Footer` | `components/layout/footer.tsx` | The closing line: year, Malang time, email |
+| `MalangClock` | `components/ui/malang-clock.tsx` | "HH:MM in Malang", empty until mount, in the closing line |
 | `PageHeader` | `components/ui/page-header.tsx` | The top of a Notion page: icon, 40px bold title, muted description, then a slot for properties or tabs |
 | `Properties` | `components/ui/properties.tsx` | Notion's page properties: a muted name with its icon, the value in ink |
 | `Callout` | `components/ui/callout.tsx` | Notion's grey callout block, one per page at most |
@@ -26,18 +27,22 @@ Restyle shared primitives in place; never fork a second version. Prefer them ove
 | `Badge`, `Chip` | `components/ui/badge.tsx`, `chip.tsx` | Notion's grey select tag |
 | `InkLink` | `components/ui/ink-link.tsx` | Every text link, internal or external: ink with a grey underline; optional `icon` |
 | `PlateFigure` | `components/ui/plate-figure.tsx` | Notion's image block: a picture on the grey ground, 10px corners, a caption |
-| `Sky`, `SkyCover`, `SkyToggle`, `MalangClock` | `components/ui/sky.tsx` | The home cover, its hidden pause control, and the hour in Malang |
+| `PageCover` | `components/ui/page-cover.tsx` | Notion's page cover: a photo through `next/image` with a blur placeholder, 30vh. Only the home uses it |
+| `Mention` | `app/_components/home/mention.tsx` | Notion's link mention in running text, with a hover preview card |
 | `ThemeToggle`, `switchTheme()` | `components/layout/theme-toggle.tsx` | The one path for theme changes |
 | `HoverTip` | `components/ui/hover-tip.tsx` | The one tooltip for every `data-tip`, mounted once in the root layout |
 | `StatStrip` | `components/ui/stat-strip.tsx` | Figures: `dt` label, `dd` numeral, in hairline cards |
 | `InkChart`, `InkHeatmap`, `HatchBar` | `components/ui/ink-chart.tsx`, `ink-heatmap.tsx`, `app/_components/contribution/wakatime-progress.tsx` | Data viz |
 | `StatusLine` | `components/ui/status-line.tsx` | Empty, failed and loading states as one honest line; failed adds an icon |
 | `Skeleton` | `components/ui/skeleton.tsx` | Loading shapes on `bg-tint` |
+| `PageLoading` and the skeleton shapes, `FADE_IN` | `components/ui/page-loading.tsx` | A route's `loading.tsx` in the page's own shapes, see [page-shell.md](./page-shell.md#loading) |
 | `ReadingNow` | `components/ui/reading-now.tsx` | Realtime visitor line (client island) |
 | `NotFoundView` | `components/ui/not-found-view.tsx` | 404, error and empty states |
 | `AuthShell` | `components/layout/auth-shell.tsx` | Notion's sign-in page |
+| `AdminSidebar`, `AdminMenu`, `AdminTopHeader`, `NotificationBell`, `ViewTabs` | `components/layout/admin/*` | The admin's Notion shell, see [platforms.md](./platforms.md#admin) |
+| `Collection` | `app/(admin)/admin/dashboard/_components/collection.tsx` | An admin collection as a Notion table with an inline editor |
 
-Deleted, so do not bring them back: the handle header (`running-head.tsx`), the footer sky band, `WordScroll`, `Logo` and its art, `Engraving`, `Eyebrow`, `Marker`, and every old identity class the gate's R1c rule names.
+Deleted, so do not bring them back: the handle header (`running-head.tsx`), the footer sky band, the painted sky cover, `WordScroll`, `Logo` and its art, `Engraving`, `Eyebrow`, `Marker`, and every old identity class the gate's R1c rule names.
 
 ## Rules per primitive
 
@@ -49,13 +54,14 @@ Deleted, so do not bring them back: the handle header (`running-head.tsx`), the 
 - **Toggle.** `Accordion`, or a `<details>` styled the same way: a 16px `ChevronRight` before the title that turns 90 degrees when open, the row `rounded-md` with `hover:bg-tint`, content indented 24px.
 - **Switch, radio, avatar.** `rounded-full`. The switch is ink when on and `input` grey when off.
 - **Badge, chip.** Notion's select tag: `rounded` (4px), `text-small`, ink text on `bg-tint-strong` (`secondary` on `bg-tint`). `status` adds an 8px square before the word: filled for on, outline for off, dashed for draft. Never colour-coded.
-- **Skeleton.** `bg-tint`, `rounded-md`, with a soft pulse only under `motion-safe`.
+- **Skeleton.** `bg-tint`, `rounded-md`, with a soft pulse only under `motion-safe`. Content that replaces a skeleton fades in with `FADE_IN` (300ms, `motion-safe`).
 - **Table.** Notion's table: `text-small`, hairlines on every row and between cells, head cells in muted-foreground at weight 400, `tabular-nums`, numbers right-aligned. Selected rows `bg-tint`. Wide tables scroll inside their wrapper; give the table a `min-w-*` so columns keep their words.
 - **Properties.** A `dl` grid: the name in muted `small` with a 16px icon, the value in ink. Use it for facts about a page (Role, Published, Reading time, Source, Tags), not for prose.
 - **Callout.** An icon and a short passage on `bg-tint`, `rounded-md`. One per page at most.
 - **List rows.** `LedgerRow`: an optional 16px icon in muted-foreground, the title in ink at the body size and weight 500, one muted `small` line under it, meta on the right in `small` muted `tabular-nums`. With `href` the whole row is one stretched link, `rounded-md`, `hover:bg-tint`, with the focus ring on the row. Other controls inside the row need `relative z-10`.
 - **Gallery cards.** `MediaCard`: a frame (`rounded-lg`, hairline) with the picture at 16:10 on `bg-muted` over a hairline, then the title in `small` at weight 500, a description and a `caption` meta line. The whole card is one link and tints on hover. Without a picture the title shows on the grey ground. Lay cards out with `Gallery`.
-- **Floating layers.** Dialog, alert dialog, sheet, popover, dropdown menu, select content and the terminal overlay use the float surface (`bg-popover`, `rounded-lg`, hairline) and a fixed scrim. Menu items are 28px, `text-small`, `focus:bg-tint`. Esc closes; focus returns to the trigger.
+- **Floating layers.** Dialog, alert dialog, sheet, popover, dropdown menu, select content and the terminal overlay use the float surface (`bg-popover`, `rounded-lg`, hairline) and a fixed scrim. Menus and select content fade with a small zoom from 0.97; dialogs fade and zoom over `--dur-sheet`; sheets slide fully. Menu items are 28px, `text-small`, `focus:bg-tint`. Esc closes; focus returns to the trigger.
+- **Mentions.** `Mention` in running text: the name in ink at weight 500 with a grey underline and a 16px picture or icon before it, `hover:bg-tint` at `duration-75`. On hover (after 150ms) or keyboard focus a 18rem preview card on the float surface fades in and rises 4px: the picture at 16:9 on the grey ground, the title, up to three muted lines. The card is `aria-hidden` and hidden on devices without hover. Internal links, so the event goes through `data-track="mention-click"`.
 - **Tooltip and toast.** Inverted, as in Notion: `bg-foreground text-background`, no border, no shadow. The hover tip is `rounded-md` `caption` at weight 500; the toast is `rounded-lg` `small` at the bottom centre.
 - **Icons.** lucide only, 16px in rows, buttons and properties, 20px in the Menu button, 56px as a page icon, `strokeWidth={1.5}` (1.25 for page icons). Functional only. `react-icons` and `@radix-ui/react-icons` are gone; do not add them back. No emoji in UI.
 - **Code.** A server `<pre>` on a tile, system mono, `tabIndex={0}`, no syntax colours. Inline code is a grey wash (ink at 8%), 4px corners, in ink. The client `CopyButton` keeps the `Click Copy Code` event.
@@ -108,7 +114,9 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | Event | Where | Data |
 |---|---|---|
 | `nav-click`, `menu-open` | Sidebar, menu sheet, breadcrumb / the Menu button | `item`, `area` / none |
-| `theme-toggle` | ThemeToggle, the sidebar's theme control | `to` |
+| `theme-toggle` | ThemeToggle, the sidebar's theme radios | `to` |
+| `sidebar-toggle` | The sidebar's « button (`CollapseToggle`), via `track()` | `to`: `collapsed`, `open` |
+| `mention-click` | Home bio mentions, via `data-track` | `item` (the mention's title in kebab case) |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
 | `cta-click`, `resume-open` | Home list links / the CV link | `target` / `area` |
 | `social-click`, `email-click` | Sidebar (`area: sidebar` or `menu`), home properties (`area: bio`), home contact (`area: contact`, email), closing line (`area: colophon`, email) | `network`, `area` |
@@ -134,5 +142,6 @@ Content counts read "Read by 1,204 people in the last 30 days." and hide below 1
 - Field borders at 3:1 (`border-input`).
 - State by icon and word, never colour alone.
 - A text alternative for every chart.
-- A pause control for anything that moves for more than five seconds (the cover's `SkyToggle`, visually hidden until keyboard focus).
+- The folded sidebar keeps every row's name as screen-reader text; the « button has a label and `aria-expanded`.
+- Nothing on the site moves for more than five seconds on its own.
 - No horizontal scroll at 320 or 375px. `<html lang="en">`.

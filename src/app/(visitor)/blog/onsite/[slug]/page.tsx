@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { ArticleShell } from "@/components/ui/article-shell"
+import { FADE_IN } from "@/components/ui/page-loading"
 import ClapButton from "@/components/ui/clap-button"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
@@ -59,6 +60,7 @@ export default async function OnsiteArticlePage({ params }: Props) {
     <>
       <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.coverImage} published={published} modified={post.updated_at} />
       <ArticleShell
+        className={FADE_IN}
         title={post.title}
         standfirst={post.description || undefined}
         properties={articleProperties({ published, minutes: minutesToRead(content), source: "This site", path, reads })}

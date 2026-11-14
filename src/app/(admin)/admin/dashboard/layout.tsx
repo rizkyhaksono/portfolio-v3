@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { requireAdminPage } from "@/lib/admin-page"
-import { AdminSpine } from "@/components/layout/admin/admin-spine"
+import { AdminSidebar } from "@/components/layout/admin/admin-spine"
 import { AdminTopHeader } from "@/components/layout/admin/admin-top-header"
 
 export const metadata: Metadata = {
@@ -23,11 +23,11 @@ export default async function AdminDashboardLayout({ children }: Readonly<{ chil
 
   // data-private: Umami's block selector keeps the admin out of session replays.
   return (
-    <div data-private className="min-h-screen [--admin-rail:15rem]">
-      <AdminSpine user={user} />
-      <div className="md:pl-[var(--admin-rail)]">
+    <div data-private className="flex min-h-svh">
+      <AdminSidebar user={user} />
+      <div className="flex min-w-0 flex-1 flex-col">
         <AdminTopHeader user={user} />
-        <main id="main" className="px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pt-8">
+        <main id="main" className="min-w-0 flex-1 px-6 pb-24 pt-10 sm:pt-16 xl:px-12">
           {children}
         </main>
       </div>

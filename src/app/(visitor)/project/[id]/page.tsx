@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { getAllProject } from "@/services/visitor/project"
 import { getPathReads } from "@/services/visitor/umami"
 import { ArticleShell } from "@/components/ui/article-shell"
+import { FADE_IN } from "@/components/ui/page-loading"
 import type { Property } from "@/components/ui/properties"
 import { ReaderCount } from "@/components/ui/reader-count"
 import ClapButton from "@/components/ui/clap-button"
@@ -48,6 +49,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
   return (
     <ArticleShell
+      className={FADE_IN}
       title={project.title}
       properties={properties}
       meta={<ReaderCount path={`/project/${project.id}`} reads={reads} className="text-small" />}

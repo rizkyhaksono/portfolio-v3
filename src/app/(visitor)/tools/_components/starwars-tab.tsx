@@ -44,11 +44,16 @@ function Gallery({ load, aspect, label }: Readonly<{ load: (page: number) => Pro
   return (
     <div className="space-y-6">
       {failure}
-      <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5 [&>li]:min-w-0">
+      <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-6 [&>li]:min-w-0">
         {loading
-          ? Array.from({ length: 10 }, (_, i) => (
-              <li key={i}>
-                <Skeleton className={`${aspect} rounded-lg`} />
+          ? Array.from({ length: 12 }, (_, i) => (
+              <li key={i} className="overflow-hidden rounded-lg border border-border">
+                <Skeleton className={`${aspect} rounded-none`} />
+                <div className="space-y-1.5 px-2.5 pb-2.5 pt-2">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
               </li>
             ))
           : list.data?.data.map((entry) => (

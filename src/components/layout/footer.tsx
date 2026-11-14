@@ -1,6 +1,6 @@
 import { EMAIL } from "@/commons/constants/contact"
 import { InkLink } from "@/components/ui/ink-link"
-import { MalangClock } from "@/components/ui/sky"
+import { MalangClock } from "@/components/ui/malang-clock"
 import { cn } from "@/lib/utils"
 
 /** The end of a page: one quiet line with the year, the hour in Malang and the address. The sidebar holds the links. */

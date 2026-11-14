@@ -70,19 +70,12 @@ describe("UI gate", () => {
 
   it("R4: sizes, tracking and radius come from the scale", () => {
     const arbitrary = /rounded-\[|text-\[\d+(?:\.\d+)?px\]|tracking-\[|(?<![\w-])uppercase(?![\w-])/
-    const allow = [
-      // The admin tabs and sidebar are rebuilt in the admin PR.
-      "src/app/(admin)/admin/dashboard/_components/collection.tsx",
-      "src/app/(admin)/admin/dashboard/analytics/_components/analytics-dashboard.tsx",
-      "src/app/(admin)/admin/dashboard/feedback/page.tsx",
-      "src/components/layout/admin/admin-spine.tsx",
-    ]
-    expect(offenders(arbitrary, { allow, within: /^src\//, skipComments: true })).toEqual([])
+    expect(offenders(arbitrary, { within: /^src\//, skipComments: true })).toEqual([])
   })
 
-  it("R6: gradients and blur live only in globals.css and the footer sky", () => {
+  it("R6: gradients and blur live only in globals.css", () => {
     const decoration = /gradient-to|bg-gradient|radial-gradient|linear-gradient|backdrop-blur/
-    const allow = ["src/app/globals.css", "src/components/ui/sky.tsx"]
+    const allow = ["src/app/globals.css"]
     expect(offenders(decoration, { allow, within: /^src\//, skipComments: true })).toEqual([])
   })
 

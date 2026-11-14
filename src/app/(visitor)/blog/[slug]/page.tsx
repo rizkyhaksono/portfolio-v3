@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { ArticleShell } from "@/components/ui/article-shell"
+import { FADE_IN } from "@/components/ui/page-loading"
 import CodeBlock, { Pre } from "@/components/ui/code-block"
 import { InkLink } from "@/components/ui/ink-link"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -19,6 +20,9 @@ import { getPathReads } from "@/services/visitor/umami"
 export const revalidate = 3600
 
 type Props = { params: Promise<{ slug: string }> }
+
+/** A link in a property row: 44px tall on phones, the row's own height from `md`. */
+const PROPERTY_LINK = "inline-flex min-h-11 items-center md:min-h-0"
 
 const MARKDOWN: Components = {
   // The page owns the h1.
@@ -71,18 +75,19 @@ export default async function BlogArticlePage({ params }: Props) {
     <>
       <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.cover_image} published={post.published_at} modified={post.edited_at} />
       <ArticleShell
+        className={FADE_IN}
         title={post.title}
         standfirst={isClipped(post.description) ? undefined : post.description}
         properties={articleProperties({
           published: post.published_at,
           minutes: post.reading_time_minutes,
           source: (
-            <InkLink href={post.url} external>
+            <InkLink href={post.url} external className={PROPERTY_LINK}>
               DEV Community
             </InkLink>
           ),
           comments: (
-            <InkLink href="#letters">
+            <InkLink href="#letters" className={PROPERTY_LINK}>
               {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
             </InkLink>
           ),

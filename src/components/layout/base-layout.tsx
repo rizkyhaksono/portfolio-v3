@@ -14,7 +14,7 @@ interface BaseLayoutProps {
   fit?: boolean
   /** Notion's full-width page for app-like pages (/tools, /chat); everything else reads in the 708px column. */
   width?: "prose" | "wide"
-  /** Notion's page cover, full width above the column (the Langit Malang sky on home). */
+  /** Notion's page cover, full width above the column (the photo on home). */
   cover?: ReactNode
 }
 

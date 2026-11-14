@@ -39,7 +39,7 @@ export function LedgerRow({ title, href, external, event, eventData, meta, icon,
   return (
     <li
       className={cn(
-        "group relative -mx-2 flex gap-2.5 rounded-md px-2 py-1.5 transition-colors duration-ui ease-out",
+        "group relative -mx-2 flex gap-2.5 rounded-md px-2 py-1.5 transition-colors duration-75 ease-out",
         href && "hover:bg-tint has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring",
         className,
       )}

@@ -6,6 +6,7 @@ import { getAllRoadmapLessons, getRoadmapIndex, getRoadmapLessonBySlug } from "@
 import { ogImageUrl } from "@/lib/site-url"
 import { BookOpen, Clock, FileText, ListOrdered, Signal } from "lucide-react"
 import { ArticleShell } from "@/components/ui/article-shell"
+import { FADE_IN } from "@/components/ui/page-loading"
 import { InkLink } from "@/components/ui/ink-link"
 import { YouTubeFacade } from "@/components/ui/youtube-facade"
 import { getMDXComponents, headingIds } from "@/components/ui/roadmap-mdx-component"
@@ -60,6 +61,7 @@ export default async function RoadmapLessonPage({ params }: Readonly<Props>) {
 
   return (
     <ArticleShell
+      className={FADE_IN}
       icon={<FileText />}
       title={meta.title}
       standfirst={meta.description}

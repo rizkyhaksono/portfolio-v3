@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN } from "@/components/ui/page-loading"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { Properties } from "@/components/ui/properties"
 import type { ProfileData } from "@/commons/types/profile"
@@ -56,7 +57,7 @@ export function ProfileView({ profile }: Readonly<{ profile: ProfileData }>) {
   ]
 
   return (
-    <article className="w-full">
+    <article className={`w-full ${FADE_IN}`}>
       {profile.bannerUrl && (
         <PlateFigure className="mb-8">
           <div className="relative aspect-[3/1]">
@@ -74,7 +75,8 @@ export function ProfileView({ profile }: Readonly<{ profile: ProfileData }>) {
         title={<span className="[overflow-wrap:anywhere]">{profile.name}</span>}
         description={profile.headline || undefined}
       >
-        <Properties items={properties} />
+        {/* A narrower name column on phones, so the email keeps to one line. */}
+        <Properties items={properties} className="grid-cols-[minmax(6.5rem,8rem)_minmax(0,1fr)] sm:grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)]" />
       </PageHeader>
 
       <div className="border-t border-border pt-6">

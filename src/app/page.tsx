@@ -1,14 +1,15 @@
 import { Suspense, type ReactNode } from "react"
 import Image from "next/image"
-import { Briefcase, ChevronRight, FileText, Link2, Mail, MapPin } from "lucide-react"
+import { Briefcase, FileText, GraduationCap, Link2, Mail, MapPin } from "lucide-react"
 import BaseLayout from "@/components/layout/base-layout"
-import { Callout } from "@/components/ui/callout"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { Gallery, MediaCard } from "@/components/ui/media-card"
 import { Properties } from "@/components/ui/properties"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SkyCover } from "@/components/ui/sky"
+import { PageCover } from "@/components/ui/page-cover"
+import { Mention } from "@/app/_components/home/mention"
+import cover from "@/assets/cover/home.webp"
 import { StatusLine } from "@/components/ui/status-line"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDay } from "@/app/_components/blog/format"
@@ -117,21 +118,58 @@ function Intro() {
   )
 }
 
-/** Who and what, as plain page text. */
-function Bio() {
+type Project = Awaited<ReturnType<typeof getAllProject>>[number]
+
+/** Who and what, as plain page text. With the projects loaded, the names become Notion mentions with a preview. */
+function BioText({ projects }: Readonly<{ projects?: Project[] }>) {
+  const project = (name: string) => projects?.find((p) => p.title.toLowerCase().includes(name.toLowerCase()))
+  const work = (name: string, text: string) => {
+    const found = project(name)
+    if (!found) return text
+    return (
+      <Mention href={`/project/${found.id}`} image={plateOf(found)} icon={<Briefcase />} title={found.title} description={firstSentence(found.description)}>
+        {text}
+      </Mention>
+    )
+  }
+
   return (
     <div className="mt-6 space-y-3 border-t border-border pt-6 text-body text-pretty text-foreground">
       <p>
-        Senior AI engineer at Sarana AI in Malang, East Java, building LLM systems for production: retrieval and embeddings,
-        MCP integrations, and agents that run on AWS.
+        Senior AI engineer at{" "}
+        {projects ? (
+          <Mention href="#work" icon={<Briefcase />} title="Sarana AI" description="Where I work now: retrieval and embeddings, MCP integrations and agents on AWS.">
+            Sarana AI
+          </Mention>
+        ) : (
+          "Sarana AI"
+        )}{" "}
+        in Malang, East Java, building LLM systems for production: retrieval and embeddings, MCP integrations, and agents that
+        run on AWS.
       </p>
       <p>
-        I ship end-to-end products in Next.js, Go and Python, from Info Pangan Jakarta, the city&apos;s official food price
-        monitor, to platforms for Adaro and Biofarma, with CI/CD I can rely on.
+        I ship end-to-end products in Next.js, Go and Python, from {work("Info Pangan", "Info Pangan Jakarta")}, the city&apos;s
+        official food price monitor, to platforms for {work("Adaro", "Adaro")} and {work("Biofarma", "Biofarma")}, with CI/CD I
+        can rely on.
       </p>
-      <p>I studied informatics at Universitas Muhammadiyah Malang and graduated cum laude.</p>
+      <p>
+        I studied informatics at{" "}
+        {projects ? (
+          <Mention href="#education" icon={<GraduationCap />} title="Universitas Muhammadiyah Malang" description="Informatics, graduated cum laude.">
+            Universitas Muhammadiyah Malang
+          </Mention>
+        ) : (
+          "Universitas Muhammadiyah Malang"
+        )}{" "}
+        and graduated cum laude.
+      </p>
     </div>
   )
+}
+
+async function Bio() {
+  const projects = await getAllProject().catch(() => undefined)
+  return <BioText projects={projects ?? undefined} />
 }
 
 async function Projects() {
@@ -194,33 +232,48 @@ async function Writing() {
   )
 }
 
-/** Every role and study, newest first. */
-async function Work() {
-  const [career, education] = await Promise.allSettled([getAllCarrer(), getAllEducation()])
-  const fulfilled = <T,>(result: PromiseSettledResult<T[] | null>) => (result.status === "fulfilled" ? (result.value ?? []) : [])
-  const entries = [...fulfilled(career), ...fulfilled(education)].sort((a, b) => startOf(b.duration) - startOf(a.duration))
-  if (entries.length === 0) return <StatusLine kind="failed">Work history did not load just now. It is all in the CV.</StatusLine>
+type Entry = { id: string | number; title: string; subtitle: string; duration: string }
+
+/** A Notion table of records; the rows keep the organisation in `title` and the role or study in `subtitle`. */
+function RecordTable({ entries, first, second }: Readonly<{ entries: Entry[]; first: string; second: string }>) {
   return (
-    <Table className="min-w-[34rem]">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Role</TableHead>
-          <TableHead>Where</TableHead>
-          <TableHead>When</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {entries.map((entry) => (
-          <TableRow key={entry.id}>
-            {/* The records keep the organisation in `title` and the role in `subtitle`. */}
-            <TableCell className="font-medium text-foreground">{entry.subtitle.trim() || entry.title}</TableCell>
-            <TableCell className="text-muted-foreground">{entry.title}</TableCell>
-            <TableCell className="whitespace-nowrap text-muted-foreground">{entry.duration.replace(" - ", " to ")}</TableCell>
+    <div className="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:px-0">
+      <Table className="min-w-[34rem]">
+        <TableHeader>
+          <TableRow>
+            <TableHead>{first}</TableHead>
+            <TableHead>{second}</TableHead>
+            <TableHead>When</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {entries.map((entry) => (
+            <TableRow key={entry.id}>
+              <TableCell className="font-medium text-foreground">{entry.subtitle.trim() || entry.title}</TableCell>
+              <TableCell className="text-muted-foreground">{entry.title}</TableCell>
+              <TableCell className="whitespace-nowrap text-muted-foreground">{entry.duration.replace(" - ", " to ")}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
+}
+
+const newestFirst = <T extends { duration: string }>(rows: T[]) => [...rows].sort((a, b) => startOf(b.duration) - startOf(a.duration))
+
+/** Every role, newest first. */
+async function Work() {
+  const career = await getAllCarrer().catch(() => null)
+  if (!career?.length) return <StatusLine kind="failed">Work history did not load just now. It is all in the CV.</StatusLine>
+  return <RecordTable entries={newestFirst(career)} first="Role" second="Company" />
+}
+
+/** Every study, newest first. */
+async function Education() {
+  const education = await getAllEducation().catch(() => null)
+  if (!education?.length) return <StatusLine kind="failed">Education did not load just now. It is in the CV.</StatusLine>
+  return <RecordTable entries={newestFirst(education)} first="Study" second="School" />
 }
 
 /** Every recommendation LinkedIn returns; the section is left out when there are none. */
@@ -244,9 +297,11 @@ async function Recommendations() {
 
 export default function Home() {
   return (
-    <BaseLayout cover={<SkyCover />}>
+    <BaseLayout cover={<PageCover src={cover} />}>
       <Intro />
-      <Bio />
+      <Suspense fallback={<BioText />}>
+        <Bio />
+      </Suspense>
 
       <Section id="projects" title="Projects">
         <Suspense fallback={<CardsSkeleton />}>
@@ -266,29 +321,25 @@ export default function Home() {
         </Suspense>
       </Section>
 
+      <Section id="education" title="Education">
+        <Suspense fallback={<RowsSkeleton rows={3} />}>
+          <Education />
+        </Suspense>
+      </Section>
+
       <Suspense fallback={null}>
         <Recommendations />
       </Suspense>
 
       <Section id="contact" title="Contact">
-        <Callout icon={<Mail />}>
-          <p>
-            Write to me at{" "}
-            <InkLink href={`mailto:${EMAIL}`} event="email-click" eventData={{ area: "contact" }} className="break-all">
-              {EMAIL}
-            </InkLink>
-            , or leave a message below.
-          </p>
-        </Callout>
-        <details className="group mt-3">
-          <summary className="-mx-1.5 flex min-h-11 cursor-pointer list-none items-center gap-1.5 rounded-md px-1.5 text-body font-medium text-foreground transition-colors hover:bg-tint md:min-h-8 [&::-webkit-details-marker]:hidden">
-            <ChevronRight aria-hidden className="size-4 text-muted-foreground transition-transform duration-ui ease-out group-open:rotate-90" strokeWidth={2} />
-            Leave a message here
-          </summary>
-          <div className="mt-3 pl-6">
-            <ContactForm />
-          </div>
-        </details>
+        <p className="mb-4 text-body text-foreground">
+          Write to me at{" "}
+          <InkLink href={`mailto:${EMAIL}`} event="email-click" eventData={{ area: "contact" }} className="break-all">
+            {EMAIL}
+          </InkLink>
+          , or send a message here.
+        </p>
+        <ContactForm />
       </Section>
     </BaseLayout>
   )

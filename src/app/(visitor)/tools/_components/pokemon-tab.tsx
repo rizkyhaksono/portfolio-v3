@@ -65,8 +65,8 @@ export function PokemonTab() {
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSearch} className="flex items-end gap-3">
-        <div className="min-w-0 flex-1">
+      <form onSubmit={handleSearch} className="flex max-w-xl flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
+        <div className="min-w-0 flex-1 space-y-1">
           <Label htmlFor="pokemon-search">Name or number</Label>
           <Input
             id="pokemon-search"
@@ -77,7 +77,9 @@ export function PokemonTab() {
             aria-describedby={missing ? "pokemon-search-error" : undefined}
           />
         </div>
-        <Button type="submit">Look up</Button>
+        <Button type="submit" className="w-full sm:h-9 sm:w-auto">
+          Look up
+        </Button>
       </form>
       {missing && (
         <p id="pokemon-search-error" className="-mt-3 flex gap-2 text-caption text-foreground">
@@ -91,11 +93,15 @@ export function PokemonTab() {
       )}
       {(list.status !== "error" || list.data) && (
         <>
-          <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 [&>li]:min-w-0">
+          <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 xl:grid-cols-6 [&>li]:min-w-0">
             {loading
               ? Array.from({ length: 12 }, (_, i) => (
-                  <li key={i}>
-                    <Skeleton className="h-44 rounded-lg" />
+                  <li key={i} className="overflow-hidden rounded-lg border border-border">
+                    <Skeleton className="h-28 rounded-none" />
+                    <span className="block space-y-1.5 px-2.5 pb-2.5 pt-2">
+                      <Skeleton className="h-4 w-2/3" />
+                      <Skeleton className="h-3 w-5/6" />
+                    </span>
                   </li>
                 ))
               : list.data?.data.map((p) => (

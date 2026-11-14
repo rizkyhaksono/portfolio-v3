@@ -22,7 +22,7 @@ Human-readable design system (required reading for UI work):
 - `docs/ui/README.md`: index, the rules in one screen, the UI gate
 - `docs/ui/design-system.md`: tokens and tints, Onest and the Notion type scale, radii, the home cover, motion
 - `docs/ui/surfaces.md`: page, sidebar, tile, frame, float, inverted
-- `docs/ui/page-shell.md`: BaseLayout, sidebar, top bar, closing line, page patterns, the home
+- `docs/ui/page-shell.md`: BaseLayout, sidebar, top bar, closing line, page patterns, loading, the home
 - `docs/ui/components.md`: primitives, copy, Umami events
 - `docs/ui/platforms.md`: visitor, user, admin, auth
 
