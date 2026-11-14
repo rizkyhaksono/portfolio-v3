@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next"
+import { headers } from "next/headers"
 import Script from "next/script"
 import { Plus_Jakarta_Sans } from "next/font/google"
 import { ThemeProvider } from "@/components/layout/theme-provider"
@@ -8,7 +9,7 @@ import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
-import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
+import { UmamiBootstrapScript } from "@/components/layout/umami-bootstrap-script"
 import { PRINT_HEX } from "@/lib/print-hex"
 import { PlateFilters } from "@/components/ui/plate-filters"
 import "./globals.css"
@@ -65,21 +66,25 @@ export const viewport: Viewport = {
   themeColor: PRINT_HEX.paper,
 }
 
-export default function RootLayout({
+/** App shell: fonts, theme, analytics bootstrap, and global UI primitives. */
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined
+
   return (
     <html lang="en" data-scroll-behavior="smooth" className={fontSans.variable} suppressHydrationWarning>
       <head>
-        <JsonLd />
+        <JsonLd nonce={nonce} />
         {umamiEnabled && (
           <>
-            <script dangerouslySetInnerHTML={{ __html: UMAMI_BEFORE_SEND }} />
+            <UmamiBootstrapScript nonce={nonce} />
             <Script
               defer
               src={umamiSrc}
+              nonce={nonce}
               data-website-id={umamiWebsiteId}
               data-domains="natee.my.id"
               data-exclude-hash="true"

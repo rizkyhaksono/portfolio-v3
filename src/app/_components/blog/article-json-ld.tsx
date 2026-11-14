@@ -1,4 +1,6 @@
+import { headers } from "next/headers"
 import { MetadataConstants } from "@/commons/constants/metadata"
+import { JsonLdScript } from "@/components/seo/json-ld-script"
 import { getSiteUrl } from "@/lib/site-url"
 
 interface ArticleJsonLdProps {
@@ -12,7 +14,8 @@ interface ArticleJsonLdProps {
 }
 
 /** BlogPosting structured data for an article page. */
-export function ArticleJsonLd({ title, description, path, image, published, modified }: Readonly<ArticleJsonLdProps>) {
+export async function ArticleJsonLd({ title, description, path, image, published, modified }: Readonly<ArticleJsonLdProps>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined
   const base = getSiteUrl()
   const data = {
     "@context": "https://schema.org",
@@ -27,6 +30,5 @@ export function ArticleJsonLd({ title, description, path, image, published, modi
     author: { "@type": "Person", name: MetadataConstants.creator, url: base },
   }
 
-  // `<` escaped so a title can never close the script element.
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replaceAll("<", "\\u003c") }} />
+  return <JsonLdScript nonce={nonce} data={data} />
 }

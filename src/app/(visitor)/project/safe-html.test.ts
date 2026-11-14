@@ -3,7 +3,7 @@ import { plainText, safeHtml } from "./safe-html"
 describe("safeHtml", () => {
   it("keeps the rich-text formatting", () => {
     expect(safeHtml('<p class="x">A <strong>bold</strong> <a href="https://natee.my.id" target="_blank">link</a></p><ul><li>one</li></ul><br/>')).toBe(
-      '<p>A <strong>bold</strong> <a href="https://natee.my.id">link</a></p><ul><li>one</li></ul><br>',
+      '<p>A <strong>bold</strong> <a href="https://natee.my.id">link</a></p><ul><li>one</li></ul><br />',
     )
   })
 
@@ -13,7 +13,7 @@ describe("safeHtml", () => {
     expect(safeHtml('<a href="javascript:alert(1)">x</a>')).toBe("<a>x</a>")
     expect(safeHtml('<a href="javascript&#58;alert(1)">x</a>')).toBe("<a>x</a>")
     expect(safeHtml('<a href="//evil.example">x</a>')).toBe("<a>x</a>")
-    expect(safeHtml('<a href="a>b" onclick=x>y</a>')).toBe('<a>b" onclick=x>y</a>')
+    expect(safeHtml('<a href="a>b" onclick=x>y</a>')).toBe("<a>y</a>")
   })
 
   it("turns typed ● paragraphs into a list", () => {
@@ -22,8 +22,8 @@ describe("safeHtml", () => {
     )
   })
 
-  it("escapes any other angle bracket", () => {
-    expect(safeHtml("<scr<script>ipt>alert(1)")).toBe("ipt>alert(1)")
+  it("strips unknown tags and leaves plain text", () => {
+    expect(safeHtml("<scr<script>ipt>alert(1)")).toBe("ipt&gt;alert(1)")
     expect(safeHtml("1 < 2 and <iframe src=x></iframe>")).toBe("1 &lt; 2 and ")
   })
 })

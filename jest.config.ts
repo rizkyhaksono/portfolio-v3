@@ -24,4 +24,10 @@ const config: Config = {
   ],
 }
 
-export default createJestConfig(config)
+/** Extends the Next.js Jest preset so sanitize-html ESM dependencies transpile in tests. */
+export default async function jestConfig() {
+  const nextConfig = await createJestConfig(config)()
+  // sanitize-html pulls in ESM-only htmlparser2; allow Jest to transpile node_modules.
+  nextConfig.transformIgnorePatterns = ['^\\.next/']
+  return nextConfig
+}
