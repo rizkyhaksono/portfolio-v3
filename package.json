@@ -49,7 +49,7 @@
     "clsx": "^2.1.1",
     "feed": "^5.2.0",
     "gray-matter": "^4.0.3",
-    "lucide-react": "^0.548.0",
+    "lucide-react": "^1.71.0",
     "minisearch": "^7.2.0",
     "next": "^16.4.6",
     "next-mdx-remote": "^6.0.0",
