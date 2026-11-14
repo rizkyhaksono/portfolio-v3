@@ -272,8 +272,20 @@ html[data-sidebar="collapsed"] .app-sidebar .sidebar-expanded-only {
   display: none;
 }
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-head {
-  flex-direction: column;
-  align-items: stretch;
+  justify-content: center;
+}
+/* In the rail every row is an icon centred in its own square; the label is screen-reader text above. */
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-row {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+  min-height: 2rem;
+}
+.sidebar-collapsed-only {
+  display: none;
+}
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-collapsed-only {
+  display: block;
 }
 
 @tailwind utilities;

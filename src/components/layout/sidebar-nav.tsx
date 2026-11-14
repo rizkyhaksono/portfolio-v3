@@ -16,8 +16,9 @@ import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
 
 // Notion's sidebar row: 28px (44px on touch), a 16px icon, grey text that inks and tints on hover and when current.
+// `data-tip-rail` names the icon on hover only while the sidebar is folded (hover-tip.tsx).
 const ROW =
-  "flex min-h-11 w-full items-center gap-2 rounded-md px-2 text-left text-small text-muted-foreground transition-colors duration-75 ease-out hover:bg-tint hover:text-foreground aria-[current=page]:bg-tint aria-[current=page]:font-medium aria-[current=page]:text-foreground lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
+  "sidebar-row flex min-h-11 w-full items-center gap-2 rounded-md px-2 text-left text-small text-muted-foreground transition-colors duration-75 ease-out hover:bg-tint hover:text-foreground aria-[current=page]:bg-tint aria-[current=page]:font-medium aria-[current=page]:text-foreground lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
 
 const GITHUB = media_socials.find(({ title }) => title === "GitHub")!.href
 const LINKEDIN = media_socials.find(({ title }) => title === "LinkedIn")!.href
@@ -26,7 +27,7 @@ function PageRow({ href, label, area, pathname }: Readonly<{ href: string; label
   const current = href === "/" ? pathname === "/" : isCurrentPath(pathname, href)
   return (
     <li>
-      <Link href={href} aria-current={current ? "page" : undefined} className={ROW} {...navTrack(href, area)}>
+      <Link href={href} aria-current={current ? "page" : undefined} data-tip={label} data-tip-rail className={ROW} {...navTrack(href, area)}>
         <SectionIcon href={href} />
         <span className="sidebar-label truncate">{label}</span>
       </Link>
@@ -34,10 +35,10 @@ function PageRow({ href, label, area, pathname }: Readonly<{ href: string; label
   )
 }
 
-function OutRow({ href, icon, network, children }: Readonly<{ href: string; icon: ReactNode; network: string; children: ReactNode }>) {
+function OutRow({ href, icon, network, children }: Readonly<{ href: string; icon: ReactNode; network: string; children: string }>) {
   return (
     <li>
-      <a href={href} target="_blank" rel="noopener noreferrer" data-umami-event="social-click" data-umami-event-network={network} data-umami-event-area="sidebar" className={ROW}>
+      <a href={href} target="_blank" rel="noopener noreferrer" data-umami-event="social-click" data-umami-event-network={network} data-umami-event-area="sidebar" data-tip={children} data-tip-rail className={ROW}>
         {icon}
         <span className="sidebar-label truncate">{children}</span>
         <span className="sr-only"> (opens in a new tab)</span>
@@ -115,6 +116,11 @@ function CollapseToggle() {
   )
 }
 
+/** The rail's break between groups, where the expanded sidebar has a heading or space. */
+function RailDivider() {
+  return <div aria-hidden className="sidebar-collapsed-only mx-auto my-2 h-px w-4 bg-border" />
+}
+
 function GroupLabel({ children }: Readonly<{ children: ReactNode }>) {
   return <p className="sidebar-expanded-only mb-0.5 mt-5 px-2 text-caption font-medium text-muted-foreground">{children}</p>
 }
@@ -131,7 +137,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
       <div className="sidebar-head flex items-center gap-1">
         <Link
           href="/"
-          className="flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-9"
+          className="sidebar-expanded-only flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-9"
           {...navTrack("/", area)}
         >
           <Image src="/rizky.jpg" alt="" width={20} height={20} className="size-5 shrink-0 rounded object-cover" />
@@ -147,6 +153,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
             <PageRow key={href} href={href} label={label} area={area} pathname={pathname} />
           ))}
         </ul>
+        <RailDivider />
         <GroupLabel>More</GroupLabel>
         <ul role="list">
           {NAV_SECTIONS.filter((section) => !section.head).map(({ href, label }) => (
@@ -154,7 +161,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
           ))}
           <PageRow href="/profile" label="Account" area={area} pathname={pathname} />
           <li>
-            <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="blog" data-track-area={area} className={ROW}>
+            <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="blog" data-track-area={area} data-tip="RSS feed" data-tip-rail className={ROW}>
               <Rss aria-hidden strokeWidth={1.5} />
               <span className="sidebar-label">RSS feed</span>
             </a>
@@ -163,15 +170,16 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
       </nav>
 
       <div className="mt-auto pt-6">
+        <RailDivider />
         <ul role="list" aria-label="Contact">
           <li>
-            <button type="button" data-open-feedback={area} aria-haspopup="dialog" className={ROW}>
+            <button type="button" data-open-feedback={area} aria-haspopup="dialog" data-tip="Send feedback" data-tip-rail className={ROW}>
               <MessageSquareText aria-hidden strokeWidth={1.5} />
               <span className="sidebar-label">Send feedback</span>
             </button>
           </li>
           <li>
-            <a href={`mailto:${EMAIL}`} data-track="email-click" data-track-area={area} className={ROW}>
+            <a href={`mailto:${EMAIL}`} data-track="email-click" data-track-area={area} data-tip="Email" data-tip-rail className={ROW}>
               <Mail aria-hidden strokeWidth={1.5} />
               <span className="sidebar-label truncate">Email</span>
             </a>
