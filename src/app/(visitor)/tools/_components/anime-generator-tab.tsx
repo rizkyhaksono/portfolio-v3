@@ -74,12 +74,12 @@ function Images() {
       {failed && <ToolError onRetry={generate}>The image did not load. Try again in a moment.</ToolError>}
 
       {picture ? (
-        <PlateFigure tone="color" className="w-fit max-w-full">
+        <PlateFigure className="w-fit max-w-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={picture.url} alt={`A random ${picture.category} image`} className="mx-auto h-auto max-h-[32rem] w-auto max-w-full" />
         </PlateFigure>
       ) : (
-        !failed && <p className="text-body text-ink-soft">Pick a category, then press Generate image.</p>
+        !failed && <p className="text-body text-muted-foreground">Pick a category, then press Generate image.</p>
       )}
     </div>
   )
@@ -112,14 +112,15 @@ function Quotes() {
       {error && <ToolError>{error}</ToolError>}
 
       {quote ? (
-        <figure className="border-l-2 border-ink pl-5">
-          <blockquote className="max-w-[60ch] font-display text-lead text-ink">&ldquo;{quote.content}&rdquo;</blockquote>
-          <figcaption className="mt-3 text-small text-ink-soft">
+        // Notion's quote block: a 3px ink bar beside the line.
+        <figure className="max-w-[60ch] border-l-[3px] border-foreground pl-4">
+          <blockquote className="text-body text-foreground">&ldquo;{quote.content}&rdquo;</blockquote>
+          <figcaption className="mt-2 text-small text-muted-foreground">
             {quote.character.name}, {quote.anime.name}
           </figcaption>
         </figure>
       ) : (
-        !error && <p className="text-body text-ink-soft">Press Get a quote for a random line from an anime.</p>
+        !error && <p className="text-body text-muted-foreground">Press Get a quote for a random line from an anime.</p>
       )}
     </div>
   )

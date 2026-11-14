@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3001';
+
 export default defineConfig({
   testDir: './__tests__/e2e',
   fullyParallel: true,
@@ -8,7 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:3001',
+    baseURL,
     trace: 'on-first-retry',
   },
 
@@ -47,9 +49,12 @@ export default defineConfig({
     // },
   ],
 
-  webServer: {
-    command: 'bun run start',
-    url: 'http://localhost:3001',
-    reuseExistingServer: !process.env.CI,
-  },
+  // An E2E_BASE_URL points at a server that is already running (a preview), so none is started.
+  webServer: process.env.E2E_BASE_URL
+    ? undefined
+    : {
+        command: 'bun run start',
+        url: baseURL,
+        reuseExistingServer: !process.env.CI,
+      },
 });

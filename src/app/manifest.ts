@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { MetadataConstants } from "@/commons/constants/metadata";
-import { PRINT_HEX } from "@/lib/print-hex";
+import { THEME_HEX } from "@/lib/theme-hex";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: MetadataConstants.description,
     start_url: "/",
     display: "standalone",
-    background_color: PRINT_HEX.paper,
-    theme_color: PRINT_HEX.paper,
+    background_color: THEME_HEX.light.background,
+    theme_color: THEME_HEX.light.background,
     icons: [
       {
         src: "/favicon.ico",

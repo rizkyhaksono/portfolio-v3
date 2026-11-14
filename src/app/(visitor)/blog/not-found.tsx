@@ -6,10 +6,9 @@ import NotFoundView from "@/components/ui/not-found-view"
 export default function BlogNotFound() {
   return (
     <>
-      <NotFoundView title="Article not found">
+      <NotFoundView title="There is no article at this address.">
         <p>
-          No article is printed at this address. It may have moved, or the link has a typo;{" "}
-          <InkLink href="/blog">the writing index</InkLink> lists everything.
+          It may have moved, or the link has a typo. <InkLink href="/blog">The writing page</InkLink> lists every article.
         </p>
       </NotFoundView>
       <NotFoundTrack />

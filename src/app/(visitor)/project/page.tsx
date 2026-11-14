@@ -1,121 +1,106 @@
-import Image from "next/image"
 import { getAllProject } from "@/services/visitor/project"
-import { getPathReads } from "@/services/visitor/umami"
+import { media_socials } from "@/commons/constants/contact"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { InkLink } from "@/components/ui/ink-link"
-import { LedgerList, LedgerRow } from "@/components/ui/ledger"
-import { PlateFigure } from "@/components/ui/plate-figure"
-import { ReaderCount } from "@/components/ui/reader-count"
+import { Gallery, MediaCard } from "@/components/ui/media-card"
+import { PageHeader } from "@/components/ui/page-header"
 import { StatusLine } from "@/components/ui/status-line"
-import { SECTION_SPACING } from "@/lib/design-system"
-import { canOptimizeImage } from "@/lib/image-hosts"
-import { ProjectLinks, plateOf } from "./project-links"
-import { plainText } from "./safe-html"
+import { selectFeaturedProjects } from "./featured"
+import { plateOf } from "./project-links"
+import { firstSentence, plainText } from "./safe-html"
 
 export const revalidate = 3600
 
 // The server runs in UTC; a project added on a Jakarta New Year's Eve belongs to the new year.
 const JAKARTA_YEAR = new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Asia/Jakarta" })
-/** Calendar year in Jakarta, or nothing when the date does not parse. */
+/** Calendar year in Jakarta, or "Undated" when the date does not parse. */
 const yearOf = (iso: string) => {
   const date = new Date(iso)
-  return Number.isNaN(date.getTime()) ? null : Number(JAKARTA_YEAR.format(date))
+  return Number.isNaN(date.getTime()) ? "Undated" : JAKARTA_YEAR.format(date)
 }
 
-const FEATURED_PROJECTS = [
-  ["info pangan jakarta", "info pangan"],
-  ["adaro water solution", "adaro water"],
-  ["ecrf biofarma", "ecrf", "biofarma"],
-] as const
+type Project = Awaited<ReturnType<typeof getAllProject>>[number]
 
-/** Normalizes project titles before curated matching. */
-function normalizeTitle(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()
+function byYear(projects: Project[]) {
+  const years = new Map<string, Project[]>()
+  for (const project of projects) {
+    const year = yearOf(project.created_at)
+    years.set(year, [...(years.get(year) ?? []), project])
+  }
+  return years
 }
 
-/** Picks the requested projects in a stable editorial order. */
-function selectFeaturedProjects<T extends { title: string }>(projects: T[]): T[] {
-  return FEATURED_PROJECTS.flatMap((aliases) => {
-    const match = projects.find((project) => aliases.some((alias) => normalizeTitle(project.title).includes(alias)))
-    return match ? [match] : []
-  })
+const GITHUB = media_socials.find((social) => social.title === "GitHub")?.href ?? "https://github.com/rizkyhaksono"
+
+/** Notion's gallery view grouped by a property: a small muted label with the count, then the cards. */
+function ProjectGroup({ id, label, projects, lead }: Readonly<{ id: string; label: string; projects: Project[]; lead?: boolean }>) {
+  return (
+    <section aria-labelledby={id} className="mt-10 first:mt-0">
+      <h2 id={id} className="mb-2 flex items-baseline gap-2 text-small font-medium text-muted-foreground">
+        {label}
+        <span className="font-normal tabular-nums">
+          {projects.length}
+          <span className="sr-only"> {projects.length === 1 ? "project" : "projects"}</span>
+        </span>
+      </h2>
+      <Gallery>
+        {projects.map((project, i) => (
+          <li key={project.id}>
+            <MediaCard
+              href={`/project/${project.id}`}
+              image={plateOf(project)}
+              title={project.title}
+              description={firstSentence(plainText(project.description))}
+              meta={yearOf(project.created_at)}
+              priority={lead && i === 0}
+            />
+          </li>
+        ))}
+      </Gallery>
+    </section>
+  )
 }
 
 export default async function ProjectPage() {
-  const [projects, reads] = await Promise.all([getAllProject(), getPathReads()])
+  // A thrown fetch shows the failed line; Supabase errors already come back as an empty list.
+  const projects = await getAllProject().catch(() => null)
+  const icon = <SectionIcon href="/project" />
+
+  if (!projects) {
+    return (
+      <div>
+        <PageHeader icon={icon} title="Projects" />
+        <StatusLine kind="failed">
+          The projects did not load just now. Try again in a few minutes, or browse the code on{" "}
+          <span className="whitespace-nowrap">
+            <InkLink href={GITHUB} external>
+              GitHub
+            </InkLink>
+            .
+          </span>
+        </StatusLine>
+      </div>
+    )
+  }
+
   const featured = selectFeaturedProjects(projects)
   const featuredIds = new Set(featured.map((project) => project.id))
   const rest = projects.filter((project) => !featuredIds.has(project.id))
-  // The first featured plate is the LCP image on phones, so it must not wait as a lazy image.
-  const leadPlateId = featured.find((project) => plateOf(project))?.id
 
   return (
     <div>
-      <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Projects</h1>
-        {projects.length > 0 && (
-          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
-            {projects.length.toLocaleString("en")} projects on record, the featured work first.
-          </p>
-        )}
-      </header>
-      <div aria-hidden className="border-t border-ink" />
+      <PageHeader
+        icon={icon}
+        title="Projects"
+        description={projects.length > 0 ? `${projects.length.toLocaleString("en")} projects. The hand-picked ones first.` : undefined}
+      />
 
-      {projects.length === 0 && (
-        <StatusLine kind="empty" className="mt-8">
-          No projects are published yet.
-        </StatusLine>
-      )}
+      {projects.length === 0 && <StatusLine kind="empty">No projects are listed right now.</StatusLine>}
 
-      {featured.length > 0 && (
-        <section aria-labelledby="featured" className="mt-12">
-          <h2 id="featured" className="font-display text-h2 text-ink">
-            Featured
-          </h2>
-          <div className="mt-6 border-t border-ink">
-            {featured.map((project) => {
-              const plate = plateOf(project)
-              return (
-                <article key={project.id} className="grid gap-6 border-b border-rule py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:gap-10">
-                  <div className="min-w-0">
-                    <h3 className="font-display text-h3 text-balance text-ink">
-                      <InkLink href={`/project/${project.id}`} className="no-underline hover:underline">
-                        {project.title}
-                      </InkLink>
-                    </h3>
-                    <p className="mt-3 line-clamp-4 max-w-[66ch] text-body text-ink-soft">{plainText(project.description)}</p>
-                    <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-3" />
-                    <ProjectLinks project={project} className="mt-3" />
-                  </div>
-                  {plate && (
-                    <PlateFigure className="order-first md:sticky md:order-none md:top-[calc(var(--head-h)+1.5rem)] md:self-start">
-                      <div className="relative aspect-[16/10]">
-                        <Image src={plate} alt="" fill priority={project.id === leadPlateId} unoptimized={!canOptimizeImage(plate)} sizes="(min-width: 768px) 20rem, 100vw" className="object-cover object-top" />
-                      </div>
-                    </PlateFigure>
-                  )}
-                </article>
-              )
-            })}
-          </div>
-        </section>
-      )}
-
-      {rest.length > 0 && (
-        <section aria-labelledby="more" className={SECTION_SPACING.section}>
-          <h2 id="more" className="font-display text-h2 text-ink">
-            {featured.length > 0 ? "More projects" : "All projects"}
-          </h2>
-          <LedgerList className="mt-6">
-            {rest.map((project) => (
-              <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} meta={yearOf(project.created_at)}>
-                <p className="line-clamp-2 max-w-[60ch]">{plainText(project.description)}</p>
-                <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
-                <ProjectLinks project={project} className="mt-1" />
-              </LedgerRow>
-            ))}
-          </LedgerList>
-        </section>
-      )}
+      {featured.length > 0 && <ProjectGroup id="hand-picked" label="Hand-picked" projects={featured} lead />}
+      {[...byYear(rest)].map(([year, rows], i) => (
+        <ProjectGroup key={year} id={`year-${year}`} label={year} projects={rows} lead={featured.length === 0 && i === 0} />
+      ))}
     </div>
   )
 }

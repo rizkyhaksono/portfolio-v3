@@ -13,7 +13,7 @@ export function GET() {
   const author = authors.rizky;
 
   const feed = new Feed({
-    title: "Rizky Haksono — Changelog",
+    title: "Rizky Haksono: Changelog",
     description: "Release notes and platform updates",
     id: `${base}/changelog`,
     link: `${base}/changelog`,

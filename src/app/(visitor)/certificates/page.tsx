@@ -1,8 +1,10 @@
 import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationRow } from "@/app/_components/certification/certification-card"
-import { LedgerList } from "@/components/ui/ledger"
+import { PageHeader } from "@/components/ui/page-header"
 import { StatusLine } from "@/components/ui/status-line"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { SectionIcon } from "@/components/layout/section-icons"
 
 export const revalidate = 3600
 
@@ -19,39 +21,52 @@ async function getAllCertifications(): Promise<LinkedinCertification[]> {
 
 const yearOf = (cert: LinkedinCertification) => /^\d{4}/.exec(cert.issued ?? "")?.[0] ?? "Undated"
 
+/** Notion's table view, grouped by year: a small group label with its count over a hairline table per year. */
 export default async function CertificatesPage() {
   const certifications = await getAllCertifications()
   const years = new Map<string, LinkedinCertification[]>()
   for (const cert of certifications) years.set(yearOf(cert), [...(years.get(yearOf(cert)) ?? []), cert])
 
   return (
-    <div>
-      <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Certificates</h1>
-        {certifications.length > 0 && (
-          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
-            {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.
-          </p>
-        )}
-      </header>
-      <div aria-hidden className="border-t border-ink" />
+    <>
+      <PageHeader
+        icon={<SectionIcon href="/certificates" />}
+        title="Certificates"
+        description={certifications.length > 0 && `${certifications.length.toLocaleString("en")} certificates and courses on record, newest first.`}
+      />
 
       {certifications.length === 0 ? (
-        <StatusLine kind="failed" className="mt-8">
-          The record could not be loaded just now. Try again in a few minutes.
-        </StatusLine>
+        <StatusLine kind="failed">The record could not be loaded just now. Try again in a few minutes.</StatusLine>
       ) : (
-        // The head rule tops the first year, so its own top rule would stack under it.
-        <div className="mt-8 [&>:first-child]:border-t-0">
+        <div className="space-y-8">
           {[...years].map(([year, rows]) => (
-            <LedgerList key={year} marker={<h2>{year}</h2>}>
-              {rows.map((cert) => (
-                <CertificationRow key={cert.id} certification={cert} />
-              ))}
-            </LedgerList>
+            <section key={year} aria-labelledby={`year-${year}`}>
+              <h2 id={`year-${year}`} className="mb-2 flex items-baseline gap-2 text-small font-medium text-foreground">
+                {year}
+                <span className="font-normal tabular-nums text-muted-foreground">
+                  {rows.length}
+                  <span className="sr-only"> {rows.length === 1 ? "certificate" : "certificates"}</span>
+                </span>
+              </h2>
+              <Table className="min-w-[40rem] table-fixed">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead scope="col">Name</TableHead>
+                    <TableHead scope="col" className="w-48">Issuer</TableHead>
+                    <TableHead scope="col" className="w-24">Issued</TableHead>
+                    <TableHead scope="col" className="w-32">Link</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rows.map((cert) => (
+                    <CertificationRow key={cert.id} certification={cert} />
+                  ))}
+                </TableBody>
+              </Table>
+            </section>
           ))}
         </div>
       )}
-    </div>
+    </>
   )
 }

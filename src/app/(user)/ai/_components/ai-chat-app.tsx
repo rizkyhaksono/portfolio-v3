@@ -53,14 +53,14 @@ function Letter({ m }: Readonly<{ m: Message }>) {
   if (m.role === "user") {
     return (
       <div>
-        <p className="text-small font-semibold text-ink">You</p>
-        <p className="mt-1 whitespace-pre-wrap break-words text-body text-ink">{m.msg}</p>
+        <p className="text-small font-semibold text-foreground">You</p>
+        <p className="mt-1 whitespace-pre-wrap break-words text-body text-foreground">{m.msg}</p>
       </div>
     )
   }
   return (
-    <div className="border-l border-ink pl-4">
-      <p className="text-small font-semibold text-ink">Etan</p>
+    <div className="border-l border-foreground pl-4">
+      <p className="text-small font-semibold text-foreground">Etan</p>
       {m.msg ? (
         <div className="prose prose--chat mt-1 break-words">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN}>
@@ -68,7 +68,7 @@ function Letter({ m }: Readonly<{ m: Message }>) {
           </ReactMarkdown>
         </div>
       ) : (
-        <p className="mt-1 font-display text-caption text-ink-soft">Writing…</p>
+        <p className="mt-1 text-caption text-muted-foreground">Writing…</p>
       )}
     </div>
   )
@@ -89,26 +89,26 @@ function SessionList({
   onPending: (p: PendingAction) => void
 }>) {
   if (sessions.length === 0) {
-    return <p className="p-3 font-display text-caption text-ink-soft">No conversations yet. Your first message starts one.</p>
+    return <p className="p-3 text-caption text-muted-foreground">No conversations yet. Your first message starts one.</p>
   }
   const action = "underline-offset-[0.18em] hover:underline disabled:no-underline disabled:opacity-60 [@media(pointer:coarse)]:min-h-11"
   return (
-    <ul role="list" className="divide-y divide-rule border-b border-rule">
+    <ul role="list" className="divide-y divide-border border-b border-border">
       {sessions.map((s) => {
         const count = s.messages?.length ?? s.messageCount ?? 0
         return (
-          <li key={s.id} className={cn("px-3 py-2.5", s.id === activeId && "bg-tint")}>
+          <li key={s.id} className={cn("px-3 py-2.5", s.id === activeId && "bg-muted")}>
             <button
               type="button"
               onClick={() => onSelect(s)}
               disabled={busy}
               aria-current={s.id === activeId || undefined}
-              className="block w-full truncate text-left text-small font-semibold text-ink underline-offset-[0.18em] hover:underline disabled:no-underline [@media(pointer:coarse)]:min-h-11"
+              className="block w-full truncate text-left text-small font-semibold text-foreground underline-offset-[0.18em] hover:underline disabled:no-underline [@media(pointer:coarse)]:min-h-11"
             >
               {s.title || "Untitled conversation"}
             </button>
-            <div className="mt-0.5 flex items-center gap-3 text-caption text-ink-soft">
-              <span className="font-display tabular-nums">
+            <div className="mt-0.5 flex items-center gap-3 text-caption text-muted-foreground">
+              <span className="tabular-nums">
                 {count} {count === 1 ? "message" : "messages"}
               </span>
               <button type="button" disabled={busy} onClick={() => onPending({ kind: "rename", session: s })} className={cn("ml-auto", action)}>
@@ -368,11 +368,11 @@ export default function AIChatApp({
   return (
     <div
       data-private
-      className="grid h-[calc(100dvh-16rem)] min-h-[24rem] grid-rows-[minmax(0,1fr)] border border-rule md:h-[calc(100dvh-14rem)] md:min-h-[30rem] md:grid-cols-[16rem_minmax(0,1fr)]"
+      className="grid h-[calc(100dvh-16rem)] min-h-[24rem] grid-rows-[minmax(0,1fr)] border border-border md:h-[calc(100dvh-14rem)] md:min-h-[30rem] md:grid-cols-[16rem_minmax(0,1fr)]"
     >
-      <aside aria-label="Conversations" className="hidden min-h-0 flex-col border-r border-rule md:flex">
-        <div className="flex items-center justify-between gap-2 border-b border-rule p-3">
-          <h2 className="font-display text-h4 text-ink">Conversations</h2>
+      <aside aria-label="Conversations" className="hidden min-h-0 flex-col border-r border-border md:flex">
+        <div className="flex items-center justify-between gap-2 border-b border-border p-3">
+          <h2 className="text-h4 text-foreground">Conversations</h2>
           <Button size="sm" variant="outline" onClick={newChat} disabled={loading}>
             New chat
           </Button>
@@ -381,8 +381,8 @@ export default function AIChatApp({
       </aside>
 
       <section aria-label="Conversation" className="flex min-h-0 min-w-0 flex-col">
-        <div className="flex items-center gap-2 border-b border-rule p-3">
-          <h2 className="min-w-0 flex-1 truncate font-display text-h4 text-ink">{activeTitle || "New conversation"}</h2>
+        <div className="flex items-center gap-2 border-b border-border p-3">
+          <h2 className="min-w-0 flex-1 truncate text-h4 text-foreground">{activeTitle || "New conversation"}</h2>
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
               <Button size="sm" variant="outline" className="md:hidden">
@@ -405,13 +405,13 @@ export default function AIChatApp({
         <div ref={scrollRef} aria-busy={loading || opening} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="max-w-[66ch] space-y-6">
             {opening ? (
-              <p role="status" className="font-display text-caption text-ink-soft">
+              <p role="status" className="text-caption text-muted-foreground">
                 Opening the conversation…
               </p>
             ) : messages.length === 0 && !loading ? (
               <div>
-                <h3 className="font-display text-h3 text-ink">Ask Etan anything</h3>
-                <p className="mt-2 max-w-[52ch] text-body text-ink-soft">
+                <h3 className="text-h3 text-foreground">Ask Etan anything</h3>
+                <p className="mt-2 max-w-[52ch] text-body text-muted-foreground">
                   Questions about Rizky&apos;s projects, skills or background are answered from his own records. Each
                   conversation is saved to your account.
                 </p>
@@ -420,13 +420,13 @@ export default function AIChatApp({
               messages.map((m) => <Letter key={m.id} m={m} />)
             )}
             {loading && messages[messages.length - 1]?.role !== "model" && (
-              <p className="border-l border-ink pl-4 font-display text-caption text-ink-soft">Etan is writing…</p>
+              <p className="border-l border-foreground pl-4 text-caption text-muted-foreground">Etan is writing…</p>
             )}
           </div>
         </div>
 
         {error && (
-          <ErrorNote className="border-t border-rule px-4 py-3">
+          <ErrorNote className="border-t border-border px-4 py-3">
             {error.message}
             {error.signIn && (
               <>
@@ -437,7 +437,7 @@ export default function AIChatApp({
           </ErrorNote>
         )}
 
-        <form onSubmit={send} className="border-t border-rule p-3 sm:p-4">
+        <form onSubmit={send} className="border-t border-border p-3 sm:p-4">
           <Label htmlFor="ai-message">Your message</Label>
           <Input
             id="ai-message"
@@ -462,7 +462,7 @@ export default function AIChatApp({
               />
             )}
             {limitNote && (
-              <p id="ai-limit" className="font-display text-caption tabular-nums text-ink-soft">
+              <p id="ai-limit" className="text-caption tabular-nums text-muted-foreground">
                 {limitNote}
               </p>
             )}

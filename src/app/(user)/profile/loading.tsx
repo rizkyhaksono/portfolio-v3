@@ -1,19 +1,22 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-/** Static ruled stand-in for the profile sheet while the account server answers. No pulse. */
+const ROWS = ["w-2/3", "w-1/3", "w-1/2", "w-1/3", "w-1/4"]
+
+/** Notion skeleton of the profile while the account server answers: avatar, name, property rows. */
 export default function ProfileLoading() {
   return (
-    <div role="status" className="w-full border border-ink p-[3px]">
+    <div role="status" className="w-full">
       <span className="sr-only">Loading your profile…</span>
-      <div aria-hidden className="border border-rule p-5 sm:p-8">
-        <div className="flex items-end gap-5 pb-6">
-          <Skeleton className="h-20 w-20 sm:h-24 sm:w-24" />
-          <Skeleton className="h-10 flex-1" />
-        </div>
-        <div className="border-t border-ink" />
-        <div className="mt-8 flex flex-col gap-4">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-5 w-1/2" />
+      <div aria-hidden>
+        <Skeleton className="size-16 rounded-full" />
+        <Skeleton className="mt-4 h-10 w-1/2 rounded-lg" />
+        <div className="mt-5 flex flex-col gap-2">
+          {ROWS.map((width, i) => (
+            <div key={i} className="flex h-8 items-center gap-2">
+              <Skeleton className="h-4 w-28 shrink-0" />
+              <Skeleton className={`h-4 ${width}`} />
+            </div>
+          ))}
         </div>
       </div>
     </div>

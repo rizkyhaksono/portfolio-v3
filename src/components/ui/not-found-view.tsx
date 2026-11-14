@@ -1,32 +1,34 @@
-import { InkLink } from "@/components/ui/ink-link"
-import { Logo } from "@/components/ui/logo"
+import Link from "next/link"
+import { FileQuestion } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 interface NotFoundViewProps {
   title?: string
-  /** Replaces the default standfirst; error.tsx passes its message and a retry button here. */
+  /** Replaces the default line. */
   children?: React.ReactNode
+  /** A button set before the ways back, such as error.tsx's retry. */
+  action?: React.ReactNode
   className?: string
 }
 
-/** Not found pattern: the mark, italic title, one standfirst, two ways back. */
-export function NotFoundView({ title = "Page not found", children, className }: Readonly<NotFoundViewProps>) {
+/** Notion's empty page: a large muted icon, a short title, one muted line and the ways back as buttons. */
+export function NotFoundView({ title = "There is no page at this address.", children, action, className }: Readonly<NotFoundViewProps>) {
   return (
-    <section className={cn("w-full py-8 md:py-24", className)}>
-      <div className="max-w-[40rem]">
-        <Logo variant="mark" label="Rizky Haksono" className="mb-6 w-20 sm:w-24" />
-        <h1 className="speckle font-display text-h1 text-balance text-ink">{title}</h1>
-        <div className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">
-          {children ?? <p>Nothing is printed at this address. The page may have moved, or the link has a typo.</p>}
-        </div>
-        <ul role="list" className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-body">
-          <li>
-            <InkLink href="/" className="inline-flex min-h-11 items-center md:min-h-0">Home</InkLink>
-          </li>
-          <li>
-            <InkLink href="/project" className="inline-flex min-h-11 items-center md:min-h-0">Projects</InkLink>
-          </li>
-        </ul>
+    <section className={cn("w-full", className)}>
+      <FileQuestion aria-hidden strokeWidth={1.25} className="mb-4 size-14 text-muted-foreground" />
+      <h1 className="text-h1 text-balance text-foreground">{title}</h1>
+      <div className="mt-2 text-pretty text-body text-muted-foreground">
+        {children ?? <p>It may have moved, or the link has a typo.</p>}
+      </div>
+      <div className="mt-6 flex flex-wrap gap-2">
+        {action}
+        <Button asChild variant="outline" className="min-h-11 md:min-h-8">
+          <Link href="/">Go home</Link>
+        </Button>
+        <Button asChild variant="ghost" className="min-h-11 md:min-h-8">
+          <Link href="/project">See the projects</Link>
+        </Button>
       </div>
     </section>
   )

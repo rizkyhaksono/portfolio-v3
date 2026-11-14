@@ -122,21 +122,21 @@ export function ContactForm() {
       noValidate
       data-private
       aria-describedby="contact-status"
-      className="space-y-6"
+      className="space-y-5"
     >
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-2">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div className="space-y-1.5">
           <Label htmlFor="contact-email">Your email</Label>
           <Input id="contact-email" type="email" autoComplete="email" required disabled={busy} {...fieldProps("email")} />
           {fieldError("email")}
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Label htmlFor="contact-name">Your name</Label>
           <Input id="contact-name" autoComplete="name" required disabled={busy} {...fieldProps("name")} />
           {fieldError("name")}
         </div>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <Label htmlFor="contact-message">Message</Label>
         <Textarea id="contact-message" rows={6} maxLength={5000} required disabled={busy} className="resize-y" {...fieldProps("message")} />
         {fieldError("message")}
@@ -155,11 +155,11 @@ export function ContactForm() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <Button type="submit" disabled={busy}>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+        <Button type="submit" size="lg" disabled={busy}>
           {busy ? "Sending…" : "Send the message"}
         </Button>
-        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 font-display text-small text-ink">
+        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 text-small text-foreground">
           {status.kind === "sent" && (
             <>
               <Check aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />

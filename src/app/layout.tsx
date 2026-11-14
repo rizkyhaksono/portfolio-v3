@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { headers } from "next/headers"
 import Script from "next/script"
-import { Plus_Jakarta_Sans } from "next/font/google"
+import { Onest } from "next/font/google"
 import { ThemeProvider } from "@/components/layout/theme-provider"
 import { HoverTip } from "@/components/ui/hover-tip"
 import { Toaster } from "@/components/layout/toaster"
@@ -10,14 +10,12 @@ import { getMetadataBaseUrl } from "@/lib/site-url"
 import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
 import { UmamiBootstrapScript } from "@/components/layout/umami-bootstrap-script"
-import { PRINT_HEX } from "@/lib/print-hex"
-import { PlateFilters } from "@/components/ui/plate-filters"
+import { THEME_HEX } from "@/lib/theme-hex"
 import "./globals.css"
 
-// Plus Jakarta Sans only (Tokotype, OFL): one variable family, roman and italic.
-const fontSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
+// Onest only (OFL): one clean sans in the spirit of Apple's SF, for the site, the admin and the cards.
+const fontSans = Onest({
+  subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
   display: "swap",
   adjustFontFallback: true,
@@ -53,8 +51,8 @@ export const metadata: Metadata = {
   alternates: {
     types: {
       "application/rss+xml": [
-        { url: "/feed.xml", title: "Rizky Haksono — Blog" },
-        { url: "/changelog.xml", title: "Rizky Haksono — Changelog" },
+        { url: "/feed.xml", title: "Rizky Haksono: Writing" },
+        { url: "/changelog.xml", title: "Rizky Haksono: Changelog" },
       ],
     },
   },
@@ -63,7 +61,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   // dvh app shells (/chat, /ai) shrink above the Android keyboard instead of panning.
   interactiveWidget: "resizes-content",
-  themeColor: PRINT_HEX.paper,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_HEX.light.background },
+    { media: "(prefers-color-scheme: dark)", color: THEME_HEX.dark.background },
+  ],
 }
 
 /** App shell: fonts, theme, analytics bootstrap, and global UI primitives. */
@@ -96,8 +97,7 @@ export default async function RootLayout({
         )}
       </head>
       <body className="font-sans antialiased">
-        <PlateFilters />
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange nonce={nonce}>
           {children}
           <UmamiRecorder />
           <HoverTip />

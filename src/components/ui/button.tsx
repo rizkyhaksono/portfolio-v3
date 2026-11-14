@@ -5,27 +5,26 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-// One ink: solid, outline, or underline. Destructive is an outline with a cross and a verb, never red.
+// Notion buttons: 6px corners, 14px medium text, a flat fill or a translucent hover, no lift and no shadow.
+// Destructive keeps its cross, so the danger never rests on colour alone.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-print)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-rule-strong disabled:text-ink-soft [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-small font-medium transition-colors duration-press ease-out disabled:pointer-events-none disabled:opacity-40 [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Disabled is a dashed empty slot in tokens, not a faded fill (opacity greys the ink in Night print).
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 disabled:border disabled:bg-tint",
-        destructive:
-          "border border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground",
-        outline: "border border-ink bg-transparent text-ink hover:bg-tint",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-rule/60",
-        ghost: "text-ink decoration-1 underline-offset-[0.18em] hover:underline",
-        link: "text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2",
+        default: "bg-foreground text-background hover:bg-foreground/85",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-foreground/15 bg-background text-foreground hover:bg-tint",
+        secondary: "bg-tint text-foreground hover:bg-tint-strong",
+        ghost: "text-foreground hover:bg-tint",
+        link: "text-foreground underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-8 px-3 text-small",
-        lg: "h-11 px-6",
-        xl: "h-12 px-7 text-base",
-        icon: "h-10 w-10 [@media(pointer:coarse)]:min-w-11",
+        default: "h-8 px-3",
+        sm: "h-7 px-2",
+        lg: "h-10 px-4",
+        xl: "h-11 px-5 text-body",
+        icon: "size-8 [@media(pointer:coarse)]:min-w-11",
       },
     },
     defaultVariants: {

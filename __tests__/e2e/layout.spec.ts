@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// Every visitor pattern once: ledger, article, plates, cabinet, correspondence, board, figures, auth, not found.
+// Every visitor page once (lists, articles, apps, figures), plus auth, the admin login and not found.
 const ROUTES = [
   '/',
   '/blog',

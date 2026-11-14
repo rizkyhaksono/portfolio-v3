@@ -14,7 +14,7 @@ export async function GET() {
   const author = authors.rizky;
 
   const feed = new Feed({
-    title: "Rizky Haksono — Blog",
+    title: "Rizky Haksono: Writing",
     description: MetadataConstants.description,
     id: `${base}/`,
     link: `${base}/blog`,

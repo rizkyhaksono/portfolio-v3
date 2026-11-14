@@ -51,6 +51,8 @@ function useUmamiRecorder(pathname: string) {
 /** Mounted once in the root layout so it also sees admin and auth routes, which have no BaseLayout. */
 export function UmamiRecorder() {
   useUmamiRecorder(usePathname())
+  // Root-mounted, so `data-track` clicks count on every page, the auth pages (no BaseLayout) included.
+  useEffect(() => installTrackDelegation(), [])
   return null
 }
 
@@ -61,7 +63,7 @@ function focusOrigin(from: Element | null): HTMLElement | null {
 }
 
 /**
- * BaseLayout's client tools. The `data-track` listener installs at mount; the feedback dialog loads on a
+ * BaseLayout's client tools. The feedback dialog loads on a
  * `[data-open-feedback]` click; the terminal waits for the page to settle.
  */
 export function DeferredClientUtilities() {
@@ -74,8 +76,6 @@ export function DeferredClientUtilities() {
     event.preventDefault()
     returnFocus.current?.focus({ preventScroll: true })
   }, [])
-
-  useEffect(() => installTrackDelegation(), [])
 
   // Pictures are not drag sources; Chromium and Safari take this from CSS, Firefox needs the event.
   useEffect(() => {

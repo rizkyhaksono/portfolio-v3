@@ -113,40 +113,40 @@ export function NotificationBell() {
         <Button variant="ghost" size="icon" className="relative" aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}>
           <Bell strokeWidth={1.5} aria-hidden />
           {unread > 0 && (
-            <span aria-hidden className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center bg-ink px-1 text-caption font-semibold leading-none tabular-nums text-paper">
+            <span aria-hidden className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center bg-foreground px-1 text-caption font-semibold leading-none tabular-nums text-background">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" {...hover.content} className="w-[min(20rem,calc(100vw-2rem))] p-0">
-        <div className="flex items-center justify-between gap-3 border-b border-ink px-3 py-2">
-          <p className="font-display text-h4 text-ink">Notifications</p>
+        <div className="flex items-center justify-between gap-3 border-b border-foreground px-3 py-2">
+          <p className="text-h4 text-foreground">Notifications</p>
           {unread > 0 && (
-            <button type="button" onClick={markAllRead} className="text-small text-ink underline-offset-[0.18em] hover:underline">
+            <button type="button" onClick={markAllRead} className="text-small text-foreground underline-offset-[0.18em] hover:underline">
               Mark all read
             </button>
           )}
         </div>
         <div className="max-h-[60vh] overflow-y-auto">
           {items.length === 0 ? (
-            <p className="px-3 py-8 text-center font-display text-small text-ink-soft">Nothing new.</p>
+            <p className="px-3 py-8 text-center text-small text-muted-foreground">Nothing new.</p>
           ) : (
             items.map((n) => (
-              <div key={n.id} className="border-b border-rule last:border-b-0">
+              <div key={n.id} className="border-b border-border last:border-b-0">
                 <DropdownMenuItem asChild className="block px-3 py-2.5">
                   <Link href={safeRedirect(n.href, "/admin/dashboard")}>
                     <span className="flex items-baseline gap-2">
                       {isUnread(n) && (
-                        <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-ink">
-                          <span aria-hidden className="size-2 bg-ink" />
+                        <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-foreground">
+                          <span aria-hidden className="size-2 bg-foreground" />
                           New
                         </span>
                       )}
-                      <span className="truncate text-small font-semibold text-ink">{n.title}</span>
+                      <span className="truncate text-small font-semibold text-foreground">{n.title}</span>
                     </span>
-                    {n.detail && <span className="mt-0.5 block truncate text-small text-ink-soft">{n.detail}</span>}
-                    <span className="mt-0.5 block font-display text-caption text-ink-soft">{timeAgo(n.createdAt)}</span>
+                    {n.detail && <span className="mt-0.5 block truncate text-small text-muted-foreground">{n.detail}</span>}
+                    <span className="mt-0.5 block text-caption text-muted-foreground">{timeAgo(n.createdAt)}</span>
                   </Link>
                 </DropdownMenuItem>
               </div>

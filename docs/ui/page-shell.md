@@ -2,100 +2,143 @@
 
 ## Shell
 
-```
-1024px and up
-  Running head (sticky, 52px, paper + grain, 1px rule below):
-    [RH mark]   Projects Writing Etan AI Chat Roadmap Tools Stats   [theme] [Account]
-  Bleed slot (home masthead only)
-  main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
-  Ink rule (single, 1px)
-  Colophon: RH mark beside name, role, email / Read, Try, Site columns / credit line / Send feedback, Back to top
-  Engraving band, full bleed, 100:26 (about 26vw tall), at most 440px, at least min(200px, 18svh)
+Every visitor page is laid out like a Notion workspace: a grey page tree on the left, a thin top bar with the page's path, then the page in Notion's 708px column.
 
-768px to 1023px   wordmark, Projects Writing Etan AI, [Search] [menu icon]
-under 768px       wordmark, [menu icon]   (48px head, 44px targets)
+```
+┌────────────────────┬──────────────────────────────────────────────────────────────┐
+│ [R] Rizky Haksono  │ [≡] (below lg)  ⌂ Rizky Haksono / ✎ Writing          [◐]     │  top bar, 44px
+│                    ├──────────────────────────────────────────────────────────────┤
+│ ⌂ Home             │                                                              │
+│ ▦ Projects         │        ✎                                  page icon          │
+│ ✎ Writing          │        Writing                            40px bold title    │
+│ ⌖ Roadmap          │        Essays and notes on AI and ...     muted description  │
+│ ⚒ Tools            │                                                              │
+│ ▥ Stats            │        2026                               group label        │
+│ ✉ Chat             │        ▤ A post title          3 Mar      list view rows     │
+│                    │        ▤ Another post          1 Feb      (tint on hover)    │
+│ More               │                                                              │
+│ ✪ Certificates     │        ...                                                   │
+│ ↺ Changelog        │                                                              │
+│ ◯ Account          │        ──────────────────────────────────                    │
+│ ⌁ RSS feed         │        © 2026 Rizky Haksono. 14:05 in Malang   email         │  closing line
+│                    │                                                              │
+│ ✉ Send feedback    │                                                              │
+│ @ Email            │                                                              │
+│ ⌥ GitHub           │                                                              │
+│ in LinkedIn        │                                                              │
+│ [Light|Dark|System]│                                                              │
+│ Privacy  Terms     │                                                              │
+└────────────────────┴──────────────────────────────────────────────────────────────┘
+  sidebar: bg-muted, 15rem, lg and up                page column: 708px, centred in the space
 ```
 
-- If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
-- Certificates and Changelog live in the colophon and the menu.
-- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
-- The colophon (full variant) is one field with the page: the theme's own paper and grain, no rules; mark, name, job line, email, Send feedback and Back to top on the left, the Read / Try / Site columns on the right, and the Hollar plate (`<Engraving crop="band" fade />`) fading up into the field at the bottom. The type and plate credits live in the Colophon section at the foot of `/changelog`.
-- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon and terminal overlay all import it.
+### Sidebar
+
+`src/components/layout/sidebar.tsx` (the `aside`) and `sidebar-nav.tsx` (the tree, a client component).
+
+- **Where.** From `lg`, a sticky full-height `aside` (`aria-label="Site"`), `w-60` (15rem), `bg-muted`, no border. Below `lg` it is hidden and the same `SidebarNav` opens in the menu sheet.
+- **Owner's row.** The 20px portrait (`rounded`) and "Rizky Haksono" in `small` at weight 500, linking home.
+- **Main pages.** "Home", then the `NAV_SECTIONS` entries with `head` set (Projects, Writing, Roadmap, Tools, Stats, Chat), each with its 16px lucide icon from `SECTION_ICONS`.
+- **More.** A `caption` muted group label, then the other sections (Certificates, Changelog), Account (`/profile`) and the RSS feed.
+- **Bottom block** (pushed down with `mt-auto`): Send feedback (`data-open-feedback`), Email, GitHub and LinkedIn; the segmented Light, Dark and System radio group; then the legal links (Privacy, Terms) in `caption`.
+- **Rows.** `text-small text-muted-foreground`, `rounded-md`, 28px tall from `lg` (44px below), a 16px icon with `strokeWidth={1.5}`. Hover and the current page (`aria-current="page"`) get `bg-tint` and ink text; the current page is also weight 500.
+- Internal rows use `navTrack(href, area)`; outside rows carry `data-umami-event="social-click"` with `area: sidebar` (or `menu` in the sheet).
+
+### Top bar
+
+`src/components/layout/top-bar.tsx`. Notion's top bar: 44px (`--head-h`), sticky, opaque `bg-background`, no border, no blur, no shadow. It carries `viewTransitionName: site-header`.
+
+- **Left, below `lg`:** the "Menu" button (`ContentsTrigger`, a `PanelLeft` icon, `aria-label="Menu"`, `data-umami-event="menu-open"`). Keep the name "Menu": e2e tests find it.
+- **Breadcrumb** (`breadcrumb.tsx`): "Rizky Haksono" with the home icon, then `/` and the section this page belongs to (from `NAV_SECTIONS`, `LEGAL_LINKS` or Account), each with its icon. Only two levels. `aria-current="page"` on the crumb that is the page itself.
+- **Right:** `ThemeToggle`, a ghost icon button labelled "Dark theme" with `aria-pressed`.
+
+### Menu sheet
+
+`src/components/layout/contents-sheet.tsx`, loaded on first open by `contents-trigger.tsx`. Below `lg` the sidebar tree slides in from the left in a Radix sheet, `bg-muted`, 18rem wide (at most 85vw), with an sr-only "Menu" title. Any link or the feedback button inside closes it, and focus returns to the trigger.
+
+### Page icon and title
+
+Every page opens with `PageHeader` (or `ArticleShell` on article pages): the page's lucide icon at 56px from `SECTION_ICONS` (`<SectionIcon href="/blog" />`), then the title at `text-title sm:text-display` (32px, 40px from `sm`, weight 700), an optional muted description, and an optional slot for `Properties`, view tabs or a feed link. One per page.
+
+### Closing line
+
+`src/components/layout/footer.tsx`. The page ends on one quiet line in the page column, over a hairline: "© {year} Rizky Haksono. {HH:MM} in Malang" (`MalangClock`) and the email as a muted `InkLink` (`email-click`, `area: colophon`). `caption` muted text. The sidebar holds every other link. There is no sky band and no link row.
+
+`src/commons/constants/navigation-menu.ts` is the only nav source (`NAV_SECTIONS`, `LEGAL_LINKS`, `isCurrentPath`, `navTrack`). The sidebar, the menu sheet, the breadcrumb and the terminal overlay all import it. `SECTION_ICONS` in `src/components/layout/section-icons.tsx` is the only icon map for pages.
 
 ### BaseLayout
 
-File: `src/components/layout/base-layout.tsx`. It is a server component and reads no cookies, so pages under it can be static or ISR.
+`src/components/layout/base-layout.tsx`. A server component that reads no cookies, so pages under it can be static or ISR. It mounts the sidebar, the top bar, the page column, the closing line and `DeferredClientUtilities`.
 
 | Prop | Values | Use |
 |---|---|---|
-| `bleed?` | `ReactNode` | Full-width slot above `main` (home masthead only) |
-| `footer?` | `'full'` (default), `'compact'`, `'none'` | `compact` on `/ai` and `/chat` |
+| `width?` | `'prose'` (default, 708px), `'wide'` (full width) | `wide` on `/tools` and `/chat` |
+| `fit?` | `boolean` | App-like page that fills the viewport under the top bar and never scrolls itself (`/chat`) |
+| `footer?` | `'full'` (default, the closing line), `'none'`; `'compact'` is an alias of `'none'` | `compact` on `/chat` and `/ai` |
+| `cover?` | `ReactNode` | Notion's page cover, full width above the column. Only the home passes one (`<SkyCover />`) |
 
-- The old `sidebar` and `rightSidebar` props, the navbar, sidebars, right-sidebar windows and visitor panel are gone. Do not bring them back.
-- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger (a two-rule menu icon labelled "Menu"). `DeferredClientUtilities` (terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. There is no site search. The feedback dialog opens from `[data-open-feedback]` buttons (colophon); nothing floats over the page.
-- There is no scroll-to-top button; the colophon has a "Back to top" link.
-- Do not add horizontal padding inside BaseLayout. The wrapper already pads.
+- No right-hand panels, no scroll-to-top button, no second sidebar.
+- Do not add horizontal padding inside `BaseLayout`; the column already has its gutters.
+- `DeferredClientUtilities` (terminal overlay, feedback dialog) mounts inside `BaseLayout`, so the admin and auth skip it. The feedback dialog opens from `[data-open-feedback]` buttons; nothing floats over the page.
 
-### Page width and PageSection
+## Width and alignment
 
-| Primitive | File | Role |
-|---|---|---|
-| `PageSection` | `src/components/ui/page-section.tsx` | Section rhythm (`SECTION_SPACING.section`) and an optional `SectionHeading` |
-| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. `description` is for figures only (the LeetCode summary), never a standfirst. |
+- One 708px column (`PROSE_WIDTH`), centred in the space right of the sidebar, with 24px gutters on phones and 48px from `sm`.
+- **Everything inside the column is left-aligned:** icons, titles, headings, page text, lists, tables and forms. Only the auth column centres its title and small print.
+- **Images** stay as wide as the column (`BREAKOUT` is empty), so their edges line up with the text. A gallery fills the column in two columns (three from `lg`).
+- **Full width:** `/tools` and `/chat` use `width="wide"`.
 
-One width for every page. Every visitor and user route fills BaseLayout's wrapper (`SHELL_WIDTH` in `layout/running-head.tsx`), so the page head starts on the logo's left edge and the widest rule or row ends under "Account". Pages never narrow or centre their outer container: no `mx-auto max-w-*` wrapper, no width preset. Admin keeps its own shell, and Auth keeps `AuthShell`.
-
-- **Page head.** The `h1`, then a single 1px ink rule (`border-t border-ink`), both full width. Never stack rules: a list, strip, tab row or board right under the head drops its own top rule, so only the head rule shows. No description, standfirst or italic lead under the title. Only short functional meta lines stay: counts, "Subscribe by RSS", "Times are Jakarta time.", datelines.
-- **Running text keeps a readable measure.** Prose, article bodies, chat messages, form text and excerpts cap at about 60 to 66ch (`.prose` is 66ch, otherwise `max-w-[66ch]`), left-aligned on the same edge. Never centre them.
-- **Ledgers.** Rows, rules and the marker (date) column span the full width.
-- **Articles.** `ArticleShell` starts on the shell's left edge: the 13rem rail, then a column that takes the rest; `.prose` inside it holds the 66ch measure. An article's own summary (a post or lesson description) may sit under its title as the one standfirst.
-- **Cards.** The Profile card and the Etan sign-in slip fill the width; their text keeps its measure.
-
-## Page patterns
-
-Every route uses one of these patterns. Pick the pattern first, then the primitives.
-
-| Pattern | Component | Routes |
-|---|---|---|
-| Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
-| Article | `ui/article-shell.tsx` (server; 13rem sticky rail beside a 66ch column; rail becomes `<details>` under `lg`) | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
-| Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
-| Correspondence | A column of letters, replies set behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
-| Admin | Ruled spine, `--admin-rail`, inverted active row | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx` (form beside a reversed ink `panel` on `/auth`; one narrow column without it) | `/auth/*`, `/admin/auth/login` |
-| Profile card | Double-rule sheet, definition list, dotted leaders | `/profile`, `/profile/edit`, admin settings |
-| Not found | `ui/not-found-view.tsx` (server) | 404s, `error.tsx`, empty states |
-
-Every route already uses one of these patterns. New routes pick one; never add legacy structure (window chrome, glass cards, sidebars).
-
-## Home
-
-The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
-
-- Masthead in the `bleed` slot (`Masthead` in `src/app/page.tsx`): a `.masthead` section at least the first screen tall (`100svh` minus the running head, 30rem floor) in the theme's ink and paper. The job line (`text-lead`, ink-soft) and the speckled `h1` "Rizky Haksono" (never animated itself, the LCP element) are centred with their bottom on the plate's top edge. The name is the `display` token at `min(12vw, 22svh, 11rem)` on one line from `sm`, and `min(21vw, 13svh)` on two lines below.
-- The Bromo plate (`next/image`, `fill`, `object-cover`, focus `45% 0%`, `priority`, `unoptimized`, `alt=""`) fills the bottom 56%, layered above the name and nudged so the peaks cut the foot of the letters (the `h1` sits 0.2em low), as in the specimen.
-- The lede follows on paper inside the shell (`Lede`): the positioning sentence at `h1` size (24px floor below `sm`, where its unscrolled ghost passes as large text at 3.17:1), inking word by word on its own `.ws` view timeline, then three ink links.
-- About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with a bold drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
-- Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.
-- Sections with no data hide. They never show zeros, `NaN` or `-Infinity`.
-- `content-visibility: auto` only on Activity, Certificates, Readers and Recommendations, never on or around sticky content.
-
-## Sticky rules
-
-- Sticky elements use `top: var(--head-h)` (plus an offset) so they clear the running head.
-- Opaque sticky surfaces take `.bg-paper-grain`.
-- No `overflow: hidden` or `auto` on any ancestor of a sticky element. Use `overflow-x: clip` where clipping is needed.
-- Verify sticky still works after the menu sheet opens and closes.
-
-## Width anti-patterns
+The admin keeps its own shell; see [platforms.md](./platforms.md#admin).
 
 | Avoid | Use |
 |---|---|
-| `mx-auto max-w-*` on a page wrapper, page head or section | Nothing: the page fills BaseLayout's wrapper |
-| A width preset or a narrower "ledger" or "article" column | The shell width; cap only running text with `max-w-[66ch]` |
-| A centred text column (`mx-auto max-w-[66ch]`) | Left-aligned `max-w-[66ch]` on the shell's left edge |
-| A description, standfirst or italic lead under a page `h1` | Nothing, or a short functional meta line (a count, a feed link, a dateline) |
-| A second `container` inside a page | Trust BaseLayout |
-| Horizontal scroll at 375px | Wrap, stack, or clip with `overflow-x: clip` |
+| Centred paragraphs, titles, lists or rows | Left-aligned inside the centred column |
+| A second `container` or `mx-auto max-w-*` wrapper inside a page | `BaseLayout` and its `width` prop |
+| Hand-made h1 blocks | `PageHeader` |
+| Boxes around sections, stat cards, tiles for plain text | Headings, `Properties`, list or table views |
+| Horizontal scroll at 320 or 375px | Wrap, stack, or let a wide table scroll inside its own wrapper |
+
+## Page patterns
+
+Every route uses one of these Notion page types. Pick the pattern first, then the primitives.
+
+| Pattern | Component | Routes | Look |
+|---|---|---|---|
+| Page | `PageHeader`, `Properties` | Every visitor page | Icon, 40px bold title, muted description, then properties (a muted name with its icon, the value in ink) |
+| List view | `ui/ledger.tsx` (`LedgerList`, `LedgerRow`) | Home Writing, `/blog` rows, `/roadmap` lessons | Rows with an optional 16px icon, the title in ink at weight 500, one muted line under it, meta on the right. The whole row is the link and tints on hover. A small muted group label (a year, a level) above each group |
+| Gallery view | `MediaCard` in `Gallery` (`ui/media-card.tsx`) | Home Projects, `/project` (grouped by "Hand-picked" and year), the newest `/blog` posts with a cover | Cards with a hairline and 10px corners: the picture on the grey ground, then the title and a property or two in `small`. Two columns, three from `lg`. Tint on hover |
+| Table view | `ui/table.tsx` | Home Work experience, `/certificates` | Hairline cells, grey head cells in `small` at weight 400, numbers with `tabular-nums`. Wide tables scroll in their wrapper |
+| Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | The cover picture, the icon, the 40px title, a muted standfirst, properties, tags, the contents in a closed toggle, a hairline, `.prose`, then previous and next |
+| Cabinet | `tools/_components/tool-shell.tsx`, `ui/pager.tsx` | `/tools`, `/ai` | `width="wide"`, Notion view tabs, state in `?tab=` |
+| Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home Contact, admin Feedback | A column of messages; the home form sits in a Notion toggle so its scripts load only when opened |
+| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, admin Home and Analytics | Numerals at the `numeral` size, no cards around them, solid fills, a text alternative for every chart |
+| Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` | Notion's sign-in page, see [platforms.md](./platforms.md#auth) |
+| Admin | `components/layout/admin/*` | `/admin/dashboard/*` | Its own shell until the admin rebuild |
+| Profile card | The profile sheet | `/profile`, `/profile/edit`, admin Settings | A definition list in a frame |
+| Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states | "There is no page at this address." and a way back |
+
+Blocks a page may use: `Callout` (one per page at most), the Notion toggle (`Accordion`, or a `<details>` with the rotating triangle), view tabs (`Tabs`), quotes (a 3px ink bar on the left, as in `.prose blockquote`) and headings (`text-h2` sections).
+
+New routes pick one of these. Never add window chrome, glass cards, shadows or a second sidebar to a visitor page.
+
+## Home
+
+`src/app/page.tsx`. The home is a Notion page about the owner, under the Langit Malang cover. The intro is static, so the LCP is text and the cover; every data list is its own async server component in `<Suspense>` with a skeleton. Order:
+
+1. **Cover:** `SkyCover`, the painted Malang sky by the hour (see [design-system.md](./design-system.md#langit-malang-the-home-cover)).
+2. **Icon and title:** the round portrait (96px, 112px from `sm`, a 4px page-coloured ring) overlapping the cover's lower edge, then "Rizky Haksono" as the h1 at `text-title sm:text-display`.
+3. **Properties:** Role, Based in, Email and Elsewhere (GitHub, LinkedIn, CV).
+4. **Bio:** under a hairline, three short paragraphs in ink at the body size.
+5. **Projects:** a gallery of up to six cards (featured first, then newest), then "All N projects" when there are more.
+6. **Writing:** the newest five posts as a list view with a page icon and the date, then "All writing".
+7. **Work experience:** a table of **every** career and education entry, newest first, never sliced: Role, Where, When.
+8. **Recommendations:** every LinkedIn recommendation as a quote with a 3px ink bar, only when the API returns real ones.
+9. **Contact:** one `Callout` with the email, then a toggle ("Leave a message here") holding the form, so Turnstile and EmailJS load only when it opens.
+
+Every list has an honest failed or empty line (`StatusLine`), for example "Projects did not load just now. The code is on GitHub in the meantime." Recommendations hide when there are none. Nothing shows zeros, `NaN` or `-Infinity`. Activity (heatmap, WakaTime, Duolingo) lives on `/stats`, and certificates on `/certificates`, both in the sidebar.
+
+## Sticky and overflow rules
+
+- The top bar is sticky at 44px (`--head-h`); the sidebar is sticky at full height. Anchor targets keep `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` from `globals.css`, not `scroll-padding-top` on `html`.
+- `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky content.
+- Radix scroll lock is moved to `html` in `globals.css` so the sticky bar does not jump; check sticky still works after the menu sheet opens and closes.

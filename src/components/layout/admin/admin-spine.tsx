@@ -4,7 +4,6 @@ import { useState, type MouseEvent } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
-import { Logo } from "@/components/ui/logo"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -64,15 +63,15 @@ function SpineNav({ onNavigate }: Readonly<{ onNavigate?: () => void }>) {
     <nav aria-label="Admin" className="flex flex-col gap-6 px-3 py-5">
       {SECTIONS.map((section) => (
         <div key={section.label}>
-          <p className="px-3 pb-1 font-display text-caption text-ink-soft">{section.label}</p>
-          <ul className="border-t border-rule">
+          <p className="px-3 pb-1 text-caption text-muted-foreground">{section.label}</p>
+          <ul className="border-t border-border">
             {section.items.map((item) => (
-              <li key={item.href} className="border-b border-rule">
+              <li key={item.href} className="border-b border-border">
                 <Link
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
-                  className="flex min-h-10 items-center px-3 text-[15px] text-ink transition-colors hover:bg-tint aria-[current=page]:bg-ink aria-[current=page]:font-semibold aria-[current=page]:text-paper [@media(pointer:coarse)]:min-h-11"
+                  className="flex min-h-10 items-center px-3 text-[15px] text-foreground transition-colors hover:bg-muted aria-[current=page]:bg-foreground aria-[current=page]:font-semibold aria-[current=page]:text-background [@media(pointer:coarse)]:min-h-11"
                 >
                   {item.title}
                 </Link>
@@ -126,15 +125,15 @@ function LogoutButton() {
 function SpineAccount({ user }: Readonly<{ user?: AdminUser }>) {
   const name = user?.name || "Admin"
   return (
-    <div className="border-t border-ink px-6 py-4">
+    <div className="border-t border-foreground px-6 py-4">
       <div className="flex items-center gap-3">
         <Avatar className="size-9">
           {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />}
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="truncate text-small font-semibold text-ink">{name}</p>
-          {user?.email && <p className="truncate text-caption text-ink-soft">{user.email}</p>}
+          <p className="truncate text-small font-semibold text-foreground">{name}</p>
+          {user?.email && <p className="truncate text-caption text-muted-foreground">{user.email}</p>}
         </div>
       </div>
       <div className="mt-3">
@@ -146,11 +145,10 @@ function SpineAccount({ user }: Readonly<{ user?: AdminUser }>) {
 
 function Masthead() {
   return (
-    <Link href={HOME} className="flex min-h-[var(--head-h)] items-center gap-2.5 border-b border-ink px-6 text-ink">
-      <Logo variant="mini" className="size-8" />
+    <Link href={HOME} className="flex min-h-[var(--head-h)] items-center gap-2.5 border-b border-foreground px-6 text-foreground">
       <span className="leading-tight">
-        <span className="block font-display text-[1.125rem]">Rizky Haksono</span>
-        <span className="block text-caption text-ink-soft">Admin</span>
+        <span className="block text-[1.125rem]">Rizky Haksono</span>
+        <span className="block text-caption text-muted-foreground">Admin</span>
       </span>
     </Link>
   )
@@ -159,7 +157,7 @@ function Masthead() {
 /** Desktop spine: fixed to the left edge, `--admin-rail` wide, ruled in ink. */
 export function AdminSpine({ user }: Readonly<{ user?: AdminUser }>) {
   return (
-    <aside className="bg-paper-grain fixed inset-y-0 left-0 z-40 hidden w-[var(--admin-rail)] flex-col border-r border-ink md:flex">
+    <aside className="bg-background fixed inset-y-0 left-0 z-40 hidden w-[var(--admin-rail)] flex-col border-r border-foreground md:flex">
       <Masthead />
       <div className="flex-1 overflow-y-auto">
         <SpineNav />
