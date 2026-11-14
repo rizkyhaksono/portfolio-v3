@@ -1,11 +1,12 @@
 import { MetadataConstants } from "@/commons/constants/metadata"
-import { escapeJsonLd } from "@/lib/escape-json-ld"
 import { getSiteUrl } from "@/lib/site-url"
+import { JsonLdScript } from "@/components/seo/json-ld-script"
 
 interface JsonLdProps {
   nonce?: string
 }
 
+/** Site-wide Person and WebSite structured data for the root layout. */
 export default function JsonLd({ nonce }: Readonly<JsonLdProps>) {
   const siteUrl = getSiteUrl()
 
@@ -32,16 +33,8 @@ export default function JsonLd({ nonce }: Readonly<JsonLdProps>) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        nonce={nonce}
-        dangerouslySetInnerHTML={{ __html: escapeJsonLd(person) }}
-      />
-      <script
-        type="application/ld+json"
-        nonce={nonce}
-        dangerouslySetInnerHTML={{ __html: escapeJsonLd(website) }}
-      />
+      <JsonLdScript nonce={nonce} data={person} />
+      <JsonLdScript nonce={nonce} data={website} />
     </>
   )
 }

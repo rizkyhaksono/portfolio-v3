@@ -49,6 +49,7 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   },
 }
 
+/** Strips figures/scripts and turns admin ● paragraphs into a `<ul>`. */
 function normalizeTypedBullets(html: string): string {
   return html.replace(UNPRINTED, "").replace(BULLET_RUN, (run) => `<ul>${run.replace(BULLET_ITEM, "<li>$1</li>")}</ul>`)
 }

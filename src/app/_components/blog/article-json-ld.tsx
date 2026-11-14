@@ -1,6 +1,6 @@
 import { headers } from "next/headers"
 import { MetadataConstants } from "@/commons/constants/metadata"
-import { escapeJsonLd } from "@/lib/escape-json-ld"
+import { JsonLdScript } from "@/components/seo/json-ld-script"
 import { getSiteUrl } from "@/lib/site-url"
 
 interface ArticleJsonLdProps {
@@ -30,7 +30,5 @@ export async function ArticleJsonLd({ title, description, path, image, published
     author: { "@type": "Person", name: MetadataConstants.creator, url: base },
   }
 
-  return (
-    <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: escapeJsonLd(data) }} />
-  )
+  return <JsonLdScript nonce={nonce} data={data} />
 }

@@ -30,7 +30,8 @@ function continueWithCsp(request: NextRequest): NextResponse {
   return response
 }
 
-export async function proxy(request: NextRequest) {
+/** Next.js proxy entry: session gates and per-request CSP nonce headers. */
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Admin dashboard: require the main session (works for SSO/Google + email login).

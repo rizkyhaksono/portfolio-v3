@@ -9,7 +9,7 @@ import { MetadataConstants } from "@/commons/constants/metadata"
 import { getMetadataBaseUrl } from "@/lib/site-url"
 import { UmamiRecorder } from "@/components/layout/deferred-client-utilities"
 import JsonLd from "@/components/seo/json-ld"
-import { UMAMI_BEFORE_SEND } from "@/lib/umami-before-send"
+import { UmamiBootstrapScript } from "@/components/layout/umami-bootstrap-script"
 import { PRINT_HEX } from "@/lib/print-hex"
 import { PlateFilters } from "@/components/ui/plate-filters"
 import "./globals.css"
@@ -66,6 +66,7 @@ export const viewport: Viewport = {
   themeColor: PRINT_HEX.paper,
 }
 
+/** App shell: fonts, theme, analytics bootstrap, and global UI primitives. */
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -79,7 +80,7 @@ export default async function RootLayout({
         <JsonLd nonce={nonce} />
         {umamiEnabled && (
           <>
-            <script nonce={nonce} dangerouslySetInnerHTML={{ __html: UMAMI_BEFORE_SEND }} />
+            <UmamiBootstrapScript nonce={nonce} />
             <Script
               defer
               src={umamiSrc}
