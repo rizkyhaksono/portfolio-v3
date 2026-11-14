@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { ImageIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -103,9 +104,9 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex max-w-[66ch] flex-col gap-8" aria-busy={isSubmitting}>
-        <fieldset className="flex flex-col gap-3" aria-busy={uploading}>
-          <legend className="mb-3 text-small font-semibold text-ink">Cover image</legend>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5" aria-busy={isSubmitting}>
+        <fieldset className="flex flex-col gap-2" aria-busy={uploading}>
+          <legend className="mb-1.5 text-caption font-medium text-muted-foreground">Cover image</legend>
           {bannerUrl ? (
             <PlateFigure>
               <div className="relative aspect-[3/1]">
@@ -113,14 +114,15 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </div>
             </PlateFigure>
           ) : (
-            <div className="flex aspect-[3/1] items-center justify-center border border-dashed border-rule-strong font-display text-caption text-ink-soft">
+            <div className="flex aspect-[3/1] flex-col items-center justify-center gap-2 rounded-lg bg-muted text-small text-muted-foreground">
+              <ImageIcon aria-hidden strokeWidth={1.25} className="size-8" />
               No cover yet.
             </div>
           )}
 
           <input ref={coverInput} type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden onChange={uploadCover} />
-          <div className="flex flex-wrap gap-3">
-            <Button type="button" variant="outline" onClick={() => coverInput.current?.click()} disabled={busy}>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="secondary" onClick={() => coverInput.current?.click()} disabled={busy}>
               {uploading ? "Uploading…" : bannerUrl ? "Replace cover" : "Upload a cover"}
             </Button>
             {bannerUrl && (
@@ -129,7 +131,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </Button>
             )}
           </div>
-          <p className="text-small text-ink-soft">
+          <p className="text-caption text-muted-foreground">
             A wide image works best: PNG, JPG, GIF or WebP, up to 5 MB. A new cover is kept as soon as it uploads.
           </p>
           <FormAlert>{errors.bannerUrl?.message}</FormAlert>
@@ -212,11 +214,14 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
 
         <FormAlert>{errors.root?.message}</FormAlert>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-rule pt-6">
+        <div className="flex flex-wrap gap-2 border-t border-border pt-5">
+          <Button type="submit" size="lg" disabled={busy || !isDirty}>
+            {isSubmitting ? "Saving…" : "Save changes"}
+          </Button>
           {isDirty ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button type="button" variant="outline" disabled={busy}>
+                <Button type="button" variant="ghost" size="lg" disabled={busy}>
                   Cancel
                 </Button>
               </AlertDialogTrigger>
@@ -232,13 +237,10 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </AlertDialogContent>
             </AlertDialog>
           ) : (
-            <Button asChild variant="outline">
+            <Button asChild variant="ghost" size="lg">
               <Link href="/profile">Cancel</Link>
             </Button>
           )}
-          <Button type="submit" disabled={busy || !isDirty}>
-            {isSubmitting ? "Saving…" : "Save changes"}
-          </Button>
         </div>
       </form>
     </Form>

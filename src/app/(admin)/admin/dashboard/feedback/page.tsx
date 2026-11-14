@@ -71,14 +71,14 @@ export default function FeedbackAdminPage() {
 
   return (
     <div className="w-full max-w-[60rem]">
-      <div role="group" aria-label="Show feedback" className="flex flex-wrap gap-x-6 border-b border-rule">
+      <div role="group" aria-label="Show feedback" className="flex flex-wrap gap-x-6 border-b border-border">
         {FILTERS.map((f) => (
           <button
             key={f.value}
             type="button"
             aria-pressed={filter === f.value}
             onClick={() => setFilter(f.value)}
-            className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-ink-soft transition-colors hover:text-ink aria-pressed:border-ink aria-pressed:text-ink [@media(pointer:coarse)]:min-h-11"
+            className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground aria-pressed:border-foreground aria-pressed:text-foreground [@media(pointer:coarse)]:min-h-11"
           >
             {f.label}
           </button>
@@ -86,7 +86,7 @@ export default function FeedbackAdminPage() {
       </div>
 
       {state === "loading" && (
-        <ul aria-busy="true" aria-label="Loading feedback" className="divide-y divide-rule">
+        <ul aria-busy="true" aria-label="Loading feedback" className="divide-y divide-border">
           {[0, 1, 2].map((i) => (
             <li key={i} className="space-y-3 py-6">
               <Skeleton className="h-3 w-48" />
@@ -118,10 +118,10 @@ export default function FeedbackAdminPage() {
           </StatusLine>
         ) : (
           <>
-            <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+            <p className="mt-4 text-caption tabular-nums text-muted-foreground">
               Showing {items.length} of {total}.
             </p>
-            <ol className="divide-y divide-rule">
+            <ol className="divide-y divide-border">
               {items.map((f) => {
                 const link = httpUrl(f.pageUrl)
                 return (
@@ -133,12 +133,12 @@ export default function FeedbackAdminPage() {
                         </Badge>
                         <Badge variant="outline">{sentence(f.category)}</Badge>
                       </div>
-                      <p className="mt-2 font-display text-caption text-ink-soft">
+                      <p className="mt-2 text-caption text-muted-foreground">
                         Sent {formatDay(f.createdAt)}, {timeAgo(f.createdAt)}.
                       </p>
-                      <p className="mt-3 max-w-[66ch] whitespace-pre-wrap break-words text-body text-ink">{f.message}</p>
+                      <p className="mt-3 max-w-[66ch] whitespace-pre-wrap break-words text-body text-foreground">{f.message}</p>
                       {(f.email || f.pageUrl) && (
-                        <div className="mt-3 space-y-1 border-l border-ink pl-4 text-small text-ink-soft">
+                        <div className="mt-3 space-y-1 border-l border-foreground pl-4 text-small text-muted-foreground">
                           {f.email && (
                             <p>
                               From <InkLink href={`mailto:${f.email}`}>{f.email}</InkLink>
@@ -152,7 +152,7 @@ export default function FeedbackAdminPage() {
                                   {link}
                                 </InkLink>
                               ) : (
-                                <span className="text-ink">{f.pageUrl}</span>
+                                <span className="text-foreground">{f.pageUrl}</span>
                               )}
                             </p>
                           )}
@@ -176,7 +176,7 @@ export default function FeedbackAdminPage() {
               })}
             </ol>
             {items.length < total && (
-              <div className="border-t border-rule pt-6">
+              <div className="border-t border-border pt-6">
                 <Button variant="outline" onClick={() => { void load(page + 1) }} disabled={state === "more"} aria-busy={state === "more"}>
                   {state === "more" ? "Loading…" : "Load older feedback"}
                 </Button>

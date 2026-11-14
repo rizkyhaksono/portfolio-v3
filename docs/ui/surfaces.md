@@ -1,14 +1,31 @@
-# Surfaces: frame, inset, lift
+# Surfaces: page, tile, frame, float, tint
 
-There are exactly three surfaces. Each one is something a printer could make on one sheet with one ink. Do not blend them and do not invent a fourth.
+Five grounds, as in a Notion workspace. Most content needs no box: titles, page text, properties, list rows, tables and headings sit straight on the page. Reach for a surface only when the content is a separate object: a gallery card, a picture, code, a form group, a floating layer. No boxes around sections, no stat cards, no tiles for plain text.
 
 | Surface | Looks like | Code | Use for |
 |---|---|---|---|
-| **Frame** | 1px `rule` hairline on the paper, transparent ground, radius 0, no shadow | `Card`, `Surface variant="solid"` (`SURFACE.solid` = `rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card, plates |
-| **Inset** | `tint` ground, no border needed | `Surface variant="inset"` (`SURFACE.inset` = `bg-muted`) | Nested rows, code specimens, hover rows, inline status cells |
-| **Lift** | `paper` ground, 1px `ink` border, hard offset ink shadow `3px 3px 0` | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` inside the floating primitives | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Sonner toasts, the tracker card being dragged |
+| **Page** | `bg-background`, no box | nothing | Page text, properties, list rows, tables, headings, most of every page |
+| **Sidebar** | `bg-muted`, no border | `Sidebar`, the menu sheet | The page tree on the left (lg and up) and the same tree in the left sheet below lg |
+| **Tile** | `bg-muted`, `rounded-lg`, no border, no shadow | `PlateFigure`, `Surface variant="inset"`, `.prose pre` | Pictures, code blocks, the image area of a gallery card |
+| **Frame** | 1px `border-border` hairline, `rounded-lg`, page ground, no shadow | `Card`, `Surface variant="solid"`, `MediaCard` | Gallery cards, a form group, the profile card |
+| **Float** | `bg-popover`, `rounded-lg`, hairline `border-border`, no shadow | Inside the shared floating primitives | Dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay |
+| **Inverted** | `bg-foreground text-background`, no border | `HoverTip`, the Sonner toast | The tooltip (`rounded-md`) and toasts (`rounded-lg`), as in Notion |
 
-`Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases that render as a frame. Do not use them in new code.
+**Tints.** Notion's translucent fills sit on any ground: `bg-tint` (6% ink) for hover on rows, buttons and menu items, for the `Callout` block and for skeletons; `bg-tint-strong` (10% ink) for tags and selected items. They are the only hover feedback on rows and cards.
+
+**The top bar** is opaque `bg-background`, sticky, with no border, blur or shadow. Nothing on the site is translucent except the tints. The only painted ground is the home cover.
+
+`Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases of the frame. Do not use them.
+
+## Tile
+
+```tsx
+<Surface variant="inset" className="px-4 py-3">...</Surface>
+```
+
+- A tile holds a picture or code, never plain text. It has no border and no shadow.
+- Pictures show in their own colours on the grey ground; captions sit under the tile in `caption` muted text.
+- Code is a tile: server `<pre>`, system mono, `tabIndex={0}`, no syntax colours.
 
 ## Frame
 
@@ -20,47 +37,37 @@ import { Surface } from "@/components/ui/surface"
 <Surface padding="compact">...</Surface>
 ```
 
-- Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet, a plate).
-- Interactive frames show hover with the rule turning ink (`hover:border-ink`) or the row taking `bg-tint`. Never with a shadow or a lift.
 - Do not restate `border border-border bg-card` on `Card`; it is the default.
-- Page heads and the colophon sit on a single 1px ink rule (`border-t border-ink`), not a frame. Never stack rules: whatever sits right under a head (a ledger, a stat strip, a tab row, board columns) drops its own top rule. Row separators inside a ledger stay.
+- A clickable frame (a gallery card) shows hover with `hover:bg-tint`, never a shadow, a lift, a scale or a border colour change.
 
-## Inset
+## Float
 
-```tsx
-<Surface variant="inset" className="px-4 py-3">...</Surface>
-```
+- The hairline border is applied once, inside the shared floating primitives in `src/components/ui/`. Toasts are styled in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. There is no shadow; feature code never adds one.
+- Menu rows are 28px (44px on touch), `rounded-md`, `text-small`, with `focus:bg-tint`.
+- Behind a modal sits a fixed scrim filled with `--scrim`. No backdrop blur.
+- Radix layers fade in with a 4px slide over 150 to 200ms; sheets slide over `--dur-sheet`. Esc closes, and focus returns to the trigger.
 
-- Tint is a ground, not a colour. Text on tint is `ink` or `ink-soft` only.
-- Code is an inset specimen: server `<pre>`, `bg-tint`, system mono 13.5px, `tabIndex={0}`, no syntax colours.
+## Callout
 
-## Lift
-
-- Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. Feature code should not add it by hand.
-- The scrim behind a modal is ink at low opacity. No backdrop blur, ever.
-- Lift is the only shadow in the system. The soft shadow scale (small through 2xl), glows and coloured shadows are banned.
-
-## Reverse
-
-- One reversed block on the site: the `/auth` panel in `layout/auth-shell.tsx`, `bg-ink text-paper`, square, no border or shadow, hidden below `md`. It is a cut printed in reverse, not a fourth surface: no other page uses it.
-- Because both tokens flip with the theme, it prints paper type on cobalt in Paper and night type on cream in Night.
-- Rules inside it are `border-paper/30`; secondary lines are `text-paper/80`. No links or controls inside it.
+`Callout` (`components/ui/callout.tsx`) is Notion's grey callout block: an icon and a short passage on `bg-tint`, `rounded-md`. **One per page at most.** It is not a frame for sections.
 
 ## Forbidden
 
 | Avoid | Use instead |
 |---|---|
-| Translucent white fills and borders, backdrop blur, glass cards | Frame |
-| Soft shadows, shadows on hover, `hover:-translate-y-1` lifts | Frame with `hover:border-ink` or `bg-tint` row |
-| Gradient fills, glows, coloured borders | Rules in ink or rule |
-| `rounded-*` on anything | Radius 0 (radio dot excepted) |
-| Window chrome, traffic lights, terminal title bars on content | A plain frame or no box at all |
-| Filled cards on a filled card | One surface per level |
+| Glass cards, translucent fills other than the tints, backdrop blur | A tile, a frame, or no box at all |
+| Shadows on cards, hover shadows, `hover:-translate-y-*` lifts, hover scaling | `hover:bg-tint` |
+| Gradient fills, glows, coloured borders, blue hover states | The tokens and the tints |
+| `rounded-[…]`, `rounded-xl`, `rounded-2xl`, mixed radii on one level | The radius scale in [design-system.md](./design-system.md#shape) |
+| Window chrome, traffic lights, terminal title bars on content | A tile, or no box at all |
+| A tile on a tile, a frame in a frame | One surface per level |
+| Boxed sections, stat cards, more than one callout | Headings, whitespace, a `Properties` list or a `Table` |
 
 ## Padding
 
 | Context | Padding |
 |---|---|
-| Card header and content | `SURFACE_PADDING.default` |
+| Card header and content | `p-4` (inside `Card`) or `SURFACE_PADDING.default` |
 | Compact rows, feedback, education | `padding="compact"` |
-| Form slips, profile card | `padding="cozy"` |
+| Form groups, profile card | `padding="cozy"` |
+| Gallery card text | `px-2.5 pb-2.5 pt-2` (inside `MediaCard`) |

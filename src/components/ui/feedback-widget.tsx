@@ -53,8 +53,8 @@ export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAut
           <DialogTitle>Feedback and suggestions</DialogTitle>
           <DialogDescription>What should I build or write next? Found something broken?</DialogDescription>
         </DialogHeader>
-        <div className="space-y-5">
-          <div className="space-y-1">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
             <Label htmlFor={`${id}-category`}>Kind of note</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as FeedbackCategory)}>
               <SelectTrigger id={`${id}-category`}>
@@ -67,7 +67,7 @@ export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAut
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor={`${id}-message`}>Message</Label>
             <Textarea
               id={`${id}-message`}
@@ -78,7 +78,7 @@ export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAut
               onChange={(e) => setMessage(e.target.value)}
             />
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor={`${id}-email`}>Your email, if you want a reply</Label>
             <Input
               id={`${id}-email`}
@@ -91,9 +91,9 @@ export default function FeedbackWidget({ open, onOpenChange: setOpen, onCloseAut
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={submit} disabled={sending || !message.trim()} aria-busy={sending}>
-            {sending ? "Sending…" : "Send"}
+            {sending ? "Sending…" : "Send feedback"}
           </Button>
         </DialogFooter>
       </DialogContent>

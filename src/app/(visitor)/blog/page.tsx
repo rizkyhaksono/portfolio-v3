@@ -1,11 +1,10 @@
-import Image from "next/image"
-import { isSiteImage } from "@/lib/site-url"
-import { canOptimizeImage } from "@/lib/image-hosts"
-import { cn } from "@/lib/utils"
+import { FileText, Rss } from "lucide-react"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { StatusLine } from "@/components/ui/status-line"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
-import { PlateFigure } from "@/components/ui/plate-figure"
+import { Gallery, MediaCard } from "@/components/ui/media-card"
+import { PageHeader } from "@/components/ui/page-header"
 import { ReaderCount } from "@/components/ui/reader-count"
 import { formatDay, formatDayMonth, yearOf } from "@/app/_components/blog/format"
 import { getPosts, type Post, type Source } from "@/app/_components/blog/posts"
@@ -32,59 +31,71 @@ function sourcesSentence(posts: Post[]) {
 
 export default async function BlogPage() {
   const [posts, reads] = await Promise.all([getPosts(), getPathReads()])
-  const [lead, ...rest] = posts
+  // Notion's gallery for the newest posts that have a cover; everything else in the list view below.
+  const latest = posts.slice(0, 3).filter((post) => post.image)
+  const rest = posts.filter((post) => !latest.includes(post))
 
   return (
     <div>
-      <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Writing</h1>
-        <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
-          {lead && `${sourcesSentence(posts)} `}
-          {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
-          <a
-            href="/feed.xml"
-            data-track="rss-subscribe"
-            data-track-feed="blog"
-            className="relative text-ink underline decoration-1 underline-offset-[0.18em] after:absolute after:-inset-3 hover:decoration-2"
-          >
-            Subscribe by RSS
-          </a>
-          .
-        </p>
-      </header>
-      <div aria-hidden className="border-t border-ink" />
+      <PageHeader
+        icon={<SectionIcon href="/blog" />}
+        title="Writing"
+        description={posts.length > 0 ? sourcesSentence(posts) : undefined}
+      >
+        {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
+        <a
+          href="/feed.xml"
+          data-track="rss-subscribe"
+          data-track-feed="blog"
+          className="-mx-1.5 inline-flex min-h-11 items-center gap-1.5 rounded-md px-1.5 text-small text-muted-foreground transition-colors duration-ui ease-out hover:bg-tint hover:text-foreground md:min-h-8"
+        >
+          <Rss aria-hidden className="size-4" strokeWidth={1.5} />
+          Subscribe by RSS
+        </a>
+      </PageHeader>
 
-      {lead ? (
+      {posts.length > 0 ? (
         <>
-          <article className="grid gap-6 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-start md:gap-10">
-            {lead.image && (
-              <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
-                {/* DEV covers are banners; on-site and Medium covers are 16:9. */}
-                <div className={cn("relative", lead.source === "dev" ? "aspect-[1000/420]" : "aspect-video")}>
-                  <Image src={lead.image} alt="" fill priority unoptimized={!canOptimizeImage(lead.image)} sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
-                </div>
-              </PlateFigure>
-            )}
-            <div className={lead.image ? undefined : "md:col-span-2"}>
-              <p className="font-display text-caption text-ink-soft">
-                The latest{lead.date && <>, published <time dateTime={lead.date.toISOString()}>{formatDay(lead.date)}</time></>}
-                {lead.source === "medium" ? " on Medium." : "."}
-              </p>
-              <h2 className="mt-2 font-display text-h2 text-balance text-ink">
-                <InkLink href={lead.href} external={lead.source === "medium"} event="blog-open" eventData={{ source: lead.source }}>
-                  {lead.title}
-                </InkLink>
+          {latest.length > 0 && (
+            <section aria-labelledby="latest" className="mb-10">
+              <h2 id="latest" className="mb-2 text-small font-medium text-muted-foreground">
+                Latest
               </h2>
-              {lead.excerpt && <p className="mt-3 max-w-[60ch] text-body text-ink-soft">{lead.excerpt}</p>}
-              {lead.source !== "medium" && <ReaderCount path={lead.href} reads={reads} className="mt-3" />}
-            </div>
-          </article>
+              <Gallery>
+                {latest.map((post, index) => (
+                  // The listener reads the nearest data-track, so the card reports like the rows below.
+                  <li key={post.id} data-track="blog-open" data-track-source={post.source}>
+                    <MediaCard
+                      href={post.href}
+                      image={post.image}
+                      title={post.title}
+                      description={post.excerpt}
+                      meta={
+                        <>
+                          {post.date && <time dateTime={post.date.toISOString()}>{formatDay(post.date)}</time>}
+                          {post.source === "medium" ? (
+                            <p className="w-full">Published on Medium.</p>
+                          ) : (
+                            <ReaderCount path={post.href} reads={reads} className="w-full" />
+                          )}
+                        </>
+                      }
+                      external={post.source === "medium"}
+                      priority={index === 0}
+                      sizes="(min-width: 1024px) 15rem, 50vw"
+                    />
+                  </li>
+                ))}
+              </Gallery>
+            </section>
+          )}
 
           {[...byYear(rest)].map(([year, rows]) => (
-            <LedgerList key={year} marker={<h2>{year}</h2>} className="mb-10">
+            <LedgerList key={year} marker={<h2>{year}</h2>}>
               {rows.map((post) => (
                 <LedgerRow
                   key={post.id}
+                  icon={<FileText />}
                   title={post.title}
                   href={post.href}
                   external={post.source === "medium"}
@@ -92,11 +103,11 @@ export default async function BlogPage() {
                   eventData={{ source: post.source }}
                   meta={post.date && <time dateTime={post.date.toISOString()}>{formatDayMonth(post.date)}</time>}
                 >
-                  {post.excerpt && <p className="max-w-[60ch]">{post.excerpt}</p>}
+                  {post.excerpt && <p className="line-clamp-1">{post.excerpt}</p>}
                   {post.source === "medium" ? (
-                    <p className="mt-1 font-display text-caption">Published on Medium.</p>
+                    <p className="text-caption">Published on Medium.</p>
                   ) : (
-                    <ReaderCount path={post.href} reads={reads} className="mt-1" />
+                    <ReaderCount path={post.href} reads={reads} />
                   )}
                 </LedgerRow>
               ))}
@@ -104,7 +115,7 @@ export default async function BlogPage() {
           ))}
         </>
       ) : (
-        <StatusLine kind="failed" className="mt-8">
+        <StatusLine kind="failed">
           No writing could be fetched just now. Try again in a few minutes, or read it on{" "}
           <span className="whitespace-nowrap">
             <InkLink href="https://dev.to/rizkyhaksono" external>

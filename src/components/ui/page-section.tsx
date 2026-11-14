@@ -12,10 +12,7 @@ interface PageSectionProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode
 }
 
-/**
- * Standard page/home section: mt-10 rhythm + optional SectionHeading.
- * Use this instead of repeating `div.mt-10` + SectionHeading.
- */
+/** A page section: the shared rhythm and an optional small label above the content. */
 export function PageSection({
   heading,
   children,

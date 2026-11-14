@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getProvinces, getCities, getDistricts, getVillages, searchPostalCode } from "@/services/visitor/postal-code"
 import { ToolError, useToolData } from "./tool-status"
@@ -79,7 +80,7 @@ function ByPlace() {
 
   return (
     <section aria-labelledby="postal-by-place" className="space-y-4">
-      <h3 id="postal-by-place" className="font-display text-h3 text-ink">
+      <h3 id="postal-by-place" className="text-h3 text-foreground">
         Find a postal code
       </h3>
       <div className="grid gap-x-6 gap-y-4 md:grid-cols-2">
@@ -138,18 +139,18 @@ function ByPlace() {
       )}
 
       {village && postal.status !== "error" && (
-        <div aria-live="polite" className="border-t border-ink pt-4">
+        <div aria-live="polite">
           {postal.status === "loading" ? (
-            <p className="font-display text-caption text-ink-soft">Looking up the postal code…</p>
+            <p className="text-caption text-muted-foreground">Looking up the postal code…</p>
           ) : postal.data?.[0] ? (
             <>
-              <p className="font-display text-caption text-ink-soft">
+              <p className="text-caption text-muted-foreground">
                 Postal code for {villageName}, {districtName}
               </p>
-              <p className="font-display text-numeral tabular-nums text-ink">{postal.data[0].postal}</p>
+              <p className="text-numeral tabular-nums text-foreground">{postal.data[0].postal}</p>
             </>
           ) : (
-            <p className="font-display text-body text-ink-soft">No postal code on file for {villageName ?? "this village"}.</p>
+            <StatusLine kind="empty">No postal code on file for {villageName ?? "this village"}.</StatusLine>
           )}
         </div>
       )}
@@ -172,7 +173,7 @@ function ByCode() {
 
   return (
     <section aria-labelledby="postal-by-code" className="space-y-4">
-      <h3 id="postal-by-code" className="font-display text-h3 text-ink">
+      <h3 id="postal-by-code" className="text-h3 text-foreground">
         Places for a postal code
       </h3>
       <form onSubmit={submit} noValidate className="space-y-2">
@@ -195,7 +196,7 @@ function ByCode() {
           </Button>
         </div>
         {invalid && (
-          <p id="postal-code-error" className="flex gap-2 font-display text-caption text-ink">
+          <p id="postal-code-error" className="flex gap-2 text-caption text-foreground">
             <X aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />
             A postal code has five digits, for example 65144.
           </p>
@@ -207,10 +208,10 @@ function ByCode() {
           {hits.status === "error" ? (
             <ToolError onRetry={hits.retry}>The lookup did not answer.</ToolError>
           ) : hits.status === "loading" ? (
-            <p className="font-display text-caption text-ink-soft">Looking up {query}…</p>
+            <p className="text-caption text-muted-foreground">Looking up {query}…</p>
           ) : hits.data?.length ? (
             <>
-              <p className="font-display text-caption text-ink-soft">
+              <p className="text-caption text-muted-foreground">
                 {hits.data.length === 1 ? `One village uses ${query}.` : `${hits.data.length} villages share ${query}.`}
               </p>
               <LedgerList className="mt-2">
@@ -222,7 +223,7 @@ function ByCode() {
               </LedgerList>
             </>
           ) : (
-            <p className="font-display text-body text-ink-soft">No village uses postal code {query}.</p>
+            <StatusLine kind="empty">No village uses postal code {query}.</StatusLine>
           )}
         </div>
       )}

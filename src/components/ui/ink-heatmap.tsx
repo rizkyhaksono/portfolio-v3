@@ -17,7 +17,8 @@ interface InkHeatmapProps {
 const CELL = 11
 const STEP = 14
 const MONTH_ROW = 18
-const LEVEL_OPACITY = [0, 0.25, 0.5, 0.75, 1]
+// Level 0 is the muted ground; levels 1 to 4 step the foreground up to solid.
+const LEVEL_FILL = ["hsl(var(--muted))", ...[0.3, 0.5, 0.75, 1].map((alpha) => `hsl(var(--foreground) / ${alpha})`)]
 
 const formatDay = (date: string, options: Intl.DateTimeFormatOptions) =>
   new Date(`${date.slice(0, 10)}T00:00:00Z`).toLocaleDateString("en-GB", { ...options, timeZone: "UTC" })
@@ -33,16 +34,12 @@ export function heatLevels(counts: number[]): (count: number) => number {
 }
 
 const Swatch = ({ level }: { level: number }) => (
-  <span
-    className="inline-block h-[11px] w-[11px] border border-rule-strong"
-    style={{ backgroundColor: `hsl(var(--ink) / ${LEVEL_OPACITY[level]})` }}
-  />
+  <span className="inline-block size-2.5 rounded-sm" style={{ backgroundColor: LEVEL_FILL[level] }} />
 )
 
 /**
- * Server-rendered one-ink year heatmap: five quartile levels (outline only → solid ink), a rule-strong
- * outline on every cell and a `data-tip` per day. The scroller is `row-reverse`, so narrow screens
- * open on the newest weeks without a layout effect.
+ * Server-rendered year heatmap: five quartile levels from muted to solid foreground on rounded cells,
+ * a `data-tip` per day. The scroller is `row-reverse`, so narrow screens open on the newest weeks without a layout effect.
  */
 export function InkHeatmap({ weeks, label, unit = ["contribution", "contributions"], className }: Readonly<InkHeatmapProps>) {
   if (weeks.length === 0) return null
@@ -59,7 +56,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
       <div className="flex flex-row-reverse overflow-x-auto overscroll-x-contain pb-1" tabIndex={0} role="group" aria-label={summary}>
         {/* min-w-full keeps a narrow year left-aligned; a wide one overflows left and opens on the newest weeks. */}
         <div className="min-w-full shrink-0">
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className="block text-ink">
+          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className="block text-foreground">
             {weeks.map((week, col) => {
               const first = week.contributionDays[0]?.date
               const prev = weeks[col - 1]?.contributionDays[0]?.date
@@ -69,7 +66,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
               return (
                 <g key={first ?? col}>
                   {showMonth && (
-                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption font-display text-muted-foreground">
+                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption text-muted-foreground">
                       {formatDay(first, { month: "short" })}
                     </text>
                   )}
@@ -78,16 +75,13 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
                     return (
                       <rect
                         key={day.date}
-                        x={col * STEP + 0.5}
-                        y={MONTH_ROW + (row + offset) * STEP + 0.5}
-                        width={CELL - 1}
-                        height={CELL - 1}
-                        fill="currentColor"
-                        fillOpacity={LEVEL_OPACITY[level(count)]}
-                        stroke="hsl(var(--rule-strong))"
-                        strokeWidth={1}
-                        shapeRendering="crispEdges"
-                        className="hover:stroke-ink"
+                        x={col * STEP}
+                        y={MONTH_ROW + (row + offset) * STEP}
+                        width={CELL}
+                        height={CELL}
+                        rx={2}
+                        fill={LEVEL_FILL[level(count)]}
+                        className="hover:stroke-foreground"
                         data-tip={`${count.toLocaleString("en")} ${count === 1 ? unit[0] : unit[1]} on ${formatDay(day.date, { day: "numeric", month: "short", year: "numeric" })}`}
                       />
                     )
@@ -100,7 +94,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
       </div>
       <figcaption className="mt-2 flex items-center gap-1.5 text-small text-muted-foreground">
         <span className="mr-1">Less</span>
-        {LEVEL_OPACITY.map((_, i) => (
+        {LEVEL_FILL.map((_, i) => (
           <Swatch key={i} level={i} />
         ))}
         <span className="ml-1">More</span>

@@ -1,10 +1,12 @@
+import { CalendarClock, CalendarPlus, Link2 } from "lucide-react"
 import { notFound } from "next/navigation"
 import { getAllProject } from "@/services/visitor/project"
 import { getPathReads } from "@/services/visitor/umami"
 import { ArticleShell } from "@/components/ui/article-shell"
-import { InkLink } from "@/components/ui/ink-link"
+import type { Property } from "@/components/ui/properties"
 import { ReaderCount } from "@/components/ui/reader-count"
 import ClapButton from "@/components/ui/clap-button"
+import { httpUrl } from "@/lib/utils"
 import ProjectImageViewer from "./_components/project-image-viewer"
 import { ProjectLinks, plateOf } from "../project-links"
 import { safeHtml } from "../safe-html"
@@ -23,13 +25,6 @@ type Props = {
 const day = (iso: string) =>
   new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Jakarta" })
 
-/** "Added 3 March 2025." plus "Updated 5 May 2025." when it changed on another day. */
-function dateline(created: string, updated?: string) {
-  const added = day(created)
-  const changed = updated ? day(updated) : added
-  return changed === added ? `Added ${added}.` : `Added ${added}. Updated ${changed}.`
-}
-
 export default async function ProjectDetailPage({ params }: Readonly<Props>) {
   const { id } = await params
   const [projects, reads] = await Promise.all([getAllProject(), getPathReads()])
@@ -40,26 +35,28 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
   const plate = plateOf(project)
   const link = (neighbour?: (typeof projects)[number]) => neighbour && { href: `/project/${neighbour.id}`, title: neighbour.title }
 
+  const added = day(project.created_at)
+  const updated = project.updated_at ? day(project.updated_at) : added
+  const properties: Property[] = [
+    { label: "Added", icon: <CalendarPlus strokeWidth={1.5} />, value: added },
+    // Only when it changed on another day than it was added.
+    ...(updated !== added ? [{ label: "Updated", icon: <CalendarClock strokeWidth={1.5} />, value: updated }] : []),
+    ...(httpUrl(project.url) || httpUrl(project.source_code)
+      ? [{ label: "Links", icon: <Link2 strokeWidth={1.5} />, value: <ProjectLinks project={project} /> }]
+      : []),
+  ]
+
   return (
     <ArticleShell
       title={project.title}
-      dateline={dateline(project.created_at, project.updated_at)}
-      railLabel="About this project"
-      rail={
-        <>
-          <ProjectLinks project={project} className="flex-col items-start" />
-          <ReaderCount path={`/project/${project.id}`} reads={reads} />
-          <InkLink href="/project" className="inline-flex min-h-11 items-center md:min-h-0">
-            All projects
-          </InkLink>
-        </>
-      }
-      footer={<ClapButton targetType="project" targetId={project.id} className="mt-8" />}
+      properties={properties}
+      meta={<ReaderCount path={`/project/${project.id}`} reads={reads} className="text-small" />}
+      cover={plate && <ProjectImageViewer src={plate} alt={`${project.title}, screenshot`} />}
+      footer={<ClapButton targetType="project" targetId={project.id} className="mt-10" />}
       prev={link(projects[index - 1])}
       next={link(projects[index + 1])}
     >
-      {plate && <ProjectImageViewer src={plate} alt={`${project.title}, screenshot`} />}
-      <div className="[&>*+*]:mt-[1em]" dangerouslySetInnerHTML={{ __html: safeHtml(project.description) }} />
+      <div className="[&>*+*]:mt-[0.75em]" dangerouslySetInnerHTML={{ __html: safeHtml(project.description) }} />
     </ArticleShell>
   )
 }

@@ -1,161 +1,213 @@
 # Design system: tokens, type, shape, motion
 
-## Ink and paper
+## Tokens
 
-Tokens are HSL triples in `src/app/globals.css` so every shadcn part re-inks from two values. `:root` is the paper print; `<html class="dark">` is Night print.
+Tokens are HSL triples (no `hsl()` wrapper) in `src/app/globals.css`: `:root` is light and `<html class="dark">` is dark. `tailwind.config.ts` exposes them as `hsl(var(--x) / <alpha-value>)` under the shadcn names, so every primitive follows the theme with no `dark:` class. The values are Notion's neutrals.
 
-| Token | Tailwind class | Paper hex (light) | Night hex (dark) | Role |
+| Token | Class | Light | Dark | Role |
 |---|---|---|---|---|
-| `--paper` | `paper` | F3ECDC | 1E3C9E | Page, card, text on solid ink |
-| `--ink` | `ink` | 1E3C9E | F3ECDC | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `--ink-soft` | `ink-soft` | 445BAA | E6D9BC | Secondary text, on paper or tint only |
-| `--rule` | `rule` | BFC6DE | 4E67BC | Decorative hairlines only |
-| `--rule-strong` | `rule-strong` | 6476B2 | 90A3DF | Control boundaries (3:1 or better) |
-| `--tint` | `tint` | E2E4EB | 142C7B | Hover row, code ground, inset |
+| `--background` | `bg-background` | #FFFFFF | #191919 | The page, cards, fields |
+| `--foreground` | `text-foreground` | #37352F | #D4D4D4 | Page text, titles, icons, the ink button, the focus ring |
+| `--muted-foreground` | `text-muted-foreground` | #6E6D69 | #9B9B9B | Secondary text: sidebar rows, descriptions, properties, meta |
+| `--border` | `border-border` | #E9E9E7 | #2F2F2F | Hairlines: table cells, card edges, floating layers, dividers |
+| `--muted` | `bg-muted` | #F7F7F5 | #202020 | The sidebar and the menu sheet, image grounds, code blocks, table head cells in prose |
+| `--input` | `border-input` | #8F8E8A | #6E6E6E | Borders of fields that must be seen (3:1, WCAG 1.4.11) |
+| `--popover` | `bg-popover` | #FFFFFF | #252525 | Floating layers |
+| `--destructive` | `text-destructive` | #C4321F | #F27166 | Destructive actions and errors, always with a word |
+| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the home cover sky only |
+| `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the text selection fill only |
 
-The six Tailwind colours are defined as `hsl(var(--x) / <alpha-value>)`. Hex values above are rounded from the HSL triples; the few copies code needs live in `src/lib/print-hex.ts`.
+Notion's translucent fills, built from the text colour in `tailwind.config.ts` so they work on the page, the sidebar and menus alike:
 
-shadcn names map onto the same ink, so existing components keep working:
+| Class | Value | Use |
+|---|---|---|
+| `bg-tint` | foreground at 6% | Hover on rows, buttons, sidebar items, menu items; callouts; the segmented theme track; skeletons |
+| `bg-tint-strong` | foreground at 10% | Tags (`Badge`, `Chip`), the secondary button's hover, selected states |
 
-| shadcn token | Maps to |
+Derived tokens, so shadcn parts keep working:
+
+| Token | Maps to |
 |---|---|
-| `background`, `card`, `popover`, `primary-foreground`, `destructive-foreground` | paper |
-| `foreground`, `card-foreground`, `popover-foreground`, `primary`, `destructive`, `ring` | ink |
-| `secondary`, `muted`, `accent` | tint |
-| `muted-foreground` | ink-soft |
-| `border` | rule |
-| `input` | rule-strong |
-| `--radius` | `0rem` |
+| `--card`, `--primary-foreground`, `--destructive-foreground` | background |
+| `--primary`, `--ring`, `--card-foreground`, `--popover-foreground`, `--secondary-foreground`, `--accent-foreground` | foreground |
+| `--secondary`, `--accent` | muted |
+| `--radius` | `.625rem` (10px) |
 
-Other variables: `--plate-alpha` (engraving ink strength, 1 on paper, .85 at night), `--ws-ghost` (unprinted colour of the lede sentence), `--head-h` (running head height, 3.25rem, 3rem under 768px), `--dur-press` 120ms, `--dur-ui` 180ms, `--dur-sheet` 240ms, `--ease-print` `cubic-bezier(.2,0,0,1)`.
+Other variables:
+
+| Variable | Value | Use |
+|---|---|---|
+| `--dur-press` | 120ms | Button press and hover |
+| `--dur-ui` | 200ms | Hover, underline, menus, tabs, the toggle triangle |
+| `--dur-sheet` | 280ms | Sheets, dialogs, the theme crossfade |
+| `--ease-out` | `cubic-bezier(.25,.1,.25,1)` | Every transition; Tailwind class `ease-out` |
+| `--scrim` | `0 0% 6% / .5` | The fixed backdrop behind dialogs and sheets, both themes |
+| `--head-h` | 2.75rem (44px) | The top bar height, and the anchor offset |
+
+**Hex copies.** CSS variables cannot reach meta theme-color, the manifest, `global-error.tsx` or the OG and certificate cards, so `src/lib/theme-hex.ts` exports `THEME_HEX.light` and `THEME_HEX.dark` (background, foreground, mutedForeground, border, muted, sky). It is the only file in `src/` outside the CSS allowed raw hex. Change a token and its copy in the same commit; the contrast test checks they agree within one step per channel.
+
+### Colour use
+
+After a Notion page:
+
+- **Page text is ink.** Body copy, `.prose`, row titles, table cells that name things and every link label are `text-foreground`. Links go through `InkLink`: ink with a grey underline (`decoration-foreground/40`) that turns full ink on hover, so colour is never the only cue (WCAG 1.4.1).
+- **Grey is for secondary text:** sidebar rows until hovered or current, page descriptions, property names, row meta, table head cells, captions.
+- **Hover and selection are tints**, never colour: `hover:bg-tint` on anything clickable that is a row or a quiet button, `bg-tint-strong` on tags and selected items.
+- **Blue belongs to the cover.** `sky` and `sky-wash` appear only in the home page's Langit Malang cover and the `::selection` fill. Never for links, buttons, focus rings, charts, icons, tags or hover. The admin uses neither.
+- **The grass greens and the mountain haze** in the cover are an illustration-only exception to the colour cap: they live only in the `.sky` block of `globals.css` and are never UI colour.
+
+### Colour rules
+
+- Colours only through the token classes and `tint`. No hex, no `white` or `black`, no Tailwind palette colours (`gray-500`, `blue-600`, `zinc-*`), no `dark:` classes.
+- Text never takes an opacity modifier (`text-foreground/70`). Use `text-muted-foreground`. Opacity on fills and decoration (`bg-foreground/85` for the ink button's hover, `decoration-foreground/40`) is fine.
+- `border-border` is a hairline for decoration and structure. Fields that must be seen (inputs, textareas, select triggers, radios) use `border-input`.
+- State is an icon plus a word (`StatusLine`, the `Badge` status square), never colour alone. `destructive` keeps its word and its cross.
 
 ### Contrast
 
-Measured from the triples (WCAG ratio):
-
-| Pair | Paper | Night |
+| Pair | Light | Dark |
 |---|---|---|
-| ink on paper | 8.13 | 14.51 |
-| ink on tint | 7.54 | 11.01 |
-| ink-soft on paper | 5.36 | 8.96 |
-| ink-soft on tint | 4.97 | 6.80 |
-| rule-strong on paper | 3.74 | 4.96 |
+| foreground on background | 12.3 | 11.9 |
+| foreground on muted (the sidebar) | 11.4 | 11.0 |
+| muted-foreground on background | 5.2 | 6.3 |
+| muted-foreground on muted | 4.8 | 5.9 |
+| input on background | 3.3 | 3.4 |
+| destructive on background | 5.5 | 6.1 |
+| sky on background | 7.0 | 8.4 |
+| foreground on sky-wash | 9.7 | 8.8 |
 
-Rules that keep it that way:
+**Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples from `globals.css` and fails below the floors in both themes: foreground 7:1 on background, muted and popover; muted-foreground 4.5:1 on background, muted and popover; input 3:1; destructive 4.5:1; sky 4.5:1; foreground on sky-wash 7:1. It checks `THEME_HEX` against the tokens and that the print block pins the light triples. There are no footer-sky checks any more: no text sits on the sky. If a pair falls short, nudge the token, never the floor.
 
-- Never put `ink-soft` text on a fill of 12% ink or more.
-- Night print never uses full cobalt as a ground behind text.
-- Text never takes an opacity modifier (a slash opacity on a text colour fails the gate). Use `text-ink-soft`.
-- Status is shape plus word, never colour. There is no red, green or amber anywhere.
-- The wordscroll ghost word stays at 3:1 or better at 24px and up (`--ws-ghost`: ink at .6 on paper, 3.17:1; ink-soft at .7 on the night cobalt, 4.15:1). The hero sentence keeps a 24px floor on phones so the unscrolled ghost still counts as large text.
+## Type: Onest
 
-**Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples out of `globals.css` and fails the build below these floors, in Paper and in Night: ink on paper 7:1, ink-soft on paper 4.5:1, ink-soft on tint 4.5:1, rule-strong on paper 3:1, the wordscroll ghost over paper 3:1. It also checks that every hex in `src/lib/print-hex.ts` matches its token (within one per channel) and that the `@media print` block pins the Paper triples. Change a token and the test tells you which copy to update.
-
-## Type: Plus Jakarta Sans
-
-One family, Plus Jakarta Sans (Tokotype, variable, OFL), roman and italic, loaded with `next/font/google` in `src/app/layout.tsx` (`subsets: ['latin']`, `style: ['normal', 'italic']`, `display: 'swap'`, `adjustFontFallback`). The only committed font binary is the static 600 WOFF the OG and certificate cards read (`src/assets/fonts/plus-jakarta-sans-latin-600-normal.woff`). Machine text uses the system mono stack `ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`, which costs 0 bytes.
-
-| Variable | Tailwind | Use |
-|---|---|---|
-| `--font-sans` | `font-sans`, `font-display` (same face) | Everything: body, prose, UI, headings, display, numerals |
-| system mono | `font-mono` (code-block and kbd only) | Code, slugs, keys such as TRK-12, raw JSON, WPM passage, kbd |
-
-Weight and tracking carry the hierarchy and live on the size tokens (`tailwind.config.ts`), never in `tracking-[…]` classes: display 600 at -0.04em, h1 700 at -0.025em, h2 700 at -0.02em, h3 600 at -0.01em, h4 600, numerals 600 at -0.02em, body and prose 400. Buttons 15px / 600, labels 13px / 600, table heads 12px / 600 in ink-soft. Italic only for pull quotes (prose `blockquote`) and cited titles.
+One sans, **Onest** (variable, OFL), everywhere on the site and in the admin. It loads once with `next/font/google` in `src/app/layout.tsx` as `--font-sans`, and `font-sans` reads it. There is no second face, no serif, no handwritten face and no `font-display` alias. Code uses the system mono stack (`font-mono`), and only for code.
 
 ### Scale
 
-Compact and fluid between 375px and 1280px, defined as `fontSize` keys in `tailwind.config.ts`. Use the keys; never an ad-hoc size.
+The `fontSize` keys in `tailwind.config.ts`, on Notion's scale: 14px for UI (sidebar, tables, properties, controls), 16px for page text, 40px bold page titles. Weight and tracking live on the keys, so a heading needs only its size class.
 
-| Key | Size / leading | Notes |
-|---|---|---|
-| `caption`, `xs` | 12 / 1.4 | Italic for captions; `xs` is the same 12px |
-| `small` | 13 / 1.45 | |
-| `body` | 15 to 16 / 1.6 | |
-| `prose` | 16 to 17 / 1.65 | 66ch measure |
-| `lead` | 17 to 19 / 1.45 | Italic standfirst, articles only |
-| `h4` | 16 / 1.35 | |
-| `h3` | 18 to 20 / 1.3 | |
-| `h2` | 22 to 30 / 1.15 | |
-| `h1` | 30 to 44 / 1.08 | |
-| `display` | 44 to 104 / 0.92 | Italic, weight 360, `text-wrap: balance` |
-| `numeral` | 32 to 48 / 1 | Italic, `tabular-nums` |
+| Key | Size / line height | Weight | Use |
+|---|---|---|---|
+| `caption` | 12 / 16 | 400 | The closing line, captions, group labels in the sidebar, tooltips |
+| `small` | 14 / 20 | 400 | UI: sidebar rows, breadcrumb, buttons, tabs, tables, properties, row meta, tags |
+| `body` | 16 / 24 | 400 | Page text, row titles, callouts |
+| `prose` | 16 / 26 | 400 | Article text (`.prose`) |
+| `lead` | 16 / 24 | 400 | Kept for older call sites |
+| `h4` | 16 / 24 | 600 | Small headings, chat headings |
+| `h3` | 20 / 28 | 600 | Sheet and dialog titles |
+| `h2` | 24 / 32, -0.01em | 600 | Section headings on a page ("Projects", "Writing"), the auth title |
+| `h1` | 30 / 38, -0.015em | 600 | A heading 1 block |
+| `title` | 32 / 40, -0.02em | 700 | Page titles on phones |
+| `display` | 40 / 48, -0.02em | 700 | Page titles from `sm` (`text-title sm:text-display`) |
+| `numeral` | 32 / 40, -0.015em | 600 | Figures on `/stats` and the admin, with `tabular-nums` |
 
-Spacing uses a 4px base. Section rhythm is 64px from `sm` up and 48px on phones (`SECTION_SPACING.section = 'mt-12 sm:mt-16'`, `sectionGap = 'mt-3'`). The home hero fills the first screen (`100svh` minus the running head, 30rem floor) and caps the name by `svh`, so the name always fits the first screen.
+`xs` stays for older call sites; new code uses the keys above.
 
 ### Type rules
 
-- `font-synthesis: none`. Never fake a weight or an italic: both come from the variable font.
-- No upper-case text transform, no letter-spacing utilities (tight tracking lives on the size tokens), no small caps labels.
-- Headings are literal and sentence case ("Career", not "Where I've been").
-- Eyebrows only when they carry information, and then as a caption `<p>` in ink-soft, never all-caps.
-- No middle-dot meta strings. Datelines are sentences: "Published 3 March 2026, six minute read."
-- Numbers only for real sequences: changelog versions, roadmap stages, legal sections. No "01 / 02 / 03" section markers.
-- Links: underline 1px at offset .18em, 2px on hover. No "→" or arrow glyph after link text.
-- External links carry a screen-reader note "(opens in a new tab)".
-- `tabular-nums` in ledgers, tables and figures.
-- Glyphs such as check, cross, external and half-circle are inline SVG, not emoji or icon fonts.
+- Weights 400 to 700: 400 for text, `font-medium` (500) for UI emphasis (current sidebar row, row titles, buttons, tabs), 600 for headings, 700 only for page titles. The keys carry the heading weights; do not add `font-bold` to anything else.
+- Never `text-[Npx]`; use a key. Never `tracking-[…]`.
+- No `uppercase`, no small caps, no all-caps labels or eyebrows.
+- Fields use 16px on phones (`text-base`) and 14px from `sm` so iOS does not zoom.
+- `tabular-nums` in rows, tables, properties and figures.
+- Headings are literal and in sentence case ("Projects", not "Things I've built").
 
-## Shape and lines
+## Spacing and width
 
-- Radius 0 everywhere. `borderRadius` keys all resolve to 0; `full` exists only for radio dots.
-- Line vocabulary:
+- 4px base. Sections sit 48px apart (`SECTION_SPACING.section`, `mt-12`), their content 12px under the heading (`sectionGap`, `mt-3`).
+- **Page column.** `PROSE_WIDTH` is Notion's 708px column (`44.25rem` of content), centred in the space right of the sidebar, with 24px gutters on phones and 48px from `sm`. Every line in it is left-aligned.
+- **Full width.** `WIDE_WIDTH` is Notion's full-width page (up to 90rem, gutters 24, 48 and 96px), for `/tools` and `/chat`.
+- `BREAKOUT` is empty: images stay as wide as the column so their edges line up with the text. All three live in `src/lib/design-system.ts`.
+- Pages without a cover start 48px under the top bar (80px from `sm`) and leave 96px before the closing line.
 
-| Line | How | Where |
+## Shape
+
+Notion's radii. `--radius` is 10px.
+
+| Radius | Class | Value | Use |
+|---|---|---|---|
+| Dots | `rounded-full` | | Switch, radio, avatar on the home page, status dots |
+| Tags | `rounded` | 4px | `Badge`, `Chip`, the theme segments, inline code, the owner's 20px portrait in the sidebar |
+| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, list rows, toggles, callouts, the hover tip |
+| Cards and layers | `rounded-lg` | 10px | `MediaCard`, `Card`, `Surface`, `PlateFigure` images, dialogs, menus, select content, toasts |
+
+`rounded-sm` (2px) exists but has no use. `rounded-xl` and `rounded-2xl` are not part of the scale; do not use them. Never `rounded-[…]`.
+
+## Shadow, blur and gradients
+
+- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast and the hover tip are inverted slabs (`bg-foreground text-background`) with no border. The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
+- **No blur.** The top bar is opaque `bg-background`; nothing is translucent. Scrims are a fixed `--scrim` fill, never blurred. The cover's clouds are pre-softened radial shapes, never `filter: blur`.
+- **Gradients** only in `globals.css` and the cover (`sky.tsx`). No gradient text, buttons, borders or backgrounds anywhere else.
+
+## Langit Malang: the home cover
+
+The painted Malang sky survives as Notion's page cover on the home page, and only there. It says where the owner works from and that the page is alive at this hour.
+
+- **Where.** `SkyCover` (`src/components/ui/sky.tsx`) is passed to `BaseLayout` as `cover` by `src/app/page.tsx`. It runs edge to edge above the page column, 30% of the viewport tall (at least 11rem, at most 20rem). No other page has a cover sky; there is no footer sky and no auth band.
+- **What.** `Sky variant="cover"`: CSS and inline SVG only, no image file, `aria-hidden`. Back to front: a sky gradient (deeper blue overhead, from `.sky--cover`), the sun or the moon up on the right, two or three soft clouds, Arjuno's ridge and Semeru's cone in haze, rolling grass hills with blades that sway, and a fine grain. The cover variant has no name between the hills. The `band` variant (with the name) still exists in `sky.tsx` but no page mounts it.
+- **Colour by the hour.** The sky colour (`--sky-top`) follows the time of day in Malang (Asia/Jakarta, WIB), wherever the visitor is:
+
+| Phase (WIB) | Light `--sky-top` |
+|---|---|
+| Dawn, 5 to 8 | `210 57.7% 89%` |
+| Day, 8 to 15 | `211 68.4% 90.4%` |
+| Dusk, 15 to 18 | `220 37.5% 90.6%` |
+| Evening, 18 to 5 | `219 44.4% 89.4%` |
+
+- **Dark mode** is always the night sky (`215 46.3% 16.1%`) with the moon and a few static stars.
+- **Phase.** `skyPhase(date)` in `src/lib/malang-time.ts` is a pure function with a unit test for all four boundaries and the WIB offset. The server renders the day stop; a client effect sets `data-sky="dawn|day|dusk|evening"` on mount and refreshes it every five minutes.
+- **Motion.** The clouds drift and the grass sways as soon as the page loads. Phones (below 640px) and `prefers-reduced-motion: reduce` get a still scene.
+- **Pause control.** The scene moves for more than five seconds, so `SkyToggle` ("Pause the sky" or "Play the sky") sits inside the cover for keyboard and screen-reader users (WCAG 2.2.2). It is `sr-only` and shows in the cover's top left only on keyboard focus. The choice is saved in localStorage and sets `data-sky-paused` on `<html>`. Below 640px and under reduced motion it is `display: none`, since nothing moves there.
+- **The page under it.** The home's round portrait overlaps the cover's lower edge like a Notion page icon, then the title and properties follow.
+- **CSS.** One `.sky` block in `globals.css` holds every scene colour. They live nowhere else.
+
+## Motion: quiet and functional
+
+All of it is CSS or platform native. No motion library.
+
+| Motion | How | Timing |
 |---|---|---|
-| Hairline | 1px `rule` (`border-border`) | Frames, row separators, decorative rules |
-| Strong | 1px `ink` | Controls, outline buttons, floating layers |
-| Active | 2px `ink` underline | Current nav item, active tab, link hover |
-| Head rule | single 1px ink | Page heads and above the colophon; never stacked with another rule |
-| Plate frame | 1px ink, 3px paper, 1px rule around a figure | `PlateFigure` |
-| Dotted leader | dotted `rule` | Definition lists, profile card, ledgers |
-| Dashed | dashed `rule-strong` | Draft and archived states |
+| Hover tint | `bg-tint` fades in on rows, buttons, sidebar items | `--dur-ui` (buttons `--dur-press`) |
+| Link underline | The grey underline turns full ink | `--dur-ui` |
+| Toggle | The triangle (`ChevronRight`) turns 90 degrees; accordion content opens by height | `--dur-ui` |
+| View tabs | The 2px ink bar moves to the open tab with the colour | `--dur-ui` |
+| Theme crossfade | `switchTheme()` wraps the change in a view transition | `--dur-sheet` |
+| Floating layers | Radix fade with a 4px slide; sheets slide | 150 to 280ms |
+| Skeleton | A soft pulse on `bg-tint`, only under `motion-safe` | Tailwind `animate-pulse` |
+| The home cover | Clouds drift; grass blades sway | slow loops; grass 6s alternate |
 
-## Texture
+There is no route crossfade and no project morph in the current code. Use `--dur-*` and `ease-out` for anything else that responds to input (press, hover, focus, open and close).
 
-1. **Grain.** A 128px WebP tile (4 KB or less) per theme on `body`. Opaque sticky surfaces add `.bg-paper-grain` so the grain does not stop at their edge.
-2. **Ink speckle.** A small mask, only on numerals 48px and up below the fold, inverted blocks, and the 404 line.
-3. **Hatching.** 45 degree hatching (`repeating-linear-gradient(135deg, ...)`) for chart areas and `HatchBar`. This is the only permitted use of a gradient function, and it lives in CSS, not in class names.
+### Reduced motion
 
-Photos use the `.plate` duotone through `PlateFigure` (`tone="photo"`, the default). `tone="color"` skips it for pictures that must keep their own colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame is a double rule (1px ink, 3px paper, 1px rule). The photo clips its own focus outline, so the frame draws the 2px ring outline when a control inside it is focused. The Hollar engraving band (colophon only) is a CSS mask painted with `hsl(var(--ink) / var(--plate-alpha))`, so one file prints cobalt on paper and cream at night; masks never go through `next/image`.
+Under `prefers-reduced-motion: reduce`:
 
-**The hero plate.** The home masthead (`.masthead`) prints in the theme's own tokens on the page's paper grain: cobalt on cream in Paper, cream on cobalt in Night. Its name carries `.speckle`. The `/auth` ink panel carries `.ink-grain`, the other theme's grain tile, so no field uses a dot screen. The landscape is `src/assets/plates/bromo-2400.webp`: J. C. Greive after A. Salm, *Gezicht op de Bromo vulkaan*, 1869 (Rijksmuseum RP-P-1975-194, public domain), re-cut by `scripts/engrave.mjs` as a horizontal line screen bent along the broad tones, with solid ink for the riders, rocks and shadow edges, the sky cut away to transparency. It is a two-ink RGBA raster printed cream-on-cobalt for Night; in Paper the `#plate-swap` SVG filter (`ui/plate-filters.tsx`) swaps the two inks. It is served through `next/image` with `unoptimized` because the lossless file (about 150 KB) is smaller than the optimizer's lossy copies.
+- The global kill switch in `globals.css` drops durations to near zero.
+- Every `::view-transition-*` pseudo-element gets `animation: none`, and `switchTheme()` skips the view transition.
+- The cover is a still scene (no drifting clouds, no swaying grass); skeletons do not pulse; smooth scrolling is off.
+- The check: with `reducedMotion: 'reduce'`, `document.getAnimations().length` is 0.
 
-`scripts/engrave.mjs` makes both plates from scans kept outside the repo (`art-src/`).
+### Banned motion
 
-## Motion: the press moves once
+Scroll reveal or fade-up on sections, parallax, scroll-jacking or anything tied to scroll position, marquees, typing effects, custom cursors, attention loops (`animate-ping`, `animate-bounce`), hover lifts (`hover:-translate-y-*`), hover scaling, autoplaying media (YouTube is a click-to-load facade), framer-motion, `motion`, GSAP, Lenis or any other animation library.
 
-| Tier | What | Rules |
-|---|---|---|
-| 0 (no JS) | Native scroll, `data-scroll-behavior="smooth"` on `<html>`, `scroll-behavior: smooth` under no-preference, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (not `scroll-padding-top` on `html`, which scrolls the page whenever focus lands in the sticky head), sticky layouts (skills deck, ledger years, article rail, project figure column, stats chart, tools index, chat composer) | `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky. |
-| 1 (CSS scroll-driven) | Home lede wordscroll (`.ws`, the sentence on its own view timeline), reading hairline on articles and home (`scroll(root)`) | Inside `@supports (animation-timeline: view())` and `prefers-reduced-motion: no-preference`. Nothing else is scroll-linked. Firefox, older Safari and short viewports get the static, fully inked version. No JS fallback. |
-| Response | Underline 1px to 2px, button `translateY(1px)`, tab underline slide, accordion, dialog and sheet fade plus 4px, toasts | Use `--dur-press`, `--dur-ui`, `--dur-sheet`, `--ease-print`. |
+## Themes
 
-**Banned:** parallax (beyond the masthead cover), marquees and infinite scrollers, typing effects, smooth cursors, page transitions, pulsing dots and pulse skeletons, fade-up or reveal-on-scroll on sections, hover lifts (`hover:-translate-y`), Lenis, GSAP, `motion` / framer-motion, any scroll animation library on any route.
-
-**Reduced motion:** durations drop to .01ms and the lede sentence prints fully inked. Sticky stays, because it is layout.
-
-**Media:** nothing autoplays. YouTube is a click-to-load facade.
-
-## Night print (dark mode)
-
-- Token flip on `<html class="dark">`, driven by next-themes. The default is Paper (`ThemeProvider defaultTheme="light" enableSystem`), so the first visit is light; the menu sheet offers Paper, Night and System, and the running head has a Night toggle from 1024px.
-- Do not write dark-variant classes. Every colour already flips through the tokens; existing ones are deleted as files are touched.
-- The colophon band flips through `--plate-alpha`; the hero plate does not flip; photos keep the `.plate` duotone; the grain tile swaps.
-- `color-scheme` follows the theme. Viewport `themeColor` is paper by day, and the manifest uses paper; both read their hex from `src/lib/print-hex.ts`.
-- OG and certificate images are always printed on paper.
-
-## Print
-
-The print stylesheet forces paper tokens, hides the running head, menu sheet and engravings, stops the lede wordscroll, and prints link URLs.
+- next-themes with `attribute="class"`, `defaultTheme="system"` and `enableSystem`. `ThemeProvider` receives the CSP nonce so its script runs before paint and dark-OS visitors never see a light frame.
+- Light and dark are equal: Notion's white page with a #F7F7F5 sidebar, and Notion's #191919 page with a #202020 sidebar.
+- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and the sidebar's segmented Light, Dark and System radio group.
+- `switchTheme()` in `src/components/layout/theme-toggle.tsx` is the one path for theme changes. Do not call `setTheme` directly from new code.
+- `color-scheme` follows the theme. The viewport `themeColor` is an array with one entry per `prefers-color-scheme`, read from `THEME_HEX`, as is the manifest.
 
 ## Shared class tokens
 
 ```ts
-import { SURFACE, SURFACE_PADDING, SECTION_SPACING } from "@/lib/design-system"
+import { SURFACE, SURFACE_PADDING, SECTION_SPACING, PROSE_WIDTH, WIDE_WIDTH } from "@/lib/design-system"
 ```
 
-| Export | Keys | Use |
-|---|---|---|
-| `SURFACE` | `solid` (frame), `inset`; `glass` and `glassNoBlur` are retired aliases of `solid` | Surface classes, see [surfaces.md](./surfaces.md) |
-| `SURFACE_PADDING` | `default`, `compact`, `cozy` | Inner padding |
-| `SECTION_SPACING` | `section` (`mt-12 sm:mt-16`), `sectionGap` (`mt-3`) | Section rhythm |
+| Export | Use |
+|---|---|
+| `SURFACE` | `solid` (frame: hairline, 10px, card ground), `inset` (tile: `bg-muted`, 10px), `solidHover`. `glass` and `glassNoBlur` are retired aliases of `solid`; do not use them. |
+| `SURFACE_PADDING` | `default`, `compact`, `cozy` inner padding |
+| `SECTION_SPACING` | `section` (48px between sections), `sectionGap` (12px under a heading) |
+| `PROSE_WIDTH`, `WIDE_WIDTH`, `BREAKOUT` | The 708px page column, the full-width page, and the (empty) media breakout. `SHELL_WIDTH` is a deprecated alias of `PROSE_WIDTH` |

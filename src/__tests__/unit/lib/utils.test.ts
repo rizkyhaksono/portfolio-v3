@@ -22,8 +22,8 @@ describe('cn utility function', () => {
   })
 
   it('should handle arrays of class names', () => {
-    const result = cn(['px-4', 'py-2'], 'bg-ink')
-    expect(result).toBe('px-4 py-2 bg-ink')
+    const result = cn(['px-4', 'py-2'], 'bg-foreground')
+    expect(result).toBe('px-4 py-2 bg-foreground')
   })
 
   it('should handle objects with boolean values', () => {

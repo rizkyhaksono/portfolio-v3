@@ -1,5 +1,6 @@
 "use client"
 
+import { Maximize2 } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -10,23 +11,26 @@ interface ProjectImageViewerProps {
   alt: string
 }
 
-/** The cover as a plate, cropped for the column; selecting it opens the whole image in a dialog. */
+/** The page cover: the screenshot cropped to the column; selecting it opens the whole image in a dialog. */
 export default function ProjectImageViewer({ src, alt }: Readonly<ProjectImageViewerProps>) {
   return (
     <Dialog>
-      <PlateFigure caption="Select the image to see it uncropped.">
+      <PlateFigure>
         <DialogTrigger asChild>
           <button type="button" aria-label={`View the full image: ${alt}`} className="relative block aspect-[16/10] w-full cursor-zoom-in">
-            {/* `!`: the plate already frames it, so `.prose img`'s own frame must not apply. */}
             <Image
               src={src}
               alt=""
               fill
-              sizes="(min-width: 1024px) 66ch, 100vw"
-              className="!border-0 object-cover object-left-top !p-0"
+              sizes="(min-width: 640px) 45rem, 100vw"
+              className="object-cover object-top"
               priority
               unoptimized={!canOptimizeImage(src)}
             />
+            {/* Notion's expand control in the image's corner: the cue that the cover opens uncropped. */}
+            <span aria-hidden className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-md border border-border bg-background text-muted-foreground">
+              <Maximize2 className="size-4" strokeWidth={1.5} />
+            </span>
           </button>
         </DialogTrigger>
       </PlateFigure>

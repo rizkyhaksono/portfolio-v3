@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { CalendarDays } from "lucide-react"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { LegalDocument } from "@/components/ui/legal-document"
 import { InkLink } from "@/components/ui/ink-link"
 import { getMetadataBaseUrl } from "@/lib/site-url"
@@ -93,7 +95,7 @@ const sections = [
           them.
         </p>
         <p>
-          Your browser&rsquo;s local storage keeps a few settings that never leave your device: the paper or night theme,
+          Your browser&rsquo;s local storage keeps a few settings that never leave your device: the light or dark theme,
           your roadmap progress and the name for its certificate, and when you last used the contact form. Embedded YouTube
           videos load from YouTube only after you press play.
         </p>
@@ -152,7 +154,8 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalDocument
       title="Privacy policy"
-      dateline="Last updated 19 October 2026."
+      icon={<SectionIcon href="/legal/privacy" />}
+      properties={[{ label: "Last updated", icon: <CalendarDays aria-hidden />, value: <time dateTime="2026-10-19">19 October 2026</time> }]}
       next={{ href: "/legal/terms", title: "Terms of service" }}
       sections={sections}
     />

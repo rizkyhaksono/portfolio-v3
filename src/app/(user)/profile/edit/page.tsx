@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
+import { SectionIcon } from "@/components/layout/section-icons"
+import { PageHeader } from "@/components/ui/page-header"
 import { loadProfile, ProfileUnavailable } from "../_components/load-profile"
-import { ProfileSheet } from "../_components/profile-sheet"
 import { EditProfileForm } from "./_components/edit-profile-form"
 
 export const metadata: Metadata = {
@@ -13,8 +14,9 @@ export default async function EditProfilePage() {
   if (!profile) return <ProfileUnavailable />
 
   return (
-    <ProfileSheet title="Edit your profile">
+    <>
+      <PageHeader icon={<SectionIcon href="/profile" />} title="Edit your profile" />
       <EditProfileForm profile={profile} />
-    </ProfileSheet>
+    </>
   )
 }

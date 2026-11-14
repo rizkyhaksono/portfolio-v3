@@ -6,7 +6,7 @@ const siteUrl = getSiteUrl()
 export const MetadataConstants = {
   creator: "Muhammad Rizky Haksono",
   jobTitle: JOB_TITLE,
-  description: `Muhammad Rizky Haksono is a ${JOB_TITLE} building production LLM systems — RAG, MCP, and cloud-native agents.`,
+  description: `Muhammad Rizky Haksono is a ${JOB_TITLE} building production LLM systems: RAG, MCP and cloud-native agents.`,
   keyword: `Muhammad Rizky Haksono, ${JOB_TITLE}, machine learning, LLM, RAG, MCP, developer, frontend, backend, UI/UX`,
   pageTitle: `Rizky Haksono | ${JOB_TITLE}`,
   ogTitle: `Muhammad Rizky Haksono | ${JOB_TITLE}`,

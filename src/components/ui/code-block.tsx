@@ -14,15 +14,19 @@ function textOf(node: ReactNode): string {
   return "";
 }
 
-/** Server specimen box: tint ground, system mono, no syntax colours; the copy button is the only island. */
+/**
+ * Notion's code block, rendered on the server: the grey ground, the language in small muted text at the top left,
+ * and a copy button at the top right that shows on hover or focus. System mono, no syntax colours.
+ */
 function Specimen({ text, lang, className }: Readonly<{ text: string; lang?: string; className?: string }>) {
   return (
-    <div className="my-6 bg-tint">
-      <div className="flex min-h-9 items-center justify-between gap-4 border-b border-rule px-4">
-        <span className="font-display text-caption text-ink-soft">{lang}</span>
+    <div className="group/code relative my-6 rounded-md bg-muted">
+      {lang && <span className="absolute left-4 top-2.5 text-caption text-muted-foreground">{lang}</span>}
+      <div className="absolute right-2 top-1.5">
         <CopyButton text={text} lang={lang} />
       </div>
-      <pre tabIndex={0} className="overflow-x-auto p-4 font-mono text-[0.84375rem] leading-[1.55] text-ink">
+      {/* `!` padding: `.prose pre` would otherwise set its own and hide the code under the label row. */}
+      <pre tabIndex={0} className="m-0 overflow-x-auto rounded-md bg-muted !px-4 !pb-4 !pt-10 font-mono text-[0.84375rem] leading-[1.55] text-foreground">
         <code className={className}>{text}</code>
       </pre>
     </div>
@@ -35,7 +39,7 @@ const CodeBlock = ({ className, children, node: _node, ...props }: CodeBlockProp
 
   if (!className?.includes("language-") && !code.includes("\n")) {
     return (
-      <code className="bg-tint px-[0.3em] py-[0.1em] font-mono text-[0.85em]" {...props}>
+      <code className="rounded bg-tint-strong px-[0.35em] py-[0.15em] font-mono text-[0.85em]" {...props}>
         {children}
       </code>
     );

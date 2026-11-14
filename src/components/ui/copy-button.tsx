@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CopyButtonProps {
   text: string;
@@ -9,7 +10,10 @@ interface CopyButtonProps {
   lang?: string;
 }
 
-/** Copies a code specimen. The word changes with the state, so it never relies on the icon alone. */
+/**
+ * Copies a code block. Hidden until the block is hovered or focused (always shown on touch screens and while it
+ * says Copied); the word changes with the state, so it never relies on the icon alone.
+ */
 export default function CopyButton({ text, lang }: Readonly<CopyButtonProps>) {
   const [copied, setCopied] = useState(false);
 
@@ -29,7 +33,10 @@ export default function CopyButton({ text, lang }: Readonly<CopyButtonProps>) {
       onClick={copy}
       data-umami-event="Click Copy Code"
       data-umami-event-lang={lang}
-      className="inline-flex items-center gap-1.5 text-caption text-ink underline-offset-[0.18em] hover:underline active:translate-y-px [@media(pointer:coarse)]:min-h-11"
+      className={cn(
+        "inline-flex min-h-7 items-center gap-1.5 rounded-md bg-muted px-2 text-caption text-muted-foreground opacity-0 transition duration-ui ease-out hover:bg-tint-strong hover:text-foreground focus-visible:opacity-100 group-focus-within/code:opacity-100 group-hover/code:opacity-100 [@media(hover:none)]:opacity-100 [@media(pointer:coarse)]:min-h-11",
+        copied && "opacity-100",
+      )}
     >
       <Icon className="size-4" strokeWidth={1.5} aria-hidden />
       <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>

@@ -28,12 +28,5 @@ export function excerpt(html: string, max = 160): string {
 
 export const minutesToRead = (html: string) => Math.max(1, Math.round(plainText(html).split(" ").length / 200))
 
-/** A dateline sentence: "Published 3 March 2026. 6 minutes to read." */
-export function dateline(published?: string | null, minutes?: number): string | undefined {
-  const date = toDate(published)
-  const parts = [
-    date && `Published ${formatDay(date)}.`,
-    minutes && `${minutes} ${minutes === 1 ? "minute" : "minutes"} to read.`,
-  ]
-  return parts.filter(Boolean).join(" ") || undefined
-}
+/** "6 minutes", for the Reading time property. */
+export const minutesLabel = (minutes: number) => `${minutes} ${minutes === 1 ? "minute" : "minutes"}`

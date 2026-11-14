@@ -1,117 +1,25 @@
 ---
-description: One-ink UI system for Portfolio v3 (cobalt ink on cream paper). Enforce tokens, surfaces, page patterns, motion and analytics rules.
+description: Notion workspace UI system for Portfolio v3 (grey sidebar, top bar, 708px page column, monochrome Notion components, the Langit Malang sky as the home cover, light and dark). Points to AGENTS.md and docs/ui, which hold the full rules.
 globs: ["src/**/*.{tsx,ts,css}", "content/**/*.{md,mdx}", "tailwind.config.ts"]
 alwaysApply: true
 ---
 
-# UI system: one ink on paper
+# UI system: Notion workspace
 
-`docs/ui/` is the source of truth. This rule summarises it; when they disagree, `docs/ui/` wins.
+The full rules live in the "UI rules (mandatory)" section of `AGENTS.md` and in `docs/ui/` (source of truth: `docs/ui/README.md`). Read them before any UI work; when this file and `docs/ui/` disagree, `docs/ui/` wins.
 
-The whole site is one cobalt ink printed on cream paper, set in Plus Jakarta Sans, with riso grain, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on the hero's cobalt, and the menu sheet offers Paper, Night and System. Hierarchy comes from size, weight and rules.
+The design is a Notion workspace, monochrome in light and dark, set in one sans, Onest. Every public page has the grey sidebar (or the Menu sheet below `lg`), a 44px top bar with the breadcrumb, and the page in Notion's 708px column; only the home has a cover, the painted Langit Malang sky. The admin keeps its own shell until its rebuild. The jest test `src/__tests__/unit/lib/ui-gate.test.ts` enforces the rules in CI through `bun run test`; never add a file to its allowlists.
 
-The old monochrome / grayscale language, Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and glass surfaces are retired. Never reintroduce them.
+The essentials:
 
-## Tokens
-
-Defined in `src/app/globals.css` (HSL triples, `:root` and `.dark`) and exposed in `tailwind.config.ts`.
-
-| Class | Paper | Night | Role |
-|---|---|---|---|
-| `paper` | #F3ECDC | #1E3C9E | Page, card, text on solid ink |
-| `ink` | #1E3C9E | #F3ECDC | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `ink-soft` | #445BAA | #E6D9BC | Secondary text (paper or tint only) |
-| `rule` | #BFC6DE | #4E67BC | Decorative hairlines |
-| `rule-strong` | #6476B2 | #90A3DF | Control boundaries |
-| `tint` | #E2E4EB | #142C7B | Hover row, code ground, inset |
-
-- shadcn names map onto these (`background`/`card`/`popover` = paper, `foreground`/`primary`/`ring`/`destructive` = ink, `muted`/`secondary`/`accent` = tint, `muted-foreground` = ink-soft, `border` = rule, `input` = rule-strong).
-- **Never**: palette colours (`blue-500`, `neutral-*`, `zinc-*`, ...), hex in class names, `white` / `black`, opacity on text (`text-foreground/70`), `dark:` variants. Tokens flip on `<html class="dark">`.
-- Status, errors and destructive actions are shape plus word (8px square filled / outline / dashed, SVG cross, explicit verb). No red, green or amber.
-
-## Type
-
-- Plus Jakarta Sans only, roman and italic, via `next/font/google` (`--font-sans`; `font-display` is the same face). Weight and tracking live on the size tokens.
-- Italic: h1 to h4, display, one standfirst per page, captions, datelines, pull quotes, numerals.
-- Roman: body, prose, nav, buttons (15/600), labels (13/600), table heads (12/600 ink-soft), tags (12), form values.
-- Compact fluid scale (375 to 1280px), the `fontSize` keys in `tailwind.config.ts`: `body` 15 to 16px, `prose` 16 to 17, `lead` 17 to 19, `h3` 18 to 20, `h2` 22 to 30, `h1` 30 to 44, `display` 44 to 104, `numeral` 32 to 48, `small` 13, `caption` and `xs` 12. Use the keys, never ad-hoc sizes.
-- System mono (`ui-monospace, ...`) only for code, slugs, keys, raw JSON, WPM passage, kbd. `font-mono` class only in code-block and kbd files.
-- Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences. Links underline 1px, 2px on hover. `tabular-nums` in ledgers, tables, figures.
-
-## Three surfaces only
-
-| Surface | Code | Use for |
-|---|---|---|
-| **Frame** | `Card`, `Surface variant="solid"` (`rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card |
-| **Inset** | `Surface variant="inset"` (`bg-muted`) | Nested rows, code specimens, hover rows |
-| **Lift** | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Command, toasts |
-
-- `glass` / `glass-static` are retired aliases of frame. Do not use them.
-- Radius 0 everywhere; the radio dot is the only circle.
-- No gradients, glass, `backdrop-blur`, glows, `shadow-sm`..`shadow-2xl`, hover lifts. Hover = rule turns ink or row takes `bg-tint`.
-- Lines: hairline 1px rule; strong 1px ink; active 2px ink underline; page heads and the colophon sit on a single 1px ink rule; never stack rules; dotted leaders; dashed = draft or archived.
-
-## Shell and page patterns
-
-`BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) renders the sticky running head, the menu sheet, `main#main` and the colophon with the engraving band. No sidebars, no navbar, no scroll-to-top. Do not add horizontal padding inside it. Nav comes only from `src/commons/constants/navigation-menu.ts`.
-
-| Pattern | Component | Routes |
-|---|---|---|
-| Ledger | `ui/ledger.tsx` | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
-| Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
-| Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
-| Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
-| Admin | Ruled spine, `--admin-rail` | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` |
-| Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
-| Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
-
-- One width for every page: fill BaseLayout's wrapper (`SHELL_WIDTH`), never narrow or centre the outer container; cap only running text with `max-w-[66ch]`. No page descriptions under the h1. Section rhythm via `PageSection` (`mt-12 sm:mt-16`). Titles via `SectionHeading` (no `marker`).
-- Charts are server SVG (`InkChart`, `InkHeatmap`, `HatchBar`). Never add recharts.
-- Fields are baseline only (`border-0 border-b border-input`). Buttons: `bg-ink text-paper`, never a `Button` inside a `Link` (use `asChild`).
-
-## Brand, plates and details
-
-- **Logo.** The RH monogram in one ink, only through `<Logo variant="mini" | "mark" | "tile">` (`ui/logo.tsx`): `mini` glyph in `currentColor` (running head, admin spine), `mark` adds four registration ticks at 60% ink (colophon, 404, auth, locked Etan AI view), `tile` reverses it out of an ink square. Never paste the SVG or recolour it. Art is generated by `node scripts/logo/make.mjs` (Node 22.18+); do not hand-edit `logo-art.ts`, `src/app/icon.svg`, `apple-icon.png`, `favicon.ico` or `public/brand/*`. `src/app/favicon.ico` must exist: the healthcheck fetches `/favicon.ico`.
-- **Home hero.** A `.masthead` first screen in the theme's ink and paper: job line and speckled name (the LCP element) centred, the Bromo plate (inks swapped in Paper) along the bottom 56% over the foot of the letters, the name sinking behind it as the hero scrolls away. The sentence (24px floor on phones) and the links sit just below on paper. The Hollar band stays in the colophon; `/auth` pairs the form with a grained reversed ink block (`.ink-grain`). About carries the duotone portrait (a lazy `PlateFigure`: 18rem left column from `md`, under the heading at up to 20rem on phones) and the prose with a bold drop cap.
-- **PlateFigure.** `tone?: "photo" | "color"`. `photo` (default) is the duotone; `color` skips it (anime, Pokémon, OCR upload, site `/api/og` covers). The frame draws the focus outline when an interactive child is focused.
-- **Generated cards.** `ogImageUrl(params, path?)` in `src/lib/site-url.ts` always sets `v=3`.
-- **Hover tips.** `data-tip="..."` (`ui/hover-tip.tsx`), never the native `title`.
-- **Contrast guard.** `src/__tests__/unit/lib/contrast.test.ts` fails below ink on paper 7:1, ink-soft on paper and tint 4.5:1, rule-strong on paper 3:1 and the wordscroll ghost 3:1, in Paper and Night.
-- **Themes.** `defaultTheme="light"` with `enableSystem`; labels Paper, Night, System.
-
-## Motion
-
-- Tier 0 (no JS): native scroll, sticky layouts, `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }` (never `scroll-padding-top` on `html`: it scrolls the page whenever focus lands in the sticky head). `overflow-x: clip` on `html` and `main` only; never on `body`; never `overflow: hidden` / `auto` or `content-visibility` on a sticky ancestor.
-- Tier 1 (CSS, `@supports (animation-timeline: view())` + no-preference): home lede wordscroll (its own view timeline), the masthead cover and the reading hairline (articles and home). Nothing else is scroll-linked.
-- Response motion only: underline, `active:translate-y-px`, tab underline, accordion, dialog and sheet fade + 4px, toasts.
-- **Banned:** parallax (beyond the masthead cover), marquees, typing effects, smooth cursor, page transitions, pulsing dots, pulse skeletons, fade-up / reveal on sections, `BlurFade`, Lenis, GSAP, `motion` / framer-motion. Nothing autoplays.
-- Reduced motion: durations .01ms, the lede sentence fully inked, sticky stays.
-
-## Umami events
-
-- `data-umami-event` only on `<button>` and external `target="_blank"` links. On an internal `<a>` the tracker calls `preventDefault` and reloads the page.
-- Internal links: `data-track="nav-click" data-track-item="blog"`; the delegated listener in `deferred-client-utilities.tsx` forwards them. In code use `track()` from `src/lib/analytics.ts`.
-- Kebab-case, 50 characters or fewer, enum values only, one event per element, never PII. Event table in `docs/ui/components.md`.
-
-## Grep gate
-
-Both must print nothing for the paths you touched (`$PHASE_PATHS`; final run `src content`). Never add a new hit; make touched files pass.
-
-```bash
-grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnIE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
-```
-
-## Checklist before shipping UI
-
-- [ ] Route uses one page pattern
-- [ ] Ink / paper tokens only; no hex, palette colours, `white` / `black`, `dark:`
-- [ ] Only frame, inset or lift
-- [ ] Plus Jakarta Sans weights from the size tokens; mono only for machine text
-- [ ] No banned motion; reduced motion works
-- [ ] Umami attributes follow the button / external-link rule
-- [ ] Accessible: `aria-current`, 44px targets under 768px, chart text alternatives, no horizontal scroll at 375px
-- [ ] Grep gate prints nothing
+- Every visitor page uses `BaseLayout`, a Notion workspace: a grey sidebar (`bg-muted`, 15rem, `lg` and up) with the owner's row, the pages with 16px lucide icons (`SECTION_ICONS`), a "More" group, contact rows, a Light, Dark and System control and the legal links; below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet. A 44px top bar with the breadcrumb and the theme toggle. The 708px page column (`width="wide"` on `/tools` and `/chat`), ending on one quiet line (year, Malang time, email).
+- Every page opens with `PageHeader` (icon, 40px bold title via `text-title sm:text-display`, muted description). Content as Notion views and blocks: `Properties`, `LedgerList` / `LedgerRow` (list view), `MediaCard` in `Gallery` (gallery view), `Table` (table view), `ArticleShell` (article), `Callout` at most once per page.
+- Monochrome: page text and links in ink (`text-foreground`, links through `InkLink`), secondary text in `text-muted-foreground`, hover `bg-tint`, tags and selected items `bg-tint-strong`, ink primary buttons. Colours only from the token classes; no hex, palette colours or `dark:` classes. Blue (`sky`, `sky-wash`) only in the home cover and the text selection; the cover's grass greens are an illustration-only exception in the `.sky` block of `globals.css`.
+- Sizes only from the `fontSize` keys (small 14/20 for UI, body 16/24, prose 16/26, h2 24/32 at 600, page titles 40/48 at 700); weights 400 to 700; no `uppercase`, `tracking-[…]` or `text-[Npx]`. One sans, Onest; no serif, no handwritten face.
+- Notion radii: 4px tags (`rounded`), 6px controls and rows (`rounded-md`), 10px cards, images and floating layers (`rounded-lg`); no `rounded-[…]`. Fields are 36px with a 3:1 `border-input`. No boxes around sections.
+- No shadows anywhere: floating layers (dialog, sheet, menu, select) get a hairline border; the tooltip and toast are inverted. No blur anywhere; no gradients outside `globals.css` and `sky.tsx`.
+- The Langit Malang sky is the home page's cover only (`SkyCover`); there is no footer sky. Its pause toggle stays visually hidden until keyboard focus, phones get a still scene, and every animation stops under reduced motion. No motion libraries (framer-motion, `motion`, GSAP, Lenis).
+- Auth (`/auth`, `/admin/auth/login`) follows notion.so/login: one 320px centred column, a two-line title, a full-width ink button, "or continue with" Google, then "New here? Create an account". The admin keeps its own shell until its rebuild.
+- Copy in sentence case with plain verbs; no em dash in UI strings, no generic CTAs, no buzzwords.
+- Umami: `data-umami-event` only on `<button>` and external `target="_blank"` links; internal links use `data-track`.
+- Every route uses one page pattern from `docs/ui/page-shell.md`; visible focus and 44px targets on phones.
