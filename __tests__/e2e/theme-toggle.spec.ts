@@ -23,18 +23,18 @@ test.describe('Theme', () => {
     await expect(html).not.toHaveClass(/\bdark\b/);
   });
 
-  test('menu offers Light, Dark and System', async ({ page }) => {
+  test('menu offers light, dark and the device theme', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
     await page.getByRole('button', { name: 'Menu' }).click();
     const sheet = page.getByRole('dialog', { name: 'Menu' });
     const html = page.locator('html');
 
-    // A first visit follows the device, so System starts checked.
-    await expect(sheet.getByRole('radio', { name: 'System' })).toBeChecked();
-    await sheet.getByRole('radio', { name: 'Dark' }).click();
+    // A first visit follows the device, so the device option starts checked.
+    await expect(sheet.getByRole('radio', { name: 'Theme from the device' })).toBeChecked();
+    await sheet.getByRole('radio', { name: 'Dark theme' }).click();
     await expect(html).toHaveClass(/\bdark\b/);
-    await sheet.getByRole('radio', { name: 'Light' }).click();
+    await sheet.getByRole('radio', { name: 'Light theme' }).click();
     await expect(html).not.toHaveClass(/\bdark\b/);
   });
 

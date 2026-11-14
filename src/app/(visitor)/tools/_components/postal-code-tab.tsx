@@ -80,10 +80,10 @@ function ByPlace() {
 
   return (
     <section aria-labelledby="postal-by-place" className="space-y-4">
-      <h3 id="postal-by-place" className="text-h3 text-foreground">
+      <h3 id="postal-by-place" className="text-h4 text-foreground">
         Find a postal code
       </h3>
-      <div className="grid gap-x-6 gap-y-4 md:grid-cols-2">
+      <div className="grid max-w-3xl gap-x-4 gap-y-4 sm:grid-cols-2">
         <PlaceSelect
           id="postal-province"
           label="Province"
@@ -173,12 +173,12 @@ function ByCode() {
 
   return (
     <section aria-labelledby="postal-by-code" className="space-y-4">
-      <h3 id="postal-by-code" className="text-h3 text-foreground">
+      <h3 id="postal-by-code" className="text-h4 text-foreground">
         Places for a postal code
       </h3>
-      <form onSubmit={submit} noValidate className="space-y-2">
+      <form onSubmit={submit} noValidate className="max-w-xl space-y-1">
         <Label htmlFor="postal-code">Postal code</Label>
-        <div className="flex items-end gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
           <Input
             id="postal-code"
             inputMode="numeric"
@@ -189,14 +189,14 @@ function ByCode() {
             onChange={(e) => setCode(e.target.value)}
             aria-invalid={invalid || undefined}
             aria-describedby={invalid ? "postal-code-error" : undefined}
-            className="max-w-[12rem]"
+            className="sm:max-w-48"
           />
-          <Button type="submit" disabled={hits.status === "loading" && Boolean(query)} aria-busy={hits.status === "loading" && Boolean(query)}>
+          <Button type="submit" className="w-full sm:h-9 sm:w-auto" disabled={hits.status === "loading" && Boolean(query)} aria-busy={hits.status === "loading" && Boolean(query)}>
             Look up
           </Button>
         </div>
         {invalid && (
-          <p id="postal-code-error" className="flex gap-2 text-caption text-foreground">
+          <p id="postal-code-error" className="flex gap-2 pt-1 text-caption text-foreground">
             <X aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />
             A postal code has five digits, for example 65144.
           </p>
@@ -214,7 +214,7 @@ function ByCode() {
               <p className="text-caption text-muted-foreground">
                 {hits.data.length === 1 ? `One village uses ${query}.` : `${hits.data.length} villages share ${query}.`}
               </p>
-              <LedgerList className="mt-2">
+              <LedgerList className="mt-2 max-w-3xl">
                 {hits.data.map((hit) => (
                   <LedgerRow key={hit.code} titleAs="p" title={hit.village} meta={hit.postal}>
                     {hit.district}, {hit.city}, {hit.province}.

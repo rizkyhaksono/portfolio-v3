@@ -1,17 +1,16 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { getAdminNotifications, type AdminNotification } from "@/services/admin/notifications"
 import { safeRedirect } from "@/lib/utils"
 import { timeAgo } from "./admin-format"
 
 const SEEN_KEY = "admin_notifs_seen_at"
 const POLL_MS = 60_000
-const HOVER_CLOSE_MS = 200
 
 const readSeen = () => {
   try {
@@ -21,53 +20,10 @@ const readSeen = () => {
   }
 }
 
-/** Opens a dropdown while a mouse rests on the trigger or the menu. Touch and keyboard keep click-to-open. */
-function useHoverOpen() {
-  const [open, setOpen] = useState(false)
-  const byHover = useRef(false)
-  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => () => clearTimeout(closeTimer.current), [])
-
-  const enter = (e: PointerEvent) => {
-    if (e.pointerType !== "mouse") return
-    clearTimeout(closeTimer.current)
-    if (!open) byHover.current = true
-    setOpen(true)
-  }
-  const leave = (e: PointerEvent) => {
-    if (e.pointerType !== "mouse" || !byHover.current) return
-    clearTimeout(closeTimer.current)
-    closeTimer.current = setTimeout(() => setOpen(false), HOVER_CLOSE_MS)
-  }
-  const onOpenChange = (next: boolean) => {
-    byHover.current = false
-    setOpen(next)
-  }
-  // A hover-opened menu must not take focus away from whatever the admin is typing in.
-  const keepFocus = (e: Event) => {
-    if (byHover.current) e.preventDefault()
-  }
-
-  return {
-    root: { open, onOpenChange, modal: false },
-    trigger: {
-      onPointerEnter: enter,
-      onPointerLeave: leave,
-      // Radix toggles on pointerdown, which would close a menu the hover just opened.
-      onPointerDown: (e: PointerEvent) => {
-        if (e.pointerType === "mouse" && open) e.preventDefault()
-        byHover.current = false
-      },
-    },
-    content: { onPointerEnter: enter, onPointerLeave: leave, onOpenAutoFocus: keepFocus, onCloseAutoFocus: keepFocus },
-  }
-}
-
-/** Bell with an unread count. Polls once a minute, only while the tab is visible. */
+/** Bell with an unread count; opens on click. Polls once a minute, only while the tab is visible. */
 export function NotificationBell() {
   const [items, setItems] = useState<AdminNotification[]>([])
   const [seenAt, setSeenAt] = useState("")
-  const hover = useHoverOpen()
 
   const load = useCallback(async () => setItems(await getAdminNotifications()), [])
 
@@ -108,48 +64,51 @@ export function NotificationBell() {
   }
 
   return (
-    <DropdownMenu {...hover.root}>
-      <DropdownMenuTrigger asChild {...hover.trigger}>
-        <Button variant="ghost" size="icon" className="relative" aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative size-11 text-muted-foreground hover:text-foreground lg:size-8"
+          aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}
+        >
           <Bell strokeWidth={1.5} aria-hidden />
           {unread > 0 && (
-            <span aria-hidden className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center bg-foreground px-1 text-caption font-semibold leading-none tabular-nums text-background">
+            <span aria-hidden className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-caption font-medium leading-none tabular-nums text-background lg:-right-0.5 lg:-top-0.5">
               {unread > 9 ? "9+" : unread}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" {...hover.content} className="w-[min(20rem,calc(100vw-2rem))] p-0">
-        <div className="flex items-center justify-between gap-3 border-b border-foreground px-3 py-2">
-          <p className="text-h4 text-foreground">Notifications</p>
+      <DropdownMenuContent align="end" className="w-80 max-w-[calc(100vw-1rem)]">
+        <div className="flex items-center justify-between gap-3 pr-1">
+          <DropdownMenuLabel className="text-small">Notifications</DropdownMenuLabel>
           {unread > 0 && (
-            <button type="button" onClick={markAllRead} className="text-small text-foreground underline-offset-[0.18em] hover:underline">
+            <Button type="button" variant="ghost" size="sm" onClick={markAllRead} className="text-muted-foreground hover:text-foreground">
               Mark all read
-            </button>
+            </Button>
           )}
         </div>
         <div className="max-h-[60vh] overflow-y-auto">
           {items.length === 0 ? (
-            <p className="px-3 py-8 text-center text-small text-muted-foreground">Nothing new.</p>
+            <p className="px-2 py-6 text-small text-muted-foreground">Nothing new.</p>
           ) : (
             items.map((n) => (
-              <div key={n.id} className="border-b border-border last:border-b-0">
-                <DropdownMenuItem asChild className="block px-3 py-2.5">
-                  <Link href={safeRedirect(n.href, "/admin/dashboard")}>
-                    <span className="flex items-baseline gap-2">
-                      {isUnread(n) && (
-                        <span className="inline-flex shrink-0 items-center gap-1 text-caption font-semibold text-foreground">
-                          <span aria-hidden className="size-2 bg-foreground" />
-                          New
-                        </span>
-                      )}
-                      <span className="truncate text-small font-semibold text-foreground">{n.title}</span>
+              <DropdownMenuItem key={n.id} asChild className="flex items-start gap-2 py-1.5">
+                <Link href={safeRedirect(n.href, "/admin/dashboard")}>
+                  <span aria-hidden className="mt-2 flex size-1.5 shrink-0">
+                    {isUnread(n) && <span className="size-1.5 rounded-full bg-foreground" />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium text-foreground">
+                      {isUnread(n) && <span className="sr-only">New: </span>}
+                      {n.title}
                     </span>
-                    {n.detail && <span className="mt-0.5 block truncate text-small text-muted-foreground">{n.detail}</span>}
-                    <span className="mt-0.5 block text-caption text-muted-foreground">{timeAgo(n.createdAt)}</span>
-                  </Link>
-                </DropdownMenuItem>
-              </div>
+                    {n.detail && <span className="block truncate text-muted-foreground">{n.detail}</span>}
+                    <span className="block text-caption text-muted-foreground">{timeAgo(n.createdAt)}</span>
+                  </span>
+                </Link>
+              </DropdownMenuItem>
             ))
           )}
         </div>

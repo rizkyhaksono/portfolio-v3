@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
 import { StatusLine } from "@/components/ui/status-line"
+import { PageHeader } from "@/components/ui/page-header"
+import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
+import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { formatDay, httpUrl, timeAgo } from "@/components/layout/admin/admin-format"
 
@@ -70,28 +73,27 @@ export default function FeedbackAdminPage() {
   }
 
   return (
-    <div className="w-full max-w-[60rem]">
-      <div role="group" aria-label="Show feedback" className="flex flex-wrap gap-x-6 border-b border-border">
-        {FILTERS.map((f) => (
-          <button
-            key={f.value}
-            type="button"
-            aria-pressed={filter === f.value}
-            onClick={() => setFilter(f.value)}
-            className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground aria-pressed:border-foreground aria-pressed:text-foreground [@media(pointer:coarse)]:min-h-11"
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+    <>
+      <PageHeader icon={<AdminPageIcon href="/admin/dashboard/feedback" />} title="Feedback" description="Messages from the feedback form on the site, newest first." />
+      <ViewTabs
+        label="Show feedback"
+        tabs={FILTERS.map((f) => ({ label: f.label, current: filter === f.value, onSelect: () => setFilter(f.value) }))}
+        actions={
+          (state === "ready" || state === "more") && items.length > 0 ? (
+            <span className="text-small tabular-nums text-muted-foreground">
+              {items.length} of {total}
+            </span>
+          ) : undefined
+        }
+      />
 
       {state === "loading" && (
-        <ul aria-busy="true" aria-label="Loading feedback" className="divide-y divide-border">
+        <ul aria-busy="true" aria-label="Loading feedback" className="mt-2">
           {[0, 1, 2].map((i) => (
-            <li key={i} className="space-y-3 py-6">
-              <Skeleton className="h-3 w-48" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
+            <li key={i} className="space-y-2 border-b border-border px-2 py-4">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-4 w-full max-w-xl" />
+              <Skeleton className="h-4 w-2/3 max-w-md" />
             </li>
           ))}
         </ul>
@@ -113,62 +115,63 @@ export default function FeedbackAdminPage() {
 
       {(state === "ready" || state === "more") &&
         (items.length === 0 ? (
-          <StatusLine kind="empty" className="py-10">
+          <StatusLine kind="empty" className="mt-6">
             {filter === "all" ? "No feedback yet." : `Nothing marked ${filter === "new" ? "new" : filter}.`}
           </StatusLine>
         ) : (
           <>
-            <p className="mt-4 text-caption tabular-nums text-muted-foreground">
-              Showing {items.length} of {total}.
-            </p>
-            <ol className="divide-y divide-border">
+            <ol role="list" className="mt-2">
               {items.map((f) => {
                 const link = httpUrl(f.pageUrl)
                 return (
-                  <li key={f.id} className="py-6">
-                    <article>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" status={STATUS_MARK[f.status]}>
-                          {sentence(f.status)}
-                        </Badge>
-                        <Badge variant="outline">{sentence(f.category)}</Badge>
+                  <li key={f.id} className="-mx-2 rounded-md border-b border-border px-2 py-4 transition-colors duration-ui ease-out last:border-b-0 hover:bg-tint">
+                    <article className="grid gap-x-6 sm:grid-cols-[minmax(0,1fr)_auto]">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <Badge status={STATUS_MARK[f.status]}>{sentence(f.status)}</Badge>
+                          <Badge variant="secondary">{sentence(f.category)}</Badge>
+                        </div>
+                        <p className="mt-2 max-w-prose whitespace-pre-wrap break-words text-body text-foreground">{f.message}</p>
+                        {(f.email || f.pageUrl) && (
+                          <p className="mt-1 break-all text-small text-muted-foreground">
+                            {f.email && (
+                              <>
+                                From <InkLink href={`mailto:${f.email}`}>{f.email}</InkLink>
+                              </>
+                            )}
+                            {f.email && f.pageUrl && ", "}
+                            {f.pageUrl && (
+                              <>
+                                {f.email ? "on " : "On "}
+                                {link ? (
+                                  <InkLink href={link} external>
+                                    {link}
+                                  </InkLink>
+                                ) : (
+                                  <span className="text-foreground">{f.pageUrl}</span>
+                                )}
+                              </>
+                            )}
+                          </p>
+                        )}
                       </div>
-                      <p className="mt-2 text-caption text-muted-foreground">
-                        Sent {formatDay(f.createdAt)}, {timeAgo(f.createdAt)}.
-                      </p>
-                      <p className="mt-3 max-w-[66ch] whitespace-pre-wrap break-words text-body text-foreground">{f.message}</p>
-                      {(f.email || f.pageUrl) && (
-                        <div className="mt-3 space-y-1 border-l border-foreground pl-4 text-small text-muted-foreground">
-                          {f.email && (
-                            <p>
-                              From <InkLink href={`mailto:${f.email}`}>{f.email}</InkLink>
-                            </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-1 sm:mt-0 sm:flex-col sm:items-end">
+                        <p className="text-small tabular-nums text-muted-foreground">
+                          <time dateTime={f.createdAt} data-tip={formatDay(f.createdAt)}>{timeAgo(f.createdAt)}</time>
+                          <span className="sr-only">, {formatDay(f.createdAt)}</span>
+                        </p>
+                        <div className="ml-auto flex gap-1 sm:ml-0">
+                          {f.status !== "read" && (
+                            <Button size="sm" variant="ghost" onClick={() => { void setStatus(f, "read") }}>
+                              Mark as read
+                            </Button>
                           )}
-                          {f.pageUrl && (
-                            <p className="break-all">
-                              On{" "}
-                              {link ? (
-                                <InkLink href={link} external>
-                                  {link}
-                                </InkLink>
-                              ) : (
-                                <span className="text-foreground">{f.pageUrl}</span>
-                              )}
-                            </p>
+                          {f.status !== "archived" && (
+                            <Button size="sm" variant="ghost" onClick={() => { void setStatus(f, "archived") }}>
+                              Archive
+                            </Button>
                           )}
                         </div>
-                      )}
-                      <div className="mt-4 flex flex-wrap gap-3">
-                        {f.status !== "read" && (
-                          <Button size="sm" variant="outline" onClick={() => { void setStatus(f, "read") }}>
-                            Mark as read
-                          </Button>
-                        )}
-                        {f.status !== "archived" && (
-                          <Button size="sm" variant="ghost" onClick={() => { void setStatus(f, "archived") }}>
-                            Archive
-                          </Button>
-                        )}
                       </div>
                     </article>
                   </li>
@@ -176,7 +179,7 @@ export default function FeedbackAdminPage() {
               })}
             </ol>
             {items.length < total && (
-              <div className="border-t border-border pt-6">
+              <div className="mt-4">
                 <Button variant="outline" onClick={() => { void load(page + 1) }} disabled={state === "more"} aria-busy={state === "more"}>
                   {state === "more" ? "Loading…" : "Load older feedback"}
                 </Button>
@@ -184,6 +187,6 @@ export default function FeedbackAdminPage() {
             )}
           </>
         ))}
-    </div>
+    </>
   )
 }

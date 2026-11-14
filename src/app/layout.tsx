@@ -67,6 +67,8 @@ export const viewport: Viewport = {
   ],
 }
 
+const SIDEBAR_SCRIPT = `try{if(localStorage.getItem("sidebar")==="collapsed")document.documentElement.dataset.sidebar="collapsed"}catch(e){}`
+
 /** App shell: fonts, theme, analytics bootstrap, and global UI primitives. */
 export default async function RootLayout({
   children,
@@ -78,6 +80,8 @@ export default async function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className={fontSans.variable} suppressHydrationWarning>
       <head>
+        {/* The folded sidebar is set before paint, so a returning visitor never sees it open and then close. */}
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: SIDEBAR_SCRIPT }} />
         <JsonLd nonce={nonce} />
         {umamiEnabled && (
           <>

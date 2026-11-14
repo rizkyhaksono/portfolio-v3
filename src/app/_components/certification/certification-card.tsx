@@ -29,7 +29,7 @@ export function CertificationRow({ certification }: Readonly<{ certification: Li
             external
             event="cert-verify"
             eventData={{ issuer: certification.provider }}
-            className="relative after:absolute after:inset-x-0 after:-inset-y-3"
+            className="relative after:absolute after:inset-x-0 after:-inset-y-3.5"
           >
             Verify
           </InkLink>

@@ -4,6 +4,7 @@ import { SectionIcon } from "@/components/layout/section-icons"
 import { InkLink } from "@/components/ui/ink-link"
 import { Gallery, MediaCard } from "@/components/ui/media-card"
 import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN, GALLERY_NARROW } from "@/components/ui/page-loading"
 import { StatusLine } from "@/components/ui/status-line"
 import { selectFeaturedProjects } from "./featured"
 import { plateOf } from "./project-links"
@@ -43,7 +44,7 @@ function ProjectGroup({ id, label, projects, lead }: Readonly<{ id: string; labe
           <span className="sr-only"> {projects.length === 1 ? "project" : "projects"}</span>
         </span>
       </h2>
-      <Gallery>
+      <Gallery className={GALLERY_NARROW}>
         {projects.map((project, i) => (
           <li key={project.id}>
             <MediaCard
@@ -95,12 +96,14 @@ export default async function ProjectPage() {
         description={projects.length > 0 ? `${projects.length.toLocaleString("en")} projects. The hand-picked ones first.` : undefined}
       />
 
-      {projects.length === 0 && <StatusLine kind="empty">No projects are listed right now.</StatusLine>}
+      <div className={FADE_IN}>
+        {projects.length === 0 && <StatusLine kind="empty">No projects are listed right now.</StatusLine>}
 
-      {featured.length > 0 && <ProjectGroup id="hand-picked" label="Hand-picked" projects={featured} lead />}
-      {[...byYear(rest)].map(([year, rows], i) => (
-        <ProjectGroup key={year} id={`year-${year}`} label={year} projects={rows} lead={featured.length === 0 && i === 0} />
-      ))}
+        {featured.length > 0 && <ProjectGroup id="hand-picked" label="Hand-picked" projects={featured} lead />}
+        {[...byYear(rest)].map(([year, rows], i) => (
+          <ProjectGroup key={year} id={`year-${year}`} label={year} projects={rows} lead={featured.length === 0 && i === 0} />
+        ))}
+      </div>
     </div>
   )
 }

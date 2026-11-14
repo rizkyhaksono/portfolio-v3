@@ -5,15 +5,15 @@ Five grounds, as in a Notion workspace. Most content needs no box: titles, page 
 | Surface | Looks like | Code | Use for |
 |---|---|---|---|
 | **Page** | `bg-background`, no box | nothing | Page text, properties, list rows, tables, headings, most of every page |
-| **Sidebar** | `bg-muted`, no border | `Sidebar`, the menu sheet | The page tree on the left (lg and up) and the same tree in the left sheet below lg |
+| **Sidebar** | `bg-muted`, no border | `Sidebar`, the menu sheet | The page tree on the left (lg and up, folding to a 3.25rem icon rail) and the same tree in the left sheet below lg |
 | **Tile** | `bg-muted`, `rounded-lg`, no border, no shadow | `PlateFigure`, `Surface variant="inset"`, `.prose pre` | Pictures, code blocks, the image area of a gallery card |
-| **Frame** | 1px `border-border` hairline, `rounded-lg`, page ground, no shadow | `Card`, `Surface variant="solid"`, `MediaCard` | Gallery cards, a form group, the profile card |
-| **Float** | `bg-popover`, `rounded-lg`, hairline `border-border`, no shadow | Inside the shared floating primitives | Dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay |
+| **Frame** | 1px `border-border` hairline, `rounded-lg`, page ground, no shadow | `Card`, `Surface variant="solid"`, `MediaCard` | Gallery cards, the tool cards, the home contact form, the admin editor, the profile card |
+| **Float** | `bg-popover`, `rounded-lg`, hairline `border-border`, no shadow | Inside the shared floating primitives | Dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay, the mention preview card |
 | **Inverted** | `bg-foreground text-background`, no border | `HoverTip`, the Sonner toast | The tooltip (`rounded-md`) and toasts (`rounded-lg`), as in Notion |
 
 **Tints.** Notion's translucent fills sit on any ground: `bg-tint` (6% ink) for hover on rows, buttons and menu items, for the `Callout` block and for skeletons; `bg-tint-strong` (10% ink) for tags and selected items. They are the only hover feedback on rows and cards.
 
-**The top bar** is opaque `bg-background`, sticky, with no border, blur or shadow. Nothing on the site is translucent except the tints. The only painted ground is the home cover.
+**The top bar** is opaque `bg-background`, sticky, with no border, blur or shadow. Nothing on the site is translucent except the tints. The only picture across a page is the home's photo cover, on the `bg-muted` ground.
 
 `Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases of the frame. Do not use them.
 
@@ -45,7 +45,7 @@ import { Surface } from "@/components/ui/surface"
 - The hairline border is applied once, inside the shared floating primitives in `src/components/ui/`. Toasts are styled in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. There is no shadow; feature code never adds one.
 - Menu rows are 28px (44px on touch), `rounded-md`, `text-small`, with `focus:bg-tint`.
 - Behind a modal sits a fixed scrim filled with `--scrim`. No backdrop blur.
-- Radix layers fade in with a 4px slide over 150 to 200ms; sheets slide over `--dur-sheet`. Esc closes, and focus returns to the trigger.
+- Menus and select content fade with a small zoom from 0.97 (150 to 200ms); dialogs fade and zoom over `--dur-sheet`; sheets slide fully in from their edge over `--dur-sheet`. Esc closes, and focus returns to the trigger.
 
 ## Callout
 

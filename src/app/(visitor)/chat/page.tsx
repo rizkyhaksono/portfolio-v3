@@ -3,6 +3,7 @@ import { getInitialMessages, getCurrentUser } from "@/services/visitor/chat"
 import { Button } from "@/components/ui/button"
 import { SectionIcon } from "@/components/layout/section-icons"
 import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN } from "@/components/ui/page-loading"
 import { StatusLine } from "@/components/ui/status-line"
 
 export const dynamic = "force-dynamic"
@@ -20,7 +21,9 @@ export default async function ChatPage() {
       />
 
       {initialMessages ? (
-        <ChatClient initialMessages={initialMessages} currentUser={currentUser} />
+        <div className={`flex min-h-0 flex-1 flex-col ${FADE_IN}`}>
+          <ChatClient initialMessages={initialMessages} currentUser={currentUser} />
+        </div>
       ) : (
         <StatusLine
           kind="failed"

@@ -57,7 +57,7 @@ const sections = [
         </p>
         <p>
           Public pages only ever show totals, such as how many people read a post. To leave yourself out of the counts, run{" "}
-          <code>localStorage.setItem(&quot;umami.disabled&quot;, &quot;1&quot;)</code> in your browser&rsquo;s console on
+          <code className="[overflow-wrap:anywhere]">localStorage.setItem(&quot;umami.disabled&quot;, &quot;1&quot;)</code> in your browser&rsquo;s console on
           this site.
         </p>
       </>

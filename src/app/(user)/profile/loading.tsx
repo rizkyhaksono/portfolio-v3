@@ -1,22 +1,39 @@
+import { BadgeCheck, CalendarDays, Link2, Mail, MapPin, UserRound } from "lucide-react"
+import { LoadingStatus, TextSkeleton } from "@/components/ui/page-loading"
+import { Properties } from "@/components/ui/properties"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const ROWS = ["w-2/3", "w-1/3", "w-1/2", "w-1/3", "w-1/4"]
+const PROPERTIES = [
+  { label: "Email", icon: <Mail />, width: "w-40" },
+  { label: "Email check", icon: <BadgeCheck />, width: "w-20" },
+  { label: "Location", icon: <MapPin />, width: "w-28" },
+  { label: "Joined", icon: <CalendarDays />, width: "w-24" },
+  { label: "Account", icon: <UserRound />, width: "w-16" },
+  { label: "Connected", icon: <Link2 />, width: "w-16" },
+]
 
-/** Notion skeleton of the profile while the account server answers: avatar, name, property rows. */
+/** Shown while the account server answers: the avatar, the name, the profile's property rows, the bio and actions. */
 export default function ProfileLoading() {
   return (
-    <div role="status" className="w-full">
-      <span className="sr-only">Loading your profile…</span>
+    <div aria-busy="true" className="w-full">
+      <LoadingStatus>Loading your profile…</LoadingStatus>
       <div aria-hidden>
-        <Skeleton className="size-16 rounded-full" />
-        <Skeleton className="mt-4 h-10 w-1/2 rounded-lg" />
-        <div className="mt-5 flex flex-col gap-2">
-          {ROWS.map((width, i) => (
-            <div key={i} className="flex h-8 items-center gap-2">
-              <Skeleton className="h-4 w-28 shrink-0" />
-              <Skeleton className={`h-4 ${width}`} />
-            </div>
-          ))}
+        <div className="mb-8">
+          <Skeleton className="mb-4 size-16 rounded-full" />
+          <div className="flex h-10 items-center sm:h-12">
+            <Skeleton className="h-8 w-1/2 sm:h-9" />
+          </div>
+          <Properties
+            className="mt-5 grid-cols-[minmax(6.5rem,8rem)_minmax(0,1fr)] sm:grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)]"
+            items={PROPERTIES.map(({ label, icon, width }) => ({ label, icon, value: <Skeleton className={`h-3.5 ${width}`} /> }))}
+          />
+        </div>
+        <div className="border-t border-border pt-6">
+          <TextSkeleton lines={2} />
+        </div>
+        <div className="mt-8 flex flex-wrap gap-2">
+          <Skeleton className="h-8 w-28 [@media(pointer:coarse)]:h-11" />
+          <Skeleton className="h-8 w-24 [@media(pointer:coarse)]:h-11" />
         </div>
       </div>
     </div>

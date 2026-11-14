@@ -20,7 +20,7 @@ export function SourceTabs({ tabs }: Readonly<{ tabs: SourceTab[] }>) {
 
   return (
     <Tabs value={value} onValueChange={(next) => router.replace(`${pathname}?tab=${next}`, { scroll: false })}>
-      <TabsList className="mx-auto w-full max-w-[60rem]">
+      <TabsList>
         {tabs.map((tab) => (
           <TabsTrigger key={tab.id} value={tab.id}>
             {tab.label}
@@ -28,7 +28,7 @@ export function SourceTabs({ tabs }: Readonly<{ tabs: SourceTab[] }>) {
         ))}
       </TabsList>
       {tabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className="mt-8">
+        <TabsContent key={tab.id} value={tab.id} className="mt-4">
           {tab.content}
         </TabsContent>
       ))}

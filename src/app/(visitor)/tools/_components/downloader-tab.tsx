@@ -16,7 +16,7 @@ import {
 } from "@/services/visitor/downloader"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
 import { httpUrl } from "@/lib/utils"
-import { ToolError } from "./tool-status"
+import { GROUP_LABEL, ToolError } from "./tool-status"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
 
@@ -92,12 +92,15 @@ export function DownloaderTab() {
 
   return (
     <div className="space-y-6">
-      <div role="group" aria-label="Platform" className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+      <div role="group" aria-labelledby="download-platform">
+        <p id="download-platform" className={GROUP_LABEL}>
+          Platform
+        </p>
+        <div className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {PLATFORMS.map((p) => (
           <Button
             key={p.id}
             type="button"
-            size="sm"
             variant={platformId === p.id ? "default" : "outline"}
             aria-pressed={platformId === p.id}
             onClick={() => setPlatformId(p.id)}
@@ -105,11 +108,12 @@ export function DownloaderTab() {
             {p.name}
           </Button>
         ))}
+        </div>
       </div>
 
-      <form onSubmit={handleDownload} className="space-y-2">
+      <form onSubmit={handleDownload} className="max-w-xl space-y-1">
         <Label htmlFor="download-url">{platform.name} link</Label>
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
           <Input
             id="download-url"
             type="url"
@@ -121,11 +125,11 @@ export function DownloaderTab() {
             aria-describedby="download-note"
             className="min-w-0 flex-1"
           />
-          <Button type="submit" disabled={!url.trim() || isLoading} aria-busy={isLoading} className="w-full sm:w-auto">
+          <Button type="submit" disabled={!url.trim() || isLoading} aria-busy={isLoading} className="w-full sm:h-9 sm:w-auto">
             {isLoading ? "Fetching…" : "Download"}
           </Button>
         </div>
-        <p id="download-note" className="text-caption text-muted-foreground">
+        <p id="download-note" className="pt-1 text-caption text-muted-foreground">
           {platform.note}
         </p>
       </form>

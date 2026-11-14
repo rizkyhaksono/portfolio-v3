@@ -5,6 +5,8 @@ export type EventName =
   | 'nav-click'
   | 'menu-open'
   | 'theme-toggle'
+  | 'sidebar-toggle'
+  | 'mention-click'
   | 'outbound-click'
   | 'cta-click'
   | 'resume-open'

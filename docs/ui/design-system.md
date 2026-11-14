@@ -14,15 +14,15 @@ Tokens are HSL triples (no `hsl()` wrapper) in `src/app/globals.css`: `:root` is
 | `--input` | `border-input` | #8F8E8A | #6E6E6E | Borders of fields that must be seen (3:1, WCAG 1.4.11) |
 | `--popover` | `bg-popover` | #FFFFFF | #252525 | Floating layers |
 | `--destructive` | `text-destructive` | #C4321F | #F27166 | Destructive actions and errors, always with a word |
-| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the home cover sky only |
+| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent kept in the tokens, `THEME_HEX` and the contrast test; no component uses it |
 | `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the text selection fill only |
 
 Notion's translucent fills, built from the text colour in `tailwind.config.ts` so they work on the page, the sidebar and menus alike:
 
 | Class | Value | Use |
 |---|---|---|
-| `bg-tint` | foreground at 6% | Hover on rows, buttons, sidebar items, menu items; callouts; the segmented theme track; skeletons |
-| `bg-tint-strong` | foreground at 10% | Tags (`Badge`, `Chip`), the secondary button's hover, selected states |
+| `bg-tint` | foreground at 6% | Hover on rows, buttons, sidebar items, menu items; callouts; skeletons |
+| `bg-tint-strong` | foreground at 10% | Tags (`Badge`, `Chip`), the secondary button's hover, selected states (the checked theme radio) |
 
 Derived tokens, so shadcn parts keep working:
 
@@ -53,8 +53,7 @@ After a Notion page:
 - **Page text is ink.** Body copy, `.prose`, row titles, table cells that name things and every link label are `text-foreground`. Links go through `InkLink`: ink with a grey underline (`decoration-foreground/40`) that turns full ink on hover, so colour is never the only cue (WCAG 1.4.1).
 - **Grey is for secondary text:** sidebar rows until hovered or current, page descriptions, property names, row meta, table head cells, captions.
 - **Hover and selection are tints**, never colour: `hover:bg-tint` on anything clickable that is a row or a quiet button, `bg-tint-strong` on tags and selected items.
-- **Blue belongs to the cover.** `sky` and `sky-wash` appear only in the home page's Langit Malang cover and the `::selection` fill. Never for links, buttons, focus rings, charts, icons, tags or hover. The admin uses neither.
-- **The grass greens and the mountain haze** in the cover are an illustration-only exception to the colour cap: they live only in the `.sky` block of `globals.css` and are never UI colour.
+- **Blue belongs to the selection.** `sky-wash` appears only in the `::selection` fill; `sky` has no use now. Never blue for links, buttons, focus rings, charts, icons, tags or hover.
 
 ### Colour rules
 
@@ -76,7 +75,7 @@ After a Notion page:
 | sky on background | 7.0 | 8.4 |
 | foreground on sky-wash | 9.7 | 8.8 |
 
-**Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples from `globals.css` and fails below the floors in both themes: foreground 7:1 on background, muted and popover; muted-foreground 4.5:1 on background, muted and popover; input 3:1; destructive 4.5:1; sky 4.5:1; foreground on sky-wash 7:1. It checks `THEME_HEX` against the tokens and that the print block pins the light triples. There are no footer-sky checks any more: no text sits on the sky. If a pair falls short, nudge the token, never the floor.
+**Guard test.** `src/__tests__/unit/lib/contrast.test.ts` parses the triples from `globals.css` and fails below the floors in both themes: foreground 7:1 on background, muted and popover; muted-foreground 4.5:1 on background, muted and popover; input 3:1; destructive 4.5:1; sky 4.5:1; foreground on sky-wash 7:1. It checks `THEME_HEX` against the tokens and that the print block pins the light triples. If a pair falls short, nudge the token, never the floor.
 
 ## Type: Onest
 
@@ -127,54 +126,47 @@ Notion's radii. `--radius` is 10px.
 | Radius | Class | Value | Use |
 |---|---|---|---|
 | Dots | `rounded-full` | | Switch, radio, avatar on the home page, status dots |
-| Tags | `rounded` | 4px | `Badge`, `Chip`, the theme segments, inline code, the owner's 20px portrait in the sidebar |
-| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, list rows, toggles, callouts, the hover tip |
-| Cards and layers | `rounded-lg` | 10px | `MediaCard`, `Card`, `Surface`, `PlateFigure` images, dialogs, menus, select content, toasts |
+| Tags | `rounded` | 4px | `Badge`, `Chip`, inline code, the owner's 20px portrait in the sidebar |
+| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, the theme radios, list rows, toggles, callouts, the hover tip |
+| Cards and layers | `rounded-lg` | 10px | `MediaCard`, `Card`, `Surface`, `PlateFigure` images, the contact form, the mention preview, dialogs, menus, select content, toasts |
 
 `rounded-sm` (2px) exists but has no use. `rounded-xl` and `rounded-2xl` are not part of the scale; do not use them. Never `rounded-[…]`.
 
 ## Shadow, blur and gradients
 
 - **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast and the hover tip are inverted slabs (`bg-foreground text-background`) with no border. The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
-- **No blur.** The top bar is opaque `bg-background`; nothing is translucent. Scrims are a fixed `--scrim` fill, never blurred. The cover's clouds are pre-softened radial shapes, never `filter: blur`.
-- **Gradients** only in `globals.css` and the cover (`sky.tsx`). No gradient text, buttons, borders or backgrounds anywhere else.
+- **No blur.** The top bar is opaque `bg-background`; nothing is translucent. Scrims are a fixed `--scrim` fill, never blurred.
+- **No gradients.** None is left in the code: no gradient text, buttons, borders or backgrounds. The gate's R6 allowlist still names `globals.css` and the deleted `sky.tsx`; that is not a licence to add one.
 
-## Langit Malang: the home cover
+## The home cover
 
-The painted Malang sky survives as Notion's page cover on the home page, and only there. It says where the owner works from and that the page is alive at this hour.
+The home page has Notion's page cover, a photo, and no other page has one.
 
-- **Where.** `SkyCover` (`src/components/ui/sky.tsx`) is passed to `BaseLayout` as `cover` by `src/app/page.tsx`. It runs edge to edge above the page column, 30% of the viewport tall (at least 11rem, at most 20rem). No other page has a cover sky; there is no footer sky and no auth band.
-- **What.** `Sky variant="cover"`: CSS and inline SVG only, no image file, `aria-hidden`. Back to front: a sky gradient (deeper blue overhead, from `.sky--cover`), the sun or the moon up on the right, two or three soft clouds, Arjuno's ridge and Semeru's cone in haze, rolling grass hills with blades that sway, and a fine grain. The cover variant has no name between the hills. The `band` variant (with the name) still exists in `sky.tsx` but no page mounts it.
-- **Colour by the hour.** The sky colour (`--sky-top`) follows the time of day in Malang (Asia/Jakarta, WIB), wherever the visitor is:
-
-| Phase (WIB) | Light `--sky-top` |
-|---|---|
-| Dawn, 5 to 8 | `210 57.7% 89%` |
-| Day, 8 to 15 | `211 68.4% 90.4%` |
-| Dusk, 15 to 18 | `220 37.5% 90.6%` |
-| Evening, 18 to 5 | `219 44.4% 89.4%` |
-
-- **Dark mode** is always the night sky (`215 46.3% 16.1%`) with the moon and a few static stars.
-- **Phase.** `skyPhase(date)` in `src/lib/malang-time.ts` is a pure function with a unit test for all four boundaries and the WIB offset. The server renders the day stop; a client effect sets `data-sky="dawn|day|dusk|evening"` on mount and refreshes it every five minutes.
-- **Motion.** The clouds drift and the grass sways as soon as the page loads. Phones (below 640px) and `prefers-reduced-motion: reduce` get a still scene.
-- **Pause control.** The scene moves for more than five seconds, so `SkyToggle` ("Pause the sky" or "Play the sky") sits inside the cover for keyboard and screen-reader users (WCAG 2.2.2). It is `sr-only` and shows in the cover's top left only on keyboard focus. The choice is saved in localStorage and sets `data-sky-paused` on `<html>`. Below 640px and under reduced motion it is `display: none`, since nothing moves there.
+- **Where.** `PageCover` (`src/components/ui/page-cover.tsx`) is passed to `BaseLayout` as `cover` by `src/app/page.tsx` with `src/assets/cover/home.webp`. It runs edge to edge above the page column, 30% of the viewport tall (at least 11rem, at most 20rem), on the `bg-muted` ground.
+- **How.** `next/image` with `fill`, `priority`, a blur placeholder from the static import, `object-cover` and `object-position` from `position` (`50% 45%` by default), `sizes` that leave out the sidebar from `lg`. `alt=""` (it is decoration) and `data-print-hide`.
+- **Motion.** None. The photo does not move.
 - **The page under it.** The home's round portrait overlaps the cover's lower edge like a Notion page icon, then the title and properties follow.
-- **CSS.** One `.sky` block in `globals.css` holds every scene colour. They live nowhere else.
+- **The hour in Malang** lives on in the closing line: `MalangClock` (`src/components/ui/malang-clock.tsx`) renders "HH:MM in Malang" (Asia/Jakarta) after mount and refreshes every 30 seconds.
 
 ## Motion: quiet and functional
 
-All of it is CSS or platform native. No motion library.
+All of it is CSS or platform native, quick and Notion-like. No motion library.
 
 | Motion | How | Timing |
 |---|---|---|
-| Hover tint | `bg-tint` fades in on rows, buttons, sidebar items | `--dur-ui` (buttons `--dur-press`) |
+| Row hover | `bg-tint` comes in on sidebar rows, list rows, gallery cards, the breadcrumb, the theme radios and mentions | `duration-75` |
+| Button hover | `bg-tint` or the ink button's fill | `--dur-press` |
 | Link underline | The grey underline turns full ink | `--dur-ui` |
 | Toggle | The triangle (`ChevronRight`) turns 90 degrees; accordion content opens by height | `--dur-ui` |
 | View tabs | The 2px ink bar moves to the open tab with the colour | `--dur-ui` |
 | Theme crossfade | `switchTheme()` wraps the change in a view transition | `--dur-sheet` |
-| Floating layers | Radix fade with a 4px slide; sheets slide | 150 to 280ms |
+| Menus and selects | Fade with a small zoom from 0.97 | dropdown menus `--dur-ui`, select content 150ms |
+| Dialogs | Dialog and alert dialog fade and zoom from 0.97, centred by inset and auto margins so the zoom is the only transform | `--dur-sheet` |
+| Sheets | Slide fully in from their edge | `--dur-sheet` |
+| Sidebar fold | The desktop sidebar's width eases between 15rem and 3.25rem | 280ms, `cubic-bezier(0.2, 0, 0, 1)` |
+| Mention preview | The hover card fades in and rises 4px, after a 150ms hover delay | 150ms |
 | Skeleton | A soft pulse on `bg-tint`, only under `motion-safe` | Tailwind `animate-pulse` |
-| The home cover | Clouds drift; grass blades sway | slow loops; grass 6s alternate |
+| Content fade-in | `FADE_IN` in `src/components/ui/page-loading.tsx`: the part of a page that replaces its skeleton fades in, never the head | 300ms, `ease-out` |
 
 There is no route crossfade and no project morph in the current code. Use `--dur-*` and `ease-out` for anything else that responds to input (press, hover, focus, open and close).
 
@@ -182,9 +174,9 @@ There is no route crossfade and no project morph in the current code. Use `--dur
 
 Under `prefers-reduced-motion: reduce`:
 
-- The global kill switch in `globals.css` drops durations to near zero.
+- The global kill switch in `globals.css` drops animation and transition durations to near zero, so layers open, the sidebar folds and hovers change at once.
 - Every `::view-transition-*` pseudo-element gets `animation: none`, and `switchTheme()` skips the view transition.
-- The cover is a still scene (no drifting clouds, no swaying grass); skeletons do not pulse; smooth scrolling is off.
+- Skeletons do not pulse and `FADE_IN` does nothing (both are `motion-safe`); smooth scrolling is off.
 - The check: with `reducedMotion: 'reduce'`, `document.getAnimations().length` is 0.
 
 ### Banned motion
@@ -195,7 +187,7 @@ Scroll reveal or fade-up on sections, parallax, scroll-jacking or anything tied 
 
 - next-themes with `attribute="class"`, `defaultTheme="system"` and `enableSystem`. `ThemeProvider` receives the CSP nonce so its script runs before paint and dark-OS visitors never see a light frame.
 - Light and dark are equal: Notion's white page with a #F7F7F5 sidebar, and Notion's #191919 page with a #202020 sidebar.
-- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and the sidebar's segmented Light, Dark and System radio group.
+- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and, at the bottom right of the sidebar beside Privacy and Terms, three icon radios (`ThemeChoice` in `sidebar-nav.tsx`): Sun "Light theme", Moon "Dark theme" and Monitor "Theme from the device", the checked one on `bg-tint-strong`. They hide while the sidebar is folded.
 - `switchTheme()` in `src/components/layout/theme-toggle.tsx` is the one path for theme changes. Do not call `setTheme` directly from new code.
 - `color-scheme` follows the theme. The viewport `themeColor` is an array with one entry per `prefers-color-scheme`, read from `THEME_HEX`, as is the manifest.
 

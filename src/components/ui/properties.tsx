@@ -11,7 +11,7 @@ export interface Property {
 /** Notion's page properties: a muted name with its icon on the left, the value in ink on the right. */
 export function Properties({ items, className }: Readonly<{ items: Property[]; className?: string }>) {
   return (
-    <dl className={cn("grid grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)] gap-x-2 text-small", className)}>
+    <dl className={cn("grid grid-cols-[minmax(5.5rem,8rem)_minmax(0,1fr)] gap-x-2 text-small sm:grid-cols-[minmax(6.5rem,10rem)_minmax(0,1fr)]", className)}>
       {items.map(({ label, value, icon }) => (
         <Fragment key={label}>
           <dt className="flex min-h-8 items-center gap-1.5 text-muted-foreground [&>svg]:size-4 [&>svg]:shrink-0">

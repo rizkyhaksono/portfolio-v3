@@ -28,7 +28,7 @@ export function Breadcrumb() {
               <Link
                 href={href}
                 aria-current={pathname === href ? "page" : undefined}
-                className="flex min-h-11 min-w-0 items-center gap-1.5 rounded-md px-1.5 text-foreground transition-colors hover:bg-tint lg:min-h-7"
+                className="flex min-h-11 min-w-0 items-center gap-1.5 rounded-md px-1.5 text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-7"
                 {...navTrack(href, "head")}
               >
                 <SectionIcon href={href} className="size-4 shrink-0" />
