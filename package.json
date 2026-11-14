@@ -84,7 +84,7 @@
     "postcss": "^8.5.6",
     "sharp": "0.35.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2"
   },
   "overrides": {
     "@types/react": "19.2.2",
