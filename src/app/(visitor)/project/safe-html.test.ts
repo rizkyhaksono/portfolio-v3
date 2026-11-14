@@ -1,4 +1,13 @@
-import { plainText, safeHtml } from "./safe-html"
+import { firstSentence, plainText, safeHtml } from "./safe-html"
+
+describe("firstSentence", () => {
+  it("stops at the first sentence end, not inside a version number", () => {
+    expect(firstSentence("Built v1.2 of the portal. Then more.")).toBe("Built v1.2 of the portal.")
+    expect(firstSentence("Is it done? Yes.")).toBe("Is it done?")
+    expect(firstSentence("No full stop here")).toBe("No full stop here")
+    expect(firstSentence("")).toBe("")
+  })
+})
 
 describe("safeHtml", () => {
   it("keeps the rich-text formatting", () => {

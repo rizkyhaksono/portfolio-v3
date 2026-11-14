@@ -133,7 +133,7 @@ export function DownloaderTab() {
       {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
 
       {result?.type === "instagram" && (
-        <article className="space-y-4 rounded-2xl bg-muted p-5">
+        <article className="space-y-4 rounded-lg border border-border p-4 sm:p-5">
           <Badge variant="outline" status="outline">
             Preview only
           </Badge>
@@ -174,13 +174,13 @@ export function DownloaderTab() {
 
       {result?.type === "standard" &&
         (downloadLinks.length ? (
-          <article className="overflow-hidden rounded-2xl bg-muted">
+          <article className="max-w-xl overflow-hidden rounded-lg border border-border">
             {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
-              <div className="relative aspect-video w-full">
+              <div className="relative aspect-video w-full border-b border-border bg-muted">
                 <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
               </div>
             )}
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-4 sm:p-5">
               <Badge variant="outline" status="filled">
                 Ready
               </Badge>

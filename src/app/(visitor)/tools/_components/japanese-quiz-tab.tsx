@@ -4,8 +4,8 @@ import { useCallback, useState } from "react"
 import { Check, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { StatusLine } from "@/components/ui/status-line"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { getJLPTLevels, getJLPTVoca, getJLPTQuiz } from "@/services/visitor/japanese"
@@ -74,31 +74,37 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
 
   return (
     <section aria-labelledby="jlpt-words">
-      <h3 id="jlpt-words" className="text-h3 text-foreground">
+      <h3 id="jlpt-words" className="text-h4 text-foreground">
         {level} vocabulary
       </h3>
       <p className="mt-1 text-caption text-muted-foreground">{words.data.length} words, with reading and meaning.</p>
-      <LedgerList className="mt-4">
-        {words.data.map((w, i) => (
-          <LedgerRow
-            key={`${w.word}-${i}`}
-            titleAs="p"
-            title={
-              <>
-                <span lang="ja" className="text-h3">
-                  {w.word}
-                </span>{" "}
-                <span lang="ja" className="text-body text-muted-foreground">
-                  {w.reading}
-                </span>
-              </>
-            }
-          >
-            <span className="text-foreground">{w.meaning}</span>
-            {w.partOfSpeech && <span>, {w.partOfSpeech}</span>}
-          </LedgerRow>
-        ))}
-      </LedgerList>
+      <Table className="mt-4">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Word</TableHead>
+            <TableHead>Reading</TableHead>
+            <TableHead>Meaning</TableHead>
+            <TableHead className="hidden sm:table-cell">Part of speech</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {words.data.map((w, i) => (
+            <TableRow key={`${w.word}-${i}`}>
+              <TableCell lang="ja" className="whitespace-nowrap text-body font-medium text-foreground">
+                {w.word}
+              </TableCell>
+              <TableCell lang="ja" className="text-muted-foreground">
+                {w.reading}
+              </TableCell>
+              <TableCell className="text-foreground">
+                {w.meaning}
+                {w.partOfSpeech && <span className="text-muted-foreground sm:hidden">, {w.partOfSpeech}</span>}
+              </TableCell>
+              <TableCell className="hidden text-muted-foreground sm:table-cell">{w.partOfSpeech}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </section>
   )
 }
@@ -135,7 +141,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
         <p className="text-numeral tabular-nums text-foreground">
           {score} of {total}
         </p>
-        <p className="text-lead text-muted-foreground">
+        <p className="text-body text-muted-foreground">
           {verdict} That is {Math.round((score / total) * 100)}% correct.
         </p>
         <Button onClick={onAgain}>New quiz</Button>
@@ -194,13 +200,13 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
                   disabled={answered}
                   onClick={() => setChoice(option)}
                   className={cn(
-                    "flex min-h-11 w-full items-center gap-3 rounded-lg border p-3 text-left text-body transition-colors duration-ui ease-out",
-                    picked && !answered ? "border-foreground bg-foreground text-background" : "border-input text-foreground",
-                    !answered && !picked && "hover:bg-muted",
+                    "flex min-h-11 w-full items-center gap-3 rounded-md border p-2.5 text-left text-body transition-colors duration-ui ease-out",
+                    picked && !answered ? "border-foreground bg-foreground text-background" : "border-border text-foreground",
+                    !answered && !picked && "hover:bg-tint",
                     isAnswer && "border-foreground",
                   )}
                 >
-                  <span aria-hidden className="flex size-7 shrink-0 items-center justify-center rounded-md border border-current text-small">
+                  <span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded border border-current text-caption">
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span className={cn("flex-1", isWrongPick && "line-through")}>{option}</span>

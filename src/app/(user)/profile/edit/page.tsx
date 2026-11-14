@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { PageHeader } from "@/components/ui/page-header"
 import { loadProfile, ProfileUnavailable } from "../_components/load-profile"
 import { EditProfileForm } from "./_components/edit-profile-form"
@@ -14,7 +15,7 @@ export default async function EditProfilePage() {
 
   return (
     <>
-      <PageHeader title="Edit your profile" />
+      <PageHeader icon={<SectionIcon href="/profile" />} title="Edit your profile" />
       <EditProfileForm profile={profile} />
     </>
   )

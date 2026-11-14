@@ -1,12 +1,12 @@
 @tailwind base;
 
 @layer base {
-  /* Langit Malang tokens: shadcn names as HSL triples (no hsl() wrapper) so every primitive follows.
+  /* Notion-style neutrals (white page, #F7F7F5 sidebar; #191919 / #202020 in dark): shadcn names as HSL triples (no hsl() wrapper) so every primitive follows.
      Contrast floors are pinned in src/__tests__/unit/lib/contrast.test.ts; hex copies live in lib/theme-hex.ts. */
-  :root{--background:60 12.5% 96.9%;--foreground:80 4.9% 12%;--muted:60 11.1% 92.9%;--muted-foreground:72 2.6% 37.8%;--border:60 6.5% 87.8%;--input:69 2.8% 51.2%;--popover:0 0% 100%;--destructive:4 76.5% 40%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;
-  --card:var(--background);--card-foreground:var(--foreground);--popover-foreground:var(--foreground);--primary:var(--foreground);--primary-foreground:var(--background);--secondary:var(--muted);--secondary-foreground:var(--foreground);--accent:var(--muted);--accent-foreground:var(--foreground);--destructive-foreground:var(--background);--ring:var(--foreground);--radius:.75rem;
-  --head-h:3rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:60 2% 6% / .45}
-  .dark{--background:60 2% 10%;--foreground:60 9.5% 91.8%;--muted:80 4.2% 13.9%;--muted-foreground:70 3.2% 63.1%;--border:75 4.3% 18.4%;--input:70 2.7% 43.5%;--popover:60 1.4% 13.5%;--destructive:4 92.5% 68.8%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%}
+  :root{--background:0 0% 100%;--foreground:45 7.8% 20%;--muted:60 11.1% 96.5%;--muted-foreground:48 2.3% 42.2%;--border:60 4.3% 91%;--input:48 2.2% 55.1%;--popover:0 0% 100%;--destructive:6.9 72.7% 44.5%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;
+  --card:var(--background);--card-foreground:var(--foreground);--popover-foreground:var(--foreground);--primary:var(--foreground);--primary-foreground:var(--background);--secondary:var(--muted);--secondary-foreground:var(--foreground);--accent:var(--muted);--accent-foreground:var(--foreground);--destructive-foreground:var(--background);--ring:var(--foreground);--radius:.625rem;
+  --head-h:2.75rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:0 0% 6% / .5}
+  .dark{--background:0 0% 9.8%;--foreground:0 0% 83.1%;--muted:0 0% 12.5%;--muted-foreground:0 0% 60.8%;--border:0 0% 18.4%;--input:0 0% 43.1%;--popover:0 0% 14.5%;--destructive:4.7 84.3% 67.5%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%}
 
   :root {
     color-scheme: light;
@@ -105,87 +105,84 @@ img {
   background-color: hsl(var(--muted-foreground) / 0.45);
 }
 
+/* Notion's page text: 16px with 1.625 leading, headings at 600 in a 1.5 / 1.25 / 1 em ladder, tight block rhythm. */
 .prose {
   @apply text-prose;
-  max-width: 66ch;
   color: hsl(var(--foreground));
 }
 .prose > * + * {
-  margin-top: 1em;
+  margin-top: 0.75em;
 }
 .prose > :first-child {
   margin-top: 0;
 }
-.prose :is(h2, h3) {
-  font-weight: 500;
-  letter-spacing: -0.015em;
+.prose :is(h2, h3, h4) {
+  font-weight: 600;
   text-wrap: balance;
 }
-/* An em ladder on the prose body (1em): h3 one step up, h2 clearly above it. */
 .prose h2 {
-  font-size: 1.25em;
+  font-size: 1.5em;
   line-height: 1.3;
-  margin-top: 2.25em;
+  letter-spacing: -0.01em;
+  margin-top: 1.6em;
 }
 .prose h3 {
-  font-size: 1.0625em;
-  line-height: 1.35;
-  margin-top: 2em;
+  font-size: 1.25em;
+  line-height: 1.3;
+  margin-top: 1.4em;
 }
 .prose h4 {
-  font-weight: 500;
-  margin-top: 1.75em;
+  margin-top: 1.25em;
 }
 .prose :is(h2, h3, h4) + * {
-  margin-top: 0.6em;
+  margin-top: 0.4em;
 }
 .prose strong {
-  font-weight: 500;
+  font-weight: 600;
 }
 .prose a {
   color: hsl(var(--foreground));
-  text-decoration: underline dotted hsl(var(--muted-foreground) / 0.7);
+  text-decoration: underline solid hsl(var(--foreground) / 0.4);
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.25em;
-  transition: text-decoration-color var(--dur-ui) var(--ease-out), text-underline-offset var(--dur-ui) var(--ease-out);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color var(--dur-ui) var(--ease-out);
 }
 .prose a:hover {
-  text-decoration: underline solid hsl(var(--foreground));
-  text-underline-offset: 0.18em;
+  text-decoration-color: hsl(var(--foreground));
 }
+/* Notion's quote block: a 3px ink bar, the text in ink. */
 .prose blockquote {
-  border-left: 2px solid hsl(var(--border));
-  padding-left: 1rem;
-  color: hsl(var(--muted-foreground));
+  border-left: 3px solid hsl(var(--foreground));
+  padding-left: 0.875rem;
 }
 .prose ul {
-  list-style: none;
-  padding-left: 1.25em;
+  list-style: disc;
+  padding-left: 1.5em;
 }
-.prose ul > li {
-  position: relative;
-}
-.prose ul > li::before {
-  content: "\2013";
-  position: absolute;
-  left: -1.25em;
+.prose ul ul {
+  list-style: circle;
 }
 .prose ol {
   list-style: decimal;
   padding-left: 1.5em;
   font-variant-numeric: tabular-nums;
 }
-.prose li + li {
-  margin-top: 0.4em;
+.prose li {
+  padding-left: 0.125em;
 }
+.prose li + li {
+  margin-top: 0.25em;
+}
+/* Notion's simple table: hairlines on every cell, a grey header row. */
 .prose table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9em;
+  font-size: 0.875em;
   font-variant-numeric: tabular-nums;
 }
 .prose :is(th, td) {
-  padding: 0.5em 0.75em 0.5em 0;
+  border: 1px solid hsl(var(--border));
+  padding: 0.4em 0.6em;
   text-align: left;
   vertical-align: top;
   /* break-word, not anywhere: whole words set the column widths, so a wide table scrolls in its wrapper. */
@@ -196,18 +193,13 @@ img {
   white-space: nowrap;
 }
 .prose th {
-  @apply text-caption;
   font-weight: 500;
-  color: hsl(var(--muted-foreground));
-  border-bottom: 1px solid hsl(var(--border));
-}
-.prose td {
-  border-bottom: 1px solid hsl(var(--border));
+  background-color: hsl(var(--muted));
 }
 .prose img {
   max-width: 100%;
   height: auto;
-  border-radius: 1rem;
+  border-radius: 0.375rem;
   background-color: hsl(var(--muted));
 }
 .prose figcaption {
@@ -219,17 +211,18 @@ img {
 .wpm-passage {
   font-family: theme("fontFamily.mono");
 }
+/* Notion's inline code: a grey wash, 85% size, 4px corners (in ink here, not Notion's red). */
 .prose code {
   font-family: theme("fontFamily.mono");
   font-size: 0.85em;
-  background-color: hsl(var(--muted));
-  border-radius: 0.375rem;
-  padding: 0.1em 0.35em;
+  background-color: hsl(var(--foreground) / 0.08);
+  border-radius: 0.25rem;
+  padding: 0.15em 0.35em;
 }
 .prose pre {
   overflow-x: auto;
-  padding: 1rem;
-  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.375rem;
   background-color: hsl(var(--muted));
   font-size: 0.84375rem;
   line-height: 1.55;
@@ -241,7 +234,7 @@ img {
 }
 .prose hr {
   height: 1px;
-  margin: 2.5em 0;
+  margin: 1.5em 0;
   border: 0;
   background-color: hsl(var(--border));
 }
@@ -259,10 +252,10 @@ img {
 
 
 /* ── Langit Malang (ui/sky.tsx) ───────────────────────────────────────
-   The painted landscape the footer sits in, after soft painted-photo backgrounds: a sky that follows Malang's hour
+   The painted landscape of the home cover (and the band variant), after soft painted-photo backgrounds: a sky that follows Malang's hour
    (data-sky; dark mode is always night), the sun or moon, drifting clouds, Arjuno and Semeru in haze, the name set
    large between the hills, grass that moves in the wind, and a fine grain. The greens and the haze are part of this
-   one illustration, never UI colour. Footer text sits in the upper sky; its contrast is pinned in contrast.test.ts. */
+   one illustration, never UI colour. No text sits over it. */
 .sky {
   --sky-top: 211 68.4% 90.4%;
   --orb: 48 100% 97%;
@@ -436,6 +429,31 @@ img {
     bottom: 3.5rem;
   }
 }
+/* As a Notion cover: edge to edge from the first pixel (no fade from the page), deeper blue overhead, the hills in the
+   lower two thirds, a smaller sun or moon up on the right, and no name between the hills. */
+.sky--cover {
+  background: linear-gradient(to bottom, color-mix(in oklab, hsl(var(--sky-top)), hsl(var(--sky)) 22%) 0%, hsl(var(--sky-top)) 70%);
+}
+.sky--cover .sky__orb {
+  top: 12%;
+  bottom: auto;
+  right: 10%;
+  width: 6rem;
+  height: 6rem;
+}
+@media (min-width: 1024px) {
+  .sky--cover .sky__orb {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+.sky--cover .sky__clouds {
+  inset: 0 0 45%;
+}
+.sky--cover .sky__back,
+.sky--cover .sky__front {
+  height: 72%;
+}
 /* Wind in the near grass: the blades lean and settle. */
 .sky__blades {
   transform-box: fill-box;
@@ -475,16 +493,6 @@ html[data-sky-paused] .sky__blades {
   }
 }
 
-/* ── Marker (ui/marker.tsx): one landing phrase per page, the second and last use of the blue. */
-.marker {
-  background-color: hsl(var(--sky-wash));
-  color: hsl(var(--foreground));
-  border-radius: 0.25rem;
-  padding: 0 0.15em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-
 @tailwind utilities;
 
 /* Theme switch (switchTheme in layout/theme-toggle.tsx): the whole page dissolves instead of flashing. */
@@ -514,7 +522,7 @@ html[data-sky-paused] .sky__blades {
 }
 
 @media print {
-  .dark{--background:60 12.5% 96.9%;--foreground:80 4.9% 12%;--muted:60 11.1% 92.9%;--muted-foreground:72 2.6% 37.8%;--border:60 6.5% 87.8%;--input:69 2.8% 51.2%;--popover:0 0% 100%;--destructive:4 76.5% 40%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;color-scheme:light}
+  .dark{--background:0 0% 100%;--foreground:45 7.8% 20%;--muted:60 11.1% 96.5%;--muted-foreground:48 2.3% 42.2%;--border:60 4.3% 91%;--input:48 2.2% 55.1%;--popover:0 0% 100%;--destructive:6.9 72.7% 44.5%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;color-scheme:light}
   body { background: none; }
   nav, [role="dialog"], [data-print-hide] { display: none !important; }
   main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; overflow-wrap: anywhere; }

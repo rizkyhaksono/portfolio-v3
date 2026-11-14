@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Hand } from "lucide-react"
 import { toast } from "sonner"
 import { buttonVariants } from "@/components/ui/button"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
 import { getReactions, addReaction, type ReactionTarget } from "@/services/visitor/reactions"
 
-/** One clap per reader. State by shape and word: outline "Clap", then solid "Clapped". */
+/** One clap per reader, as a quiet Notion button. State by fill and word: outline "Clap", then grey "Clapped". */
 export default function ClapButton({
   targetType,
   targetId,
@@ -59,10 +60,11 @@ export default function ClapButton({
       onClick={clap}
       disabled={reacted || loading}
       aria-busy={loading || undefined}
-      className={cn(buttonVariants({ variant: reacted ? "default" : "outline" }), "disabled:opacity-100", className)}
+      className={cn(buttonVariants({ variant: reacted ? "secondary" : "outline" }), "disabled:opacity-100", className)}
     >
+      <Hand aria-hidden strokeWidth={1.5} />
       {reacted ? "Clapped" : "Clap"}
-      <span className="border-l border-current pl-2 tabular-nums">
+      <span className="ml-0.5 tabular-nums text-muted-foreground">
         {count.toLocaleString("en")}
         <span className="sr-only"> {count === 1 ? "clap" : "claps"} so far</span>
       </span>

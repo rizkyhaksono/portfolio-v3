@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 /** Signed-out chat: a sign-in card. Chat history is per user, so nothing is previewed. */
 export default function AIChatLocked() {
   return (
-    <section aria-labelledby="ai-signin-title" className="rounded-2xl bg-muted p-6 sm:p-8">
+    <section aria-labelledby="ai-signin-title" className="rounded-lg bg-muted p-6 sm:p-8">
       <h2 id="ai-signin-title" className="text-h3 text-balance text-foreground">
         Sign in to write to Etan
       </h2>

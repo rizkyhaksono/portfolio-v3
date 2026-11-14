@@ -10,13 +10,12 @@ interface StatStripProps {
   className?: string
 }
 
-/** A quiet grid of figures: a tabular numeral over its small muted label, with no boxes or rules. */
+/** Notion-style number blocks: a hairline box per figure, the small muted label over a tabular numeral. */
 export function StatStrip({ items, className }: Readonly<StatStripProps>) {
   return (
-    <dl className={cn("grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4", className)}>
+    <dl className={cn("grid grid-cols-2 gap-2 sm:grid-cols-4", className)}>
       {items.map((item) => (
-        // dt stays first for screen readers; the column is reversed so the numeral reads first on screen.
-        <div key={item.label} className="flex min-w-0 flex-col-reverse gap-1">
+        <div key={item.label} className="flex min-w-0 flex-col gap-1 rounded-lg border border-border p-4">
           <dt className="text-pretty text-small text-muted-foreground">{item.label}</dt>
           <dd className="break-words text-numeral tabular-nums text-foreground">{item.value}</dd>
         </div>

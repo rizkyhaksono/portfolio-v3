@@ -12,7 +12,7 @@ describe('PlateFigure', () => {
         <img src="/x.jpg" alt="" />
       </PlateFigure>,
     )
-    expect(frameOf(container)).toHaveClass('rounded-2xl', 'bg-muted', 'overflow-hidden')
+    expect(frameOf(container)).toHaveClass('rounded-lg', 'bg-muted', 'overflow-hidden')
     expect(frameOf(container)).not.toHaveClass('border-foreground')
     expect(frameOf(container).querySelector('img')).toBeInTheDocument()
     expect(container.querySelector('figcaption')).toHaveTextContent('Info Pangan Jakarta')

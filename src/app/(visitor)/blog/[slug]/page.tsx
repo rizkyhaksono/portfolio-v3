@@ -7,14 +7,13 @@ import { ArticleShell } from "@/components/ui/article-shell"
 import CodeBlock, { Pre } from "@/components/ui/code-block"
 import { InkLink } from "@/components/ui/ink-link"
 import { PlateFigure } from "@/components/ui/plate-figure"
-import { ReaderCount } from "@/components/ui/reader-count"
 import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
+import { articleProperties } from "@/app/_components/blog/article-properties"
 import BlogLetters from "@/app/_components/blog/blog-letters"
-import { dateline } from "@/app/_components/blog/format"
 import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
 import { canOptimizeImage } from "@/lib/image-hosts"
-import { getBlogData, getBlogDetail, getComments } from "@/services/visitor/blog"
+import { getBlogDetail, getComments } from "@/services/visitor/blog"
 import { getPathReads } from "@/services/visitor/umami"
 
 export const revalidate = 3600
@@ -72,30 +71,25 @@ export default async function BlogArticlePage({ params }: Props) {
     <>
       <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.cover_image} published={post.published_at} modified={post.edited_at} />
       <ArticleShell
-        back={{ href: "/blog", title: "All writing" }}
         title={post.title}
         standfirst={isClipped(post.description) ? undefined : post.description}
-        dateline={dateline(post.published_at, post.reading_time_minutes)}
-        meta={
-          <>
-            <ReaderCount path={path} reads={reads} className="text-small" />
-            <p>
-              First published on{" "}
-              {/* The link's hidden new-tab note is an inline-block, which lets the full stop wrap alone. */}
-              <span className="whitespace-nowrap">
-                <InkLink href={post.url} external>
-                  DEV Community
-                </InkLink>
-                .
-              </span>{" "}
-              <InkLink href="#letters">
-                {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
-              </InkLink>
-              .
-            </p>
-          </>
-        }
-        chips={tags}
+        properties={articleProperties({
+          published: post.published_at,
+          minutes: post.reading_time_minutes,
+          source: (
+            <InkLink href={post.url} external>
+              DEV Community
+            </InkLink>
+          ),
+          comments: (
+            <InkLink href="#letters">
+              {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
+            </InkLink>
+          ),
+          path,
+          reads,
+          tags,
+        })}
         cover={
           post.cover_image && (
             <PlateFigure>

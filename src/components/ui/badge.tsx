@@ -3,16 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
-// The tag look shared by Badge and Chip. Status is shape plus word, never colour.
+// Notion's select tag, shared by Badge and Chip: a grey fill, 4px corners, 14px text. Status is shape plus word, never colour.
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-small font-medium text-foreground",
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded px-1.5 text-small leading-6 text-foreground",
   {
     variants: {
       variant: {
-        default: "bg-muted",
-        secondary: "bg-muted",
-        destructive: "bg-muted font-semibold",
-        outline: "border border-border bg-transparent",
+        default: "bg-tint-strong",
+        secondary: "bg-tint",
+        destructive: "bg-tint-strong font-medium",
+        outline: "border border-border bg-transparent leading-[1.375rem]",
       },
     },
     defaultVariants: {

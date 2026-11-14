@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
 import { PageHeader } from "@/components/ui/page-header"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { StatStrip, type StatItem } from "@/components/ui/stat-strip"
 import ContributionSection from "@/app/_components/contribution"
 import { getDailyPageviews, getPathReads, getUmamiStats } from "@/services/visitor/umami"
@@ -45,7 +46,7 @@ export default async function StatsPage() {
 
   return (
     <BaseLayout>
-      <PageHeader title="Stats" description="Readers, status and practice figures, refreshed every fifteen minutes." />
+      <PageHeader icon={<SectionIcon href="/stats" />} title="Stats" description="Readers, status and practice figures, refreshed every fifteen minutes." />
 
       {strip.length > 0 && <StatStrip items={strip} className="sm:grid-cols-2" />}
       <ReadersFigures stats={stats} daily={daily} reads={reads} />

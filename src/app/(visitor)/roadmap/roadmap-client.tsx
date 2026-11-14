@@ -1,8 +1,10 @@
-﻿"use client"
+"use client"
 
 import { useEffect, useRef, useState } from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
+import { Award, BookOpen, CircleCheck, FileText } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
+import { Callout } from "@/components/ui/callout"
 import { Input } from "@/components/ui/input"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { StatusLine } from "@/components/ui/status-line"
@@ -28,38 +30,27 @@ const NAME_KEY = "roadmap-cert-name"
 /** The course rows stack above the panel at every width and push it below the fold, so bring its heading into view. */
 const revealPanel = (id: string) => document.getElementById(`${id}-title`)?.scrollIntoView({ block: "start" })
 
-function Tick() {
-  return (
-    <svg aria-hidden viewBox="0 0 16 16" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5}>
-      <path d="M2.5 8.5l3.5 3.5 7.5-8" />
-    </svg>
-  )
-}
-
 /** Shown once every lesson of the course is done in this browser. */
 function Certificate({ course, name, onName }: Readonly<{ course: string; name: string; onName: (name: string) => void }>) {
   const href = ogImageUrl({ course, name: name.trim() }, "/api/certificate")
   return (
-    <div className="mt-10">
-      <p className="flex items-center gap-2 text-body text-foreground">
-        <Tick />
-        Course completed
-      </p>
-      <label htmlFor={`${course}-name`} className="mt-4 block text-small text-foreground">
+    <Callout icon={<Award />} className="mt-10">
+      <p className="font-semibold">Course completed</p>
+      <label htmlFor={`${course}-name`} className="mt-3 block text-small text-muted-foreground">
         Name on the certificate
       </label>
-      <Input id={`${course}-name`} value={name} onChange={(event) => onName(event.target.value)} maxLength={48} autoComplete="name" className="max-w-sm" />
-      <a href={href} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "outline", className: "mt-4" })}>
+      <Input id={`${course}-name`} value={name} onChange={(event) => onName(event.target.value)} maxLength={48} autoComplete="name" className="mt-1 max-w-sm bg-background" />
+      <a href={href} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "outline", className: "mt-3 min-h-11 bg-background md:min-h-8" })}>
         Download the certificate<span className="sr-only"> (opens in a new tab)</span>
       </a>
-    </div>
+    </Callout>
   )
 }
 
-/** The share of lessons done in this browser; the words beside it carry the value. */
+/** Notion's progress bar beside the count; the words carry the value. */
 function Progress({ done, total }: Readonly<{ done: number; total: number }>) {
   return (
-    <span aria-hidden className="mt-2 block h-1 rounded-full bg-muted">
+    <span aria-hidden className="block h-1 w-16 shrink-0 overflow-hidden rounded-full bg-tint-strong">
       <span className="block h-full rounded-full bg-foreground" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
     </span>
   )
@@ -134,7 +125,11 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   return (
     <Tabs value={open} onValueChange={choose} orientation="vertical">
       {/* Radix directly: the ui trigger is a segmented pill, and these are plain rows. */}
-      <TabsPrimitive.List aria-label="Courses" className="flex flex-col">
+      {/* Radix directly: these triggers are Notion list rows, not view tabs. */}
+      <h2 id="courses-label" className="mb-1 flex items-center gap-2 text-small font-medium text-muted-foreground">
+        Courses <span className="tabular-nums">{courses.length}</span>
+      </h2>
+      <TabsPrimitive.List aria-labelledby="courses-label" className="flex flex-col">
         {courses.map((course) => {
           const done = doneOf(course)
           const total = course.lessons.length
@@ -147,16 +142,21 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
               data-track-course={course.course}
               // Radix activates on mousedown, so the panel is mounted by the time click fires.
               onClick={() => revealPanel(course.course)}
-              className="group block w-full py-2 text-left"
+              className="-mx-2 flex min-h-11 gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors duration-ui ease-out hover:bg-tint data-[state=active]:bg-tint-strong"
             >
-              <span className="block text-body text-foreground underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-foreground/40 group-data-[state=active]:decoration-foreground">
-                {courseTitle(course.course)}
+              <BookOpen aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0 text-muted-foreground" />
+              <span className="grid min-w-0 flex-1 gap-x-6 sm:grid-cols-[minmax(0,1fr)_auto]">
+                <span className="min-w-0">
+                  <span className="block text-body font-medium text-foreground">{courseTitle(course.course)}</span>
+                  <span className="block text-small tabular-nums text-muted-foreground">
+                    {total} lessons{minutes > 0 && `, about ${minutes} minutes`}
+                  </span>
+                </span>
+                <span className="flex items-center gap-2 text-small tabular-nums text-muted-foreground sm:justify-end sm:pt-0.5">
+                  <Progress done={done} total={total} />
+                  {done === 0 ? "Not started" : done === total ? "Completed" : `${done} of ${total} done`}
+                </span>
               </span>
-              <span className="block text-body tabular-nums text-muted-foreground">
-                {total} lessons{minutes > 0 && `, about ${minutes} minutes`}.{" "}
-                {done === 0 ? "Not started." : done === total ? "Completed." : `${done} of ${total} done.`}
-              </span>
-              <Progress done={done} total={total} />
             </TabsPrimitive.Trigger>
           )
         })}
@@ -172,16 +172,35 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
         const rowsOf = (value: RoadmapLevel, label: string, marker: boolean) => {
           const rows = lessons.filter((lesson) => (lesson.meta.level ?? "beginner") === value)
           return (
-            <LedgerList key={value} marker={marker ? <h3>{label}</h3> : undefined}>
+            <LedgerList
+              key={value}
+              marker={
+                marker ? (
+                  <h3 className="flex gap-2">
+                    {label} <span>{rows.length}</span>
+                  </h3>
+                ) : undefined
+              }
+            >
               {rows.map(({ slug, meta }) => (
-                <LedgerRow key={slug} titleAs={marker ? "h4" : "h3"} title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
+                <LedgerRow
+                  key={slug}
+                  titleAs={marker ? "h4" : "h3"}
+                  icon={<FileText />}
+                  title={meta.title}
+                  href={`/roadmap/${slug}`}
+                  meta={
+                    isLoaded && isModuleComplete(id, slug) ? (
+                      <span className="inline-flex items-center gap-1.5 text-foreground">
+                        <CircleCheck aria-hidden strokeWidth={1.5} className="size-4" />
+                        Done
+                      </span>
+                    ) : (
+                      meta.duration
+                    )
+                  }
+                >
                   <p>{meta.description}</p>
-                  {isLoaded && isModuleComplete(id, slug) && (
-                    <p className="mt-1 flex items-center gap-1.5 text-foreground">
-                      <Tick />
-                      Done
-                    </p>
-                  )}
                 </LedgerRow>
               ))}
             </LedgerList>
@@ -189,12 +208,13 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
         }
 
         return (
-          <TabsContent key={id} value={id} className="mt-14">
+          <TabsContent key={id} value={id} className="mt-12">
             <section aria-labelledby={`${id}-title`}>
-              <h2 id={`${id}-title`} className="text-h2 text-balance text-foreground">
+              <h2 id={`${id}-title`} className="flex items-center gap-2 text-h2 text-balance text-foreground">
+                <BookOpen aria-hidden strokeWidth={1.5} className="size-6 shrink-0" />
                 {courseTitle(id)}
               </h2>
-              <p className="mt-1 text-body text-muted-foreground">
+              <p className="mt-2 text-body text-muted-foreground">
                 From beginner to advanced in {lessons.length} lessons{minutes > 0 && `, about ${minutes} minutes of reading`}.
                 {done > 0 && done < lessons.length && ` You have finished ${done}.`}
               </p>
@@ -223,7 +243,9 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
               {done === lessons.length ? (
                 <Certificate course={id} name={name} onName={saveName} />
               ) : (
-                <p className="mt-10 text-small text-muted-foreground">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
+                <Callout icon={<Award />} className="mt-10">
+                  Finish all {lessons.length} lessons to download a certificate with your name on it.
+                </Callout>
               )}
             </section>
           </TabsContent>

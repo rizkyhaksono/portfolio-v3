@@ -112,9 +112,10 @@ function Quotes() {
       {error && <ToolError>{error}</ToolError>}
 
       {quote ? (
-        <figure>
-          <blockquote className="max-w-[60ch] text-lead text-foreground">&ldquo;{quote.content}&rdquo;</blockquote>
-          <figcaption className="mt-3 text-small text-muted-foreground">
+        // Notion's quote block: a 3px ink bar beside the line.
+        <figure className="max-w-[60ch] border-l-[3px] border-foreground pl-4">
+          <blockquote className="text-body text-foreground">&ldquo;{quote.content}&rdquo;</blockquote>
+          <figcaption className="mt-2 text-small text-muted-foreground">
             {quote.character.name}, {quote.anime.name}
           </figcaption>
         </figure>

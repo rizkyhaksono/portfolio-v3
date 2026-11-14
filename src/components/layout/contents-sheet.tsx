@@ -1,21 +1,8 @@
 "use client"
 
-import Link from "next/link"
 import type { RefObject } from "react"
-import { usePathname } from "next/navigation"
-import { useTheme } from "next-themes"
-import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/components/ui/sheet"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { LEGAL_LINKS, NAV_SECTIONS, isCurrentPath, navTrack } from "@/commons/constants/navigation-menu"
-import { track } from "@/lib/analytics"
-import { switchTheme } from "@/components/layout/theme-toggle"
-
-const THEMES = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
-] as const
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { SidebarNav } from "@/components/layout/sidebar-nav"
 
 interface ContentsSheetProps {
   open: boolean
@@ -24,79 +11,25 @@ interface ContentsSheetProps {
   returnFocus: RefObject<HTMLButtonElement | null>
 }
 
-/** The menu sheet: every section, the theme and the account link. Loaded on first open. */
+/** Below lg the sidebar slides in from the left, as Notion's does on a narrow window. Loaded on first open. */
 export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<ContentsSheetProps>) {
-  const pathname = usePathname()
-  const { theme, setTheme } = useTheme()
-
-  const chooseTheme = (to: string) => {
-    switchTheme(setTheme, to)
-    track("theme-toggle", { to })
-  }
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
+        side="left"
         aria-describedby={undefined}
         onCloseAutoFocus={(event) => {
           event.preventDefault()
           returnFocus.current?.focus({ preventScroll: true })
         }}
-        className="flex w-full max-w-none flex-col gap-0 overflow-y-auto p-0 sm:max-w-[24rem]"
+        // Any link or button in the tree closes the sheet; the feedback dialog opens on its own.
+        onClickCapture={(event) => {
+          if ((event.target as HTMLElement).closest("a, button[data-open-feedback]")) onOpenChange(false)
+        }}
+        className="flex w-72 max-w-[85vw] flex-col gap-0 overflow-y-auto bg-muted p-0 pt-12 sm:max-w-72"
       >
-        <div className="flex min-h-12 items-center px-5 pr-14 md:min-h-[var(--head-h)]">
-          <SheetTitle className="sr-only">Menu</SheetTitle>
-        </div>
-
-        <nav aria-label="Menu" className="px-5">
-          <ul>
-            {NAV_SECTIONS.map(({ href, label }) => (
-              <li key={href}>
-                <SheetClose asChild>
-                  <Link
-                    href={href}
-                    aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-                    className="flex min-h-12 items-center text-h2 leading-tight text-foreground decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
-                    {...navTrack(href, "menu")}
-                  >
-                    {label}
-                  </Link>
-                </SheetClose>
-              </li>
-            ))}
-          </ul>
-          <ul className="mt-4 flex gap-x-5 pb-4">
-            {LEGAL_LINKS.map(({ href, label }) => (
-              <li key={href}>
-                <SheetClose asChild>
-                  <Link
-                    href={href}
-                    className="inline-flex min-h-11 items-center text-small text-muted-foreground decoration-1 underline-offset-[0.18em] hover:text-foreground hover:underline"
-                    {...navTrack(href, "menu")}
-                  >
-                    {label}
-                  </Link>
-                </SheetClose>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border px-5 py-4">
-          <RadioGroup value={theme} onValueChange={chooseTheme} aria-label="Theme" className="flex gap-x-5 gap-y-0">
-            {THEMES.map(({ value, label }) => (
-              <Label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 text-small font-normal text-foreground">
-                <RadioGroupItem value={value} />
-                {label}
-              </Label>
-            ))}
-          </RadioGroup>
-          <SheetClose asChild>
-            <Link href="/profile" className="inline-flex min-h-11 items-center text-small font-semibold text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2" {...navTrack("/profile", "menu")}>
-              Account
-            </Link>
-          </SheetClose>
-        </div>
+        <SheetTitle className="sr-only">Menu</SheetTitle>
+        <SidebarNav area="menu" className="flex-1" />
       </SheetContent>
     </Sheet>
   )

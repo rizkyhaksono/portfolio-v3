@@ -1,3 +1,4 @@
+import { FileText } from "lucide-react"
 import { PageSection } from "@/components/ui/page-section"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { InkChart } from "@/components/ui/ink-chart"
@@ -51,7 +52,7 @@ export default async function ReadersFigures({ stats, daily, reads }: Readonly<R
           {top.length > 0 ? (
             <LedgerList className="mt-2">
               {top.map(({ path, readers, title }) => (
-                <LedgerRow key={path} href={path} title={title} titleAs="h4" meta={`${readers.toLocaleString("en")} readers`} />
+                <LedgerRow key={path} href={path} icon={<FileText />} title={title} titleAs="h4" meta={`${readers.toLocaleString("en")} readers`} />
               ))}
             </LedgerList>
           ) : (

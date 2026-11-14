@@ -27,7 +27,8 @@ export function GoogleButton({ returnTo, disabled }: Readonly<GoogleButtonProps>
     <Button
       type="button"
       variant="outline"
-      className="h-10 w-full"
+      size="lg"
+      className="w-full"
       onClick={start}
       disabled={disabled}
       data-umami-event="signin-start"

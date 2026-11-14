@@ -14,14 +14,14 @@ interface YouTubeFacadeProps {
   className?: string
 }
 
-/** Click-to-load YouTube: the poster on a rounded tile until asked, then the privacy-enhanced player. Nothing autoplays on load. */
+/** Notion's video block, click to load: the poster on a rounded grey well until asked, then the privacy-enhanced player. Nothing autoplays on load. */
 export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTubeFacadeProps>) {
   const [playing, setPlaying] = useState(false)
   const video = encodeURIComponent(id)
 
   return (
     <figure className={cn("my-6", className)}>
-      <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted">
+      <div className="relative aspect-video overflow-hidden rounded-lg bg-muted">
         {playing ? (
           <iframe
             ref={(frame) => frame?.focus()}
@@ -32,7 +32,7 @@ export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTube
             className="absolute inset-0 size-full"
           />
         ) : (
-          <button type="button" onClick={() => setPlaying(true)} data-umami-event="video-play" data-umami-event-lesson={lesson} className="group absolute inset-0 block size-full">
+          <button type="button" onClick={() => setPlaying(true)} data-umami-event="video-play" data-umami-event-lesson={lesson} className="group absolute inset-0 block size-full rounded-lg focus-visible:outline-offset-[-2px]">
             {/* eslint-disable-next-line @next/next/no-img-element -- poster stays a plain img so no YouTube host joins next/image */}
             <img
               src={`https://i.ytimg.com/vi/${video}/hqdefault.jpg`}
@@ -41,9 +41,9 @@ export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTube
               alt=""
               loading="lazy"
               decoding="async"
-              className="size-full object-cover"
+              className="size-full object-cover transition-opacity duration-ui ease-out group-hover:opacity-90"
             />
-            <span className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-lg bg-background px-4 py-2 text-small font-medium text-foreground group-hover:underline">
+            <span className="absolute left-1/2 top-1/2 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-small font-medium text-foreground">
               <Play className="size-4" strokeWidth={1.5} aria-hidden />
               Play video<span className="sr-only">: {title}</span>
             </span>

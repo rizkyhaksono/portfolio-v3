@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
-// The list scrolls sideways on phones; its p-1 track leaves room for each trigger's 2px focus ring.
+// Notion's view tabs: quiet labels over a hairline, the open one in ink with a 2px bar under it. Scrolls sideways on phones.
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(({ className, ...props }, ref) => (
-  <TabsPrimitive.List ref={ref} className={cn("gap-1 rounded-lg bg-muted p-1 text-muted-foreground", !className?.includes("grid") && "inline-flex max-w-full items-center overflow-x-auto", className)} {...props} />
+  <TabsPrimitive.List ref={ref} className={cn("gap-1 border-b border-border text-muted-foreground", !className?.includes("grid") && "flex max-w-full items-center overflow-x-auto", className)} {...props} />
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
@@ -17,7 +17,7 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-small font-medium transition-colors duration-ui ease-out hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground [@media(pointer:coarse)]:min-h-11",
+      "relative inline-flex min-h-9 items-center justify-center gap-1.5 whitespace-nowrap px-2 text-small font-medium transition-colors duration-ui ease-out after:absolute after:inset-x-2 after:-bottom-px after:h-0.5 after:rounded-full hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground data-[state=active]:after:bg-foreground [@media(pointer:coarse)]:min-h-11 [&_svg]:size-4",
       className
     )}
     {...props}

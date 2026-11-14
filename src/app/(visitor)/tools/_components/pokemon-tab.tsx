@@ -2,13 +2,15 @@
 
 import { useCallback, useState } from "react"
 import Image from "next/image"
-import { X } from "lucide-react"
+import { Ruler, Sparkle, Tag, Weight, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Chip } from "@/components/ui/chip"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Pager } from "@/components/ui/pager"
 import { PlateFigure } from "@/components/ui/plate-figure"
+import { Properties } from "@/components/ui/properties"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { getPokemonList, getPokemonDetail, type PokemonDetail } from "@/services/visitor/pokemon"
@@ -89,26 +91,32 @@ export function PokemonTab() {
       )}
       {(list.status !== "error" || list.data) && (
         <>
-          <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+          <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 [&>li]:min-w-0">
             {loading
               ? Array.from({ length: 12 }, (_, i) => (
                   <li key={i}>
-                    <Skeleton className="h-48 rounded-2xl" />
+                    <Skeleton className="h-44 rounded-lg" />
                   </li>
                 ))
               : list.data?.data.map((p) => (
                   <li key={p.id}>
+                    {/* A Notion gallery card that opens the entry in a dialog. */}
                     <button
                       type="button"
                       onClick={() => openDetail(p.id)}
-                      className="flex h-48 w-full flex-col items-center gap-1 rounded-2xl bg-muted p-3 text-center transition-colors duration-ui ease-out hover:bg-border"
+                      className="block w-full overflow-hidden rounded-lg border border-border bg-background text-left transition-colors duration-ui ease-out hover:bg-tint"
                     >
-                      <span className="relative block aspect-square w-20 shrink-0">
-                        {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
+                      <span className="flex h-28 items-center justify-center border-b border-border bg-muted">
+                        <span className="relative block size-20">
+                          {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
+                        </span>
                       </span>
-                      <span className="mt-1 text-caption tabular-nums text-muted-foreground">{numbered(p.id)}</span>
-                      <span className="w-full truncate text-small text-foreground">{sentence(p.name)}</span>
-                      <span className="w-full truncate text-caption text-muted-foreground">{sentence(p.types.join(", "))}</span>
+                      <span className="block px-2.5 pb-2.5 pt-2">
+                        <span className="block truncate text-small font-medium text-foreground">{sentence(p.name)}</span>
+                        <span className="mt-0.5 block truncate text-caption tabular-nums text-muted-foreground">
+                          {numbered(p.id)}, {p.types.map(sentence).join(", ")}
+                        </span>
+                      </span>
                     </button>
                   </li>
                 ))}
@@ -154,18 +162,18 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
         </PlateFigure>
       )}
 
-      <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-small">
-        <dt className="text-muted-foreground">Types</dt>
-        <dd className="text-foreground">{sentence(p.types.join(", "))}</dd>
-        <dt className="text-muted-foreground">Height</dt>
-        <dd className="tabular-nums text-foreground">{(p.height / 10).toFixed(1)} m</dd>
-        <dt className="text-muted-foreground">Weight</dt>
-        <dd className="tabular-nums text-foreground">{(p.weight / 10).toFixed(1)} kg</dd>
-        <dt className="text-muted-foreground">Abilities</dt>
-        <dd className="capitalize text-foreground">
-          {p.abilities.map((a) => `${a.name.replace(/-/g, " ")}${a.isHidden ? " (hidden)" : ""}`).join(", ")}
-        </dd>
-      </dl>
+      <Properties
+        items={[
+          { label: "Types", icon: <Tag aria-hidden strokeWidth={1.5} />, value: p.types.map((t) => <Chip key={t}>{sentence(t)}</Chip>) },
+          { label: "Height", icon: <Ruler aria-hidden strokeWidth={1.5} />, value: <span className="tabular-nums">{(p.height / 10).toFixed(1)} m</span> },
+          { label: "Weight", icon: <Weight aria-hidden strokeWidth={1.5} />, value: <span className="tabular-nums">{(p.weight / 10).toFixed(1)} kg</span> },
+          {
+            label: "Abilities",
+            icon: <Sparkle aria-hidden strokeWidth={1.5} />,
+            value: <span className="capitalize">{p.abilities.map((a) => `${a.name.replace(/-/g, " ")}${a.isHidden ? " (hidden)" : ""}`).join(", ")}</span>,
+          },
+        ]}
+      />
 
       <div>
         <h3 className="text-h4 text-foreground">Base stats</h3>
