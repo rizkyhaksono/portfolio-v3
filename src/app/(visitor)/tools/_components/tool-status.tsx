@@ -29,7 +29,7 @@ export function useToolData<T>(load: (signal: AbortSignal) => Promise<T>) {
   return { ...state, retry: () => setAttempt((n) => n + 1) }
 }
 
-/** Inline failure: an italic ink line behind a cross, and a retry when one helps. */
+/** Inline failure: one plain line behind a cross, and a retry when one helps. */
 export function ToolError({ children, onRetry }: Readonly<{ children: React.ReactNode; onRetry?: () => void }>) {
   return (
     <StatusLine
@@ -56,13 +56,13 @@ export function ToolLoading({ children = "Loading…" }: Readonly<{ children?: R
   )
 }
 
-/** Static ruled skeleton while a tool's code arrives. */
+/** Grey stand-ins while a tool's code arrives. */
 export function ToolSkeleton() {
   return (
     <div aria-busy="true" className="space-y-4">
       <span className="sr-only">Loading the tool…</span>
-      <Skeleton className="h-10 w-full" />
-      <Skeleton className="h-64 w-full" />
+      <Skeleton className="h-10 w-full rounded-lg" />
+      <Skeleton className="h-64 w-full rounded-2xl" />
     </div>
   )
 }

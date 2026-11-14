@@ -33,8 +33,8 @@ interface Entry {
   extra?: string
 }
 
-/** A page of plates (portraits or ships), with a pager and an inline error. */
-function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => Promise<{ data: Entry[]; totalPages: number }>; aspect: string; label: string }>) {
+/** A page of pictures (portraits or ships), with a pager and an inline error. */
+function Gallery({ load, aspect, label }: Readonly<{ load: (page: number) => Promise<{ data: Entry[]; totalPages: number }>; aspect: string; label: string }>) {
   const [page, setPage] = useState(1)
   const list = useToolData(useCallback(() => load(page), [load, page]))
   const loading = list.status === "loading"
@@ -49,7 +49,7 @@ function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => P
         {loading
           ? Array.from({ length: 10 }, (_, i) => (
               <li key={i}>
-                <Skeleton className={aspect} />
+                <Skeleton className={`${aspect} rounded-2xl`} />
               </li>
             ))
           : list.data?.data.map((entry) => (
@@ -93,10 +93,10 @@ export function StarWarsTab() {
         <TabsTrigger value="starships">Starships</TabsTrigger>
       </TabsList>
       <TabsContent value="characters">
-        <PlateGrid load={loadPeople} aspect="aspect-[3/4]" label="characters" />
+        <Gallery load={loadPeople} aspect="aspect-[3/4]" label="characters" />
       </TabsContent>
       <TabsContent value="starships">
-        <PlateGrid load={loadShips} aspect="aspect-[4/3]" label="starships" />
+        <Gallery load={loadShips} aspect="aspect-[4/3]" label="starships" />
       </TabsContent>
     </Tabs>
   )

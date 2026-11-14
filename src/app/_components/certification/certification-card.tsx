@@ -14,15 +14,15 @@ export function verifyUrl(link?: string | null): string | null {
   }
 }
 
-/** One credential in a ledger: title, issuer, "Verify" when there is a link to check, issue month on the right. */
+/** One credential as a row: the title, then issuer and date muted, with "Verify" when there is a link to check. */
 export function CertificationRow({ certification }: Readonly<{ certification: LinkedinCertification }>) {
   const href = verifyUrl(certification.link)
   return (
-    <LedgerRow title={certification.title} meta={certification.issuedDisplay && <span className="hidden sm:inline">{certification.issuedDisplay}</span>}>
+    <LedgerRow title={certification.title}>
       <span className="flex flex-wrap items-baseline gap-x-4">
         <span>
           {certification.provider}
-          {certification.issuedDisplay && <span className="sm:hidden">, {certification.issuedDisplay}</span>}
+          {certification.issuedDisplay && `, ${certification.issuedDisplay}`}
         </span>
         {href ? (
           <InkLink
@@ -35,7 +35,7 @@ export function CertificationRow({ certification }: Readonly<{ certification: Li
             Verify
           </InkLink>
         ) : (
-          <span className="text-caption">No public link</span>
+          <span>No public link</span>
         )}
       </span>
     </LedgerRow>

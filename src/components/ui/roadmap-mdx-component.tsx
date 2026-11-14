@@ -58,20 +58,20 @@ interface AsideProps {
   children?: ReactNode
 }
 
-/** A note set off by a left rule: the title is the word that says what kind of note it is. */
+/** A note on a muted tile: the title is the word that says what kind of note it is. */
 function Note({ title, children }: Readonly<AsideProps>) {
   return (
-    <div role="note" className="my-6 border-l border-foreground pl-4">
+    <div role="note" className="my-6 rounded-2xl bg-muted px-4 py-3">
       {title && <p className="text-h4 text-foreground">{title}</p>}
       <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
     </div>
   )
 }
 
-/** A warning is framed all round, so it differs from a note by shape as well as by word. */
+/** A warning is outlined rather than filled, so it differs from a note by shape as well as by word. */
 function Warning({ title = "Warning", children }: Readonly<AsideProps>) {
   return (
-    <div role="note" className="my-6 border border-foreground p-4">
+    <div role="note" className="my-6 rounded-2xl border border-border px-4 py-3">
       <p className="text-h4 text-foreground">{title}</p>
       <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
     </div>
@@ -89,7 +89,7 @@ const AlertDescription = ({ children }: AsideProps) => <div>{children}</div>
 function LearningObjectives({ objectives = [] }: Readonly<{ objectives?: string[] }>) {
   if (objectives.length === 0) return null
   return (
-    <section className="my-6 border-y border-border py-4">
+    <section className="my-6">
       <p className="text-h4 text-foreground">Learning objectives</p>
       <ul className="mt-2">
         {objectives.map((objective) => (
@@ -125,9 +125,9 @@ function Resources({ title = "Further reading", resources = [] }: Readonly<{ tit
 
 function NextLesson({ title, description, href }: Readonly<{ title: string; description?: string; href?: string }>) {
   return (
-    <div className="my-8 border-t border-foreground pt-4">
-      <p className="text-caption text-muted-foreground">Next lesson</p>
-      <p className="text-h3 text-foreground">{href ? <InkLink href={href}>{title}</InkLink> : title}</p>
+    <div className="my-10">
+      <p className="text-small text-muted-foreground">Next lesson</p>
+      <p className="text-body text-foreground">{href ? <InkLink href={href}>{title}</InkLink> : title}</p>
       {description && <p className="mt-1 text-muted-foreground">{description}</p>}
     </div>
   )

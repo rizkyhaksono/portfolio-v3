@@ -46,12 +46,13 @@ Full detail: [`docs/ui/README.md`](docs/ui/README.md) (source of truth), [`desig
 
 ### Identity: Langit Malang
 
-A calm, elegant, Apple-like look, equally good in light and dark: large tight semibold headlines, generous whitespace, soft large radii, quiet grey surfaces, one translucent sticky bar and slow eased motion. One font family, Onest. The one bold element is **the sky**: a blue band at the top of visitor pages whose colour follows the time of day in Malang (WIB), and the night sky in dark mode. Everything else is quiet.
+A calm reading page after joshpuckett.me, equally good in light and dark: one clean sans at a quiet size, muted prose with the names in full ink, plain lists of a title and one sentence, lots of whitespace. The one bold element is **the sky**, a painted Langit Malang scene behind the footer whose colour follows the time of day in Malang (WIB), and the night sky in dark mode. Everything else is quiet.
 
-- **Public site:** a centred layout. One 640px column; the name, page headers, section titles and footer are centred; prose, lists and rows are left-aligned inside the column. Media breaks out to 768px; `/tools` and `/chat` use the 960px wide column.
-- **Admin:** full width. A sidebar, a top bar, and content that fills the rest. No sky, no markers.
+- **Public site:** every page uses `BaseLayout`. At the top, the handle "@rizkyhaksono" at the `h1` size, linking home, with a 40px rule under it; quiet text nav on the right from `md`, the theme toggle, and "Menu" below `lg`. Then one 36rem column (`PROSE_WIDTH`), centred on the page, with all text left-aligned. `/tools` and `/chat` use the wide column (`width="wide"`). No sky at the top, no sticky or translucent header.
+- **Colour use:** prose and descriptions in `text-muted-foreground`; names, titles and links in `text-foreground`. Links go through `InkLink`, a faint underline that strengthens on hover.
+- **Admin:** full width. A sidebar, a top bar, and content that fills the rest. No sky.
 - **Themes:** `defaultTheme="system"`; labels Light, Dark and System; every change goes through `switchTheme()`.
-- **Name and icon:** the name "Rizky Haksono" as text in Onest 600. The favicon is a plain "R" tile. There is no logo mark.
+- **Name and icon:** the handle and the name as text. The favicon is a plain "R" tile. There is no logo mark and no handwritten face.
 
 ### Tokens
 
@@ -67,50 +68,49 @@ HSL triples in `src/app/globals.css` (`:root` light, `.dark` dark), exposed in `
 | `--input` | `border-input` | #85867F | #71726C | Borders of controls (3:1) |
 | `--popover` | `bg-popover` | #FFFFFF | #232322 | Floating layers |
 | `--destructive` | `text-destructive` | #B42318 | #F97066 | Destructive actions and errors, admin only, always with a word |
-| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the sky band |
-| `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the `Marker` fill |
+| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the footer sky |
+| `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the text selection fill |
 
 Derived: `--card` is background; `--primary` and `--ring` are foreground; `--secondary` and `--accent` are muted; `--radius` is `.75rem`. Motion variables: `--dur-press` 120ms, `--dur-ui` 200ms, `--dur-sheet` 280ms, `--ease-out` `cubic-bezier(.25,.1,.25,1)` (class `ease-out`). `--scrim` fills the backdrop behind modals.
 
-- **The accent has exactly two uses:** the sky band and the `Marker` highlight (`bg-sky-wash`, at most one phrase per page). Never links, buttons, focus, charts, icons or hover.
+- **Blue lives in the footer sky** (and the `::selection` fill). Never links, buttons, focus, charts, icons or hover. The footer's grass greens and mountain haze are an illustration-only exception to the colour cap: they live only in the `.sky` block of `globals.css` and are never UI colour.
 - No hex, no `white` / `black`, no palette colours (`gray-500`, `blue-600`), no `dark:` classes: every token flips on `<html class="dark">`.
 - Text never takes an opacity modifier; use `text-muted-foreground`. Controls use `border-input`, not `border-border`.
 - State is an icon plus a word (`StatusLine`), never colour alone.
-- **Contrast guard:** `src/__tests__/unit/lib/contrast.test.ts` reads the triples and fails below the floors in both themes (foreground 7:1, muted-foreground 4.5:1, including over every sky stop; input 3:1; text on sky-wash 4.5:1) and checks `THEME_HEX` against the tokens. Change a token, change `theme-hex.ts` in the same commit.
+- **Contrast guard:** `src/__tests__/unit/lib/contrast.test.ts` reads the triples and fails below the floors in both themes (foreground 7:1, muted-foreground 4.5:1, including over every footer sky stop, dawn, day, dusk and evening in light and night in dark; input 3:1; text on sky-wash 4.5:1) and checks `THEME_HEX` against the tokens. Change a token, change `theme-hex.ts` in the same commit.
 
 ### Type
 
-One family, **Onest** (variable, OFL), loaded once with `next/font/google` in `src/app/layout.tsx` as `--font-sans`. Site, admin and the OG and certificate cards all use it. System mono (`font-mono`) only for code. There is no second face and no `font-display`.
+One sans, **Onest** (variable, OFL), loaded once with `next/font/google` in `src/app/layout.tsx` as `--font-sans`. Site and admin use it. System mono (`font-mono`) only for code. There is no second face, no serif, no handwritten face and no `font-display`.
 
-| Key | Size / line height | Weight | Tracking |
+| Key | Size / line height | Weight | Use |
 |---|---|---|---|
-| `caption` | 12 / 16 | 400 | |
-| `small` | 13 / 20 | 400 | |
-| `body` | 15 / 24 | 400 | |
-| `prose` | 17 / 28 | 400 | |
-| `lead` | 19 / 28 | 400, muted | |
-| `h4` | 15 / 24 | 500 | |
-| `h3` | 19 / 26 | 600 | -0.01em |
-| `h2` | 24 / 30 | 600 | -0.015em |
-| `h1` | 40 / 44, 32 on phones | 600 | -0.02em |
-| `display` | 56 / 60, 40 on phones (home name only) | 600 | -0.025em |
-| `numeral` | 32 / 36 | 600 | tabular |
+| `caption` | 12 / 18 | 400 | Footer year, captions, small meta |
+| `small` | 13 / 20 | 400 | Nav, group labels, row meta |
+| `body` | 15 / 24 | 400 | Rows, UI text |
+| `prose` | 16 / 28 | 400 | Article prose (`.prose`) |
+| `lead` | 16 / 26 | 400 | A lead line or a quote |
+| `h2`, `h3`, `h4` | 15 / 24 | 500, foreground | Section labels ("Projects", "Writing") |
+| `h1`, `display` | 24 / 32, -0.015em | 500 | Page titles and the handle |
+| `numeral` | 28 / 32 | 500 | Figures on `/stats` and the admin |
 
-- Weights 400, 500 and 600 only. Onest has no italic and font synthesis is off, so never rely on italics.
+- Weights 400 and 500 only: 400 for text, 500 for headings, titles and figures (the keys carry it). No `font-semibold` or `font-bold` on headings. Hierarchy comes from colour (foreground against muted) before size.
 - Sizes only from the keys: never `text-[Npx]`. Tracking only from the keys: never `tracking-[…]`. No `uppercase`.
+- `xs` in `tailwind.config.ts` stays for older call sites; new code uses the keys above.
 - Inputs use 16px on phones. `tabular-nums` in rows, tables and figures.
 
 ### Shape, shadow, blur
 
-- **Radii grow with the surface:** fields and buttons `rounded-lg`, chips and badges `rounded-md`, floating layers `rounded-xl`, tiles and cards `rounded-2xl`, dots, switches, radios and avatars `rounded-full`. Never `rounded-[…]`.
-- **Surfaces** ([surfaces.md](docs/ui/surfaces.md)): page (no box), tile (`bg-muted`, no border, no shadow), frame (hairline `border-border`), float (`bg-popover`, `shadow-float`). One surface per level.
-- **`shadow-float`** only on floating layers (dialog, sheet, menu, popover, select content, hover tip, toasts, terminal overlay), applied inside the shared primitives. Nothing on the page casts a shadow.
-- **One blur:** the translucent sticky header in `running-head.tsx` (`backdrop-blur-md`). Scrims are a fixed fill, never blurred.
+- **Radii only where there is a real object:** tiles and images `rounded-2xl`; controls keep theirs (fields and buttons `rounded-lg`, chips and badges `rounded-md`, floating layers `rounded-xl`, dots, switches, radios and avatars `rounded-full`). Never `rounded-[…]`.
+- **Keep calm:** no boxes around sections, no stat cards, no tiles for plain text. No dividers except the short rule under the handle and the hairline inside the footer.
+- **Surfaces** ([surfaces.md](docs/ui/surfaces.md)): page (no box), tile (`bg-muted`, no border, no shadow, for screenshots and code), frame (hairline `border-border`, for forms and admin panels), float (`bg-popover`, hairline `border-border`, no shadow). One surface per level.
+- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`, so no shadow utility exists. Floating layers (dialog, sheet, menu, popover, select content, hover tip, toasts, terminal overlay) are set apart by a hairline `border-border` only, applied inside the shared primitives.
+- **No blur.** The header is plain and scrolls away with the page. Scrims are a fixed fill, never blurred.
 - **Gradients** only in `globals.css` and the sky (`sky.tsx`).
 
-### The sky
+### The footer sky
 
-`Sky` (`src/components/ui/sky.tsx`) is mounted by `BaseLayout`: the full band with clouds on home, a shorter static band on other visitor pages, nothing in the admin. It is `aria-hidden` and `pointer-events-none`. The phase (`skyPhase()` in `src/lib/malang-time.ts`: dawn, day, dusk, evening in WIB) sets `data-sky` on mount and crossfades over 600ms; the server renders the day stop. Dark mode is always the night sky with static stars. Clouds drift on a slow loop (about 90s), are pre-blurred shapes (never `filter: blur`), are hidden below `sm`, and stop for reduced motion, a hidden tab, or the pause button beside the theme toggle ("Pause the sky" / "Play the sky", `aria-pressed`, saved in localStorage). Stop colours live only in the `.sky` block of `globals.css`.
+`Sky` (`src/components/ui/sky.tsx`) is the painted Langit Malang scene behind the full footer of every visitor page, built from CSS and inline SVG only (no image file). Back to front: a vertical sky gradient, the sun or the moon, two or three soft clouds drifting slowly, Arjuno and Semeru in haze, the name set large between the hills, and rolling grass hills with blades that sway. It is `aria-hidden` and `pointer-events-none`. The phase (`skyPhase()` in `src/lib/malang-time.ts`: dawn, day, dusk, evening in WIB) sets `data-sky` on mount; the server renders the day stop. Dark mode is always the night sky with a few static stars. The footer text (handle, email, one line of links, the year and the hour in Malang) sits in the upper sky. Clouds are pre-softened shapes (never `filter: blur`). The clouds drift and the grass sways as soon as the page loads. Phones (below 640px) and `prefers-reduced-motion: reduce` get a still scene (the clouds are hidden on phones). There is no visible pause button: `SkyToggle` stays in the footer link line as `sr-only`, appears on keyboard focus, and lets keyboard and screen-reader users stop the motion (WCAG 2.2.2; the choice is saved in localStorage). The `/auth` pages end on the same landscape as a band at the bottom, with no footer text and the same hidden toggle. Stop colours and the grass greens live only in the `.sky` block of `globals.css`.
 
 ### Motion
 
@@ -119,9 +119,9 @@ All CSS or platform native. The complete list:
 1. **Route crossfade:** React `ViewTransition` around the `BaseLayout` content, opacity only (out 140ms, in 200ms). The header and footer stay still.
 2. **Project morph:** the `MediaCard` image and the project hero share `project-<id>` (320ms).
 3. **Theme crossfade:** `switchTheme()` wraps the change in a view transition.
-4. **Link underline:** dotted muted to solid foreground, 150ms.
+4. **Link underline:** the faint underline strengthens to full foreground, 200ms.
 5. **Card hover:** the media image scales to 1.015 over 400ms, only under `(hover: hover)` and `motion-safe`.
-6. **The sky:** slow clouds with a pause control.
+6. **The footer sky:** slow clouds and swaying grass, playing at once, with a pause toggle that stays visually hidden until keyboard focus.
 
 Floating layers keep their Radix fade (150 to 280ms). Anything else that responds to input uses `--dur-*` and `ease-out`.
 
@@ -133,29 +133,30 @@ Floating layers keep their Radix fade (150 to 280ms). Anything else that respond
 
 - `dark:` classes
 - Raw hex, `white` / `black` and Tailwind palette colours in components
-- Gradients outside `globals.css` and the sky; blur outside the header
+- Gradients outside `globals.css` and `sky.tsx`; blur anywhere
 - `uppercase`, `tracking-[…]`, `text-[Npx]`, `rounded-[…]`
 - framer-motion, `motion`, GSAP, Lenis
 - Em dashes in UI copy, generic CTAs, buzzwords
-- Glass cards, soft shadows on the page, hover lifts, window chrome
+- Glass cards, boxed sections, stat cards, shadows of any kind, hover lifts, hover backgrounds on rows, window chrome
+- A sky band at the top, a sticky or translucent header, a handwritten face, bold headings
 - Any class, variable or asset from the old design (see gate rules R1, R1b and R1c)
 
 ### Page patterns
 
 | Pattern | Component | Routes |
 |---|---|---|
-| Ledger | `ui/ledger.tsx`: rows grouped by year, hover `bg-muted` | `/blog` rows, `/certificates`, `/changelog`, `/roadmap`, `/project` rows, home Writing and Work |
-| Article | `ui/article-shell.tsx`: centred header, contents in the margin from `xl`, `<details>` below | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Media | `MediaCard`, `ui/plate-figure.tsx`: a picture on a `bg-muted` tile, `rounded-2xl`, in its own colours | Home Projects, `/project` featured, the `/blog` lead post, covers |
+| Ledger | `ui/ledger.tsx`: plain rows, a title in foreground with one muted line under it, an optional small muted group label; no boxes, rules or hover backgrounds | Home lists, `/blog` rows, `/certificates`, `/changelog`, `/roadmap`, `/project` rows |
+| Article | `ui/article-shell.tsx`: header, prose, contents in a `<details>` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
+| Media | `MediaCard`, `ui/plate-figure.tsx`: a picture on a `bg-muted` tile, `rounded-2xl`, in its own colours | Only where screenshots matter: `/project` featured, the `/blog` lead post, project pages |
 | Cabinet | `tools/_components/tool-shell.tsx`, `ui/pager.tsx`, `width="wide"` | `/tools`, `/ai` |
 | Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home contact, admin Feedback |
-| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar`: solid fills, text alternatives | `/stats`, admin Home and Analytics |
+| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar`: solid fills, text alternatives, no cards | `/stats`, admin Home and Analytics |
 | Admin | `components/layout/admin/*`: full width, sidebar, peek sheet | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx`: one centred column | `/auth/*`, `/admin/auth/login` |
+| Auth | `layout/auth-shell.tsx`: one centred column, ending on the sky band | `/auth/*`, `/admin/auth/login` |
 | Profile card | A definition list in a frame | `/profile`, `/profile/edit`, admin Settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `bleed?`, `footer?: 'full' | 'compact' | 'none'`) with the translucent header, the sky, the menu sheet and the centred footer. No sidebars on visitor pages. One `PageHeader` per page. Details: [`page-shell.md`](docs/ui/page-shell.md), [`platforms.md`](docs/ui/platforms.md).
+Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `footer?: 'full' | 'compact' | 'none'`) with the handle header, the menu sheet and the painted footer. No sidebars on visitor pages. One `PageHeader` per page (24px at weight 500); section labels through `SectionHeading` or `PageSection`; `StatusLine` for empty and failed states; `Skeleton` for loading. The home is a sr-only h1, the bio, then Projects, Writing, Work experience (every career and education entry, newest first), Recommendations (only with real data) and Contact, all as text lists. Details: [`page-shell.md`](docs/ui/page-shell.md), [`platforms.md`](docs/ui/platforms.md).
 
 Shared details agents trip on:
 
@@ -187,15 +188,16 @@ The gate is the jest test `src/__tests__/unit/lib/ui-gate.test.ts`, run by `bun 
 |---|---|---|
 | R1 | Old token classes (`text-ink`, `bg-paper`, `bg-tint`, `border-rule` and the rest) and `font-display` | nowhere |
 | R1b | Old variables and identifiers: `PRINT_HEX`, `--paper`, `#1E3C9E` and so on | nowhere |
-| R1c | Old identity classes: `speckle`, `engraving`, `masthead`, `plate`, `bg-hatch` and so on | nowhere |
+| R1c | Old identity classes: `speckle`, `engraving`, `masthead`, `ws__w`, `plate-*`, `tail-piece`, `article-rail`, `reading-hairline` and so on | nowhere |
 | R2 | `dark:` | nowhere |
 | R3 | Raw colour: hex and palette colours | `src/lib/theme-hex.ts`, `globals.css`, the OG and certificate routes |
-| R4 | Arbitrary values: `rounded-[…]`, `text-[Npx]`, `tracking-[…]`, plus `uppercase` | nowhere |
+| R4 | Arbitrary values: `rounded-[…]`, `text-[Npx]`, `tracking-[…]`, plus `uppercase` | nowhere (four admin files stay listed until the admin rebuild) |
 | R5 | Motion libraries: `framer-motion`, `motion`, `gsap`, `lenis`, `animate-bounce`, `animate-ping` | nowhere |
-| R6 | Gradients and blur | `globals.css`, `sky.tsx`, `running-head.tsx` |
+| R6 | Gradients and blur | `globals.css`, `sky.tsx` |
 | R7 | Copy: em dash in UI strings, generic CTAs, buzzwords | nowhere |
+| R8 | Shadows: `shadow-*` utility classes (except `shadow-none`) and `box-shadow` | `box-shadow` in `globals.css` only |
 
-Some rules carry a shrinking allowlist of files that still break them while the redesign lands. Each PR removes the files it fixes; the cleanup PR empties the lists. Never add a file to an allowlist or loosen a pattern: fix the file.
+Some rules carry a shrinking allowlist of files that still break them while the redesign lands. Each PR removes the files it fixes; only the admin files are left on R4. Never add a file to an allowlist or loosen a pattern: fix the file.
 
 ## Development workflow
 
@@ -209,9 +211,9 @@ Some rules carry a shrinking allowlist of files that still break them while the 
 ## Acceptance checklist (UI)
 
 - [ ] The route uses one page pattern from the table above
-- [ ] Colours from the tokens only; the sky accent only in the sky and the `Marker`
-- [ ] Onest sizes from the `fontSize` keys; weights 400, 500, 600; mono only for code
-- [ ] Radii from the scale; `shadow-float` only on floating layers; no blur outside the header
+- [ ] Colours from the tokens only; muted prose with names in foreground; blue only in the footer sky
+- [ ] Onest sizes from the `fontSize` keys; weights 400 and 500 only; mono only for code
+- [ ] Radii only on tiles, images and controls; no boxed sections or extra dividers; no shadows (floating layers get a hairline border); no blur
 - [ ] Only the listed motion; reduced motion stops all of it
 - [ ] Copy in sentence case, plain verbs, no em dash, no generic CTAs or buzzwords
 - [ ] Umami attributes follow the button / external-link rule

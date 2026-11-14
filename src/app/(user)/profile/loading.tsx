@@ -1,17 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
-/** Static ruled stand-in for the profile sheet while the account server answers. No pulse. */
+/** Grey stand-in for the profile while the account server answers. */
 export default function ProfileLoading() {
   return (
-    <div role="status" className="w-full border border-foreground p-[3px]">
+    <div role="status" className="w-full">
       <span className="sr-only">Loading your profile…</span>
-      <div aria-hidden className="border border-border p-5 sm:p-8">
-        <div className="flex items-end gap-5 pb-6">
-          <Skeleton className="h-20 w-20 sm:h-24 sm:w-24" />
-          <Skeleton className="h-10 flex-1" />
+      <div aria-hidden>
+        <div className="flex items-center gap-4">
+          <Skeleton className="size-16 shrink-0 rounded-full" />
+          <Skeleton className="h-8 flex-1 rounded-lg" />
         </div>
-        <div className="border-t border-foreground" />
-        <div className="mt-8 flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-4">
           <Skeleton className="h-5 w-3/4" />
           <Skeleton className="h-5 w-1/2" />
         </div>

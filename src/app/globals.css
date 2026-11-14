@@ -5,8 +5,8 @@
      Contrast floors are pinned in src/__tests__/unit/lib/contrast.test.ts; hex copies live in lib/theme-hex.ts. */
   :root{--background:60 12.5% 96.9%;--foreground:80 4.9% 12%;--muted:60 11.1% 92.9%;--muted-foreground:72 2.6% 37.8%;--border:60 6.5% 87.8%;--input:69 2.8% 51.2%;--popover:0 0% 100%;--destructive:4 76.5% 40%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;
   --card:var(--background);--card-foreground:var(--foreground);--popover-foreground:var(--foreground);--primary:var(--foreground);--primary-foreground:var(--background);--secondary:var(--muted);--secondary-foreground:var(--foreground);--accent:var(--muted);--accent-foreground:var(--foreground);--destructive-foreground:var(--background);--ring:var(--foreground);--radius:.75rem;
-  --ws-ghost:hsl(var(--foreground) / .6);--head-h:3rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:60 2% 6% / .45}
-  .dark{--background:60 2% 10%;--foreground:60 9.5% 91.8%;--muted:80 4.2% 13.9%;--muted-foreground:70 3.2% 63.1%;--border:75 4.3% 18.4%;--input:70 2.7% 43.5%;--popover:60 1.4% 13.5%;--destructive:4 92.5% 68.8%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%;--ws-ghost:hsl(var(--muted-foreground) / .7)}
+  --head-h:3rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:60 2% 6% / .45}
+  .dark{--background:60 2% 10%;--foreground:60 9.5% 91.8%;--muted:80 4.2% 13.9%;--muted-foreground:70 3.2% 63.1%;--border:75 4.3% 18.4%;--input:70 2.7% 43.5%;--popover:60 1.4% 13.5%;--destructive:4 92.5% 68.8%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%}
 
   :root {
     color-scheme: light;
@@ -106,80 +106,6 @@ img {
   user-select: none;
 }
 
-/* Engraving: the plate is an alpha mask painted in ink, so one file prints in both themes. Crop via --pos. */
-.engraving {
-  background-color: hsl(var(--foreground) / 0.85);
-  -webkit-mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-  mask: url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-}
-/* The plate dissolves upward into the field: a gradient mask intersected with the plate. */
-.engraving--fade {
-  -webkit-mask:
-    linear-gradient(to bottom, transparent, rgb(0 0 0) 55%),
-    url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-  -webkit-mask-composite: source-in;
-  mask:
-    linear-gradient(to bottom, transparent, rgb(0 0 0) 55%),
-    url("../assets/plates/hollar-band-1600.webp") var(--pos, 50% 100%) / cover no-repeat;
-  mask-composite: intersect;
-}
-
-/* Wordscroll: the lede sentence inks word by word on its own view timeline. Static and fully inked without
-   scroll timelines or with reduced motion. */
-/* The ghost is a colour, not opacity, so it never mixes with what sits behind the words. */
-@keyframes ws-ink {
-  from {
-    color: var(--ws-ghost);
-    translate: 0.06em 0.04em;
-  }
-  to {
-    color: hsl(var(--foreground));
-    translate: 0 0;
-  }
-}
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .ws {
-      view-timeline: --ws block;
-    }
-    .ws__w {
-      display: inline-block;
-      animation: ws-ink auto linear both;
-      animation-timeline: --ws;
-    }
-  }
-}
-
-/* Masthead cover: as the hero scrolls away the name lags the page, so the Bromo plate rises over it. */
-@keyframes masthead-name {
-  to {
-    translate: 0 45svh;
-  }
-}
-@keyframes masthead-job {
-  to {
-    opacity: 0;
-  }
-}
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .masthead {
-      view-timeline: --masthead block;
-    }
-    .masthead__name,
-    .masthead__job {
-      will-change: translate, opacity;
-      animation: masthead-name auto linear both;
-      animation-timeline: --masthead;
-      animation-range: exit 0% exit 70%;
-    }
-    .masthead__job {
-      animation-name: masthead-job;
-      animation-range: exit 0% exit 30%;
-    }
-  }
-}
-
 /* Solid share bar (wakatime, roadmap progress, tools). Renamed when its users are rebuilt. */
 .bg-hatch {
   background-color: hsl(var(--muted-foreground) / 0.45);
@@ -197,7 +123,7 @@ img {
   margin-top: 0;
 }
 .prose :is(h2, h3) {
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.015em;
   text-wrap: balance;
 }
@@ -213,14 +139,14 @@ img {
   margin-top: 2em;
 }
 .prose h4 {
-  font-weight: 600;
+  font-weight: 500;
   margin-top: 1.75em;
 }
 .prose :is(h2, h3, h4) + * {
   margin-top: 0.6em;
 }
 .prose strong {
-  font-weight: 600;
+  font-weight: 500;
 }
 .prose a {
   color: hsl(var(--foreground));
@@ -277,7 +203,7 @@ img {
 }
 .prose th {
   @apply text-caption;
-  font-weight: 600;
+  font-weight: 500;
   color: hsl(var(--muted-foreground));
   border-bottom: 1px solid hsl(var(--border));
 }
@@ -319,8 +245,7 @@ img {
   background: none;
   font-size: inherit;
 }
-.prose hr,
-.tail-piece {
+.prose hr {
   height: 1px;
   margin: 2.5em 0;
   border: 0;
@@ -338,58 +263,233 @@ img {
   margin-top: 1.25em;
 }
 
-/* ── Article shell (ui/article-shell.tsx) ─────────────────────────────── */
 
-/* Tail-piece: the fleuron of `.prose hr`, set once where the text ends. */
-.tail-piece {
-  margin-top: 3rem;
+/* ── Langit Malang (ui/sky.tsx) ───────────────────────────────────────
+   The painted landscape the footer sits in, after soft painted-photo backgrounds: a sky that follows Malang's hour
+   (data-sky; dark mode is always night), the sun or moon, drifting clouds, Arjuno and Semeru in haze, the name set
+   large between the hills, grass that moves in the wind, and a fine grain. The greens and the haze are part of this
+   one illustration, never UI colour. Footer text sits in the upper sky; its contrast is pinned in contrast.test.ts. */
+.sky {
+  --sky-top: 211 68.4% 90.4%;
+  --orb: 48 100% 97%;
+  --orb-glow: 48 100% 92%;
+  --mountain: 212 30% 78%;
+  --hill-far: 105 22% 71%;
+  --hill-mid: 104 22% 58%;
+  --hill-near: 102 25% 44%;
+  --wordmark: 0 0% 100% / 0.6;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(to bottom, hsl(var(--background)) 0%, hsl(var(--sky-top)) 48%, hsl(var(--sky-top)) 100%);
 }
-
-/* Rail: a disclosure below lg; from lg it stays open with no summary. Browsers without
-   ::details-content keep the summary, so the rail is never stuck shut. */
-@supports selector(::details-content) {
-  @media (min-width: 1024px) {
-    .article-rail > summary {
-      display: none;
-    }
-    .article-rail::details-content {
-      content-visibility: visible;
-    }
+.sky[data-sky="dawn"] {
+  --sky-top: 210 57.7% 89%;
+  --orb: 36 100% 95%;
+  --orb-glow: 30 100% 90%;
+}
+.sky[data-sky="day"] {
+  --sky-top: 211 68.4% 90.4%;
+}
+.sky[data-sky="dusk"] {
+  --sky-top: 220 37.5% 90.6%;
+  --orb: 30 95% 93%;
+  --orb-glow: 22 95% 88%;
+  --mountain: 222 22% 76%;
+}
+.sky[data-sky="evening"] {
+  --sky-top: 219 44.4% 89.4%;
+  --orb: 220 40% 97%;
+  --orb-glow: 220 50% 92%;
+}
+.dark .sky,
+.dark .sky[data-sky] {
+  --sky-top: 215 46.3% 16.1%;
+  --orb: 45 30% 92%;
+  --orb-glow: 215 50% 40%;
+  --mountain: 216 32% 21%;
+  --hill-far: 140 12% 15%;
+  --hill-mid: 135 14% 11%;
+  --hill-near: 130 16% 8%;
+  --wordmark: 215 60% 80% / 0.1;
+}
+/* The sun by day, the moon by night: a soft disc with a wide glow, high on the right. */
+/* Below lg the column spans most of the width, so the sun or moon sits low, over the hills, clear of the footer text. */
+.sky__orb {
+  position: absolute;
+  bottom: 10rem;
+  right: 8%;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, hsl(var(--orb)) 0 22%, hsl(var(--orb-glow) / 0.55) 34%, hsl(var(--orb-glow) / 0) 70%);
+}
+@media (min-width: 1024px) {
+  .sky__orb {
+    top: 16%;
+    bottom: auto;
+    right: 12%;
+    width: 11rem;
+    height: 11rem;
   }
 }
-
-/* Reading hairline: inks the running head's rule as the page scrolls. Tier 1, so no JS fallback:
-   without scroll timelines or with reduced motion it is simply not there. */
-.reading-hairline {
+.dark .sky__orb {
+  background: radial-gradient(circle, hsl(var(--orb)) 0 13%, hsl(var(--orb-glow) / 0.35) 22%, hsl(var(--orb-glow) / 0) 64%);
+}
+.sky__star {
   display: none;
 }
-@keyframes reading-hairline {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
+.dark .sky__star {
+  display: block;
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 9999px;
+  background-color: hsl(var(--foreground) / 0.65);
+}
+.sky__clouds {
+  position: absolute;
+  inset: 0 0 30%;
+}
+/* Clouds are pre-softened radial shapes (no filter: blur) drifting across the sky; phones get the still scene. */
+.sky__cloud {
+  position: absolute;
+  display: none;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, hsl(0 0% 100% / 0.85), hsl(0 0% 100% / 0));
+  animation: sky-drift linear infinite;
+}
+.dark .sky__cloud {
+  background: radial-gradient(closest-side, hsl(216 34% 30% / 0.5), hsl(216 34% 30% / 0));
+}
+@media (min-width: 640px) {
+  .sky__cloud {
+    display: block;
   }
 }
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reading-hairline {
-      display: block;
-      position: fixed;
-      inset-inline: 0;
-      top: var(--head-h);
-      z-index: 40;
-      height: 2px;
-      background-color: hsl(var(--foreground));
-      transform-origin: 0 50%;
-      pointer-events: none;
-      animation: reading-hairline auto linear both;
-      animation-timeline: scroll(root);
-    }
+.sky__cloud--a {
+  top: 40%;
+  width: 32rem;
+  height: 7rem;
+  animation-duration: 120s;
+  animation-delay: -40s;
+}
+.sky__cloud--b {
+  top: 58%;
+  width: 22rem;
+  height: 5rem;
+  animation-duration: 160s;
+  animation-delay: -110s;
+}
+.sky__cloud--c {
+  top: 30%;
+  width: 38rem;
+  height: 8rem;
+  animation-duration: 200s;
+  animation-delay: -15s;
+}
+@keyframes sky-drift {
+  from {
+    transform: translateX(-40rem);
+  }
+  to {
+    transform: translateX(100vw);
+  }
+}
+.sky__back,
+.sky__front {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 15rem;
+}
+@media (min-width: 640px) {
+  .sky__back,
+  .sky__front {
+    height: 20rem;
+  }
+}
+.sky__mountain {
+  fill: hsl(var(--mountain));
+}
+.sky__hill--far {
+  fill: hsl(var(--hill-far));
+}
+.sky__hill--mid {
+  fill: hsl(var(--hill-mid));
+}
+.sky__hill--near,
+.sky__blades {
+  fill: hsl(var(--hill-near));
+}
+/* The name, set large between the far and the near hills, so the land grows over its foot. */
+.sky__wordmark {
+  position: absolute;
+  inset: auto 0 2.25rem;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(3.5rem, 17vw, 15rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+  color: hsl(var(--wordmark));
+}
+@media (min-width: 640px) {
+  .sky__wordmark {
+    bottom: 3.5rem;
+  }
+}
+/* Wind in the near grass: the blades lean and settle. */
+.sky__blades {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sky-sway 6s ease-in-out infinite alternate;
+}
+@keyframes sky-sway {
+  from {
+    transform: skewX(-3deg);
+  }
+  to {
+    transform: skewX(3deg);
+  }
+}
+/* A fine grain over the whole scene, like the painted-photo backgrounds it follows. */
+.sky__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Phones get the still scene: the clouds are hidden there and the pause control is not shown. */
+@media (max-width: 639px) {
+  .sky__blades {
+    animation: none;
+  }
+}
+html[data-sky-paused] .sky__cloud,
+html[data-sky-paused] .sky__blades {
+  animation-play-state: paused;
+}
+/* The pause control only exists where something can move. `!important` beats the display utility of its link styling. */
+@media (max-width: 639px), (prefers-reduced-motion: reduce) {
+  .sky-toggle {
+    display: none !important;
   }
 }
 
-/* ── End article shell ────────────────────────────────────────────────── */
+/* ── Marker (ui/marker.tsx): one landing phrase per page, the second and last use of the blue. */
+.marker {
+  background-color: hsl(var(--sky-wash));
+  color: hsl(var(--foreground));
+  border-radius: 0.25rem;
+  padding: 0 0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
 
 @tailwind utilities;
 
@@ -413,13 +513,16 @@ img {
   ::view-transition-new(*) {
     animation: none !important;
   }
+  .sky__cloud,
+  .sky__blades {
+    animation: none !important;
+  }
 }
 
 @media print {
   .dark{--background:60 12.5% 96.9%;--foreground:80 4.9% 12%;--muted:60 11.1% 92.9%;--muted-foreground:72 2.6% 37.8%;--border:60 6.5% 87.8%;--input:69 2.8% 51.2%;--popover:0 0% 100%;--destructive:4 76.5% 40%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;color-scheme:light}
   body { background: none; }
-  nav, [role="dialog"], .engraving, [data-print-hide] { display: none !important; }
-  .ws__w { animation: none !important; }
+  nav, [role="dialog"], [data-print-hide] { display: none !important; }
   main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; overflow-wrap: anywhere; }
   pre, blockquote, figure, img, tr { break-inside: avoid; }
   h2, h3 { break-after: avoid; }

@@ -1,6 +1,8 @@
-import { Minus, Plus } from "lucide-react"
+import { ArrowLeft, ChevronDown } from "lucide-react"
 
+import { Badge } from "@/components/ui/badge"
 import { InkLink } from "@/components/ui/ink-link"
+import { BREAKOUT } from "@/lib/design-system"
 import { cn } from "@/lib/utils"
 
 interface ArticleLink {
@@ -9,17 +11,25 @@ interface ArticleLink {
 }
 
 export interface ArticleShellProps {
-  /** Set as the page `h1`, display italic. */
+  /** The page `h1`. */
   title: React.ReactNode
-  /** One italic lead line under the title. */
+  /** One muted line under the title. */
   standfirst?: React.ReactNode
   /** A sentence, never a middle-dot string: "Published 3 March 2026. Six minutes to read." */
   dateline?: React.ReactNode
-  /** Rail content (reader count, tags, contents). Sticky beside the text from lg, a disclosure below. */
+  /** The index this page belongs to, as a small link above the title ("All projects"). */
+  back?: ArticleLink
+  /** Muted lines under the dateline: reader count, where it was first published, outside links. */
+  meta?: React.ReactNode
+  /** Tags, as small chips under the dateline. */
+  chips?: string[]
+  /** The contents ("On this page"), in a closed disclosure under the dateline. */
   rail?: React.ReactNode
-  /** Summary of the rail disclosure below lg. */
+  /** Summary of the contents disclosure. */
   railLabel?: string
-  /** After the tail-piece, before previous / next (letters, claps). */
+  /** The hero image tile, between the head and the text; it breaks out of the column on large screens. */
+  cover?: React.ReactNode
+  /** After the text, before previous / next (comments, claps). */
   footer?: React.ReactNode
   prev?: ArticleLink
   next?: ArticleLink
@@ -28,16 +38,19 @@ export interface ArticleShellProps {
   className?: string
 }
 
-/**
- * Article pattern (server, no cookies): head on a single ink rule, a 13rem sticky rail beside a 66ch column,
- * a tail-piece and previous / next. The reading hairline under the running head is CSS only (`.reading-hairline`); home renders it too.
- */
+const TARGET = "inline-flex min-h-11 items-center md:min-h-0"
+
+/** Article pattern (server, no cookies): a quiet head in the reading column, the text, then previous / next. */
 export function ArticleShell({
   title,
   standfirst,
   dateline,
+  back,
+  meta,
+  chips,
   rail,
-  railLabel = "About this page",
+  railLabel = "On this page",
+  cover,
   footer,
   prev,
   next,
@@ -45,58 +58,69 @@ export function ArticleShell({
   className,
 }: Readonly<ArticleShellProps>) {
   return (
-    // The shell's full width, so an index and its articles share one left edge; `.prose` keeps the 66ch measure.
-    <article className={cn("text-prose", className)}>
-      <div aria-hidden data-print-hide className="reading-hairline" />
-
-      <header className="pb-8">
-        <h1 className="text-h2 text-balance text-foreground sm:text-h1">{title}</h1>
-        {standfirst && <div className="mt-4 max-w-[46ch] text-lead text-muted-foreground">{standfirst}</div>}
-        {dateline && <p className="mt-4 text-caption tabular-nums text-muted-foreground">{dateline}</p>}
-      </header>
-      <div aria-hidden className="border-t border-foreground" />
-
-      <div className={cn("mt-8 grid gap-y-8", rail && "lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-12")}>
+    <article className={className}>
+      <header>
+        {back && (
+          <p className="mb-6 text-small">
+            <InkLink
+              href={back.href}
+              icon={<ArrowLeft strokeWidth={1.5} />}
+              className={cn(TARGET, "text-muted-foreground no-underline hover:text-foreground")}
+            >
+              {back.title}
+            </InkLink>
+          </p>
+        )}
+        <h1 className="text-h1 text-balance text-foreground">{title}</h1>
+        {standfirst && <p className="mt-2 text-pretty text-body text-muted-foreground">{standfirst}</p>}
+        {dateline && <p className="mt-2 text-small tabular-nums text-muted-foreground">{dateline}</p>}
+        {meta && <div className="mt-1 flex flex-col gap-1 text-small text-muted-foreground">{meta}</div>}
+        {chips && chips.length > 0 && (
+          <ul role="list" aria-label="Tags" className="mt-4 flex flex-wrap gap-2">
+            {chips.map((chip) => (
+              <li key={chip}>
+                <Badge>{chip}</Badge>
+              </li>
+            ))}
+          </ul>
+        )}
         {rail && (
-          <details className="article-rail group self-start border-b border-border text-small text-muted-foreground lg:sticky lg:top-[calc(var(--head-h)+1.5rem)] lg:border-0">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-foreground [&::-webkit-details-marker]:hidden">
+          <details className="group mt-6 text-small text-muted-foreground">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-foreground md:min-h-9 [&::-webkit-details-marker]:hidden">
               {railLabel}
-              <Plus className="size-4 group-open:hidden" strokeWidth={1.5} aria-hidden />
-              <Minus className="hidden size-4 group-open:block" strokeWidth={1.5} aria-hidden />
+              <ChevronDown className="size-4 transition-transform duration-ui ease-out group-open:rotate-180" strokeWidth={1.5} aria-hidden />
             </summary>
-            <div className="flex flex-col gap-4 pb-6 lg:pb-0">{rail}</div>
+            <div className="flex flex-col gap-3 pb-2 pt-2">{rail}</div>
           </details>
         )}
+      </header>
 
-        {/* The text's own measure, so the tail-piece, letters and next-reads line up with the prose. */}
-        <div className="min-w-0 max-w-[66ch]">
-          <div className="prose">{children}</div>
+      {cover && <div className={cn("mt-8", BREAKOUT)}>{cover}</div>}
 
-          <div aria-hidden className="tail-piece" />
-          {footer}
+      <div className="prose mt-8">{children}</div>
 
-          {(prev || next) && (
-            <nav aria-label="More to read" className="mt-12 grid gap-6 border-t border-border pt-6 sm:grid-cols-2">
-              {prev && (
-                <p className="text-small text-muted-foreground">
-                  <span className="block text-caption">Previous</span>
-                  <InkLink href={prev.href} className="inline-flex min-h-11 items-center text-h4 md:min-h-0">
-                    {prev.title}
-                  </InkLink>
-                </p>
-              )}
-              {next && (
-                <p className="text-small text-muted-foreground sm:col-start-2 sm:text-right">
-                  <span className="block text-caption">Next</span>
-                  <InkLink href={next.href} className="inline-flex min-h-11 items-center text-h4 md:min-h-0">
-                    {next.title}
-                  </InkLink>
-                </p>
-              )}
-            </nav>
+      {footer}
+
+      {(prev || next) && (
+        <nav aria-label="More to read" className="mt-14 grid gap-6 sm:grid-cols-2">
+          {prev && (
+            <p className="text-small text-muted-foreground">
+              <span className="block">Previous</span>
+              <InkLink href={prev.href} className={cn(TARGET, "text-body")}>
+                {prev.title}
+              </InkLink>
+            </p>
           )}
-        </div>
-      </div>
+          {next && (
+            <p className="text-small text-muted-foreground sm:col-start-2 sm:text-right">
+              <span className="block">Next</span>
+              <InkLink href={next.href} className={cn(TARGET, "text-body")}>
+                {next.title}
+              </InkLink>
+            </p>
+          )}
+        </nav>
+      )}
     </article>
   )
 }

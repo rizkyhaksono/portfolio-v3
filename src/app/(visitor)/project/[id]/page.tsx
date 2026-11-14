@@ -2,7 +2,6 @@ import { notFound } from "next/navigation"
 import { getAllProject } from "@/services/visitor/project"
 import { getPathReads } from "@/services/visitor/umami"
 import { ArticleShell } from "@/components/ui/article-shell"
-import { InkLink } from "@/components/ui/ink-link"
 import { ReaderCount } from "@/components/ui/reader-count"
 import ClapButton from "@/components/ui/clap-button"
 import ProjectImageViewer from "./_components/project-image-viewer"
@@ -42,23 +41,20 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
 
   return (
     <ArticleShell
+      back={{ href: "/project", title: "All projects" }}
       title={project.title}
       dateline={dateline(project.created_at, project.updated_at)}
-      railLabel="About this project"
-      rail={
+      meta={
         <>
-          <ProjectLinks project={project} className="flex-col items-start" />
-          <ReaderCount path={`/project/${project.id}`} reads={reads} />
-          <InkLink href="/project" className="inline-flex min-h-11 items-center md:min-h-0">
-            All projects
-          </InkLink>
+          <ReaderCount path={`/project/${project.id}`} reads={reads} className="text-small" />
+          <ProjectLinks project={project} className="mt-2 text-body" />
         </>
       }
-      footer={<ClapButton targetType="project" targetId={project.id} className="mt-8" />}
+      cover={plate && <ProjectImageViewer src={plate} alt={`${project.title}, screenshot`} />}
+      footer={<ClapButton targetType="project" targetId={project.id} className="mt-10" />}
       prev={link(projects[index - 1])}
       next={link(projects[index + 1])}
     >
-      {plate && <ProjectImageViewer src={plate} alt={`${project.title}, screenshot`} />}
       <div className="[&>*+*]:mt-[1em]" dangerouslySetInnerHTML={{ __html: safeHtml(project.description) }} />
     </ArticleShell>
   )

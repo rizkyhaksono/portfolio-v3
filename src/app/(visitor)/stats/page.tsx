@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import BaseLayout from "@/components/layout/base-layout"
+import { PageHeader } from "@/components/ui/page-header"
 import { StatStrip, type StatItem } from "@/components/ui/stat-strip"
+import ContributionSection from "@/app/_components/contribution"
 import { getDailyPageviews, getPathReads, getUmamiStats } from "@/services/visitor/umami"
 import { getLeetCodeStats } from "@/services/visitor/leetcode"
 import { getMonkeyTypeData } from "@/services/visitor/monkeytype"
@@ -43,18 +45,13 @@ export default async function StatsPage() {
 
   return (
     <BaseLayout>
-      <header className="pb-8">
-        <h1 className="text-h1 text-balance text-foreground">Stats</h1>
-        <p className="mt-4 text-balance text-caption text-muted-foreground">
-          Readers, status and practice figures, refreshed every fifteen minutes.
-        </p>
-      </header>
-      <div aria-hidden className="border-t border-foreground" />
+      <PageHeader title="Stats" description="Readers, status and practice figures, refreshed every fifteen minutes." />
 
-      {strip.length > 0 && <StatStrip items={strip} className="mt-8 border-t-0" />}
+      {strip.length > 0 && <StatStrip items={strip} className="sm:grid-cols-2" />}
       <ReadersFigures stats={stats} daily={daily} reads={reads} />
+      <ContributionSection />
       <SystemStatus />
-      {leetcode && <LeetCodeSection stats={leetcode} />}
+      <LeetCodeSection stats={leetcode} />
       <TypingSection data={typing} />
       <PlatformFigures chess={chess} npm={npm} />
     </BaseLayout>

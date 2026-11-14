@@ -51,7 +51,7 @@ export function OAuthCallback() {
 
   if (!retryHref) {
     return (
-      <p role="status" className="text-lead text-muted-foreground">
+      <p role="status" className="text-body text-muted-foreground">
         Checking your Google session…
       </p>
     )

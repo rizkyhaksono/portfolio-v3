@@ -7,32 +7,32 @@ Restyle shared primitives in place; never fork a second version. Prefer them ove
 | Primitive | Path | Role |
 |---|---|---|
 | `BaseLayout` | `components/layout/base-layout.tsx` | Visitor and user shell, see [page-shell.md](./page-shell.md) |
-| `PageHeader` | `components/ui/` | The one centred page header: h1 plus lead |
-| `PageSection`, `SectionHeading` | `components/ui/` | Section rhythm; a centred h2 with an optional description |
+| `PageHeader` | `components/ui/page-header.tsx` | The one page header: a 24px h1 at weight 500 and a muted intro line, left-aligned |
+| `PageSection`, `SectionHeading` | `components/ui/page-section.tsx`, `section-heading.tsx` | Section rhythm; a small h2 label (15px, weight 500) with an optional muted description and right-hand link |
 | `Card`, `Surface` | `components/ui/card.tsx`, `surface.tsx` | Frame and tile, see [surfaces.md](./surfaces.md) |
-| `InkLink` | `components/ui/ink-link.tsx` | Every text link, internal or external; optional `icon` |
-| `Marker` | `components/ui/` | The `sky-wash` highlight for one landing phrase |
-| `MediaCard` | `components/ui/` | A screenshot on a tile with title and meta below |
-| `PlateFigure` | `components/ui/plate-figure.tsx` | A picture in a plain rounded frame, in its own colours, with a caption |
-| `LedgerList`, `LedgerRow` | `components/ui/ledger.tsx` | The Ledger pattern |
+| `InkLink` | `components/ui/ink-link.tsx` | Every text link, internal or external, in foreground with a faint underline; optional `icon` |
+| `MediaCard` | `components/ui/media-card.tsx` | A screenshot on a tile with title and meta below, only where screenshots matter |
+| `PlateFigure` | `components/ui/plate-figure.tsx` | A picture on the grey `rounded-2xl` tile, in its own colours, with a caption |
+| `LedgerList`, `LedgerRow` | `components/ui/ledger.tsx` | Plain rows: a title in foreground with one muted line under it, an optional small muted group label |
 | `ArticleShell` | `components/ui/article-shell.tsx` | The Article pattern |
-| `Sky` | `components/ui/sky.tsx` | The Langit Malang band and its pause control |
+| `Sky`, `SkyToggle`, `MalangClock` | `components/ui/sky.tsx` | The painted footer scene, its pause toggle (visually hidden until keyboard focus) and the hour in Malang |
 | `ThemeToggle`, `switchTheme()` | `components/layout/theme-toggle.tsx` | The one path for theme changes |
 | `HoverTip` | `components/ui/hover-tip.tsx` | The one tooltip for every `data-tip`, mounted once in the root layout |
 | `StatStrip` | `components/ui/stat-strip.tsx` | `dt` caption, `dd` numeral, `tabular-nums` |
 | `InkChart`, `InkHeatmap`, `HatchBar` | `components/ui/ink-chart.tsx`, `ink-heatmap.tsx`, `app/_components/contribution/wakatime-progress.tsx` | Data viz |
-| `StatusLine` | `components/ui/status-line.tsx` | State as an icon plus a word |
+| `StatusLine` | `components/ui/status-line.tsx` | Empty, failed and loading states as one honest line; failed adds an icon |
+| `Skeleton` | `components/ui/skeleton.tsx` | Static loading shapes, no pulse |
 | `ReadingNow` | `components/ui/reading-now.tsx` | Realtime visitor line (client island) |
 | `NotFoundView` | `components/ui/not-found-view.tsx` | 404, error and empty states |
 | `AuthShell` | `components/layout/auth-shell.tsx` | One centred column for sign-in |
 
-Being deleted, so do not use them in new code: `WordScroll`, `Logo` and its art, `Eyebrow`, the home Skills deck, and every old identity component the gate's R1c rule names.
+Deleted, so do not bring them back: `WordScroll`, `Logo` and its art, `Engraving`, `Eyebrow`, `Marker`, the home Skills, About, Career and Site stats sections, and every old identity class the gate's R1c rule names.
 
 ## Rules per primitive
 
-- **Button.** `rounded-lg`, `h-9`, `min-h-11` below `md`, 15px at weight 500. Default: `bg-primary text-primary-foreground`. Outline: `border-input`. Ghost: `hover:bg-muted`. Destructive (admin): `text-destructive` with an explicit verb ("Delete post"). Never put a `Button` inside a `Link`; use `asChild`.
+- **Button.** `rounded-lg`, `h-9`, `min-h-11` below `md`, `text-body` at weight 500. Default: `bg-primary text-primary-foreground`. Outline: `border-input`. Ghost: `hover:bg-muted`. Destructive (admin): `text-destructive` with an explicit verb ("Delete post"). Never put a `Button` inside a `Link`; use `asChild`.
 - **Focus.** The global `:focus-visible` outline (2px `ring`, 2px offset) is always visible. Do not remove or restyle it per component.
-- **InkLink** (server). A dotted underline in muted-foreground that becomes a solid foreground underline on hover over 150ms. No arrow after the text. `icon` shows a 16px lucide icon before the text so the destination is clear before the click. `external` adds `target="_blank"`, `rel`, an sr-only "(opens in a new tab)" and `data-umami-event={event ?? 'outbound-click'}` with `data-umami-event-host`.
+- **InkLink** (server). Foreground text with a faint underline (`decoration-foreground/25`) that strengthens to full foreground on hover over `--dur-ui`, so colour is never the only cue against muted prose. No arrow after the text. `icon` shows a 16px lucide icon before the text so the destination is clear before the click. `external` adds `target="_blank"`, `rel`, an sr-only "(opens in a new tab)" and `data-umami-event={event ?? 'outbound-click'}` with `data-umami-event-host`.
 - **Fields** (input, textarea, select). A full box with `border-input`, `rounded-lg`, `bg-background`, weight 400, 16px on phones, label above. Errors sit below with an icon and a sentence, wired with `aria-describedby` and `aria-invalid`.
 - **Tabs.** Segmented: a `bg-muted` track, the active item on `bg-background`. State lives in the URL (`?tab=`).
 - **Switch, radio, avatar.** `rounded-full`.
@@ -42,12 +42,12 @@ Being deleted, so do not use them in new code: `WordScroll`, `Logo` and its art,
 - **Floating layers.** Dialog, alert dialog, sheet, popover, dropdown menu, select content, hover tip, toasts and the terminal overlay use the float surface and a fixed scrim. Esc closes; focus returns to the trigger.
 - **Icons.** lucide only, 16px or 20px, functional only. `react-icons` and `@radix-ui/react-icons` are gone; do not add them back. No emoji in UI.
 - **Code.** A server `<pre>` on a tile, system mono, `tabIndex={0}`, no syntax colours. The client `CopyButton` keeps the `Click Copy Code` event.
-- **Prose.** `.prose` in `globals.css` (no typography plugin): `prose` size, weight-600 headings, `InkLink`-style links, quiet blockquotes, lists, hairline tables, images on tiles. `.prose--chat` for chat replies.
-- **Media.** `MediaCard` and `PlateFigure` show pictures in their own colours on a `bg-muted` tile, `rounded-2xl`. Size the picture in the caller so the tile reserves its space (no layout shift). The image scales to 1.015 on hover only under `(hover: hover)` and `motion-safe`.
-- **Marker.** `bg-sky-wash` behind foreground text, at most one phrase per page, public pages only.
-- **PageHeader.** A centred h1 and an optional lead in muted-foreground. One per page.
+- **Prose.** `.prose` in `globals.css` (no typography plugin): Onest at the `prose` size (16/28), headings at weight 500, `InkLink`-style links, quiet blockquotes, lists, hairline tables, images on tiles. `.prose--chat` for chat replies.
+- **Media.** `MediaCard` and `PlateFigure` show pictures in their own colours on a `bg-muted` tile, `rounded-2xl`, only where screenshots matter (`/project` featured, the `/blog` lead, project heroes); the home has none. Size the picture in the caller so the tile reserves its space (no layout shift). The image scales to 1.015 on hover only under `(hover: hover)` and `motion-safe`.
+- **Lists.** `LedgerList` and `LedgerRow`: the title in `text-foreground` at the body size, not bold, one muted line under it, an optional small muted group label. No boxes, no rules, no hover backgrounds.
+- **PageHeader.** A left-aligned 24px h1 at weight 500 and an optional intro line in muted-foreground. One per page.
 - **Hover tips.** `data-tip="..."` on any element shows an instant tip on the float surface. Never the native `title` attribute: it waits about a second. The tip is `aria-hidden`, so keep an `aria-label` or text beside it.
-- **Generated cards.** Build `/api/og` and `/api/certificate` URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes so crawlers and CDNs refetch. The cards are set in Onest 600 and read colours from `THEME_HEX`.
+- **Generated cards.** Build `/api/og` and `/api/certificate` URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes so crawlers and CDNs refetch. They read colours from `THEME_HEX`.
 
 ## Data viz
 
@@ -93,7 +93,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `nav-click`, `menu-open` | Header, menu, footer | `item`, `area` / none |
 | `theme-toggle` | ThemeToggle | `to` |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
-| `cta-click`, `resume-open` | Home name block and bio | `target` / `area` |
+| `cta-click`, `resume-open` | Home bio and list links | `target` / `area` |
 | `social-click`, `email-click` | Contact, footer (email only) | `network`, `area` |
 | `cert-verify` | `/certificates` rows | `issuer` |
 | `contact-send` | Contact form | `status`: `ok`, `error`, `limited` |
@@ -116,5 +116,5 @@ Content counts read "Read by 1,204 people in the last 30 days." and hide below 1
 - 44px tap targets below `md` on coarse pointers (`min-h-11`, `size-11`).
 - State by icon and word, never colour alone.
 - A text alternative for every chart.
-- A pause control for anything that moves for more than five seconds (the sky).
+- A pause control for anything that moves for more than five seconds (the footer sky's `SkyToggle`, visually hidden until keyboard focus).
 - No horizontal scroll at 320 or 375px. `<html lang="en">`.

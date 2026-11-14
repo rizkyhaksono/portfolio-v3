@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlateFigure } from "@/components/ui/plate-figure"
 import {
   downloadFromFacebook,
   downloadFromInstagram,
@@ -134,7 +133,7 @@ export function DownloaderTab() {
       {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
 
       {result?.type === "instagram" && (
-        <article className="space-y-4 border border-border p-5">
+        <article className="space-y-4 rounded-2xl bg-muted p-5">
           <Badge variant="outline" status="outline">
             Preview only
           </Badge>
@@ -175,13 +174,11 @@ export function DownloaderTab() {
 
       {result?.type === "standard" &&
         (downloadLinks.length ? (
-          <article className="border border-border">
+          <article className="overflow-hidden rounded-2xl bg-muted">
             {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
-              <PlateFigure className="p-3 pb-0">
-                <div className="relative aspect-video w-full">
-                  <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
-                </div>
-              </PlateFigure>
+              <div className="relative aspect-video w-full">
+                <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
+              </div>
             )}
             <div className="space-y-4 p-5">
               <Badge variant="outline" status="filled">

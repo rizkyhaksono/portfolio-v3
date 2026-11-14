@@ -6,7 +6,7 @@ export interface InkChartPoint {
 }
 
 interface InkChartProps {
-  /** Main series: 1.5px ink line over a hatched area. */
+  /** Main series: a 1.5px line over a solid muted area. */
   points: InkChartPoint[]
   /** Optional second series, same x order, drawn dashed. */
   dashed?: InkChartPoint[]
@@ -44,8 +44,8 @@ const niceCeil = (v: number) => {
 }
 
 /**
- * Server-rendered one-ink line chart. The SVG stretches (`preserveAspectRatio="none"`) with
- * non-scaling strokes; the hatch is a CSS layer clipped to the area so its 45° lines never distort.
+ * Server-rendered line chart. The SVG stretches (`preserveAspectRatio="none"`) with non-scaling strokes;
+ * the area is a CSS layer clipped to the series, so it fills the box whatever its aspect.
  */
 export function InkChart({
   points,
@@ -83,9 +83,9 @@ export function InkChart({
       <caption className="sr-only">{label}</caption>
       <thead>
         <tr className="border-b border-border">
-          <th scope="col" className="py-1 text-left text-xs font-semibold text-muted-foreground">Date</th>
-          <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{name}</th>
-          {dashed && <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{dashedName}</th>}
+          <th scope="col" className="py-1 text-left text-caption font-medium text-muted-foreground">Date</th>
+          <th scope="col" className="py-1 text-right text-caption font-medium text-muted-foreground">{name}</th>
+          {dashed && <th scope="col" className="py-1 text-right text-caption font-medium text-muted-foreground">{dashedName}</th>}
         </tr>
       </thead>
       <tbody>
@@ -105,8 +105,8 @@ export function InkChart({
       <div className="relative" style={{ height: height ?? (compact ? 48 : 176) }}>
         {!compact && (
           <>
-            <div aria-hidden className="absolute inset-x-0 top-0 border-t border-dotted border-input" />
-            <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-dotted border-input" />
+            <div aria-hidden className="absolute inset-x-0 top-0 border-t border-border" />
+            <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-border" />
             <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption tabular-nums text-muted-foreground">
               {formatY(fromZero ? top : highest)}
             </span>
@@ -117,7 +117,7 @@ export function InkChart({
             )}
           </>
         )}
-        <div aria-hidden className="bg-hatch absolute inset-0" style={{ clipPath: area }} />
+        <div aria-hidden className="absolute inset-0 bg-muted" style={{ clipPath: area }} />
         <svg
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
@@ -125,7 +125,7 @@ export function InkChart({
           aria-label={label}
           className="absolute inset-0 h-full w-full overflow-visible text-foreground"
         >
-          {!compact && <line x1="0" y1="100" x2="100" y2="100" stroke="currentColor" strokeWidth={1} vectorEffect="non-scaling-stroke" />}
+          {!compact && <line x1="0" y1="100" x2="100" y2="100" stroke="hsl(var(--border))" strokeWidth={1} vectorEffect="non-scaling-stroke" />}
           {dashed && dashed.length > 0 && (
             <polyline
               points={line(dashed)}
@@ -149,10 +149,10 @@ export function InkChart({
             <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-foreground/10" />
           ))}
         </svg>
-        {/* An HTML square, not an SVG rect: the stretched viewBox would draw a rect as a flat bar. */}
+        {/* An HTML dot, not an SVG circle: the stretched viewBox would draw a circle as a flat ellipse. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 bg-foreground"
+          className="pointer-events-none absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground"
           style={{ left: `${px(n - 1)}%`, top: `${py(points[n - 1].y)}%` }}
         />
       </div>
@@ -166,7 +166,7 @@ export function InkChart({
             {n > 1 && <span>{formatX(points[n - 1].x)}</span>}
           </div>
           <details className="mt-3 text-small">
-            <summary className="cursor-pointer py-3 underline md:py-0 decoration-1 underline-offset-[0.18em] hover:decoration-2">
+            <summary className="w-fit cursor-pointer py-3 text-muted-foreground underline decoration-muted-foreground/60 decoration-dotted decoration-1 underline-offset-4 hover:text-foreground hover:decoration-solid md:py-0">
               Show the figures
             </summary>
             {table("mt-2 w-full border-collapse tabular-nums")}

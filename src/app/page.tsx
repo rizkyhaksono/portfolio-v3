@@ -1,113 +1,250 @@
-import { Suspense } from "react"
-import Image from "next/image"
-import AboutSection from "@/app/_components/about"
-import SkillSection from "@/app/_components/skills"
-import CareerSection from "@/app/_components/career"
-import ContributionSection from "@/app/_components/contribution"
-import CertificationSection from "@/app/_components/certification"
-import ReadersSection from "@/app/_components/site-stats"
-import RecommendationsSection from "@/app/_components/contact/linkedin-recommendations"
-import ContactSection from "@/app/_components/contact"
+import { Suspense, type ReactNode } from "react"
+import Link from "next/link"
 import BaseLayout from "@/components/layout/base-layout"
 import { InkLink } from "@/components/ui/ink-link"
-import { InkedSentence } from "@/components/ui/word-scroll"
-import { JOB_TITLE } from "@/commons/constants/author"
+import { Skeleton } from "@/components/ui/skeleton"
+import { StatusLine } from "@/components/ui/status-line"
+import { ContactForm } from "@/app/_components/contact/contact-form"
+import { getPosts } from "@/app/_components/blog/posts"
+import { plainText } from "@/app/(visitor)/project/safe-html"
+import { selectFeaturedProjects } from "@/app/(visitor)/project/featured"
+import { getAllProject } from "@/services/visitor/project"
+import { getAllCarrer } from "@/services/visitor/career"
+import { getAllEducation } from "@/services/visitor/education"
+import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
+import { EMAIL, media_socials } from "@/commons/constants/contact"
 import { RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
-import { SECTION_SPACING } from "@/lib/design-system"
-import { cn } from "@/lib/utils"
-import bromoPlate from "@/assets/plates/bromo-2400.webp"
+import { startOf } from "@/lib/career-dates"
 
 export const revalidate = 900
 
-const CTA = "inline-flex min-h-11 items-center md:min-h-0"
+const GITHUB = media_socials.find(({ title }) => title === "GitHub")!.href
+const LINKEDIN = media_socials.find(({ title }) => title === "LinkedIn")!.href
+const PROJECT_COUNT = 8
 
-/**
- * Masthead: the job line and the name in the theme's ink on its paper (cobalt on cream, cream on cobalt at
- * night), and the Bromo plate along the bottom with its sky cut away, its two inks swapped to match, so the
- * peaks rise in front of the foot of the letters. Scrolling away, the name lags the page and sinks behind the peaks
- * (`.masthead` in globals.css); the h1 itself, the LCP element, never animates. The name is capped by width
- * (one line from sm, two below), height (short screens) and size.
- */
-function Masthead() {
+/** The first sentence of a description, so every row stays one quiet line. */
+const firstSentence = (text: string) => plainText(text).split(/(?<=[.!?])\s/)[0] ?? ""
+
+/** A name the prose points at: full ink against the muted sentence around it. */
+function Name({ children }: Readonly<{ children: ReactNode }>) {
+  return <span className="text-foreground">{children}</span>
+}
+
+function Section({ id, title, children }: Readonly<{ id: string; title: string; children: ReactNode }>) {
   return (
-    <section aria-labelledby="masthead-name" className="masthead relative isolate min-h-[max(calc(100svh-var(--head-h)),30rem)] overflow-hidden">
-      <div className="masthead__name absolute inset-x-0 bottom-[56%] px-[clamp(20px,4vw,48px)] text-center">
-        <p className="masthead__job text-pretty text-lead text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-        <h1
-          id="masthead-name"
-          className="mt-[0.15em] translate-y-[0.2em] text-display text-foreground [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
-        >
-          Rizky Haksono
-        </h1>
-      </div>
-      <div data-plate className="absolute inset-x-0 bottom-0 z-10 h-[56%]">
-        {/* Served as is: the lossless two-ink plate (about 150 KB) beats the optimizer's lossy copies. */}
-        <Image src={bromoPlate} alt="" fill priority unoptimized className="object-cover object-[45%_0%]" />
-      </div>
+    <section aria-labelledby={id} className="mt-14">
+      <h2 id={id} className="text-h2 text-foreground">
+        {title}
+      </h2>
+      <div className="mt-3">{children}</div>
     </section>
   )
 }
 
-/**
- * The lede on paper, just under the plate: the positioning sentence inks itself word by word as it rises
- * (its own `.ws` view timeline) and keeps a 24px floor on phones, where its ghost (3.17:1) passes as large text.
- */
-function Lede() {
+/** A title in ink with one muted line under it; the whole row is the link when there is somewhere to go. */
+function Row({ href, external, title, children }: Readonly<{ href?: string; external?: boolean; title: ReactNode; children?: ReactNode }>) {
+  const body = (
+    <>
+      <span className="block text-body text-foreground underline decoration-transparent underline-offset-4 transition-[text-decoration-color] duration-ui ease-out group-hover:decoration-foreground/40">
+        {title}
+      </span>
+      {children && <span className="block text-body text-muted-foreground">{children}</span>}
+    </>
+  )
+  if (!href) return <li className="py-2">{body}</li>
   return (
-    <div className="ws">
-      <InkedSentence
-        className="max-w-[24ch] text-h1 text-foreground max-sm:text-[1.5rem]"
-        text="I build production AI systems: LLMs, RAG, agents and MCP, that ship, scale and stay up."
-      />
-      <ul className="mt-6 flex flex-wrap gap-x-6 text-body">
-        <li>
-          <InkLink href="/project" event="cta-click" eventData={{ target: "projects" }} className={CTA}>
-            See the projects
-          </InkLink>
-        </li>
-        <li>
-          <InkLink href="/blog" event="cta-click" eventData={{ target: "writing" }} className={CTA}>
-            Read the writing
-          </InkLink>
-        </li>
-        <li>
-          <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "masthead" }} className={CTA}>
-            CV
-          </InkLink>
-        </li>
-      </ul>
+    <li>
+      {external ? (
+        <a href={href} target="_blank" rel="noopener noreferrer" data-umami-event="outbound-click" className="group block py-2">
+          {body}
+          <span className="sr-only"> (opens in a new tab)</span>
+        </a>
+      ) : (
+        <Link href={href} className="group block py-2">
+          {body}
+        </Link>
+      )}
+    </li>
+  )
+}
+
+function RowsSkeleton({ rows }: Readonly<{ rows: number }>) {
+  return (
+    <div aria-hidden className="space-y-4 py-2">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="space-y-2">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-4 w-4/5" />
+        </div>
+      ))}
     </div>
   )
 }
 
-/** Static ruled placeholder at roughly the section's final height (no pulse). */
-function SectionSkeleton({ className }: Readonly<{ className: string }>) {
-  return <div aria-hidden className={cn(SECTION_SPACING.section, "border-t border-foreground", className)} />
+/** Who and what, in a few muted sentences; the names are in full ink. */
+function Bio() {
+  return (
+    <div className="space-y-5 text-body text-pretty text-muted-foreground">
+      <p>
+        Senior AI engineer at <Name>Sarana AI</Name> in Malang, East Java, building LLM systems for production: retrieval and
+        embeddings, MCP integrations, and agents that run on AWS.
+      </p>
+      <p>
+        I ship end-to-end products in Next.js, Go and Python, from <Name>Info Pangan Jakarta</Name>, the city&apos;s official
+        food price monitor, to platforms for <Name>Adaro</Name> and <Name>Biofarma</Name>, with CI/CD I can rely on.
+      </p>
+      <p>
+        I studied informatics at <Name>Universitas Muhammadiyah Malang</Name> and graduated cum laude. My code is on{" "}
+        <InkLink href={GITHUB} external event="social-click" eventData={{ network: "github", area: "bio" }}>
+          GitHub
+        </InkLink>
+        , I am on{" "}
+        <InkLink href={LINKEDIN} external event="social-click" eventData={{ network: "linkedin", area: "bio" }}>
+          LinkedIn
+        </InkLink>
+        , and my full history is in my{" "}
+        <InkLink href={RESUME_GOOGLE_DRIVE_URL} external event="resume-open" eventData={{ area: "bio" }}>
+          CV
+        </InkLink>
+        .
+      </p>
+    </div>
+  )
+}
+
+async function Projects() {
+  const projects = await getAllProject().catch(() => null)
+  if (!projects) return <StatusLine kind="failed">Projects did not load just now. The code is on GitHub in the meantime.</StatusLine>
+  if (projects.length === 0) return <StatusLine kind="empty">No projects are listed right now.</StatusLine>
+
+  const featured = selectFeaturedProjects(projects)
+  const newest = projects.filter((p) => !featured.includes(p)).sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))
+  const shown = [...featured, ...newest].slice(0, PROJECT_COUNT)
+  return (
+    <>
+      <ul role="list">
+        {shown.map((project) => (
+          <Row key={project.id} href={`/project/${project.id}`} title={project.title}>
+            {firstSentence(project.description)}
+          </Row>
+        ))}
+      </ul>
+      {projects.length > shown.length && (
+        <p className="mt-3 text-body">
+          <InkLink href="/project" event="cta-click" eventData={{ target: "projects" }}>
+            All {projects.length} projects
+          </InkLink>
+        </p>
+      )}
+    </>
+  )
+}
+
+async function Writing() {
+  const posts = (await getPosts().catch(() => [])).slice(0, 5)
+  if (posts.length === 0) return <StatusLine kind="failed">No writing could be fetched just now. It is on DEV Community and Medium too.</StatusLine>
+  return (
+    <>
+      <ul role="list">
+        {posts.map((post) => (
+          <Row key={post.id} href={post.href} external={post.source === "medium"} title={post.title}>
+            {firstSentence(post.excerpt)}
+          </Row>
+        ))}
+      </ul>
+      <p className="mt-3 text-body">
+        <InkLink href="/blog" event="cta-click" eventData={{ target: "writing" }}>
+          All writing
+        </InkLink>
+      </p>
+    </>
+  )
+}
+
+/** Every role and study, newest first. */
+async function Work() {
+  const [career, education] = await Promise.allSettled([getAllCarrer(), getAllEducation()])
+  const fulfilled = <T,>(result: PromiseSettledResult<T[] | null>) => (result.status === "fulfilled" ? (result.value ?? []) : [])
+  const entries = [...fulfilled(career), ...fulfilled(education)].sort((a, b) => startOf(b.duration) - startOf(a.duration))
+  if (entries.length === 0) return <StatusLine kind="failed">Work history did not load just now. It is all in the CV.</StatusLine>
+  return (
+    <ul role="list">
+      {entries.map((entry) => (
+        <Row key={entry.id} title={entry.title}>
+          {[entry.subtitle.trim(), entry.duration.replace(" - ", " to ")].filter(Boolean).join(", ")}
+        </Row>
+      ))}
+    </ul>
+  )
+}
+
+/** Every recommendation LinkedIn returns; the section is left out when there are none. */
+async function Recommendations() {
+  const { data } = await getLinkedinRecommendations().catch(() => ({ data: null }))
+  const quotes = (data ?? []).filter((rec) => rec.message?.trim())
+  if (quotes.length === 0) return null
+  return (
+    <Section id="recommendations" title="Recommendations">
+      <div className="space-y-6">
+        {quotes.map((rec) => (
+          <figure key={rec.id}>
+            <blockquote className="text-body text-muted-foreground">{rec.message.trim()}</blockquote>
+            <figcaption className="mt-2 text-small text-foreground">{rec.name}, on LinkedIn</figcaption>
+          </figure>
+        ))}
+      </div>
+    </Section>
+  )
 }
 
 export default function Home() {
   return (
-    <BaseLayout bleed={<Masthead />}>
-      <div aria-hidden data-print-hide className="reading-hairline" />
-      <Lede />
-      <AboutSection />
-      <SkillSection />
-      <Suspense fallback={<SectionSkeleton className="h-[48rem]" />}>
-        <CareerSection />
+    <BaseLayout>
+      <h1 className="sr-only">Rizky Haksono</h1>
+      <Bio />
+
+      <Section id="projects" title="Projects">
+        <Suspense fallback={<RowsSkeleton rows={5} />}>
+          <Projects />
+        </Suspense>
+      </Section>
+
+      <Section id="writing" title="Writing">
+        <Suspense fallback={<RowsSkeleton rows={4} />}>
+          <Writing />
+        </Suspense>
+      </Section>
+
+      <Section id="work" title="Work experience">
+        <Suspense fallback={<RowsSkeleton rows={4} />}>
+          <Work />
+        </Suspense>
+      </Section>
+
+      <Suspense fallback={null}>
+        <Recommendations />
       </Suspense>
-      <Suspense fallback={<SectionSkeleton className="h-[40rem]" />}>
-        <ContributionSection />
-      </Suspense>
-      <Suspense fallback={<SectionSkeleton className="h-[30rem]" />}>
-        <CertificationSection />
-      </Suspense>
-      <Suspense fallback={<SectionSkeleton className="h-[32rem]" />}>
-        <ReadersSection />
-      </Suspense>
-      <Suspense fallback={<SectionSkeleton className="h-[40rem]" />}>
-        <RecommendationsSection />
-      </Suspense>
-      <ContactSection />
+
+      <Section id="contact" title="Contact">
+        <p className="text-body text-muted-foreground">
+          Write to me at{" "}
+          <InkLink href={`mailto:${EMAIL}`} event="email-click" eventData={{ area: "contact" }} className="break-all">
+            {EMAIL}
+          </InkLink>
+          .
+        </p>
+        <details className="group mt-3">
+          <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 text-body text-muted-foreground transition-colors hover:text-foreground md:min-h-0 [&::-webkit-details-marker]:hidden">
+            <span aria-hidden className="inline-block transition-transform duration-ui ease-out group-open:rotate-90">
+              ›
+            </span>
+            Or leave a message here
+          </summary>
+          <div className="mt-4">
+            <ContactForm />
+          </div>
+        </details>
+      </Section>
     </BaseLayout>
   )
 }

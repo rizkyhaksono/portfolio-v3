@@ -1,3 +1,4 @@
+import { PageHeader } from "@/components/ui/page-header"
 import { StatusLine } from "@/components/ui/status-line"
 
 interface PageLoadingProps {
@@ -10,17 +11,8 @@ interface PageLoadingProps {
 export function PageLoading({ title, children }: Readonly<PageLoadingProps>) {
   return (
     <div aria-busy="true">
-      {title && (
-        <>
-          <header className="pb-8">
-            <h1 className="text-h1 text-balance text-foreground">{title}</h1>
-          </header>
-          <div aria-hidden className="border-t border-foreground" />
-        </>
-      )}
-      <StatusLine kind="loading" className={title ? "mt-8" : undefined}>
-        {children}
-      </StatusLine>
+      {title && <PageHeader title={title} />}
+      <StatusLine kind="loading">{children}</StatusLine>
     </div>
   )
 }

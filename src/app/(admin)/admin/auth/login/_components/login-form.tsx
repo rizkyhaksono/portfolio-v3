@@ -46,12 +46,12 @@ export function AdminLoginForm() {
 
         <FormAlert>{error}</FormAlert>
 
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button type="submit" className="h-10 w-full" disabled={pending}>
           {pending ? "Signing in…" : "Sign in to the dashboard"}
         </Button>
       </form>
 
-      <p className="flex items-center gap-4 text-caption text-muted-foreground before:h-px before:flex-1 before:bg-border before:content-[''] after:h-px after:flex-1 after:bg-border after:content-['']">
+      <p className="text-center text-caption text-muted-foreground">
         or
       </p>
 

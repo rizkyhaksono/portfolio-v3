@@ -40,7 +40,7 @@ function ChoiceGroup<T extends string | number>({
 }: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
   return (
     <div role="group" aria-label={label}>
-      <p aria-hidden className="text-small font-semibold text-foreground">
+      <p aria-hidden className="text-small text-foreground">
         {label}
       </p>
       <div className="mt-1 grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
@@ -142,7 +142,7 @@ export default function WPMTest() {
         {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
       </p>
 
-      <p className="wpm-passage min-h-[9rem] border border-border p-5 text-body leading-loose">
+      <p className="wpm-passage min-h-[9rem] rounded-2xl bg-muted p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
           const wordIndex = start + k
           return (
@@ -183,8 +183,8 @@ export default function WPMTest() {
       )}
 
       {phase === "done" && (
-        <div role="status" className="space-y-4 border-t border-foreground pt-6">
-          <p className="text-h3 text-foreground">
+        <div role="status" className="space-y-4">
+          <p className="text-body text-foreground">
             Time is up: {wpm} words a minute at {accuracy}% accuracy.
           </p>
           <div className="flex flex-wrap gap-3">

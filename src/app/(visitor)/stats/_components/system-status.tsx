@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 
 const POLL_MS = 60_000
 
-// Status by shape and word, never colour: filled, dashed outline, empty outline.
+// Status by shape and word, never colour: a filled dot, a dashed ring, an empty ring.
 const SHAPE: Record<ServiceStatus, string> = {
   operational: "border-foreground bg-foreground",
   degraded: "border-dashed border-foreground",
@@ -26,12 +26,12 @@ const HEADLINE: Record<ServiceStatus, string> = {
 }
 
 const StatusMark = ({ status }: { status: ServiceStatus }) => (
-  <span aria-hidden className={cn("inline-block size-2 shrink-0 border", SHAPE[status])} />
+  <span aria-hidden className={cn("inline-block size-2 shrink-0 rounded-full border", SHAPE[status])} />
 )
 
 function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
   return (
-    <li className="grid gap-x-6 gap-y-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
+    <li className="grid gap-x-6 gap-y-1 rounded-xl px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
       <div className="min-w-0">
         <p className="break-words text-body text-foreground">{service.name}</p>
         {service.detail && <p className="break-words text-caption text-muted-foreground">{service.detail}</p>}
@@ -49,7 +49,7 @@ function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
 const timeOf = (iso: string) => new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
 
 /**
- * Live health of the portfolio API and its dependencies, the `#status` strip on /stats. Checks on mount,
+ * Live health of the portfolio API and its dependencies, the `#status` section on /stats. Checks on mount,
  * then every minute while the tab is visible. A failed check keeps the last answer on screen.
  */
 export default function SystemStatus() {
@@ -91,13 +91,9 @@ export default function SystemStatus() {
   const overall: ServiceStatus | null = data?.overall ?? (checking ? null : "down")
 
   return (
-    <PageSection
-      id="status"
-      heading={{ title: "Status" }}
-      contentClassName="mt-6"
-    >
+    <PageSection id="status" heading={{ title: "Status" }} contentClassName="mt-4">
       <div aria-busy={checking}>
-        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-foreground py-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="flex items-center gap-3 text-h4 text-foreground">
             {overall && <StatusMark status={overall} />}
             {overall ? HEADLINE[overall] : "Checking the services"}
@@ -108,7 +104,7 @@ export default function SystemStatus() {
         </div>
 
         {services.length > 0 && (
-          <ul role="list" className="divide-y divide-border border-b border-border">
+          <ul role="list" className="-mx-3 mt-3">
             {services.map((service, index) => (
               <ServiceRow key={`${service.name}-${index}`} service={service} />
             ))}

@@ -36,13 +36,15 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 ## UI rules (mandatory)
 
-Read the UI rules in [`AGENTS.md`](./AGENTS.md#ui-rules-mandatory) and [`docs/ui/`](./docs/ui/README.md) before any UI work; they win over this file. The design is **Langit Malang**: calm, Apple-like, light and dark, one font family (Onest). The jest test `src/__tests__/unit/lib/ui-gate.test.ts` enforces it in CI through `bun run test`. The essentials:
+Read the UI rules in [`AGENTS.md`](./AGENTS.md#ui-rules-mandatory) and [`docs/ui/`](./docs/ui/README.md) before any UI work; they win over this file. The design is **Langit Malang**: a calm reading page after joshpuckett.me, in light and dark, set in one clean sans (Onest), with a painted sky in the footer. The jest test `src/__tests__/unit/lib/ui-gate.test.ts` enforces it in CI through `bun run test`. The essentials:
 
-- Colours only from the token classes; no hex, palette colours or `dark:` classes. Blue (`sky`, `sky-wash`) only for the sky band and the `Marker`.
-- Sizes only from the `fontSize` keys; weights 400, 500, 600; no `uppercase`, `tracking-[…]` or `text-[Npx]`.
-- Radii from the scale (fields and buttons `lg`, chips `md`, floating layers `xl`, tiles `2xl`, dots `full`); no `rounded-[…]`.
-- `shadow-float` on floating layers only; the sticky header is the only blur; no gradients outside `globals.css` and the sky.
-- No motion libraries (framer-motion, `motion`, GSAP, Lenis); every animation stops under reduced motion.
+- Every visitor page uses `BaseLayout`: the handle "@rizkyhaksono" with a short rule under it at the top, one 36rem column (`width="wide"` on `/tools` and `/chat`), and the Langit Malang footer at the bottom. No sky at the top, no sticky or translucent header.
+- Prose in `text-muted-foreground`; names, titles and links in `text-foreground` (links through `InkLink`). Lists are plain rows (`LedgerList`, `LedgerRow`): a title with one muted line under it, no boxes, rules or hover backgrounds.
+- Colours only from the token classes; no hex, palette colours or `dark:` classes. Blue (`sky`, `sky-wash`) only in the footer sky and the text selection. The footer's grass greens are an illustration-only exception that lives in the `.sky` block of `globals.css`.
+- Sizes only from the `fontSize` keys (body 15/24, article prose 16/28, section labels 15/24 and page titles 24/32 at weight 500); weights 400 and 500 only; no `uppercase`, `tracking-[…]` or `text-[Npx]`. No serif, no handwritten face.
+- Radii only on real tiles and images (`rounded-2xl`) and on controls; no `rounded-[…]`. No dividers except the rule under the handle and the hairline inside the footer.
+- No shadows anywhere: floating layers (dialog, sheet, menu, select, toast, hover tip) are set apart by a hairline border only. No blur anywhere; no gradients outside `globals.css` and `sky.tsx`.
+- No motion libraries (framer-motion, `motion`, GSAP, Lenis). The footer sky plays at once; its pause toggle stays visually hidden until keyboard focus, phones get a still scene, and every animation stops under reduced motion.
 - Copy in sentence case with plain verbs; no em dash in UI strings, no generic CTAs, no buzzwords.
 - Umami: `data-umami-event` only on `<button>` and external `target="_blank"` links; internal links use `data-track`.
 

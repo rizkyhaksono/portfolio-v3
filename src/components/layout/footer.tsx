@@ -1,122 +1,118 @@
 import Link from "next/link"
-import { Engraving } from "@/components/ui/engraving"
-import { Logo } from "@/components/ui/logo"
-import { JOB_TITLE } from "@/commons/constants/author"
-import { LEGAL_LINKS, NAV_SECTIONS, navTrack } from "@/commons/constants/navigation-menu"
-import { SHELL_WIDTH } from "@/lib/design-system"
+import { EMAIL, media_socials } from "@/commons/constants/contact"
+import { LEGAL_LINKS, navTrack } from "@/commons/constants/navigation-menu"
+import { PROSE_WIDTH, WIDE_WIDTH } from "@/lib/design-system"
+import { MalangClock, Sky, SkyToggle } from "@/components/ui/sky"
 import { cn } from "@/lib/utils"
 
-const EMAIL = "mrizkyhaksono@gmail.com"
-const [MAILBOX, MAIL_DOMAIN] = EMAIL.split("@")
-
-const COLUMNS = [
-  { column: "read", heading: "Read" },
-  { column: "try", heading: "Try" },
-  { column: "site", heading: "Site" },
-] as const
-
 const linkClass =
-  "inline-flex min-h-11 items-center text-foreground decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
+  "inline-flex min-h-11 items-center text-small text-muted-foreground transition-colors duration-ui ease-out hover:text-foreground md:min-h-0"
 
-function InkRule() {
-  return <div aria-hidden className="border-t border-foreground" />
-}
-
-function BackToTop() {
-  return (
-    <a href="#main" className={cn(linkClass, "shrink-0 text-small")}>
-      Back to top
-    </a>
-  )
-}
+const SITE_LINKS = [
+  { href: "/certificates", label: "Certificates" },
+  { href: "/changelog", label: "Changelog" },
+  ...LEGAL_LINKS,
+] as const
 
 /** Opens the feedback dialog (DeferredClientUtilities listens for `data-open-feedback`). */
 function FeedbackButton() {
   return (
-    <button type="button" data-open-feedback="colophon" aria-haspopup="dialog" className={cn(linkClass, "shrink-0 text-small")}>
+    <button type="button" data-open-feedback="colophon" aria-haspopup="dialog" className={linkClass}>
       Send feedback
     </button>
   )
 }
 
-function LegalLinks() {
-  return LEGAL_LINKS.map(({ href, label }) => (
-    <li key={href}>
-      <Link href={href} className={linkClass} {...navTrack(href, "colophon")}>
-        {label}
-      </Link>
-    </li>
-  ))
+function FooterLinks({ withSky }: Readonly<{ withSky: boolean }>) {
+  return (
+    <ul className="flex flex-wrap items-center gap-x-4">
+      {media_socials
+        .filter(({ title }) => title !== "Instagram")
+        .map(({ title, href }) => (
+          <li key={title}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-umami-event="social-click"
+              data-umami-event-network={title.toLowerCase()}
+              data-umami-event-area="colophon"
+              className={linkClass}
+            >
+              {title}
+            </a>
+          </li>
+        ))}
+      <li>
+        <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="writing" className={linkClass}>
+          RSS
+        </a>
+      </li>
+      {SITE_LINKS.map(({ href, label }) => (
+        <li key={href}>
+          <Link href={href} className={linkClass} {...navTrack(href, "colophon")}>
+            {label}
+          </Link>
+        </li>
+      ))}
+      <li>
+        <FeedbackButton />
+      </li>
+      {withSky && (
+        // Not shown on screen (the scene simply moves), but reachable by keyboard and screen readers (WCAG 2.2.2).
+        <li>
+          <SkyToggle className={cn(linkClass, "sr-only focus-visible:not-sr-only")} />
+        </li>
+      )}
+    </ul>
+  )
 }
 
-/** Colophon: `full` everywhere, `compact` (one ruled line, no plate) on /chat. */
-export default function Footer({
-  variant = "full",
-  backToTop = true,
-}: Readonly<{ variant?: "full" | "compact"; /** Off on pages that never scroll. */ backToTop?: boolean }>) {
+/**
+ * The sign-off, set in Langit Malang: the handle, the address, one line of links and the hour in Malang, over a
+ * painted landscape with the name set large between the hills. `compact` (on /chat) keeps only the links.
+ */
+export default function Footer({ variant = "full", wide = false }: Readonly<{ variant?: "full" | "compact"; wide?: boolean }>) {
+  const column = wide ? WIDE_WIDTH : PROSE_WIDTH
+
   if (variant === "compact") {
     return (
-      <footer className={cn(SHELL_WIDTH, "pb-6")}>
-        <InkRule />
-        <div className="flex flex-wrap items-center gap-x-6 pt-2 text-small">
-          <p className="text-foreground">Rizky Haksono</p>
-          <ul className="flex gap-x-5">
-            <LegalLinks />
-          </ul>
-          <span className="flex gap-x-5 md:ml-auto">
-            <FeedbackButton />
-            {backToTop && <BackToTop />}
-          </span>
+      <footer data-print-hide className={cn(column, "pb-4")}>
+        <div className="border-t border-border pt-3">
+          <FooterLinks withSky={false} />
         </div>
       </footer>
     )
   }
 
-  // One field with the page: the theme's own paper, no rules, the Hollar plate fading up into it.
   return (
-    <footer className="text-foreground">
-      <div className={cn(SHELL_WIDTH, "grid grid-cols-3 gap-x-6 gap-y-10 pt-16 sm:gap-x-12 sm:pt-24 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-x-20")}>
-        <div className="col-span-3 flex items-start gap-5 lg:col-span-1">
-          <Logo variant="mark" className="w-16 shrink-0 sm:w-20" />
-          <div>
-            <p className="text-h3 text-foreground">Rizky Haksono</p>
-            <p className="mt-1 max-w-[34ch] text-pretty text-small text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
-            <a
-              href={`mailto:${EMAIL}`}
-              data-track="email-click"
-              data-track-area="colophon"
-              className="mt-3 inline-flex min-h-11 items-center text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
-            >
-              {/* Below ~360px the address cannot fit beside the mark; it may break before the @, never mid-word. */}
-              {MAILBOX}
-              <wbr />@{MAIL_DOMAIN}
-            </a>
-            <div className="mt-4 flex gap-x-5">
-              <FeedbackButton />
-              <BackToTop />
-            </div>
-          </div>
+    <footer
+      data-print-hide
+      style={{ viewTransitionName: "site-footer" }}
+      className="relative isolate mt-8 min-h-[34rem] overflow-hidden sm:min-h-[42rem]"
+    >
+      <Sky />
+      <div className={cn(column, "pt-16")}>
+        <p className="text-h1 text-foreground">@rizkyhaksono</p>
+        <p className="mt-2 text-body text-muted-foreground">
+          Write to me at{" "}
+          <a
+            href={`mailto:${EMAIL}`}
+            data-track="email-click"
+            data-track-area="colophon"
+            className="text-foreground underline-offset-4 hover:underline"
+          >
+            {EMAIL}
+          </a>
+          .
+        </p>
+        <div className="mt-6">
+          <FooterLinks withSky />
         </div>
-
-        {COLUMNS.map(({ column, heading }) => (
-          <nav key={column} aria-labelledby={`colophon-${column}`}>
-            <p id={`colophon-${column}`} className="text-small font-semibold text-foreground">
-              {heading}
-            </p>
-            <ul className="mt-3">
-              {NAV_SECTIONS.filter((section) => section.column === column).map(({ href, label }) => (
-                <li key={href}>
-                  <Link href={href} className={cn(linkClass, "text-muted-foreground hover:text-foreground")} {...navTrack(href, "colophon")}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-              {column === "site" && <LegalLinks />}
-            </ul>
-          </nav>
-        ))}
+        <p className="mt-4 text-caption text-muted-foreground">
+          © {new Date().getFullYear()} Rizky Haksono. <MalangClock />
+        </p>
       </div>
-      <Engraving crop="band" fade className="mt-10 sm:mt-16" />
     </footer>
   )
 }

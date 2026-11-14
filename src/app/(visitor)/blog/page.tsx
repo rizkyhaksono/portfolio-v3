@@ -1,12 +1,10 @@
-import Image from "next/image"
-import { isSiteImage } from "@/lib/site-url"
-import { canOptimizeImage } from "@/lib/image-hosts"
-import { cn } from "@/lib/utils"
 import { StatusLine } from "@/components/ui/status-line"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
-import { PlateFigure } from "@/components/ui/plate-figure"
+import { MediaCard } from "@/components/ui/media-card"
+import { PageHeader } from "@/components/ui/page-header"
 import { ReaderCount } from "@/components/ui/reader-count"
+import { SECTION_SPACING } from "@/lib/design-system"
 import { formatDay, formatDayMonth, yearOf } from "@/app/_components/blog/format"
 import { getPosts, type Post, type Source } from "@/app/_components/blog/posts"
 import { getPathReads } from "@/services/visitor/umami"
@@ -36,75 +34,76 @@ export default async function BlogPage() {
 
   return (
     <div>
-      <header className="pb-8">
-        <h1 className="text-h1 text-balance text-foreground">Writing</h1>
-        <p className="mt-4 text-caption tabular-nums text-muted-foreground">
-          {lead && `${sourcesSentence(posts)} `}
-          {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
-          <a
-            href="/feed.xml"
-            data-track="rss-subscribe"
-            data-track-feed="blog"
-            className="relative text-foreground underline decoration-1 underline-offset-[0.18em] after:absolute after:-inset-3 hover:decoration-2"
-          >
-            Subscribe by RSS
-          </a>
-          .
-        </p>
-      </header>
-      <div aria-hidden className="border-t border-foreground" />
+      <PageHeader
+        title="Writing"
+        description={
+          <>
+            {lead && `${sourcesSentence(posts)} `}
+            {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
+            <a
+              href="/feed.xml"
+              data-track="rss-subscribe"
+              data-track-feed="blog"
+              className="relative text-foreground underline decoration-foreground/25 decoration-1 underline-offset-4 transition-[text-decoration-color] duration-ui ease-out after:absolute after:-inset-3 hover:decoration-foreground"
+            >
+              Subscribe by RSS
+            </a>
+            .
+          </>
+        }
+      />
 
       {lead ? (
         <>
-          <article className="grid gap-6 py-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-start md:gap-10">
-            {lead.image && (
-              <PlateFigure tone={isSiteImage(lead.image) ? "color" : "photo"}>
-                {/* DEV covers are banners; on-site and Medium covers are 16:9. */}
-                <div className={cn("relative", lead.source === "dev" ? "aspect-[1000/420]" : "aspect-video")}>
-                  <Image src={lead.image} alt="" fill priority unoptimized={!canOptimizeImage(lead.image)} sizes="(min-width: 1216px) 36rem, (min-width: 768px) 52vw, 100vw" className="object-cover" />
-                </div>
-              </PlateFigure>
-            )}
-            <div className={lead.image ? undefined : "md:col-span-2"}>
-              <p className="text-caption text-muted-foreground">
-                The latest{lead.date && <>, published <time dateTime={lead.date.toISOString()}>{formatDay(lead.date)}</time></>}
-                {lead.source === "medium" ? " on Medium." : "."}
-              </p>
-              <h2 className="mt-2 text-h2 text-balance text-foreground">
-                <InkLink href={lead.href} external={lead.source === "medium"} event="blog-open" eventData={{ source: lead.source }}>
-                  {lead.title}
-                </InkLink>
-              </h2>
-              {lead.excerpt && <p className="mt-3 max-w-[60ch] text-body text-muted-foreground">{lead.excerpt}</p>}
-              {lead.source !== "medium" && <ReaderCount path={lead.href} reads={reads} className="mt-3" />}
+          <div>
+            {/* The listener reads the nearest data-track, so the card reports like the rows below. */}
+            <div data-track="blog-open" data-track-source={lead.source}>
+              <MediaCard
+                href={lead.href}
+                image={lead.image}
+                title={lead.title}
+                description={lead.excerpt}
+                meta={lead.date && <time dateTime={lead.date.toISOString()}>{formatDay(lead.date)}</time>}
+                external={lead.source === "medium"}
+                priority
+              />
             </div>
-          </article>
+            {lead.source === "medium" ? (
+              <p className="mt-1 text-caption text-muted-foreground">Published on Medium.</p>
+            ) : (
+              <ReaderCount path={lead.href} reads={reads} className="mt-1" />
+            )}
+          </div>
 
-          {[...byYear(rest)].map(([year, rows]) => (
-            <LedgerList key={year} marker={<h2>{year}</h2>} className="mb-10">
-              {rows.map((post) => (
-                <LedgerRow
-                  key={post.id}
-                  title={post.title}
-                  href={post.href}
-                  external={post.source === "medium"}
-                  event="blog-open"
-                  eventData={{ source: post.source }}
-                  meta={post.date && <time dateTime={post.date.toISOString()}>{formatDayMonth(post.date)}</time>}
-                >
-                  {post.excerpt && <p className="max-w-[60ch]">{post.excerpt}</p>}
-                  {post.source === "medium" ? (
-                    <p className="mt-1 text-caption">Published on Medium.</p>
-                  ) : (
-                    <ReaderCount path={post.href} reads={reads} className="mt-1" />
-                  )}
-                </LedgerRow>
+          {rest.length > 0 && (
+            <div className={SECTION_SPACING.section}>
+              {[...byYear(rest)].map(([year, rows]) => (
+                <LedgerList key={year} marker={<h2>{year}</h2>}>
+                  {rows.map((post) => (
+                    <LedgerRow
+                      key={post.id}
+                      title={post.title}
+                      href={post.href}
+                      external={post.source === "medium"}
+                      event="blog-open"
+                      eventData={{ source: post.source }}
+                      meta={post.date && <time dateTime={post.date.toISOString()}>{formatDayMonth(post.date)}</time>}
+                    >
+                      {post.excerpt && <p className="line-clamp-2">{post.excerpt}</p>}
+                      {post.source === "medium" ? (
+                        <p className="mt-1 text-caption">Published on Medium.</p>
+                      ) : (
+                        <ReaderCount path={post.href} reads={reads} className="mt-1" />
+                      )}
+                    </LedgerRow>
+                  ))}
+                </LedgerList>
               ))}
-            </LedgerList>
-          ))}
+            </div>
+          )}
         </>
       ) : (
-        <StatusLine kind="failed" className="mt-8">
+        <StatusLine kind="failed">
           No writing could be fetched just now. Try again in a few minutes, or read it on{" "}
           <span className="whitespace-nowrap">
             <InkLink href="https://dev.to/rizkyhaksono" external>

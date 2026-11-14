@@ -8,14 +8,12 @@ import { loadProfile, ProfileUnavailable } from "./_components/load-profile"
 import { LogoutButton } from "./_components/logout-button"
 import { ProfileSheet } from "./_components/profile-sheet"
 
-/** A definition row with a dotted leader running from the term to its value. */
+/** A plain label and value; the label sits above the value on phones. */
 function Entry({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
   return (
-    <div className="flex items-baseline gap-3 py-2">
-      <dt className="flex flex-1 items-baseline gap-3 whitespace-nowrap text-small font-semibold text-muted-foreground after:min-w-4 after:flex-1 after:border-b after:border-dotted after:border-input after:content-['']">
-        {term}
-      </dt>
-      <dd className="min-w-0 text-right text-body text-foreground [overflow-wrap:anywhere]">{children}</dd>
+    <div className="grid gap-1 py-2 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-4">
+      <dt className="text-small text-muted-foreground">{term}</dt>
+      <dd className="min-w-0 text-body text-foreground [overflow-wrap:anywhere]">{children}</dd>
     </div>
   )
 }
@@ -49,9 +47,9 @@ export default async function ProfilePage() {
   return (
     <ProfileSheet
       title={profile.name}
-      standfirst={profile.headline || undefined}
+      description={profile.headline || undefined}
       portrait={
-        <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
+        <Avatar className="size-16 sm:size-20">
           {portrait && <AvatarImage src={portrait} alt="" referrerPolicy="no-referrer" className="object-cover" />}
           <AvatarFallback className="text-h3">{initials(profile.name)}</AvatarFallback>
         </Avatar>
@@ -72,7 +70,7 @@ export default async function ProfilePage() {
         <p className="text-body text-muted-foreground">No bio yet. Add a few lines from the edit page.</p>
       )}
 
-      <dl className="mt-8 flex flex-col">
+      <dl className="mt-6 flex flex-col">
         <Entry term="Email">{profile.email}</Entry>
         <Entry term="Email check">
           <Badge variant="outline" status={profile.emailVerified ? "filled" : "dashed"}>
@@ -85,7 +83,7 @@ export default async function ProfilePage() {
         <Entry term="Connected accounts">{providers.length ? providers.join(", ") : "None"}</Entry>
       </dl>
 
-      <div className="mt-10 flex flex-wrap gap-3 border-t border-border pt-6">
+      <div className="mt-8 flex flex-wrap gap-3">
         <Button asChild>
           <Link href="/profile/edit">Edit profile</Link>
         </Button>

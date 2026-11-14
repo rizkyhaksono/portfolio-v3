@@ -1,5 +1,6 @@
 import { PageSection } from "@/components/ui/page-section"
 import { InkChart } from "@/components/ui/ink-chart"
+import { StatusLine } from "@/components/ui/status-line"
 import type { MonkeyTypePersonalBest, MonkeyTypeUserData } from "@/commons/types/monkeytype"
 
 const WIB_MS = 7 * 3_600_000
@@ -13,18 +14,29 @@ function timeAtKeyboard(seconds: number) {
   return hours > 0 ? `${hours} h ${minutes} min` : `${minutes} min`
 }
 
-/** MonkeyType: best speed in a sentence, then the last ten personal bests (raw speed dashed). */
+/** MonkeyType: best speed in a sentence, then the last ten personal bests (raw speed dashed); a failed or empty line without them. */
 export default function TypingSection({ data }: Readonly<{ data: MonkeyTypeUserData }>) {
   // The 25-word personal-bests endpoint answers with a plain array, whatever the declared type says.
   const tests = [...(Array.isArray(data.personalBests) ? (data.personalBests as MonkeyTypePersonalBest[]) : [])]
     .sort((a, b) => a.timestamp - b.timestamp)
     .slice(-10)
   const stats = data.stats
-  if (data.bestWpm === 0 && !stats?.completedTests) return null
+
+  if (data.bestWpm === 0 && !stats?.completedTests) {
+    return (
+      <PageSection id="typing" heading={{ title: "Typing" }}>
+        {!data.stats && !data.personalBests ? (
+          <StatusLine kind="failed">MonkeyType did not answer just now, so the typing figures are missing.</StatusLine>
+        ) : (
+          <StatusLine kind="empty">No finished typing tests on MonkeyType yet.</StatusLine>
+        )}
+      </PageSection>
+    )
+  }
 
   return (
     <PageSection id="typing" heading={{ title: "Typing" }} contentClassName="mt-4 space-y-8">
-      <p className="max-w-[60ch] text-body text-muted-foreground">
+      <p className="text-body text-muted-foreground">
         {data.bestWpm > 0 && (
           <>
             The best 25-word test on MonkeyType ran at <span className="tabular-nums text-foreground">{data.bestWpm}</span> words a
