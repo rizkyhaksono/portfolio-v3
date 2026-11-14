@@ -36,7 +36,7 @@ export default function SkillSection() {
           <li
             key={group.name}
             style={{ "--i": i } as CSSProperties}
-            className="bg-paper-grain border-t border-foreground pb-8 md:sticky md:top-[calc(var(--head-h)+1rem+var(--i)*3.25rem)] md:min-h-[55svh]"
+            className="bg-background border-t border-foreground pb-8 md:sticky md:top-[calc(var(--head-h)+1rem+var(--i)*3.25rem)] md:min-h-[55svh]"
           >
             <h3 className="flex min-h-[3.25rem] items-center text-h3 text-foreground">{group.name}</h3>
             <p className="text-small text-muted-foreground">{group.note}</p>

@@ -17,7 +17,7 @@ export function AdminTopHeader({ user }: Readonly<{ user?: AdminUser }>) {
   const pathname = usePathname()
 
   return (
-    <header className="bg-paper-grain sticky top-0 z-30 border-b border-border">
+    <header className="bg-background sticky top-0 z-30 border-b border-border">
       <div className="flex min-h-[var(--head-h)] items-center gap-3 px-4 sm:px-6 lg:px-10">
         <AdminMenu user={user} />
         <h1 className="min-w-0 truncate text-h3 text-foreground">{titleFor(pathname)}</h1>

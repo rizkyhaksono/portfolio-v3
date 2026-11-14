@@ -3,7 +3,7 @@ import { forwardRef, type HTMLAttributes } from "react"
 import { cn } from "@/lib/utils"
 import { SURFACE } from "@/lib/design-system"
 
-/** Frame surface: 1px rule hairline on the paper itself. No fill, no shadow. */
+/** Frame surface: a hairline round the card ground. No shadow. */
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
   <div ref={ref} className={cn(SURFACE.solid, className)} {...props} />
 ))

@@ -27,13 +27,13 @@ const AccordionTrigger = React.forwardRef<
     <AccordionPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex flex-1 items-center justify-between py-4 text-left text-small font-semibold underline-offset-[0.18em] hover:underline [&[data-state=open]>svg]:rotate-180",
+        "flex flex-1 items-center justify-between py-4 text-left text-small font-medium underline-offset-4 hover:underline [&[data-state=open]>svg]:rotate-180",
         className
       )}
       {...props}
     >
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 transition-transform [transition-duration:var(--dur-ui)] [transition-timing-function:var(--ease-print)]" strokeWidth={1.5} />
+      <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-[var(--dur-ui)] ease-out" strokeWidth={1.5} />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ))
@@ -45,7 +45,7 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <AccordionPrimitive.Content
     ref={ref}
-    className="overflow-hidden text-small data-[state]:[animation-duration:var(--dur-ui)] data-[state]:[animation-timing-function:var(--ease-print)] data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+    className="overflow-hidden text-small data-[state]:[animation-duration:var(--dur-ui)] data-[state]:[animation-timing-function:var(--ease-out)] data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
     {...props}
   >
     <div className={cn("pb-4 pt-0", className)}>{children}</div>

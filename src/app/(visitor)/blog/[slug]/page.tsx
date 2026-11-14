@@ -95,12 +95,12 @@ export default async function BlogArticlePage({ params }: Props) {
             )}
             <p>
               <InkLink href="#letters">
-                {letters.toLocaleString("en")} {letters === 1 ? "letter" : "letters"}
+                {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
               </InkLink>{" "}
               from readers.
             </p>
             <p>
-              First printed on{" "}
+              First published on{" "}
               {/* The link's hidden new-tab note is an inline-block, which lets the full stop wrap alone. */}
               <span className="whitespace-nowrap">
                 <InkLink href={post.url} external>

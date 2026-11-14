@@ -21,7 +21,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatDay } from "@/components/layout/admin/admin-format"
-import { PRINT_HEX } from "@/lib/print-hex"
+import { THEME_HEX } from "@/lib/theme-hex"
 import {
   getAdminSettingsClient,
   getCurrentUserClient,
@@ -61,8 +61,8 @@ const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: strin
 ]
 
 const THEMES = [
-  { value: "light", label: "Paper" },
-  { value: "dark", label: "Night" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
 ] as const
 
@@ -96,20 +96,20 @@ interface UserData {
 }
 
 // The CSS tokens flip with the active theme, so each half pins its own theme's colours through the hex copies.
-const PAPER: CSSProperties = { backgroundColor: PRINT_HEX.paper, color: PRINT_HEX.ink }
-const NIGHT: CSSProperties = { backgroundColor: PRINT_HEX.night, color: PRINT_HEX.nightInk }
+const LIGHT: CSSProperties = { backgroundColor: THEME_HEX.light.background, color: THEME_HEX.light.foreground }
+const DARK: CSSProperties = { backgroundColor: THEME_HEX.dark.background, color: THEME_HEX.dark.foreground }
 
 /** The mini logo printed in each theme's own ink: paper, night, or half of each. */
 function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
   return (
     <span aria-hidden className="relative block size-16 shrink-0 border border-border">
       {mode !== "dark" && (
-        <span className="absolute inset-0 flex items-center justify-center" style={PAPER}>
+        <span className="absolute inset-0 flex items-center justify-center" style={LIGHT}>
           <Logo variant="mini" className="size-10" />
         </span>
       )}
       {mode !== "light" && (
-        <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={NIGHT}>
+        <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={DARK}>
           <Logo variant="mini" className="size-10" />
         </span>
       )}

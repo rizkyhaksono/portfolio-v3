@@ -79,7 +79,7 @@ export default function Footer({
         <div className="col-span-3 flex items-start gap-5 lg:col-span-1">
           <Logo variant="mark" className="w-16 shrink-0 sm:w-20" />
           <div>
-            <p className="speckle text-h3 text-foreground">Rizky Haksono</p>
+            <p className="text-h3 text-foreground">Rizky Haksono</p>
             <p className="mt-1 max-w-[34ch] text-pretty text-small text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
             <a
               href={`mailto:${EMAIL}`}

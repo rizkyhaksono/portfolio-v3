@@ -7,10 +7,9 @@ import { cn } from "@/lib/utils"
 
 const Tabs = TabsPrimitive.Root
 
-// The list scrolls sideways on phones, so the focus ring sits inside each trigger instead of being clipped.
-// The hairline is an inset line, not a border, so the active 2px underline prints over it instead of under it.
+// The list scrolls sideways on phones; its p-1 track leaves room for each trigger's 2px focus ring.
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(({ className, ...props }, ref) => (
-  <TabsPrimitive.List ref={ref} className={cn("items-end gap-6 text-muted-foreground shadow-[inset_0_-1px_0_hsl(var(--rule))]", !className?.includes("grid") && "flex max-w-full overflow-x-auto", className)} {...props} />
+  <TabsPrimitive.List ref={ref} className={cn("gap-1 rounded-lg bg-muted p-1 text-muted-foreground", !className?.includes("grid") && "inline-flex max-w-full items-center overflow-x-auto", className)} {...props} />
 ))
 TabsList.displayName = TabsPrimitive.List.displayName
 
@@ -18,7 +17,7 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex min-h-10 items-center justify-center whitespace-nowrap rounded-none border-b-2 border-transparent px-1 pb-1.5 pt-2 text-[15px] font-semibold transition-colors [transition-duration:var(--dur-ui)] [transition-timing-function:var(--ease-print)] hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=active]:border-foreground data-[state=active]:text-foreground focus-visible:[outline-offset:-2px] [@media(pointer:coarse)]:min-h-11",
+      "inline-flex min-h-9 items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-small font-medium transition-colors duration-[var(--dur-ui)] ease-out hover:text-foreground disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-float [@media(pointer:coarse)]:min-h-11",
       className
     )}
     {...props}

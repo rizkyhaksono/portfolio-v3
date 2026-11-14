@@ -37,7 +37,7 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
   return (
     <section id="letters" aria-labelledby="letters-title" className="mt-12 border-t border-foreground pt-6">
       <h2 id="letters-title" className="text-h3 text-foreground">
-        Letters
+        Comments
       </h2>
       {comments.length > 0 ? (
         <ol role="list" className="mt-6 flex flex-col gap-8">
@@ -47,7 +47,7 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
         </ol>
       ) : (
         <StatusLine kind="empty" className="mt-4">
-          No letters yet.
+          No comments yet.
         </StatusLine>
       )}
       <p className="mt-8 text-small text-muted-foreground">
@@ -55,7 +55,7 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
         <InkLink href={url} external>
           DEV Community
         </InkLink>
-        ; new letters are printed here within the hour.
+        ; new comments appear here within the hour.
       </p>
     </section>
   )

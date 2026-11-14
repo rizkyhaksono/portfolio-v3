@@ -1,16 +1,16 @@
 import { readFileSync } from "fs"
 import { join } from "path"
-import { PRINT_HEX } from "@/lib/print-hex"
+import { THEME_HEX } from "@/lib/theme-hex"
 
 type Triple = readonly [h: number, s: number, l: number]
 
 const css = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8")
 
-/** `--name:H S% L%` declarations of every `selector{…}` block that defines `--paper`, in file order. */
+/** `--name:H S% L%` declarations of every `selector{…}` block that defines `--background`, in file order. */
 function tokenBlocks(selector: string): Record<string, Triple>[] {
   const blocks = [...css.matchAll(new RegExp(`${selector}\\s*\\{([^}]*)\\}`, "g"))].map((m) => m[1])
   return blocks
-    .filter((body) => body.includes("--paper:"))
+    .filter((body) => body.includes("--background:"))
     .map((body) =>
       Object.fromEntries(
         [...body.matchAll(/--([a-z-]+):\s*(-?[\d.]+)\s+([\d.]+)%\s+([\d.]+)%/g)].map(
@@ -51,10 +51,16 @@ const withinOne = (a: string, b: string) =>
   [1, 3, 5].every((i) => Math.abs(parseInt(a.slice(i, i + 2), 16) - parseInt(b.slice(i, i + 2), 16)) <= 1)
 
 const FLOORS: [string, string, number][] = [
-  ["ink", "paper", 7],
-  ["ink-soft", "paper", 4.5],
-  ["ink-soft", "tint", 4.5],
-  ["rule-strong", "paper", 3],
+  ["foreground", "background", 7],
+  ["muted-foreground", "background", 4.5],
+  ["muted-foreground", "muted", 4.5],
+  ["foreground", "muted", 7],
+  ["input", "background", 3],
+  ["destructive", "background", 4.5],
+  ["foreground", "sky-wash", 7],
+  ["sky", "background", 4.5],
+  ["foreground", "popover", 7],
+  ["muted-foreground", "popover", 4.5],
 ]
 
 describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, tokens) => {
@@ -67,35 +73,28 @@ describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, 
 
 // The unscrolled hero sentence is large text (24px floor, asserted at 375x812 in __tests__/e2e/navigation.spec.ts), so its ghost needs 3:1.
 describe.each([["light", light, ":root"], ["dark", dark, "\\.dark"]] as const)("%s wordscroll ghost", (_theme, tokens, selector) => {
-  it("the ghost colour over paper is at least 3:1", () => {
+  it("the ghost colour over the background is at least 3:1", () => {
     const { token, alpha } = ghostOf(selector)
     expect(tokens[token]).toBeDefined()
     expect(alpha).toBeGreaterThan(0)
-    const paper = rgb(tokens.paper)
-    const ghost = rgb(tokens[token]).map((c, i) => c * alpha + paper[i] * (1 - alpha))
-    expect(contrast(ghost, paper)).toBeGreaterThanOrEqual(3)
+    const background = rgb(tokens.background)
+    const ghost = rgb(tokens[token]).map((c, i) => c * alpha + background[i] * (1 - alpha))
+    expect(contrast(ghost, background)).toBeGreaterThanOrEqual(3)
   })
 })
 
-describe("PRINT_HEX", () => {
-  it.each([
-    ["paper", light.paper],
-    ["ink", light.ink],
-    ["inkSoft", light["ink-soft"]],
-    ["rule", light.rule],
-    ["night", dark.paper],
-    ["nightTint", dark.tint],
-    ["nightInkSoft", dark["ink-soft"]],
-    ["nightInk", dark.ink],
-  ] as const)("%s matches its token (±1 per channel)", (key, triple) => {
-    expect(withinOne(PRINT_HEX[key], hex(triple))).toBe(true)
+describe.each([["light", light], ["dark", dark]] as const)("THEME_HEX.%s", (theme, tokens) => {
+  it.each(Object.entries(THEME_HEX[theme]))("%s matches its token (±1 per channel)", (key, value) => {
+    const triple = tokens[key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)]
+    expect(triple).toBeDefined()
+    expect(withinOne(value, hex(triple))).toBe(true)
   })
 })
 
 describe("print block", () => {
   it("pins the light triples", () => {
     expect(printBlock).toBeDefined()
-    for (const name of ["paper", "ink", "ink-soft", "rule", "rule-strong", "tint"]) {
+    for (const name of ["background", "foreground", "muted", "muted-foreground", "border", "input"]) {
       expect(printBlock[name]).toBeDefined()
       expect(printBlock[name]).toEqual(light[name])
     }

@@ -1,24 +1,26 @@
 # Platform shells
 
-Every route group prints in the same ink on the same paper. Groups differ in shell and pattern, never in palette.
+Every route group shares the same tokens and the same font, Onest. Groups differ in shell, width and pattern, never in palette.
 
 ## Visitor (public portfolio)
 
 **Routes:** `/`, `/blog`, `/project`, `/certificates`, `/changelog`, `/roadmap`, `/tools`, `/stats`, `/chat`, `/legal/*`
 
-**Shell:** `BaseLayout` with the running head, menu sheet and colophon. No sidebars.
+**Shell:** `BaseLayout`: the translucent header, the sky, one centred 640px column, the menu sheet and the centred footer. No sidebars.
 
 | Route | Pattern |
 |---|---|
-| `/` | Masthead print plate (`bleed`: dotted cobalt sky, name in cream, the Bromo plate) and the lede on paper, then the home story, with the duotone portrait in About, see [page-shell.md](./page-shell.md) |
-| `/blog`, `/certificates`, `/changelog`, `/project` index | Ledger (projects add three featured Plates rows) |
-| `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Article |
-| `/roadmap` | Ledger |
-| `/tools` | Cabinet. The anime generator (`?tab=anime-generator`, group Play) has images by mood (cringe, blush, dance; waifu and neko stay hidden) and a quote tab; pictures sit in a `tone="color"` plate |
-| `/stats` | Figures |
-| `/chat` | Correspondence, `footer="compact"` |
+| `/` | Name block, bio, Projects (Media), Writing and Work (Ledger), Recommendations, Contact. See [page-shell.md](./page-shell.md#home) |
+| `/project` | `PageHeader`, three `MediaCard`s, then rows grouped by year |
+| `/project/[id]` | Article: back link, h1, dateline, links, the morph hero, prose, clap, previous and next |
+| `/blog` | A lead `MediaCard`, then rows grouped by year |
+| `/blog/[slug]`, `/blog/onsite/[slug]`, `/roadmap/[slug]`, `/legal/*` | Article. Post comments are called "Comments" |
+| `/certificates`, `/changelog`, `/roadmap` | Ledger |
+| `/tools` | Cabinet, `width="wide"`. The anime generator (`?tab=anime-generator`) shows pictures by mood (cringe, blush, dance; waifu and neko stay hidden) and a quote tab |
+| `/stats` | Figures: Readers, Coding (heatmap, WakaTime, Duolingo), Status, LeetCode, Typing, Chess.com and npm |
+| `/chat` | Correspondence, `width="wide"`, `footer="compact"` |
 
-`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/`). `/ai` (Etan AI) is hidden since 2026-11-05: a temporary redirect home, its `/api/ai/*` proxies answer 404 and the API no longer registers `/v3/ai`; the code stays. Do not rebuild them.
+`/signal`, `/status` and `/playground` are redirects (`/`, `/stats`, `/`). `/ai` (Etan AI) has been hidden since 2026-11-05: a temporary redirect home, its `/api/ai/*` proxies answer 404 and the API no longer registers `/v3/ai`; the code stays. Do not rebuild them.
 
 ## User (signed in)
 
@@ -35,22 +37,31 @@ Every route group prints in the same ink on the same paper. Groups differ in she
 
 **Routes:** `/admin/dashboard/*`
 
-**Shell:** its own ruled spine (`--admin-rail`) with an inverted active row, not `BaseLayout`. No terminal or feedback widget.
+The admin shares the tokens and Onest. It is a work tool, so it has **no sky and no markers**, and it is **full width**.
 
-**Patterns:** Figures for the dashboard and analytics, Ledger for lists, frame form slips for editing, Correspondence for feedback, Profile card for settings. Same tokens, same three surfaces.
+- **Sidebar** (like macOS Finder or Notes): 15rem wide from `md`, `bg-muted` at half strength, no rules. The workspace name "Rizky Haksono" with "Admin" under it, one lucide icon per item. Items: Home, Analytics, Feedback, then Content (Projects, Career, Education, Posts), then Settings, then "Open the site", then the avatar and Log out. The active item has a `bg-muted` ground and `aria-current`. On phones the sidebar is a left sheet.
+- **Top bar:** 44px, with the breadcrumb, the notifications bell (opens on click, not hover) and the theme toggle.
+- **Content** fills everything right of the sidebar, with 24px padding (32px from `xl`). Tables and charts use the whole width. Only forms keep a readable cap: the peek editor is 44rem, the Settings fields 40rem, left-aligned.
+- **Page titles:** one plain h1 per page at the `h2` size, left-aligned.
+- **Collections** (Projects, Career, Education, Posts): a table with real columns. Clicking a row opens a right-side peek sheet (44rem) with the editor; the URL carries `?edit=<id>` or `?new=1`. "New {noun}" sits at the top. Search appears only above 10 rows. Unsaved changes are guarded. Delete lives in the peek behind a confirm that says what disappears from the site.
+- **Errors** are honest: `describeFailure()` in `admin-format.ts` turns status codes into sentences (see [components.md](./components.md#copy)).
+- `destructive` is used here, always with a word.
+- No terminal overlay or feedback widget.
 
 ## Auth
 
 **Routes:** `/auth/*`, `/admin/auth/login`
 
-**Shell:** `layout/auth-shell.tsx`, split or narrow. A frame form slip with baseline fields. No gradients, stock photos, heavy shadows or coloured checks.
+**Shell:** `layout/auth-shell.tsx`, one centred column: the name, a short line on what an account is for, the form. Fields are full boxes with `border-input`. No stock photos, no gradients, no heavy shadows, no coloured checks.
 
 ## Outliers
 
 | Item | Guidance |
 |---|---|
-| Terminal overlay | Own layout, same ink and paper |
-| OG and certificate images (`/api/og`, `/api/certificate`) | Always printed on paper colours, with the RH mark from `public/brand/og-mark.svg`; with `src/lib/print-hex.ts`, the only places hex values are allowed in code. Request them through `ogImageUrl` (`v=3`) |
+| Terminal overlay | Its own layout on the float surface, the same tokens |
+| OG and certificate images (`/api/og`, `/api/certificate`) | A neutral card set in Onest 600, colours from `THEME_HEX`. With `src/lib/theme-hex.ts` and `globals.css`, the only places raw hex is allowed. Request them through `ogImageUrl` (`v=5`) |
+| Favicon, icon, apple-icon | A plain "R" tile. `src/app/favicon.ico` must stay at that path: the container healthcheck fetches `/favicon.ico` |
+| `not-found`, `error.tsx`, `global-error.tsx` | The name as text; `global-error.tsx` has no CSS, so it reads `THEME_HEX` and `system-ui` |
 
 ## Agent instruction files
 

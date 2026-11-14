@@ -54,34 +54,40 @@ const config = {
 				card: {
 					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
 					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
+				},
+				// Langit Malang accent: the sky band and the Marker only.
+				sky: {
+					DEFAULT: 'hsl(var(--sky) / <alpha-value>)',
+					wash: 'hsl(var(--sky-wash) / <alpha-value>)'
 				}
 			},
-			// Fluid 375 -> 1280px. Weight and tracking carry the hierarchy; balance lives on the elements.
+			// Apple-like scale: big, tight headlines and quiet 15px body. h1 and display grow from 375 to 1280px.
 			fontSize: {
-				xs: ['0.75rem', { lineHeight: '1.4' }],
-				caption: ['0.75rem', { lineHeight: '1.4' }],
-				small: ['0.8125rem', { lineHeight: '1.45' }],
-				body: ['clamp(0.9375rem, 0.9116rem + 0.1105vw, 1rem)', { lineHeight: '1.55' }],
-				prose: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.6' }],
-				lead: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.45' }],
-				h4: ['1rem', { lineHeight: '1.35', fontWeight: '600' }],
-				h3: ['clamp(1.125rem, 1.0732rem + 0.221vw, 1.25rem)', { lineHeight: '1.3', fontWeight: '600', letterSpacing: '-0.01em' }],
-				h2: ['clamp(1.375rem, 1.1678rem + 0.884vw, 1.875rem)', { lineHeight: '1.15', fontWeight: '700', letterSpacing: '-0.02em' }],
-				h1: ['clamp(1.875rem, 1.5124rem + 1.547vw, 2.75rem)', { lineHeight: '1.08', fontWeight: '700', letterSpacing: '-0.025em' }],
-				display: ['clamp(2.75rem, 1.1961rem + 6.6298vw, 6.5rem)', { lineHeight: '0.9', fontWeight: '600', letterSpacing: '-0.04em' }],
-				numeral: ['clamp(2rem, 1.5856rem + 1.768vw, 3rem)', { lineHeight: '1', fontWeight: '600', letterSpacing: '-0.02em' }]
+				xs: ['0.75rem', { lineHeight: '1rem' }],
+				caption: ['0.75rem', { lineHeight: '1rem' }],
+				small: ['0.8125rem', { lineHeight: '1.25rem' }],
+				body: ['0.9375rem', { lineHeight: '1.5rem' }],
+				prose: ['1.0625rem', { lineHeight: '1.75rem' }],
+				lead: ['1.1875rem', { lineHeight: '1.75rem' }],
+				h4: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
+				h3: ['1.1875rem', { lineHeight: '1.625rem', fontWeight: '600', letterSpacing: '-0.01em' }],
+				h2: ['1.5rem', { lineHeight: '1.875rem', fontWeight: '600', letterSpacing: '-0.015em' }],
+				h1: ['clamp(2rem, 1.7928rem + 0.884vw, 2.5rem)', { lineHeight: '1.1', fontWeight: '600', letterSpacing: '-0.02em' }],
+				display: ['clamp(2.5rem, 2.0856rem + 1.768vw, 3.5rem)', { lineHeight: '1.07', fontWeight: '600', letterSpacing: '-0.025em' }],
+				numeral: ['2rem', { lineHeight: '2.25rem', fontWeight: '600', letterSpacing: '-0.015em' }]
 			},
-			// Radius 0 everywhere; `full` only for radio dots.
+			// Radius grows with surface size: fields and buttons md/lg, tiles 2xl, dots and switches full.
 			borderRadius: {
-				none: '0px',
-				DEFAULT: '0px',
-				sm: '0px',
-				md: '0px',
-				lg: '0px',
-				xl: '0px',
-				'2xl': '0px',
-				'3xl': '0px',
-				full: '9999px'
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 0.25rem)',
+				sm: 'calc(var(--radius) - 0.5rem)'
+			},
+			// Floating layers only (dialog, sheet, menu, toast); nothing on the page itself casts a shadow.
+			boxShadow: {
+				float: '0 1px 2px hsl(var(--foreground) / 0.06), 0 8px 24px -8px hsl(var(--foreground) / 0.18)'
+			},
+			transitionTimingFunction: {
+				out: 'var(--ease-out)'
 			},
 			keyframes: {
 				'accordion-down': {

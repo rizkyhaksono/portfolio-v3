@@ -9,10 +9,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { LEGAL_LINKS, NAV_SECTIONS, isCurrentPath, navTrack } from "@/commons/constants/navigation-menu"
 import { track } from "@/lib/analytics"
+import { switchTheme } from "@/components/layout/theme-toggle"
 
 const THEMES = [
-  { value: "light", label: "Paper" },
-  { value: "dark", label: "Night" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
 ] as const
 
@@ -29,7 +30,7 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
   const { theme, setTheme } = useTheme()
 
   const chooseTheme = (to: string) => {
-    setTheme(to)
+    switchTheme(setTheme, to)
     track("theme-toggle", { to })
   }
 

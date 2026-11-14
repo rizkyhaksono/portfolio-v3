@@ -50,7 +50,7 @@ export function ArticleShell({
       <div aria-hidden data-print-hide className="reading-hairline" />
 
       <header className="pb-8">
-        <h1 className="speckle text-h2 text-balance text-foreground sm:text-h1">{title}</h1>
+        <h1 className="text-h2 text-balance text-foreground sm:text-h1">{title}</h1>
         {standfirst && <div className="mt-4 max-w-[46ch] text-lead text-muted-foreground">{standfirst}</div>}
         {dateline && <p className="mt-4 text-caption tabular-nums text-muted-foreground">{dateline}</p>}
       </header>

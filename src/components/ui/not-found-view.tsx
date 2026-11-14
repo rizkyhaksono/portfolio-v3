@@ -15,9 +15,9 @@ export function NotFoundView({ title = "Page not found", children, className }: 
     <section className={cn("w-full py-8 md:py-24", className)}>
       <div className="max-w-[40rem]">
         <Logo variant="mark" label="Rizky Haksono" className="mb-6 w-20 sm:w-24" />
-        <h1 className="speckle text-h1 text-balance text-foreground">{title}</h1>
+        <h1 className="text-h1 text-balance text-foreground">{title}</h1>
         <div className="mt-4 max-w-[46ch] text-lead text-muted-foreground">
-          {children ?? <p>Nothing is printed at this address. The page may have moved, or the link has a typo.</p>}
+          {children ?? <p>There is no page at this address. The page may have moved, or the link has a typo.</p>}
         </div>
         <ul role="list" className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-body">
           <li>

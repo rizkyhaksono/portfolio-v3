@@ -1,14 +1,28 @@
-# Surfaces: frame, inset, lift
+# Surfaces: page, tile, frame, float
 
-There are exactly three surfaces. Each one is something a printer could make on one sheet with one ink. Do not blend them and do not invent a fourth.
+Four surfaces and one bar. Most content needs no surface at all: prose, rows and headings sit straight on the page. Reach for a surface only when the content is a separate object.
 
 | Surface | Looks like | Code | Use for |
 |---|---|---|---|
-| **Frame** | 1px `rule` hairline on the paper, transparent ground, radius 0, no shadow | `Card`, `Surface variant="solid"` (`SURFACE.solid` = `rounded-none border border-border bg-transparent`) | Content boxes, form slips, profile card, plates |
-| **Inset** | `tint` ground, no border needed | `Surface variant="inset"` (`SURFACE.inset` = `bg-muted`) | Nested rows, code specimens, hover rows, inline status cells |
-| **Lift** | `paper` ground, 1px `ink` border, hard offset ink shadow `3px 3px 0` | `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]` inside the floating primitives | Floating layers only: Dialog, AlertDialog, Sheet, Popover, DropdownMenu, Tooltip, Select, Sonner toasts, the tracker card being dragged |
+| **Page** | `bg-background`, no box | nothing | Prose, rows, headings, most of every page |
+| **Tile** | `bg-muted`, `rounded-2xl`, no border, no shadow | `Surface variant="inset"`, `MediaCard`, `PlateFigure` | Screenshots and photos, code blocks, inset rows, segmented tracks |
+| **Frame** | 1px `border-border` hairline, `rounded-2xl`, transparent ground, no shadow | `Card`, `Surface variant="solid"` | Separate objects: a form group, the profile card, admin panels |
+| **Float** | `bg-popover`, `rounded-xl`, `shadow-float`, hairline border | Inside the shared floating primitives | Dialog, alert dialog, sheet, popover, dropdown menu, select content, hover tip, toasts, terminal overlay |
 
-`Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases that render as a frame. Do not use them in new code.
+**The bar.** The sticky header is the one translucent element: a translucent `background` fill with `backdrop-blur-md` and a hairline that appears after scrolling, so the sky and the content scroll under a calm, readable bar. Nothing else is translucent or blurred.
+
+`Surface variant="glass"` and `"glass-static"` (and `SURFACE.glass` / `glassNoBlur`) are retired aliases of the frame. Do not use them.
+
+## Tile
+
+```tsx
+<Surface variant="inset" className="px-4 py-3">...</Surface>
+```
+
+- Grey tiles separate work from prose the Apple way, without lines. A tile has no border and no shadow.
+- Media sits on a tile in its own colours, `rounded-2xl`, title and meta below the tile, not on it.
+- Code is a tile: server `<pre>`, system mono, `tabIndex={0}`, no syntax colours.
+- Text on a tile is `text-foreground` or `text-muted-foreground` only.
 
 ## Frame
 
@@ -20,42 +34,26 @@ import { Surface } from "@/components/ui/surface"
 <Surface padding="compact">...</Surface>
 ```
 
-- Most content needs no box at all. A ledger row or an article sits on the paper between rules. Reach for a frame only when the content is a separate object (a form slip, a profile sheet, a plate).
-- Interactive frames show hover with the rule turning ink (`hover:border-ink`) or the row taking `bg-tint`. Never with a shadow or a lift.
 - Do not restate `border border-border bg-card` on `Card`; it is the default.
-- Page heads and the colophon sit on a single 1px ink rule (`border-t border-ink`), not a frame. Never stack rules: whatever sits right under a head (a ledger, a stat strip, a tab row, board columns) drops its own top rule. Row separators inside a ledger stay.
+- Interactive rows show hover with `bg-muted` and `rounded-lg`, never with a shadow, a lift or a border colour change.
 
-## Inset
+## Float
 
-```tsx
-<Surface variant="inset" className="px-4 py-3">...</Surface>
-```
-
-- Tint is a ground, not a colour. Text on tint is `ink` or `ink-soft` only.
-- Code is an inset specimen: server `<pre>`, `bg-tint`, system mono 13.5px, `tabIndex={0}`, no syntax colours.
-
-## Lift
-
-- Lift is applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. Feature code should not add it by hand.
-- The scrim behind a modal is ink at low opacity. No backdrop blur, ever.
-- Lift is the only shadow in the system. The soft shadow scale (small through 2xl), glows and coloured shadows are banned.
-
-## Reverse
-
-- One reversed block on the site: the `/auth` panel in `layout/auth-shell.tsx`, `bg-ink text-paper`, square, no border or shadow, hidden below `md`. It is a cut printed in reverse, not a fourth surface: no other page uses it.
-- Because both tokens flip with the theme, it prints paper type on cobalt in Paper and night type on cream in Night.
-- Rules inside it are `border-paper/30`; secondary lines are `text-paper/80`. No links or controls inside it.
+- Applied once, inside the shared floating primitives in `src/components/ui/` and in Sonner's `toastOptions.classNames` in `src/components/layout/toaster.tsx`. Feature code does not add `shadow-float` by hand.
+- Behind a modal sits a fixed scrim filled with `--scrim`. No backdrop blur.
+- Radix layers fade in 150 to 200ms; sheets slide over `--dur-sheet`. Esc closes, and focus returns to the trigger.
 
 ## Forbidden
 
 | Avoid | Use instead |
 |---|---|
-| Translucent white fills and borders, backdrop blur, glass cards | Frame |
-| Soft shadows, shadows on hover, `hover:-translate-y-1` lifts | Frame with `hover:border-ink` or `bg-tint` row |
-| Gradient fills, glows, coloured borders | Rules in ink or rule |
-| `rounded-*` on anything | Radius 0 (radio dot excepted) |
-| Window chrome, traffic lights, terminal title bars on content | A plain frame or no box at all |
-| Filled cards on a filled card | One surface per level |
+| Glass cards, translucent fills, backdrop blur anywhere but the header | A tile or a frame |
+| Shadows on cards, hover shadows, `hover:-translate-y-*` lifts | A `bg-muted` hover row, or the media image scale |
+| Gradient fills, glows, coloured borders | The tokens |
+| `rounded-[…]` or mixed radii on one level | The radius scale in [design-system.md](./design-system.md#shape) |
+| Borders around media tiles | The muted ground alone |
+| Window chrome, traffic lights, terminal title bars on content | A tile, or no box at all |
+| A tile on a tile, a frame in a frame | One surface per level |
 
 ## Padding
 
@@ -63,4 +61,4 @@ import { Surface } from "@/components/ui/surface"
 |---|---|
 | Card header and content | `SURFACE_PADDING.default` |
 | Compact rows, feedback, education | `padding="compact"` |
-| Form slips, profile card | `padding="cozy"` |
+| Form groups, profile card | `padding="cozy"` |
