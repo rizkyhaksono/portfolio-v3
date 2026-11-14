@@ -26,11 +26,11 @@ export function Toaster() {
       theme="system"
       toastOptions={{
         classNames: {
-          toast: "!rounded-none !border !border-ink !bg-paper !text-ink !shadow-[3px_3px_0_hsl(var(--ink))] !font-sans",
-          description: "!text-ink-soft",
-          actionButton: "!rounded-none !bg-ink !text-paper",
-          cancelButton: "!rounded-none !bg-tint !text-ink",
-          closeButton: "!rounded-none !border-ink !bg-paper !text-ink",
+          toast: "!rounded-none !border !border-foreground !bg-background !text-foreground !shadow-[3px_3px_0_hsl(var(--ink))] !font-sans",
+          description: "!text-muted-foreground",
+          actionButton: "!rounded-none !bg-foreground !text-background",
+          cancelButton: "!rounded-none !bg-muted !text-foreground",
+          closeButton: "!rounded-none !border-foreground !bg-background !text-foreground",
         },
       }}
     />

@@ -10,9 +10,9 @@ const POLL_MS = 60_000
 
 // Status by shape and word, never colour: filled, dashed outline, empty outline.
 const SHAPE: Record<ServiceStatus, string> = {
-  operational: "border-ink bg-ink",
-  degraded: "border-dashed border-ink",
-  down: "border-ink",
+  operational: "border-foreground bg-foreground",
+  degraded: "border-dashed border-foreground",
+  down: "border-foreground",
 }
 const WORD: Record<ServiceStatus, string> = {
   operational: "Operational",
@@ -33,13 +33,13 @@ function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
   return (
     <li className="grid gap-x-6 gap-y-1 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
       <div className="min-w-0">
-        <p className="break-words text-body text-ink">{service.name}</p>
-        {service.detail && <p className="break-words font-display text-caption text-ink-soft">{service.detail}</p>}
+        <p className="break-words text-body text-foreground">{service.name}</p>
+        {service.detail && <p className="break-words text-caption text-muted-foreground">{service.detail}</p>}
       </div>
-      <p className="flex items-center gap-2 text-small tabular-nums text-ink-soft sm:justify-end">
+      <p className="flex items-center gap-2 text-small tabular-nums text-muted-foreground sm:justify-end">
         {service.latencyMs != null && <span className="mr-2">{service.latencyMs} ms</span>}
         <StatusMark status={service.status} />
-        <span className="text-ink">{WORD[service.status]}</span>
+        <span className="text-foreground">{WORD[service.status]}</span>
       </p>
     </li>
   )
@@ -97,8 +97,8 @@ export default function SystemStatus() {
       contentClassName="mt-6"
     >
       <div aria-busy={checking}>
-        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-ink py-4">
-          <p className="flex items-center gap-3 font-display text-h4 text-ink">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-foreground py-4">
+          <p className="flex items-center gap-3 text-h4 text-foreground">
             {overall && <StatusMark status={overall} />}
             {overall ? HEADLINE[overall] : "Checking the services"}
           </p>
@@ -108,7 +108,7 @@ export default function SystemStatus() {
         </div>
 
         {services.length > 0 && (
-          <ul role="list" className="divide-y divide-rule border-b border-rule">
+          <ul role="list" className="divide-y divide-border border-b border-border">
             {services.map((service, index) => (
               <ServiceRow key={`${service.name}-${index}`} service={service} />
             ))}
@@ -116,7 +116,7 @@ export default function SystemStatus() {
         )}
 
         {data?.checkedAt && (
-          <p className="mt-3 font-display text-caption text-ink-soft">
+          <p className="mt-3 text-caption text-muted-foreground">
             {failed
               ? `The last check did not reach the API, so this is the answer from ${timeOf(data.checkedAt)}.`
               : `Checked at ${timeOf(data.checkedAt)}.`}{" "}

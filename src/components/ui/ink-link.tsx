@@ -28,7 +28,7 @@ function hostOf(href: string) {
 }
 
 export function InkLink({ href, external, event, eventData, className, children }: Readonly<InkLinkProps>) {
-  const classes = cn("text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2", className)
+  const classes = cn("text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2", className)
 
   if (external) {
     return (

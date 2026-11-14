@@ -105,7 +105,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex max-w-[66ch] flex-col gap-8" aria-busy={isSubmitting}>
         <fieldset className="flex flex-col gap-3" aria-busy={uploading}>
-          <legend className="mb-3 text-small font-semibold text-ink">Cover image</legend>
+          <legend className="mb-3 text-small font-semibold text-foreground">Cover image</legend>
           {bannerUrl ? (
             <PlateFigure>
               <div className="relative aspect-[3/1]">
@@ -113,7 +113,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </div>
             </PlateFigure>
           ) : (
-            <div className="flex aspect-[3/1] items-center justify-center border border-dashed border-rule-strong font-display text-caption text-ink-soft">
+            <div className="flex aspect-[3/1] items-center justify-center border border-dashed border-input text-caption text-muted-foreground">
               No cover yet.
             </div>
           )}
@@ -129,7 +129,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </Button>
             )}
           </div>
-          <p className="text-small text-ink-soft">
+          <p className="text-small text-muted-foreground">
             A wide image works best: PNG, JPG, GIF or WebP, up to 5 MB. A new cover is kept as soon as it uploads.
           </p>
           <FormAlert>{errors.bannerUrl?.message}</FormAlert>
@@ -212,7 +212,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
 
         <FormAlert>{errors.root?.message}</FormAlert>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-rule pt-6">
+        <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-6">
           {isDirty ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>

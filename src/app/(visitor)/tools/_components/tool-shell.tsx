@@ -54,12 +54,12 @@ export function ToolCabinet({ tab }: Readonly<{ tab: ToolTab | null }>) {
       <nav aria-label="Tools" className="flex flex-col gap-5 self-start lg:sticky lg:top-[calc(var(--head-h)+1.5rem)]">
         {GROUPS.map((group) => (
           <div key={group}>
-            <p className="font-display text-caption text-ink-soft">{group}</p>
-            <ul role="list" className="mt-1 grid grid-cols-2 gap-x-6 border-t border-rule lg:grid-cols-1">
+            <p className="text-caption text-muted-foreground">{group}</p>
+            <ul role="list" className="mt-1 grid grid-cols-2 gap-x-6 border-t border-border lg:grid-cols-1">
               {TOOLS.filter((t) => t.group === group).map((t) => {
                 const active = t.id === tab
                 return (
-                  <li key={t.id} className="border-b border-rule">
+                  <li key={t.id} className="border-b border-border">
                     <Link
                       href={`/tools?tab=${t.id}#tool-title`}
                       replace
@@ -67,7 +67,7 @@ export function ToolCabinet({ tab }: Readonly<{ tab: ToolTab | null }>) {
                       data-track="tool-open"
                       data-track-tool={t.id}
                       className={cn(
-                        "flex min-h-11 items-center py-2 text-body text-ink underline-offset-[0.18em]",
+                        "flex min-h-11 items-center py-2 text-body text-foreground underline-offset-[0.18em]",
                         active ? "font-semibold underline decoration-2" : "decoration-1 hover:underline",
                       )}
                     >
@@ -83,11 +83,11 @@ export function ToolCabinet({ tab }: Readonly<{ tab: ToolTab | null }>) {
 
       {tool ? (
         <section aria-labelledby="tool-title" className="min-w-0">
-          <header className="border-b border-rule pb-4">
-            <h2 id="tool-title" className="font-display text-h2 text-ink">
+          <header className="border-b border-border pb-4">
+            <h2 id="tool-title" className="text-h2 text-foreground">
               {tool.name}
             </h2>
-            <p className="mt-2 max-w-[60ch] text-body text-ink-soft">{tool.note}</p>
+            <p className="mt-2 max-w-[60ch] text-body text-muted-foreground">{tool.note}</p>
           </header>
           <div className="mt-6">
             <tool.Panel />

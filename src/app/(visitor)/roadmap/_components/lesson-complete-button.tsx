@@ -20,11 +20,11 @@ export function LessonCompleteButton({ courseId, slug }: Readonly<LessonComplete
 
   return (
     // Reserves its height while progress loads, so nothing below it moves.
-    <div className="mt-12 min-h-[5.5rem] border-t border-ink pt-4">
+    <div className="mt-12 min-h-[5.5rem] border-t border-foreground pt-4">
       {isLoaded &&
         (complete ? (
           <>
-            <p ref={status} tabIndex={-1} className="flex items-center gap-2 font-display text-h4 text-ink">
+            <p ref={status} tabIndex={-1} className="flex items-center gap-2 text-h4 text-foreground">
               <svg aria-hidden viewBox="0 0 16 16" className="size-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path d="M2.5 8.5l3.5 3.5 7.5-8" />
               </svg>
@@ -38,7 +38,7 @@ export function LessonCompleteButton({ courseId, slug }: Readonly<LessonComplete
           </>
         ) : (
           <>
-            <p className="text-body text-ink-soft">Finished reading? Mark it done to track your progress in this browser.</p>
+            <p className="text-body text-muted-foreground">Finished reading? Mark it done to track your progress in this browser.</p>
             <Button
               type="button"
               className="mt-3"

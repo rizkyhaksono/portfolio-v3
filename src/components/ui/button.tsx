@@ -7,18 +7,18 @@ import { cn } from "@/lib/utils"
 
 // One ink: solid, outline, or underline. Destructive is an outline with a cross and a verb, never red.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-print)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-rule-strong disabled:text-ink-soft [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-print)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-input disabled:text-muted-foreground [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         // Disabled is a dashed empty slot in tokens, not a faded fill (opacity greys the ink in Night print).
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 disabled:border disabled:bg-tint",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 disabled:border disabled:bg-muted",
         destructive:
           "border border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground",
-        outline: "border border-ink bg-transparent text-ink hover:bg-tint",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-rule/60",
-        ghost: "text-ink decoration-1 underline-offset-[0.18em] hover:underline",
-        link: "text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2",
+        outline: "border border-foreground bg-transparent text-foreground hover:bg-muted",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-border/60",
+        ghost: "text-foreground decoration-1 underline-offset-[0.18em] hover:underline",
+        link: "text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2",
       },
       size: {
         default: "h-10 px-4 py-2",

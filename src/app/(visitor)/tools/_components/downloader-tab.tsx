@@ -126,7 +126,7 @@ export function DownloaderTab() {
             {isLoading ? "Fetching…" : "Download"}
           </Button>
         </div>
-        <p id="download-note" className="text-caption text-ink-soft">
+        <p id="download-note" className="text-caption text-muted-foreground">
           {platform.note}
         </p>
       </form>
@@ -134,16 +134,16 @@ export function DownloaderTab() {
       {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
 
       {result?.type === "instagram" && (
-        <article className="space-y-4 border border-rule p-5">
+        <article className="space-y-4 border border-border p-5">
           <Badge variant="outline" status="outline">
             Preview only
           </Badge>
-          <h3 className="font-display text-h4 text-ink">Instagram post found</h3>
-          {result.data.note && <p className="text-small text-ink-soft">{result.data.note}</p>}
+          <h3 className="text-h4 text-foreground">Instagram post found</h3>
+          {result.data.note && <p className="text-small text-muted-foreground">{result.data.note}</p>}
 
           <dl className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small">
-            <dt className="text-ink-soft">Shortcode</dt>
-            <dd className="min-w-0 break-all text-ink">{result.data.shortcode}</dd>
+            <dt className="text-muted-foreground">Shortcode</dt>
+            <dd className="min-w-0 break-all text-foreground">{result.data.shortcode}</dd>
             <dd>
               <Button variant="ghost" size="sm" onClick={() => copyShortcode(result.data.shortcode)}>
                 <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>
@@ -169,13 +169,13 @@ export function DownloaderTab() {
               </Button>
             )}
           </div>
-          <p className="font-display text-caption text-ink-soft">Open the direct link, then save the video or image from your browser.</p>
+          <p className="text-caption text-muted-foreground">Open the direct link, then save the video or image from your browser.</p>
         </article>
       )}
 
       {result?.type === "standard" &&
         (downloadLinks.length ? (
-          <article className="border border-rule">
+          <article className="border border-border">
             {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
               <PlateFigure className="p-3 pb-0">
                 <div className="relative aspect-video w-full">
@@ -187,8 +187,8 @@ export function DownloaderTab() {
               <Badge variant="outline" status="filled">
                 Ready
               </Badge>
-              <h3 className="line-clamp-2 break-words font-display text-h4 text-ink">{result.data.title}</h3>
-              <p className="font-display text-caption text-ink-soft">
+              <h3 className="line-clamp-2 break-words text-h4 text-foreground">{result.data.title}</h3>
+              <p className="text-caption text-muted-foreground">
                 {[`From ${platform.name}`, result.data.author && `by ${result.data.author}`, result.data.duration && `${result.data.duration} long`]
                   .filter(Boolean)
                   .join(", ")}

@@ -28,11 +28,11 @@ export function HatchBar({ name, percent, value }: Readonly<HatchBarProps>) {
 
   return (
     <li className="grid grid-cols-[6.5rem_minmax(0,1fr)_5.5rem] items-center gap-3 py-1.5 text-small sm:grid-cols-[8rem_minmax(0,1fr)_6rem]">
-      <span className="break-words leading-tight text-ink">{name}</span>
-      <span aria-hidden className="block h-3 border border-rule-strong">
-        <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${width}%` }} />
+      <span className="break-words leading-tight text-foreground">{name}</span>
+      <span aria-hidden className="block h-3 border border-input">
+        <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${width}%` }} />
       </span>
-      <span className="text-right tabular-nums text-ink-soft">{value}</span>
+      <span className="text-right tabular-nums text-muted-foreground">{value}</span>
     </li>
   )
 }

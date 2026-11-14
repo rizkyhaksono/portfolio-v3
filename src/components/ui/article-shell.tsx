@@ -50,16 +50,16 @@ export function ArticleShell({
       <div aria-hidden data-print-hide className="reading-hairline" />
 
       <header className="pb-8">
-        <h1 className="speckle font-display text-h2 text-balance text-ink sm:text-h1">{title}</h1>
-        {standfirst && <div className="mt-4 max-w-[46ch] font-display text-lead text-ink-soft">{standfirst}</div>}
-        {dateline && <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">{dateline}</p>}
+        <h1 className="speckle text-h2 text-balance text-foreground sm:text-h1">{title}</h1>
+        {standfirst && <div className="mt-4 max-w-[46ch] text-lead text-muted-foreground">{standfirst}</div>}
+        {dateline && <p className="mt-4 text-caption tabular-nums text-muted-foreground">{dateline}</p>}
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       <div className={cn("mt-8 grid gap-y-8", rail && "lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-x-12")}>
         {rail && (
-          <details className="article-rail group self-start border-b border-rule text-small text-ink-soft lg:sticky lg:top-[calc(var(--head-h)+1.5rem)] lg:border-0">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-ink [&::-webkit-details-marker]:hidden">
+          <details className="article-rail group self-start border-b border-border text-small text-muted-foreground lg:sticky lg:top-[calc(var(--head-h)+1.5rem)] lg:border-0">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 text-foreground [&::-webkit-details-marker]:hidden">
               {railLabel}
               <Plus className="size-4 group-open:hidden" strokeWidth={1.5} aria-hidden />
               <Minus className="hidden size-4 group-open:block" strokeWidth={1.5} aria-hidden />
@@ -76,19 +76,19 @@ export function ArticleShell({
           {footer}
 
           {(prev || next) && (
-            <nav aria-label="More to read" className="mt-12 grid gap-6 border-t border-rule pt-6 sm:grid-cols-2">
+            <nav aria-label="More to read" className="mt-12 grid gap-6 border-t border-border pt-6 sm:grid-cols-2">
               {prev && (
-                <p className="text-small text-ink-soft">
-                  <span className="block font-display text-caption">Previous</span>
-                  <InkLink href={prev.href} className="inline-flex min-h-11 items-center font-display text-h4 md:min-h-0">
+                <p className="text-small text-muted-foreground">
+                  <span className="block text-caption">Previous</span>
+                  <InkLink href={prev.href} className="inline-flex min-h-11 items-center text-h4 md:min-h-0">
                     {prev.title}
                   </InkLink>
                 </p>
               )}
               {next && (
-                <p className="text-small text-ink-soft sm:col-start-2 sm:text-right">
-                  <span className="block font-display text-caption">Next</span>
-                  <InkLink href={next.href} className="inline-flex min-h-11 items-center font-display text-h4 md:min-h-0">
+                <p className="text-small text-muted-foreground sm:col-start-2 sm:text-right">
+                  <span className="block text-caption">Next</span>
+                  <InkLink href={next.href} className="inline-flex min-h-11 items-center text-h4 md:min-h-0">
                     {next.title}
                   </InkLink>
                 </p>

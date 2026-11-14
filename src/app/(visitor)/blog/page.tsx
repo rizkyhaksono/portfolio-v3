@@ -37,22 +37,22 @@ export default async function BlogPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Writing</h1>
-        <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+        <h1 className="speckle text-h1 text-balance text-foreground">Writing</h1>
+        <p className="mt-4 text-caption tabular-nums text-muted-foreground">
           {lead && `${sourcesSentence(posts)} `}
           {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}
           <a
             href="/feed.xml"
             data-track="rss-subscribe"
             data-track-feed="blog"
-            className="relative text-ink underline decoration-1 underline-offset-[0.18em] after:absolute after:-inset-3 hover:decoration-2"
+            className="relative text-foreground underline decoration-1 underline-offset-[0.18em] after:absolute after:-inset-3 hover:decoration-2"
           >
             Subscribe by RSS
           </a>
           .
         </p>
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       {lead ? (
         <>
@@ -66,16 +66,16 @@ export default async function BlogPage() {
               </PlateFigure>
             )}
             <div className={lead.image ? undefined : "md:col-span-2"}>
-              <p className="font-display text-caption text-ink-soft">
+              <p className="text-caption text-muted-foreground">
                 The latest{lead.date && <>, published <time dateTime={lead.date.toISOString()}>{formatDay(lead.date)}</time></>}
                 {lead.source === "medium" ? " on Medium." : "."}
               </p>
-              <h2 className="mt-2 font-display text-h2 text-balance text-ink">
+              <h2 className="mt-2 text-h2 text-balance text-foreground">
                 <InkLink href={lead.href} external={lead.source === "medium"} event="blog-open" eventData={{ source: lead.source }}>
                   {lead.title}
                 </InkLink>
               </h2>
-              {lead.excerpt && <p className="mt-3 max-w-[60ch] text-body text-ink-soft">{lead.excerpt}</p>}
+              {lead.excerpt && <p className="mt-3 max-w-[60ch] text-body text-muted-foreground">{lead.excerpt}</p>}
               {lead.source !== "medium" && <ReaderCount path={lead.href} reads={reads} className="mt-3" />}
             </div>
           </article>
@@ -94,7 +94,7 @@ export default async function BlogPage() {
                 >
                   {post.excerpt && <p className="max-w-[60ch]">{post.excerpt}</p>}
                   {post.source === "medium" ? (
-                    <p className="mt-1 font-display text-caption">Published on Medium.</p>
+                    <p className="mt-1 text-caption">Published on Medium.</p>
                   ) : (
                     <ReaderCount path={post.href} reads={reads} className="mt-1" />
                   )}

@@ -51,7 +51,7 @@ export function AdminLoginForm() {
         </Button>
       </form>
 
-      <p className="flex items-center gap-4 font-display text-caption text-ink-soft before:h-px before:flex-1 before:bg-rule before:content-[''] after:h-px after:flex-1 after:bg-rule after:content-['']">
+      <p className="flex items-center gap-4 text-caption text-muted-foreground before:h-px before:flex-1 before:bg-border before:content-[''] after:h-px after:flex-1 after:bg-border after:content-['']">
         or
       </p>
 

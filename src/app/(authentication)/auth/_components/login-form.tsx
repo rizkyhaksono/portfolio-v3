@@ -46,7 +46,7 @@ export default function LoginForm({ createdEmail }: Readonly<LoginFormProps>) {
 
   return (
     <div className="flex flex-col gap-8">
-      {createdEmail && <p className="text-body text-ink">Your account is ready. Sign in with the password you just chose.</p>}
+      {createdEmail && <p className="text-body text-foreground">Your account is ready. Sign in with the password you just chose.</p>}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleLogin)} noValidate className="flex flex-col gap-6" aria-busy={isSubmitting}>
@@ -86,7 +86,7 @@ export default function LoginForm({ createdEmail }: Readonly<LoginFormProps>) {
         </form>
       </Form>
 
-      <p className="flex items-center gap-4 font-display text-caption text-ink-soft before:h-px before:flex-1 before:bg-rule before:content-[''] after:h-px after:flex-1 after:bg-rule after:content-['']">
+      <p className="flex items-center gap-4 text-caption text-muted-foreground before:h-px before:flex-1 before:bg-border before:content-[''] after:h-px after:flex-1 after:bg-border after:content-['']">
         or
       </p>
 

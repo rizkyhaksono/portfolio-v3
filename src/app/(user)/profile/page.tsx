@@ -12,10 +12,10 @@ import { ProfileSheet } from "./_components/profile-sheet"
 function Entry({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
   return (
     <div className="flex items-baseline gap-3 py-2">
-      <dt className="flex flex-1 items-baseline gap-3 whitespace-nowrap text-small font-semibold text-ink-soft after:min-w-4 after:flex-1 after:border-b after:border-dotted after:border-rule-strong after:content-['']">
+      <dt className="flex flex-1 items-baseline gap-3 whitespace-nowrap text-small font-semibold text-muted-foreground after:min-w-4 after:flex-1 after:border-b after:border-dotted after:border-input after:content-['']">
         {term}
       </dt>
-      <dd className="min-w-0 text-right text-body text-ink [overflow-wrap:anywhere]">{children}</dd>
+      <dd className="min-w-0 text-right text-body text-foreground [overflow-wrap:anywhere]">{children}</dd>
     </div>
   )
 }
@@ -53,7 +53,7 @@ export default async function ProfilePage() {
       portrait={
         <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
           {portrait && <AvatarImage src={portrait} alt="" referrerPolicy="no-referrer" className="object-cover" />}
-          <AvatarFallback className="font-display text-h3">{initials(profile.name)}</AvatarFallback>
+          <AvatarFallback className="text-h3">{initials(profile.name)}</AvatarFallback>
         </Avatar>
       }
       cover={
@@ -67,9 +67,9 @@ export default async function ProfilePage() {
       }
     >
       {profile.about ? (
-        <p className="max-w-[60ch] whitespace-pre-line text-body text-ink">{profile.about}</p>
+        <p className="max-w-[60ch] whitespace-pre-line text-body text-foreground">{profile.about}</p>
       ) : (
-        <p className="text-body text-ink-soft">No bio yet. Add a few lines from the edit page.</p>
+        <p className="text-body text-muted-foreground">No bio yet. Add a few lines from the edit page.</p>
       )}
 
       <dl className="mt-8 flex flex-col">
@@ -85,7 +85,7 @@ export default async function ProfilePage() {
         <Entry term="Connected accounts">{providers.length ? providers.join(", ") : "None"}</Entry>
       </dl>
 
-      <div className="mt-10 flex flex-wrap gap-3 border-t border-rule pt-6">
+      <div className="mt-10 flex flex-wrap gap-3 border-t border-border pt-6">
         <Button asChild>
           <Link href="/profile/edit">Edit profile</Link>
         </Button>

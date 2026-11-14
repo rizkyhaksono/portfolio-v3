@@ -25,10 +25,10 @@ type Phase = "idle" | "running" | "done"
 type CharState = "right" | "wrong" | "caret" | "todo"
 
 const CHAR: Record<CharState, string> = {
-  right: "text-ink",
-  wrong: "bg-ink text-paper",
-  caret: "text-ink underline decoration-2 underline-offset-4",
-  todo: "text-ink-soft",
+  right: "text-foreground",
+  wrong: "bg-foreground text-background",
+  caret: "text-foreground underline decoration-2 underline-offset-4",
+  todo: "text-muted-foreground",
 }
 
 function ChoiceGroup<T extends string | number>({
@@ -40,7 +40,7 @@ function ChoiceGroup<T extends string | number>({
 }: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
   return (
     <div role="group" aria-label={label}>
-      <p aria-hidden className="text-small font-semibold text-ink">
+      <p aria-hidden className="text-small font-semibold text-foreground">
         {label}
       </p>
       <div className="mt-1 grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
@@ -138,11 +138,11 @@ export default function WPMTest() {
       </div>
 
       {/* One fixed line on phones: nothing above the field may grow while the keyboard is open. */}
-      <p className="font-display text-caption tabular-nums text-ink-soft sm:hidden">
+      <p className="text-caption tabular-nums text-muted-foreground sm:hidden">
         {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
       </p>
 
-      <p className="wpm-passage min-h-[9rem] border border-rule p-5 text-body leading-loose">
+      <p className="wpm-passage min-h-[9rem] border border-border p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
           const wordIndex = start + k
           return (
@@ -183,8 +183,8 @@ export default function WPMTest() {
       )}
 
       {phase === "done" && (
-        <div role="status" className="space-y-4 border-t border-ink pt-6">
-          <p className="font-display text-h3 text-ink">
+        <div role="status" className="space-y-4 border-t border-foreground pt-6">
+          <p className="text-h3 text-foreground">
             Time is up: {wpm} words a minute at {accuracy}% accuracy.
           </p>
           <div className="flex flex-wrap gap-3">

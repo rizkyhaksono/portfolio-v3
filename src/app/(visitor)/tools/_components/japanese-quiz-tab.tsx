@@ -27,7 +27,7 @@ export function JapaneseQuizTab() {
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="text-small font-semibold text-ink">Level</legend>
+        <legend className="text-small font-semibold text-foreground">Level</legend>
         {levels.status === "loading" && !levels.data ? (
           <ToolLoading>Loading levels…</ToolLoading>
         ) : (
@@ -74,10 +74,10 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
 
   return (
     <section aria-labelledby="jlpt-words">
-      <h3 id="jlpt-words" className="font-display text-h3 text-ink">
+      <h3 id="jlpt-words" className="text-h3 text-foreground">
         {level} vocabulary
       </h3>
-      <p className="mt-1 font-display text-caption text-ink-soft">{words.data.length} words, with reading and meaning.</p>
+      <p className="mt-1 text-caption text-muted-foreground">{words.data.length} words, with reading and meaning.</p>
       <LedgerList className="mt-4">
         {words.data.map((w, i) => (
           <LedgerRow
@@ -88,13 +88,13 @@ function Vocabulary({ level }: Readonly<{ level: string }>) {
                 <span lang="ja" className="text-h3">
                   {w.word}
                 </span>{" "}
-                <span lang="ja" className="text-body text-ink-soft">
+                <span lang="ja" className="text-body text-muted-foreground">
                   {w.reading}
                 </span>
               </>
             }
           >
-            <span className="text-ink">{w.meaning}</span>
+            <span className="text-foreground">{w.meaning}</span>
             {w.partOfSpeech && <span>, {w.partOfSpeech}</span>}
           </LedgerRow>
         ))}
@@ -109,7 +109,7 @@ function Quiz({ level }: Readonly<{ level: string }>) {
   if (quiz.status === "error") return <ToolError onRetry={quiz.retry}>The {level} quiz did not load.</ToolError>
   // Loading unmounts the round, so each new set starts from a clean score.
   if (quiz.status === "loading" || !quiz.data) return <ToolLoading>Dealing {level} questions…</ToolLoading>
-  if (quiz.data.length === 0) return <p className="font-display text-body text-ink-soft">No questions for {level} yet.</p>
+  if (quiz.data.length === 0) return <p className="text-body text-muted-foreground">No questions for {level} yet.</p>
 
   return <QuizRound questions={quiz.data} onAgain={quiz.retry} />
 }
@@ -131,11 +131,11 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
         <>Keep practising. <span lang="ja">がんばって!</span></>
       )
     return (
-      <div role="status" className="space-y-4 border-t border-ink pt-6">
-        <p className="font-display text-numeral tabular-nums text-ink">
+      <div role="status" className="space-y-4 border-t border-foreground pt-6">
+        <p className="text-numeral tabular-nums text-foreground">
           {score} of {total}
         </p>
-        <p className="font-display text-lead text-ink-soft">
+        <p className="text-lead text-muted-foreground">
           {verdict} That is {Math.round((score / total) * 100)}% correct.
         </p>
         <Button onClick={onAgain}>New quiz</Button>
@@ -162,23 +162,23 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
   return (
     <div className="space-y-6">
       <div>
-        <p className="font-display text-caption tabular-nums text-ink-soft">
+        <p className="text-caption tabular-nums text-muted-foreground">
           Question {index + 1} of {total}. {score} right so far.
         </p>
-        <span aria-hidden className="mt-2 block h-3 border border-rule-strong">
-          <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${((index + 1) / total) * 100}%` }} />
+        <span aria-hidden className="mt-2 block h-3 border border-input">
+          <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${((index + 1) / total) * 100}%` }} />
         </span>
       </div>
 
       <fieldset>
         <legend className="w-full py-4">
-          <span lang="ja" className="block font-display text-h1 text-ink">
+          <span lang="ja" className="block text-h1 text-foreground">
             {q.word}
           </span>
-          <span lang="ja" className="mt-2 block text-h4 text-ink-soft">
+          <span lang="ja" className="mt-2 block text-h4 text-muted-foreground">
             {q.reading}
           </span>
-          <span className="mt-4 block text-small text-ink-soft">What does this word mean?</span>
+          <span className="mt-4 block text-small text-muted-foreground">What does this word mean?</span>
         </legend>
 
         <ul role="list" className="grid gap-2">
@@ -195,9 +195,9 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
                   onClick={() => setChoice(option)}
                   className={cn(
                     "flex min-h-11 w-full items-center gap-3 border p-3 text-left text-body transition-colors",
-                    picked && !answered ? "border-ink bg-ink text-paper" : "border-rule-strong text-ink",
-                    !answered && !picked && "hover:bg-tint",
-                    isAnswer && "border-ink",
+                    picked && !answered ? "border-foreground bg-foreground text-background" : "border-input text-foreground",
+                    !answered && !picked && "hover:bg-muted",
+                    isAnswer && "border-foreground",
                   )}
                 >
                   <span aria-hidden className="flex size-7 shrink-0 items-center justify-center border border-current text-small">
@@ -223,7 +223,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
         </ul>
       </fieldset>
 
-      <p role="status" className="flex min-h-6 gap-2 font-display text-body text-ink">
+      <p role="status" className="flex min-h-6 gap-2 text-body text-foreground">
         {answered && (
           <>
             {right ? <Check aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0" /> : <X aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0" />}

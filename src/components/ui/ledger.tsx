@@ -10,13 +10,13 @@ interface LedgerListProps {
 
 /** Ruled index of rows. With a marker, the 8rem label column sticks below the running head from md up (override with `md:grid-cols-[…]`). */
 export function LedgerList({ marker, children, className }: Readonly<LedgerListProps>) {
-  const rows = <ul role="list" className="divide-y divide-rule">{children}</ul>
+  const rows = <ul role="list" className="divide-y divide-border">{children}</ul>
 
-  if (marker == null) return <div className={cn("border-t border-ink", className)}>{rows}</div>
+  if (marker == null) return <div className={cn("border-t border-foreground", className)}>{rows}</div>
 
   return (
-    <div className={cn("grid border-t border-ink md:grid-cols-[8rem_minmax(0,1fr)] md:gap-x-6", className)}>
-      <div className="pt-3 font-display text-h3 tabular-nums text-ink md:sticky md:top-[calc(var(--head-h)+1rem)] md:self-start md:pb-3">
+    <div className={cn("grid border-t border-foreground md:grid-cols-[8rem_minmax(0,1fr)] md:gap-x-6", className)}>
+      <div className="pt-3 text-h3 tabular-nums text-foreground md:sticky md:top-[calc(var(--head-h)+1rem)] md:self-start md:pb-3">
         {marker}
       </div>
       {rows}
@@ -41,9 +41,9 @@ interface LedgerRowProps {
 
 export function LedgerRow({ title, href, external, event, eventData, meta, titleAs: Title = "h3", children, className }: Readonly<LedgerRowProps>) {
   return (
-    <li className={cn("relative grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[minmax(0,1fr)_auto]", href && "transition-colors hover:bg-tint", className)}>
+    <li className={cn("relative grid gap-x-6 gap-y-1 py-4 sm:grid-cols-[minmax(0,1fr)_auto]", href && "transition-colors hover:bg-muted", className)}>
       <div className="min-w-0">
-        <Title className="font-display text-h4 text-balance text-ink">
+        <Title className="text-h4 text-balance text-foreground">
           {href ? (
             <InkLink
               href={href}
@@ -58,9 +58,9 @@ export function LedgerRow({ title, href, external, event, eventData, meta, title
             title
           )}
         </Title>
-        {children && <div className="mt-1 text-body text-ink-soft sm:text-small">{children}</div>}
+        {children && <div className="mt-1 text-body text-muted-foreground sm:text-small">{children}</div>}
       </div>
-      {meta != null && <div className="font-display text-small tabular-nums text-ink-soft sm:text-right">{meta}</div>}
+      {meta != null && <div className="text-small tabular-nums text-muted-foreground sm:text-right">{meta}</div>}
     </li>
   )
 }

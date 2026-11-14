@@ -16,10 +16,10 @@ const COLUMNS = [
 ] as const
 
 const linkClass =
-  "inline-flex min-h-11 items-center text-ink decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
+  "inline-flex min-h-11 items-center text-foreground decoration-1 underline-offset-[0.18em] hover:underline md:min-h-0 md:py-0.5"
 
 function InkRule() {
-  return <div aria-hidden className="border-t border-ink" />
+  return <div aria-hidden className="border-t border-foreground" />
 }
 
 function BackToTop() {
@@ -59,7 +59,7 @@ export default function Footer({
       <footer className={cn(SHELL_WIDTH, "pb-6")}>
         <InkRule />
         <div className="flex flex-wrap items-center gap-x-6 pt-2 text-small">
-          <p className="font-display text-ink">Rizky Haksono</p>
+          <p className="text-foreground">Rizky Haksono</p>
           <ul className="flex gap-x-5">
             <LegalLinks />
           </ul>
@@ -74,18 +74,18 @@ export default function Footer({
 
   // One field with the page: the theme's own paper, no rules, the Hollar plate fading up into it.
   return (
-    <footer className="text-ink">
+    <footer className="text-foreground">
       <div className={cn(SHELL_WIDTH, "grid grid-cols-3 gap-x-6 gap-y-10 pt-16 sm:gap-x-12 sm:pt-24 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-x-20")}>
         <div className="col-span-3 flex items-start gap-5 lg:col-span-1">
           <Logo variant="mark" className="w-16 shrink-0 sm:w-20" />
           <div>
-            <p className="speckle font-display text-h3 text-ink">Rizky Haksono</p>
-            <p className="mt-1 max-w-[34ch] text-pretty text-small text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+            <p className="speckle text-h3 text-foreground">Rizky Haksono</p>
+            <p className="mt-1 max-w-[34ch] text-pretty text-small text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
             <a
               href={`mailto:${EMAIL}`}
               data-track="email-click"
               data-track-area="colophon"
-              className="mt-3 inline-flex min-h-11 items-center text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
+              className="mt-3 inline-flex min-h-11 items-center text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2 md:min-h-0"
             >
               {/* Below ~360px the address cannot fit beside the mark; it may break before the @, never mid-word. */}
               {MAILBOX}
@@ -100,13 +100,13 @@ export default function Footer({
 
         {COLUMNS.map(({ column, heading }) => (
           <nav key={column} aria-labelledby={`colophon-${column}`}>
-            <p id={`colophon-${column}`} className="font-display text-small font-semibold text-ink">
+            <p id={`colophon-${column}`} className="text-small font-semibold text-foreground">
               {heading}
             </p>
             <ul className="mt-3">
               {NAV_SECTIONS.filter((section) => section.column === column).map(({ href, label }) => (
                 <li key={href}>
-                  <Link href={href} className={cn(linkClass, "text-ink-soft hover:text-ink")} {...navTrack(href, "colophon")}>
+                  <Link href={href} className={cn(linkClass, "text-muted-foreground hover:text-foreground")} {...navTrack(href, "colophon")}>
                     {label}
                   </Link>
                 </li>

@@ -22,9 +22,9 @@ export function Logo({ variant = "mini", className, label }: Readonly<LogoProps>
 
   return (
     <svg viewBox={variant === "mark" ? "-4 0 72 64" : "0 0 64 64"} className={cn("shrink-0", className)} {...a11y}>
-      {variant === "tile" && <rect width="64" height="64" className="fill-ink" />}
-      <path d={LOGO_ART.glyph} className={variant === "tile" ? "fill-paper" : undefined} fill="currentColor" />
-      {variant === "mark" && <path d={LOGO_ART.marks} fill="none" className="stroke-ink opacity-60" strokeWidth={1.5} />}
+      {variant === "tile" && <rect width="64" height="64" className="fill-foreground" />}
+      <path d={LOGO_ART.glyph} className={variant === "tile" ? "fill-background" : undefined} fill="currentColor" />
+      {variant === "mark" && <path d={LOGO_ART.marks} fill="none" className="stroke-foreground opacity-60" strokeWidth={1.5} />}
     </svg>
   )
 }

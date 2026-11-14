@@ -62,9 +62,9 @@ function PlateGrid({ load, aspect, label }: Readonly<{ load: (page: number) => P
                     <div className={`${aspect} w-full`} />
                   )}
                 </PlateFigure>
-                <h3 className="mt-3 font-display text-h4 text-ink">{entry.name}</h3>
-                {entry.line && <p className="mt-1 text-caption text-ink-soft">{entry.line}</p>}
-                {entry.extra && <p className="mt-1 line-clamp-2 text-caption text-ink-soft">{entry.extra}</p>}
+                <h3 className="mt-3 text-h4 text-foreground">{entry.name}</h3>
+                {entry.line && <p className="mt-1 text-caption text-muted-foreground">{entry.line}</p>}
+                {entry.extra && <p className="mt-1 line-clamp-2 text-caption text-muted-foreground">{entry.extra}</p>}
               </li>
             ))}
       </ul>

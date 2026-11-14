@@ -136,7 +136,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn("text-caption text-ink-soft", className)}
+      className={cn("text-caption text-muted-foreground", className)}
       {...props}
     />
   )
@@ -158,7 +158,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("flex items-start gap-1.5 font-display text-small text-ink", className)}
+      className={cn("flex items-start gap-1.5 text-small text-foreground", className)}
       {...props}
     >
       {error && <X className="mt-[0.2em] size-4 shrink-0" strokeWidth={1.5} aria-hidden />}

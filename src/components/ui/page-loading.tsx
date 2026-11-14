@@ -13,9 +13,9 @@ export function PageLoading({ title, children }: Readonly<PageLoadingProps>) {
       {title && (
         <>
           <header className="pb-8">
-            <h1 className="speckle font-display text-h1 text-balance text-ink">{title}</h1>
+            <h1 className="speckle text-h1 text-balance text-foreground">{title}</h1>
           </header>
-          <div aria-hidden className="border-t border-ink" />
+          <div aria-hidden className="border-t border-foreground" />
         </>
       )}
       <StatusLine kind="loading" className={title ? "mt-8" : undefined}>

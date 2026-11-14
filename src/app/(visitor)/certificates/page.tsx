@@ -27,14 +27,14 @@ export default async function CertificatesPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Certificates</h1>
+        <h1 className="speckle text-h1 text-balance text-foreground">Certificates</h1>
         {certifications.length > 0 && (
-          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+          <p className="mt-4 text-caption tabular-nums text-muted-foreground">
             {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.
           </p>
         )}
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       {certifications.length === 0 ? (
         <StatusLine kind="failed" className="mt-8">

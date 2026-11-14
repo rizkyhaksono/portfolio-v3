@@ -14,10 +14,10 @@ interface PlateFigureProps {
 export function PlateFigure({ children, caption, className, tone = "photo" }: Readonly<PlateFigureProps>) {
   return (
     <figure className={className}>
-      <div className="border border-ink p-[3px] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
-        <div className={cn("overflow-hidden border border-rule [&_img]:block", tone === "photo" && "plate")}>{children}</div>
+      <div className="border border-foreground p-[3px] has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
+        <div className={cn("overflow-hidden border border-border [&_img]:block", tone === "photo" && "plate")}>{children}</div>
       </div>
-      {caption && <figcaption className="mt-2 font-display text-caption text-ink-soft">{caption}</figcaption>}
+      {caption && <figcaption className="mt-2 text-caption text-muted-foreground">{caption}</figcaption>}
     </figure>
   )
 }

@@ -32,10 +32,10 @@ function Masthead() {
   return (
     <section aria-labelledby="masthead-name" className="masthead relative isolate min-h-[max(calc(100svh-var(--head-h)),30rem)] overflow-hidden">
       <div className="masthead__name absolute inset-x-0 bottom-[56%] px-[clamp(20px,4vw,48px)] text-center">
-        <p className="masthead__job text-pretty font-display text-lead text-ink-soft">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
+        <p className="masthead__job text-pretty text-lead text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
         <h1
           id="masthead-name"
-          className="speckle mt-[0.15em] translate-y-[0.2em] font-display text-display text-ink [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
+          className="speckle mt-[0.15em] translate-y-[0.2em] text-display text-foreground [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
         >
           Rizky Haksono
         </h1>
@@ -56,7 +56,7 @@ function Lede() {
   return (
     <div className="ws">
       <InkedSentence
-        className="max-w-[24ch] text-h1 text-ink max-sm:text-[1.5rem]"
+        className="max-w-[24ch] text-h1 text-foreground max-sm:text-[1.5rem]"
         text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
       />
       <ul className="mt-6 flex flex-wrap gap-x-6 text-body">
@@ -82,7 +82,7 @@ function Lede() {
 
 /** Static ruled placeholder at roughly the section's final height (no pulse). */
 function SectionSkeleton({ className }: Readonly<{ className: string }>) {
-  return <div aria-hidden className={cn(SECTION_SPACING.section, "border-t border-ink", className)} />
+  return <div aria-hidden className={cn(SECTION_SPACING.section, "border-t border-foreground", className)} />
 }
 
 export default function Home() {

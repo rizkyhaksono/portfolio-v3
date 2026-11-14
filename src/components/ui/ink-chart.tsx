@@ -82,7 +82,7 @@ export function InkChart({
     <table className={className}>
       <caption className="sr-only">{label}</caption>
       <thead>
-        <tr className="border-b border-rule">
+        <tr className="border-b border-border">
           <th scope="col" className="py-1 text-left text-xs font-semibold text-muted-foreground">Date</th>
           <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{name}</th>
           {dashed && <th scope="col" className="py-1 text-right text-xs font-semibold text-muted-foreground">{dashedName}</th>}
@@ -90,7 +90,7 @@ export function InkChart({
       </thead>
       <tbody>
         {points.map((p, i) => (
-          <tr key={p.x} className="border-b border-rule hover:bg-tint">
+          <tr key={p.x} className="border-b border-border hover:bg-muted">
             <th scope="row" className="py-1 text-left font-normal">{formatX(p.x)}</th>
             <td className="py-1 text-right">{formatY(p.y)}</td>
             {dashed && <td className="py-1 text-right">{formatY(dashed[i]?.y ?? 0)}</td>}
@@ -105,13 +105,13 @@ export function InkChart({
       <div className="relative" style={{ height: height ?? (compact ? 48 : 176) }}>
         {!compact && (
           <>
-            <div aria-hidden className="absolute inset-x-0 top-0 border-t border-dotted border-rule-strong" />
-            <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-dotted border-rule-strong" />
-            <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption font-display tabular-nums text-muted-foreground">
+            <div aria-hidden className="absolute inset-x-0 top-0 border-t border-dotted border-input" />
+            <div aria-hidden className="absolute inset-x-0 top-1/2 border-t border-dotted border-input" />
+            <span aria-hidden className="absolute left-0 top-0 -translate-y-full pb-0.5 text-caption tabular-nums text-muted-foreground">
               {formatY(fromZero ? top : highest)}
             </span>
             {!fromZero && (
-              <span aria-hidden className="absolute bottom-1 left-0 z-10 bg-background pr-1 text-caption font-display tabular-nums text-muted-foreground">
+              <span aria-hidden className="absolute bottom-1 left-0 z-10 bg-background pr-1 text-caption tabular-nums text-muted-foreground">
                 {formatY(lowest)}
               </span>
             )}
@@ -123,7 +123,7 @@ export function InkChart({
           preserveAspectRatio="none"
           role="img"
           aria-label={label}
-          className="absolute inset-0 h-full w-full overflow-visible text-ink"
+          className="absolute inset-0 h-full w-full overflow-visible text-foreground"
         >
           {!compact && <line x1="0" y1="100" x2="100" y2="100" stroke="currentColor" strokeWidth={1} vectorEffect="non-scaling-stroke" />}
           {dashed && dashed.length > 0 && (
@@ -146,13 +146,13 @@ export function InkChart({
             vectorEffect="non-scaling-stroke"
           />
           {points.map((p, i) => (
-            <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-ink/10" />
+            <rect key={p.x} x={(i * 100) / n} y="0" width={100 / n} height="100" data-tip={describe(i)} className="fill-transparent hover:fill-foreground/10" />
           ))}
         </svg>
         {/* An HTML square, not an SVG rect: the stretched viewBox would draw a rect as a flat bar. */}
         <span
           aria-hidden
-          className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 bg-ink"
+          className="pointer-events-none absolute size-1.5 -translate-x-1/2 -translate-y-1/2 bg-foreground"
           style={{ left: `${px(n - 1)}%`, top: `${py(points[n - 1].y)}%` }}
         />
       </div>
@@ -161,7 +161,7 @@ export function InkChart({
         table("sr-only")
       ) : (
         <>
-          <div aria-hidden className="mt-1.5 flex justify-between text-caption font-display tabular-nums text-muted-foreground">
+          <div aria-hidden className="mt-1.5 flex justify-between text-caption tabular-nums text-muted-foreground">
             <span>{formatX(points[0].x)}</span>
             {n > 1 && <span>{formatX(points[n - 1].x)}</span>}
           </div>

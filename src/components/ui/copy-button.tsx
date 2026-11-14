@@ -29,7 +29,7 @@ export default function CopyButton({ text, lang }: Readonly<CopyButtonProps>) {
       onClick={copy}
       data-umami-event="Click Copy Code"
       data-umami-event-lang={lang}
-      className="inline-flex items-center gap-1.5 text-caption text-ink underline-offset-[0.18em] hover:underline active:translate-y-px [@media(pointer:coarse)]:min-h-11"
+      className="inline-flex items-center gap-1.5 text-caption text-foreground underline-offset-[0.18em] hover:underline active:translate-y-px [@media(pointer:coarse)]:min-h-11"
     >
       <Icon className="size-4" strokeWidth={1.5} aria-hidden />
       <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>

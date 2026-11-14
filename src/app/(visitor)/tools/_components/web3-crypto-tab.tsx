@@ -24,7 +24,7 @@ const usd = (value: number, compact = false) =>
 
 /** Direction as a word, never as a colour. */
 function Change({ value }: Readonly<{ value: number }>) {
-  if (!Number.isFinite(value)) return <span className="text-ink-soft">Not reported</span>
+  if (!Number.isFinite(value)) return <span className="text-muted-foreground">Not reported</span>
   return (
     <>
       {value >= 0 ? "Up" : "Down"} {Math.abs(value).toFixed(2)}%
@@ -73,7 +73,7 @@ function Prices() {
         {prices.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-ink">{coin.name}</span> <span className="text-ink-soft">{coin.symbol}</span>
+              <span className="font-semibold text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{usd(coin.current_price)}</TableCell>
             <TableCell className="pr-0 text-right sm:pr-2">
@@ -107,11 +107,11 @@ function Trending() {
         {trending.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-ink">{coin.name}</span> <span className="text-ink-soft">{coin.symbol}</span>
+              <span className="font-semibold text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
-            <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-ink-soft">Not reported</span>}</TableCell>
+            <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-muted-foreground">Not reported</span>}</TableCell>
             <TableCell className="pr-0 text-right sm:pr-2">
-              {coin.price_usd > 0 ? <Change value={coin.price_change_24h} /> : <span className="text-ink-soft">Not reported</span>}
+              {coin.price_usd > 0 ? <Change value={coin.price_change_24h} /> : <span className="text-muted-foreground">Not reported</span>}
             </TableCell>
             <TableCell className="hidden text-right sm:table-cell">{coin.market_cap_rank ?? "Unranked"}</TableCell>
           </TableRow>
@@ -155,7 +155,7 @@ function Chart() {
   const change = first && last ? ((last.y - first.y) / first.y) * 100 : NaN
 
   const choice = (active: boolean) =>
-    `min-h-10 border px-3 text-small [@media(pointer:coarse)]:min-h-11 ${active ? "border-ink bg-ink text-paper" : "border-rule-strong text-ink hover:border-ink"}`
+    `min-h-10 border px-3 text-small [@media(pointer:coarse)]:min-h-11 ${active ? "border-foreground bg-foreground text-background" : "border-input text-foreground hover:border-foreground"}`
 
   return (
     <div className="space-y-5">
@@ -182,7 +182,7 @@ function Chart() {
         <ToolLoading>Loading the price history…</ToolLoading>
       ) : (
         <>
-          <p className="max-w-[60ch] text-body text-ink">
+          <p className="max-w-[60ch] text-body text-foreground">
             {name} is {change >= 0 ? "up" : "down"} {Math.abs(change).toFixed(1)}% over the last {days} days, from {usd(first!.y)} to {usd(last!.y)}.
             {high && low && ` Its high was ${usd(high.y)} on ${day(high.x)}; its low was ${usd(low.y)} on ${day(low.x)}.`}
           </p>
@@ -195,7 +195,7 @@ function Chart() {
             height={220}
             className={chart.status === "loading" ? "opacity-60" : undefined}
           />
-          <p className="font-display text-caption text-ink-soft">In US dollars, from CoinGecko through this site's API. Not financial advice.</p>
+          <p className="text-caption text-muted-foreground">In US dollars, from CoinGecko through this site's API. Not financial advice.</p>
         </>
       )}
     </div>

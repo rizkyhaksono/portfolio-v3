@@ -83,7 +83,7 @@ export default async function BlogArticlePage({ params }: Props) {
             <ReaderCount path={path} reads={reads} />
             {tags.length > 0 && (
               <div>
-                <p className="font-display text-caption">Filed under</p>
+                <p className="text-caption">Filed under</p>
                 <ul role="list" className="mt-2 flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <li key={tag}>

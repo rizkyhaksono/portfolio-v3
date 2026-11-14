@@ -193,8 +193,8 @@ export function Collection<T extends { id: string }, V extends FormValues>({
     <section className="w-full max-w-[60rem]">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="font-display text-h3 text-ink">{heading}</h2>
-          <p className="mt-1 font-display text-caption text-ink-soft">
+          <h2 className="text-h3 text-foreground">{heading}</h2>
+          <p className="mt-1 text-caption text-muted-foreground">
             {note}
             {state === "ready" && ` ${items.length} ${items.length === 1 ? noun : plural}.`}
           </p>
@@ -208,17 +208,17 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       </div>
 
       {filters && state === "ready" && (
-        <div role="group" aria-label={`Filter ${plural}`} className="mt-4 flex flex-wrap gap-x-6 border-b border-rule">
+        <div role="group" aria-label={`Filter ${plural}`} className="mt-4 flex flex-wrap gap-x-6 border-b border-border">
           {filters.map(({ label, test }, i) => (
             <button
               key={label}
               type="button"
               aria-pressed={filter === i}
               onClick={() => setFilter(i)}
-              className="-mb-px inline-flex min-h-10 items-center gap-1.5 border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-ink-soft transition-colors hover:text-ink aria-pressed:border-ink aria-pressed:text-ink [@media(pointer:coarse)]:min-h-11"
+              className="-mb-px inline-flex min-h-10 items-center gap-1.5 border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-muted-foreground transition-colors hover:text-foreground aria-pressed:border-foreground aria-pressed:text-foreground [@media(pointer:coarse)]:min-h-11"
             >
               {label}
-              <span className="font-display font-normal tabular-nums">{items.filter(test).length}</span>
+              <span className="font-normal tabular-nums">{items.filter(test).length}</span>
             </button>
           ))}
         </div>
@@ -226,7 +226,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
 
       {slip && (
         <Card ref={slipRef} className="mt-6 scroll-mt-[calc(var(--head-h)+1rem)] p-4 sm:p-6">
-          <h3 className="font-display text-h4 text-ink">{editing ? `Edit “${view(editing).title}”` : `New ${noun}`}</h3>
+          <h3 className="text-h4 text-foreground">{editing ? `Edit “${view(editing).title}”` : `New ${noun}`}</h3>
           <Form {...form}>
             <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mt-4 grid gap-5 sm:grid-cols-2">
               {fields.map(({ name, label, kind = "text", placeholder, note: hint, half }) => (
@@ -235,7 +235,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
                   control={form.control}
                   name={name as Path<V>}
                   render={({ field }) => (
-                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0 border-y border-rule py-3")}>
+                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0 border-y border-border py-3")}>
                       <div className="space-y-1">
                         <FormLabel>{label}</FormLabel>
                         {hint && <FormDescription>{hint}</FormDescription>}
@@ -273,7 +273,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       )}
 
       {state === "loading" && (
-        <ul aria-busy="true" aria-label={`Loading ${plural}`} className="mt-6 divide-y divide-rule border-t border-ink">
+        <ul aria-busy="true" aria-label={`Loading ${plural}`} className="mt-6 divide-y divide-border border-t border-foreground">
           {[0, 1, 2, 3].map((i) => (
             <li key={i} className="space-y-2 py-4">
               <Skeleton className="h-5 w-1/2" />
@@ -299,7 +299,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
 
       {state === "ready" &&
         (shown.length === 0 ? (
-          <StatusLine kind="empty" className="mt-6 border-y border-rule py-8">
+          <StatusLine kind="empty" className="mt-6 border-y border-border py-8">
             {items.length === 0 ? `No ${plural} yet. Add the first one above.` : `No ${plural} match this filter.`}
           </StatusLine>
         ) : (
@@ -308,7 +308,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
               const row = view(item)
               const text = stripHtml(row.text)
               return (
-                <LedgerRow key={item.id} title={row.title} meta={row.meta} className={cn(editing?.id === item.id && "bg-tint")}>
+                <LedgerRow key={item.id} title={row.title} meta={row.meta} className={cn(editing?.id === item.id && "bg-muted")}>
                   {row.status && (
                     <Badge variant="outline" status={row.status.mark} className="mb-1.5">
                       {row.status.word}

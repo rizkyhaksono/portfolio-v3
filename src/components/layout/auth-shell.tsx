@@ -27,27 +27,27 @@ export function AuthShell({ title, standfirst, footer, panel, children }: Readon
     >
       {panel && (
         // Reversed out of the ink like a cut in a newspaper: paper type on ink, which flips with the theme.
-        <aside className="ink-grain hidden bg-ink p-8 text-paper md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
+        <aside className="ink-grain hidden bg-foreground p-8 text-background md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
           <Logo variant="mini" className="w-20" />
           {panel}
         </aside>
       )}
 
       <div className="flex min-w-0 flex-col">
-        <Link href="/" className="inline-flex w-fit items-center gap-3 text-body font-semibold text-ink hover:underline [@media(pointer:coarse)]:min-h-11">
+        <Link href="/" className="inline-flex w-fit items-center gap-3 text-body font-semibold text-foreground hover:underline [@media(pointer:coarse)]:min-h-11">
           <Logo variant="mini" className={cn("size-8", panel && "md:hidden")} />
           Rizky Haksono
         </Link>
 
         <header className="mt-10 pb-6">
-          <h1 className="speckle font-display text-h2 text-balance text-ink">{title}</h1>
-          {standfirst && <p className="mt-3 max-w-[46ch] text-pretty font-display text-lead text-ink-soft">{standfirst}</p>}
+          <h1 className="speckle text-h2 text-balance text-foreground">{title}</h1>
+          {standfirst && <p className="mt-3 max-w-[46ch] text-pretty text-lead text-muted-foreground">{standfirst}</p>}
         </header>
-        <div aria-hidden className="border-t border-ink" />
+        <div aria-hidden className="border-t border-foreground" />
 
         <div className="mt-8">{children}</div>
 
-        {footer && <div className="mt-10 border-t border-rule pt-4 text-small text-ink-soft">{footer}</div>}
+        {footer && <div className="mt-10 border-t border-border pt-4 text-small text-muted-foreground">{footer}</div>}
       </div>
     </main>
   )
