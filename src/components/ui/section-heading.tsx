@@ -1,47 +1,29 @@
 import { cn } from "@/lib/utils"
-import { Eyebrow } from "@/components/ui/eyebrow"
 
 interface SectionHeadingProps {
-  eyebrow?: React.ReactNode
   title: React.ReactNode
-  /** Trailing words set roman inside the italic title. */
-  accent?: React.ReactNode
   description?: React.ReactNode
-  align?: "left" | "center"
   as?: "h1" | "h2" | "h3"
   className?: string
   titleClassName?: string
+  /** Right-hand slot on the title line: a "See all" link, a count. */
+  aside?: React.ReactNode
   children?: React.ReactNode
 }
 
 const TITLE_SIZE = { h1: "text-h1", h2: "text-h2", h3: "text-h3" } as const
 
-/** Italic display heading with an optional caption above and a short description below. */
-export function SectionHeading({
-  eyebrow,
-  title,
-  accent,
-  description,
-  align = "left",
-  as = "h2",
-  className,
-  titleClassName,
-  children,
-}: Readonly<SectionHeadingProps>) {
+/** A small section label in the reading column, with an optional link on its right. */
+export function SectionHeading({ title, description, as = "h2", className, titleClassName, aside, children }: Readonly<SectionHeadingProps>) {
   const Tag = as
 
   return (
-    <div className={cn("flex flex-col gap-2", align === "center" && "items-center text-center", className)}>
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Tag className={cn("text-balance text-foreground", TITLE_SIZE[as], titleClassName)}>
-        {title}
-        {accent && <> <em>{accent}</em></>}
-      </Tag>
-      {description && (
-        <p className={cn("max-w-[60ch] text-body text-muted-foreground", align === "center" && "mx-auto")}>
-          {description}
-        </p>
-      )}
+    <div className={cn("flex flex-col gap-1", className)}>
+      <div className="flex items-baseline justify-between gap-4">
+        <Tag className={cn("text-balance text-foreground", TITLE_SIZE[as], titleClassName)}>{title}</Tag>
+        {aside && <div className="shrink-0 text-small text-muted-foreground">{aside}</div>}
+      </div>
+      {description && <p className="text-body text-muted-foreground">{description}</p>}
       {children}
     </div>
   )

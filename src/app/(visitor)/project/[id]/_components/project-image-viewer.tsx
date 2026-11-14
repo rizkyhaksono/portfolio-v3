@@ -10,20 +10,19 @@ interface ProjectImageViewerProps {
   alt: string
 }
 
-/** The cover as a plate, cropped for the column; selecting it opens the whole image in a dialog. */
+/** The screenshot on a grey tile, cropped to the column; selecting it opens the whole image in a dialog. */
 export default function ProjectImageViewer({ src, alt }: Readonly<ProjectImageViewerProps>) {
   return (
     <Dialog>
       <PlateFigure caption="Select the image to see it uncropped.">
         <DialogTrigger asChild>
           <button type="button" aria-label={`View the full image: ${alt}`} className="relative block aspect-[16/10] w-full cursor-zoom-in">
-            {/* `!`: the plate already frames it, so `.prose img`'s own frame must not apply. */}
             <Image
               src={src}
               alt=""
               fill
-              sizes="(min-width: 1024px) 66ch, 100vw"
-              className="!border-0 object-cover object-left-top !p-0"
+              sizes="(min-width: 640px) 36rem, 100vw"
+              className="object-cover object-top"
               priority
               unoptimized={!canOptimizeImage(src)}
             />

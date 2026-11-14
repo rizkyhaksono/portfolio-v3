@@ -1,42 +1,27 @@
 import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
 import { navTrack } from "@/commons/constants/navigation-menu"
 import { cn } from "@/lib/utils"
-import { SHELL_WIDTH } from "@/lib/design-system"
-import { Logo } from "@/components/ui/logo"
+import { PROSE_WIDTH, WIDE_WIDTH } from "@/lib/design-system"
 import { NavLinks } from "./nav-links"
 import { ThemeToggle } from "./theme-toggle"
 import { ContentsTrigger } from "./contents-trigger"
 
-export { SHELL_WIDTH }
-
-/** Sticky running head: wordmark, sections, theme, account; Contents below 1024px. */
-export function RunningHead() {
+/** The top of every page: the handle with a short rule under it, quiet section links and the theme switch. */
+export function RunningHead({ wide = false }: Readonly<{ wide?: boolean }>) {
   return (
-    <header data-print-hide className="bg-background sticky top-0 z-40 border-b border-border">
-      <div className={cn(SHELL_WIDTH, "flex h-[var(--head-h)] items-center gap-4 xl:gap-6")}>
-        <Link
-          href="/"
-          aria-label="Rizky Haksono, home"
-          className="inline-flex min-h-11 min-w-11 shrink-0 items-center text-foreground"
-          {...navTrack("/", "head")}
-        >
-          <Logo variant="mini" className="size-8" />
-        </Link>
-
-        <nav aria-label="Sections" className="hidden md:block">
-          <NavLinks />
-        </nav>
-
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="hidden lg:inline-flex" />
-          <Link
-            href="/profile"
-            className={cn(buttonVariants({ variant: "ghost" }), "hidden px-2 lg:inline-flex")}
-            {...navTrack("/profile", "head")}
-          >
-            Account
+    <header data-print-hide style={{ viewTransitionName: "site-header" }} className={cn(wide ? WIDE_WIDTH : PROSE_WIDTH, "pt-12 sm:pt-20")}>
+      <div className="flex items-start justify-between gap-6">
+        <div>
+          <Link href="/" className="inline-flex min-h-11 items-center text-h1 text-foreground md:min-h-0" {...navTrack("/", "head")}>
+            @rizkyhaksono
           </Link>
+          <div aria-hidden className="mt-4 h-px w-10 bg-foreground" />
+        </div>
+        <div className="-mr-2 flex items-center gap-1">
+          <nav aria-label="Sections" className="hidden md:block">
+            <NavLinks />
+          </nav>
+          <ThemeToggle />
           <ContentsTrigger className="lg:hidden" />
         </div>
       </div>

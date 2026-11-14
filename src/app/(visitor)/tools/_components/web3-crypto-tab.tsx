@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react"
+import { Button } from "@/components/ui/button"
 import { InkChart } from "@/components/ui/ink-chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -73,7 +74,7 @@ function Prices() {
         {prices.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
+              <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{usd(coin.current_price)}</TableCell>
             <TableCell className="pr-0 text-right sm:pr-2">
@@ -107,7 +108,7 @@ function Trending() {
         {trending.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
+              <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-muted-foreground">Not reported</span>}</TableCell>
             <TableCell className="pr-0 text-right sm:pr-2">
@@ -139,7 +140,7 @@ const toPoints = (prices: unknown[]): Point[] =>
 
 const day = (x: string) => new Date(`${x.slice(0, 10)}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" })
 
-/** Price history as one ink line: pick a coin and a window; the sentence underneath says what happened. */
+/** Price history as one line: pick a coin and a window; the sentence above says what happened. */
 function Chart() {
   const [coin, setCoin] = useState<(typeof CHART_COINS)[number][0]>("bitcoin")
   const [days, setDays] = useState<(typeof RANGES)[number]>(30)
@@ -154,24 +155,21 @@ function Chart() {
   const low = points.reduce<Point | undefined>((a, p) => (!a || p.y < a.y ? p : a), undefined)
   const change = first && last ? ((last.y - first.y) / first.y) * 100 : NaN
 
-  const choice = (active: boolean) =>
-    `min-h-10 border px-3 text-small [@media(pointer:coarse)]:min-h-11 ${active ? "border-foreground bg-foreground text-background" : "border-input text-foreground hover:border-foreground"}`
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <div role="group" aria-label="Coin" className="flex flex-wrap gap-2">
           {CHART_COINS.map(([id, label]) => (
-            <button key={id} type="button" aria-pressed={coin === id} className={choice(coin === id)} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
+            <Button key={id} type="button" size="sm" variant={coin === id ? "default" : "outline"} aria-pressed={coin === id} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
               {label}
-            </button>
+            </Button>
           ))}
         </div>
         <div role="group" aria-label="Period" className="flex gap-2">
           {RANGES.map((d) => (
-            <button key={d} type="button" aria-pressed={days === d} className={choice(days === d)} onClick={() => setDays(d)}>
+            <Button key={d} type="button" size="sm" variant={days === d ? "default" : "outline"} aria-pressed={days === d} onClick={() => setDays(d)}>
               {d} days
-            </button>
+            </Button>
           ))}
         </div>
       </div>

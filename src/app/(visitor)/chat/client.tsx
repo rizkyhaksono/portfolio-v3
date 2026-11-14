@@ -72,63 +72,70 @@ interface ChatClientProps {
 
 const nameOf = (message: PublicChatMessage) => message.user?.name || "Anonymous"
 
-interface LetterProps {
+interface MessageProps {
   message: PublicChatMessage
   quoted: PublicChatMessage | null
+  mine: boolean
   canReply: boolean
-  canManage: boolean
   onReply: (m: PublicChatMessage) => void
   onEdit: (m: PublicChatMessage) => void
   onDelete: (m: PublicChatMessage) => void
 }
 
-/** One letter: the writer, the text, a dateline sentence. Replies sit behind a left rule. */
-function Letter({ message, quoted, canReply, canManage, onReply, onEdit, onDelete }: Readonly<LetterProps>) {
+/** Others write on the page with their name and time above; your own messages sit right, in a grey bubble. */
+function Message({ message, quoted, mine, canReply, onReply, onEdit, onDelete }: Readonly<MessageProps>) {
   const name = nameOf(message)
   const date = new Date(message.createdAt)
   const edited = message.updatedAt !== message.createdAt
 
   return (
-    <article className={cn(quoted && "ml-3 border-l border-foreground pl-4 sm:ml-8")}>
-      <div className="flex items-center gap-3">
-        <Avatar className="size-8">
+    <article className={cn("flex gap-3", mine && "justify-end")}>
+      {!mine && (
+        <Avatar className="mt-0.5 size-8">
           <AvatarImage src={message.user?.avatarUrl ?? message.user?.iconUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
-          <AvatarFallback className="text-xs">{name.charAt(0)}</AvatarFallback>
+          <AvatarFallback className="text-caption">{name.charAt(0)}</AvatarFallback>
         </Avatar>
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2 text-body">
-          <span className="font-semibold text-foreground">{name}</span>
-          {message.user?.role === "ADMIN" && <Badge variant="outline">Site owner</Badge>}
-        </div>
-      </div>
-
-      {quoted && (
-        <p className="mt-2 truncate text-caption text-muted-foreground">
-          In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
-        </p>
       )}
-      <p className="mt-2 max-w-[66ch] whitespace-pre-wrap break-words text-body text-foreground">{message.message}</p>
 
-      <div className="mt-1 flex flex-wrap items-center gap-x-5">
-        {!Number.isNaN(date.getTime()) && (
-          <time dateTime={message.createdAt} suppressHydrationWarning className="text-caption text-muted-foreground">
-            {STAMP.format(date)}
-            {edited && ", edited"}
-          </time>
+      <div className={cn("flex min-w-0 max-w-[85%] flex-col sm:max-w-[70%]", mine ? "items-end text-right" : "items-start")}>
+        <p className="flex flex-wrap items-center gap-x-2 text-small text-muted-foreground">
+          <span className="text-foreground">{mine ? "You" : name}</span>
+          {message.user?.role === "ADMIN" && <Badge variant="outline">Site owner</Badge>}
+          {!Number.isNaN(date.getTime()) && (
+            <time dateTime={message.createdAt} suppressHydrationWarning>
+              {STAMP.format(date)}
+              {edited && ", edited"}
+            </time>
+          )}
+        </p>
+
+        {quoted && (
+          <p className="mt-1 max-w-full truncate text-caption text-muted-foreground">
+            In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
+          </p>
         )}
-        {canReply && (
-          <Button variant="ghost" size="sm" className="px-0" aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
-            Reply
-          </Button>
-        )}
-        {canManage && (
-          <>
-            <Button variant="ghost" size="sm" className="px-0" aria-label="Edit your message" onClick={() => onEdit(message)}>
-              Edit
-            </Button>
-            <Button variant="ghost" size="sm" className="px-0" aria-label="Delete your message" onClick={() => onDelete(message)}>
-              Delete
-            </Button>
-          </>
+        <p className={cn("mt-1 max-w-[66ch] whitespace-pre-wrap break-words text-left text-body text-foreground", mine && "rounded-2xl bg-muted px-4 py-2.5")}>
+          {message.message}
+        </p>
+
+        {(canReply || mine) && (
+          <div className="flex flex-wrap items-center gap-x-4">
+            {canReply && (
+              <Button variant="ghost" size="sm" className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
+                Reply
+              </Button>
+            )}
+            {mine && (
+              <>
+                <Button variant="ghost" size="sm" className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Edit your message" onClick={() => onEdit(message)}>
+                  Edit
+                </Button>
+                <Button variant="ghost" size="sm" className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label="Delete your message" onClick={() => onDelete(message)}>
+                  Delete
+                </Button>
+              </>
+            )}
+          </div>
         )}
       </div>
     </article>
@@ -267,23 +274,23 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
         </Button>
       </div>
 
-      <div ref={listRef} tabIndex={0} aria-label="Messages" className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-border">
+      <div ref={listRef} tabIndex={0} aria-label="Messages" className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-lg">
       {stream.length === 0 ? (
         <StatusLine kind="empty" className="py-10">
           No messages yet. Yours could be the first.
         </StatusLine>
       ) : (
-        <ol role="list">
+        <ol role="list" className="flex flex-col gap-6 py-4">
           {stream.map((m, index) => {
             const isMine = currentUser?.id === m.userId
             const newest = index === stream.length - 1
             return (
-              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined} className="py-5">
-                <Letter
+              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined}>
+                <Message
                   message={m}
                   quoted={m.replyToId ? byId.get(m.replyToId) ?? null : null}
+                  mine={isMine}
                   canReply={Boolean(currentUser) && !isMine}
-                  canManage={isMine}
                   onReply={handleReply}
                   onEdit={handleEdit}
                   onDelete={setPendingDelete}
@@ -296,7 +303,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
       </div>
 
       {currentUser ? (
-        <form onSubmit={handleSendMessage} className="shrink-0 border-t border-foreground pb-4 pt-3">
+        <form onSubmit={handleSendMessage} className="shrink-0 pb-4 pt-3">
           <div className="flex items-baseline justify-between gap-4">
             <Label htmlFor="chat-message" className="truncate">
               {composerLabel}
@@ -307,7 +314,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
               </Button>
             )}
           </div>
-          <div className="mt-1 flex items-end gap-3">
+          <div className="mt-1 flex items-end gap-2">
             <Textarea
               id="chat-message"
               ref={textareaRef}
@@ -329,7 +336,8 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
           </p>
         </form>
       ) : (
-        <div className="shrink-0 border-t border-foreground py-3">
+        <div className="mb-4 mt-3 flex shrink-0 flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-body text-muted-foreground">Sign in to post and reply under your own name.</p>
           <Button asChild size="sm">
             <Link href="/auth?redirect=/chat">Sign in to write a message</Link>
           </Button>

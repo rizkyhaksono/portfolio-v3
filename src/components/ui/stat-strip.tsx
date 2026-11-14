@@ -10,13 +10,14 @@ interface StatStripProps {
   className?: string
 }
 
-/** Row of figures: italic caption above a tabular italic numeral, split by hairlines. */
+/** A quiet grid of figures: a tabular numeral over its small muted label, with no boxes or rules. */
 export function StatStrip({ items, className }: Readonly<StatStripProps>) {
   return (
-    <dl className={cn("grid grid-cols-2 border-y border-border sm:grid-cols-4", className)}>
+    <dl className={cn("grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4", className)}>
       {items.map((item) => (
-        <div key={item.label} className="flex min-w-0 flex-col justify-between gap-1 border-border px-3 py-5 sm:px-4 max-sm:[&:nth-child(odd)]:pl-0 sm:first:pl-0 [&:not(:last-child)]:border-r [&:nth-child(even)]:border-r-0 sm:[&:nth-child(even):not(:last-child)]:border-r">
-          <dt className="text-pretty text-caption text-muted-foreground">{item.label}</dt>
+        // dt stays first for screen readers; the column is reversed so the numeral reads first on screen.
+        <div key={item.label} className="flex min-w-0 flex-col-reverse gap-1">
+          <dt className="text-pretty text-small text-muted-foreground">{item.label}</dt>
           <dd className="break-words text-numeral tabular-nums text-foreground">{item.value}</dd>
         </div>
       ))}

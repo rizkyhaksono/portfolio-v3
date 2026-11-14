@@ -1,14 +1,26 @@
 import { test, expect } from '@playwright/test';
 import { NAV_SECTIONS } from '../../src/commons/constants/navigation-menu';
+import { EMAIL } from '../../src/commons/constants/contact';
 
 const headLinks = (size: 'md' | 'lg') =>
   NAV_SECTIONS.filter((s) => s.head === 'md' || (size === 'lg' && s.head === 'lg'));
+
+const VISITOR_ROUTES = ['/', '/project', '/blog', '/roadmap', '/tools', '/stats', '/chat', '/certificates', '/changelog', '/legal/privacy'];
 
 test.describe('Navigation', () => {
   test('home loads with the site title', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Rizky Haksono/);
   });
+
+  for (const route of VISITOR_ROUTES) {
+    test(`${route} opens with the handle linking home`, async ({ page }) => {
+      await page.goto(route);
+      const handle = page.getByRole('banner').getByRole('link', { name: '@rizkyhaksono', exact: true });
+      await expect(handle).toBeVisible();
+      await expect(handle).toHaveAttribute('href', '/');
+    });
+  }
 
   test('running head lists every section at 1440 and marks the current one', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
@@ -67,41 +79,47 @@ test.describe('Navigation', () => {
     await page.goto('/');
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   });
+});
 
-  test('portrait sits in About, not the hero, on desktop', async ({ page }) => {
+test.describe('Home', () => {
+  test('lists projects as text rows with a link to all of them', async ({ page }) => {
+    await page.goto('/');
+    const main = page.getByRole('main');
+    await expect(main.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeAttached();
+    await expect(main.getByRole('heading', { level: 2, name: 'Projects', exact: true })).toBeVisible();
+    await expect(main.locator('a[href^="/project/"]').first()).toBeVisible();
+    await expect(main.getByRole('link', { name: /^All \d+ projects$/ })).toHaveAttribute('href', '/project');
+    await expect(main.getByRole('heading', { level: 2, name: 'Writing', exact: true })).toBeVisible();
+  });
+
+  test('shows the work experience section with its entries', async ({ page }) => {
+    await page.goto('/');
+    const work = page.getByRole('region', { name: 'Work experience' });
+    await expect(work.getByRole('heading', { level: 2 })).toBeVisible();
+    await expect(work.getByRole('listitem').first()).toBeVisible();
+  });
+});
+
+test.describe('Footer', () => {
+  test('signs off over the sky with the address and a hidden pause control at 1280', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
-    const portrait = { name: 'Portrait of Rizky Haksono', exact: true };
-    await expect(page.locator('#about').getByRole('img', portrait)).toBeVisible();
-    await expect(page.locator('.masthead').getByRole('img', portrait)).toHaveCount(0);
+    const footer = page.getByRole('contentinfo');
+    await expect(footer.getByRole('link', { name: EMAIL })).toHaveAttribute('href', `mailto:${EMAIL}`);
+    // No visible button: sr-only (a 1x1 box) until keyboard focus, so keyboard and screen readers can stop the sky.
+    const pause = footer.getByRole('button', { name: 'Pause the sky' });
+    await expect(pause).toBeAttached();
+    expect((await pause.boundingBox())?.width).toBeLessThanOrEqual(1);
+    await pause.focus();
+    await expect.poll(async () => (await pause.boundingBox())?.width ?? 0).toBeGreaterThan(1);
   });
 
-  test.describe('hero plate', () => {
-    for (const viewport of [{ width: 1280, height: 800 }, { width: 375, height: 812 }]) {
-      test(`prints the name over the Bromo plate at ${viewport.width}`, async ({ page }) => {
-        await page.setViewportSize(viewport);
-        await page.goto('/');
-        const hero = page.locator('section.masthead');
-        await expect(hero.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeInViewport({ ratio: 1 });
-        await expect(hero.locator('img')).toBeVisible();
-      });
-    }
-  });
-
-  // The unscrolled sentence prints in the ghost colour (3.17:1 on Paper), which passes only as large text (24px+).
-  test('lede sentence keeps the 24px large-text floor on a phone', async ({ page }) => {
+  test('drops the pause control below 640, where the scene stands still', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
-    const sentence = page.locator('.ws p', { has: page.locator('.ws__w') });
-    const size = await sentence.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-    expect(size).toBeGreaterThanOrEqual(24);
-  });
-
-  test('hero fills a short phone without sideways scroll, with the links just below', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Rizky Haksono' })).toBeInViewport({ ratio: 1 });
-    await expect(page.locator('.ws').getByRole('link', { name: /^CV/ })).toBeAttached();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+    const footer = page.getByRole('contentinfo');
+    await expect(footer.getByRole('link', { name: EMAIL })).toBeVisible();
+    // display:none takes it out of the accessibility tree, so look it up with hidden elements included.
+    await expect(footer.getByRole('button', { name: 'Pause the sky', includeHidden: true })).toHaveCSS('display', 'none');
   });
 });

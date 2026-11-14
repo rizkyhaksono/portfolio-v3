@@ -88,7 +88,7 @@ export default function SignupForm({ onCreated }: Readonly<SignupFormProps>) {
 
         <FormAlert>{errors.root?.message}</FormAlert>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" className="h-10 w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating your account…" : "Create account"}
         </Button>
       </form>

@@ -80,13 +80,13 @@ export default function LoginForm({ createdEmail }: Readonly<LoginFormProps>) {
 
           <FormAlert>{errors.root?.message}</FormAlert>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" className="h-10 w-full" disabled={isSubmitting}>
             {isSubmitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
       </Form>
 
-      <p className="flex items-center gap-4 text-caption text-muted-foreground before:h-px before:flex-1 before:bg-border before:content-[''] after:h-px after:flex-1 after:bg-border after:content-['']">
+      <p className="text-center text-caption text-muted-foreground">
         or
       </p>
 

@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss"
-import { fontFamily } from "tailwindcss/defaultTheme"
 
 const config = {
 	darkMode: ["class"],
@@ -7,10 +6,7 @@ const config = {
 	prefix: "",
 	theme: {
 		fontFamily: {
-			sans: [
-				'var(--font-sans)',
-				...fontFamily.sans
-			],
+			sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
 			mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 		},
 		container: {
@@ -61,20 +57,20 @@ const config = {
 					wash: 'hsl(var(--sky-wash) / <alpha-value>)'
 				}
 			},
-			// Apple-like scale: big, tight headlines and quiet 15px body. h1 and display grow from 375 to 1280px.
+			// One sans (Onest), quiet sizes: 15/24 body, 24px page titles; hierarchy is colour first, weight second.
 			fontSize: {
 				xs: ['0.75rem', { lineHeight: '1rem' }],
-				caption: ['0.75rem', { lineHeight: '1rem' }],
+				caption: ['0.75rem', { lineHeight: '1.125rem' }],
 				small: ['0.8125rem', { lineHeight: '1.25rem' }],
 				body: ['0.9375rem', { lineHeight: '1.5rem' }],
-				prose: ['1.0625rem', { lineHeight: '1.75rem' }],
-				lead: ['1.1875rem', { lineHeight: '1.75rem' }],
+				prose: ['1rem', { lineHeight: '1.75rem' }],
+				lead: ['1rem', { lineHeight: '1.625rem' }],
 				h4: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
-				h3: ['1.1875rem', { lineHeight: '1.625rem', fontWeight: '600', letterSpacing: '-0.01em' }],
-				h2: ['1.5rem', { lineHeight: '1.875rem', fontWeight: '600', letterSpacing: '-0.015em' }],
-				h1: ['clamp(2rem, 1.7928rem + 0.884vw, 2.5rem)', { lineHeight: '1.1', fontWeight: '600', letterSpacing: '-0.02em' }],
-				display: ['clamp(2.5rem, 2.0856rem + 1.768vw, 3.5rem)', { lineHeight: '1.07', fontWeight: '600', letterSpacing: '-0.025em' }],
-				numeral: ['2rem', { lineHeight: '2.25rem', fontWeight: '600', letterSpacing: '-0.015em' }]
+				h3: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
+				h2: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
+				h1: ['1.5rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }],
+				display: ['1.5rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }],
+				numeral: ['1.75rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }]
 			},
 			// Radius grows with surface size: fields and buttons md/lg, tiles 2xl, dots and switches full.
 			borderRadius: {
@@ -82,9 +78,11 @@ const config = {
 				md: 'calc(var(--radius) - 0.25rem)',
 				sm: 'calc(var(--radius) - 0.5rem)'
 			},
-			// Floating layers only (dialog, sheet, menu, toast); nothing on the page itself casts a shadow.
-			boxShadow: {
-				float: '0 1px 2px hsl(var(--foreground) / 0.06), 0 8px 24px -8px hsl(var(--foreground) / 0.18)'
+			// Named so the class is not ambiguous with tailwindcss-animate's animation duration (which drops `duration-[var(...)]`).
+			transitionDuration: {
+				press: "var(--dur-press)",
+				ui: "var(--dur-ui)",
+				sheet: "var(--dur-sheet)",
 			},
 			transitionTimingFunction: {
 				out: 'var(--ease-out)'

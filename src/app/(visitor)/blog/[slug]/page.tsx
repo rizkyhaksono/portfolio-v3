@@ -4,7 +4,6 @@ import { notFound } from "next/navigation"
 import ReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { ArticleShell } from "@/components/ui/article-shell"
-import { Chip } from "@/components/ui/chip"
 import CodeBlock, { Pre } from "@/components/ui/code-block"
 import { InkLink } from "@/components/ui/ink-link"
 import { PlateFigure } from "@/components/ui/plate-figure"
@@ -13,7 +12,7 @@ import { Table } from "@/components/ui/roadmap-mdx-component"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import BlogLetters from "@/app/_components/blog/blog-letters"
 import { dateline } from "@/app/_components/blog/format"
-import { getSiteUrl, isSiteImage, ogImageUrl } from "@/lib/site-url"
+import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
 import { canOptimizeImage } from "@/lib/image-hosts"
 import { getBlogData, getBlogDetail, getComments } from "@/services/visitor/blog"
 import { getPathReads } from "@/services/visitor/umami"
@@ -38,10 +37,9 @@ const withoutFrontMatter = (markdown: string) => markdown.replace(/^---\r?\n[\s\
 /** DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it. */
 const isClipped = (description?: string) => /(\.\.\.|…)$/u.test(description?.trim() ?? "")
 
-/** Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI. */
-export async function generateStaticParams() {
-  return []
-}
+// No generateStaticParams: the root layout reads headers() for the CSP nonce, so an on-demand ISR render of an
+// unbuilt slug threw DYNAMIC_SERVER_USAGE (500). Rendering per request, with the fetches cached by `next.revalidate`,
+// also keeps DEV.to (which rate-limits CI bursts) out of the build.
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -74,31 +72,13 @@ export default async function BlogArticlePage({ params }: Props) {
     <>
       <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.cover_image} published={post.published_at} modified={post.edited_at} />
       <ArticleShell
+        back={{ href: "/blog", title: "All writing" }}
         title={post.title}
         standfirst={isClipped(post.description) ? undefined : post.description}
         dateline={dateline(post.published_at, post.reading_time_minutes)}
-        railLabel="About this article"
-        rail={
+        meta={
           <>
-            <ReaderCount path={path} reads={reads} />
-            {tags.length > 0 && (
-              <div>
-                <p className="text-caption">Filed under</p>
-                <ul role="list" className="mt-2 flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <li key={tag}>
-                      <Chip>{tag}</Chip>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            <p>
-              <InkLink href="#letters">
-                {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
-              </InkLink>{" "}
-              from readers.
-            </p>
+            <ReaderCount path={path} reads={reads} className="text-small" />
             <p>
               First published on{" "}
               {/* The link's hidden new-tab note is an inline-block, which lets the full stop wrap alone. */}
@@ -107,27 +87,33 @@ export default async function BlogArticlePage({ params }: Props) {
                   DEV Community
                 </InkLink>
                 .
-              </span>
+              </span>{" "}
+              <InkLink href="#letters">
+                {letters.toLocaleString("en")} {letters === 1 ? "comment" : "comments"}
+              </InkLink>
+              .
             </p>
           </>
         }
-        footer={<BlogLetters comments={comments} url={post.url} />}
+        chips={tags}
+        cover={
+          post.cover_image && (
+            <PlateFigure>
+              <Image
+                src={post.cover_image}
+                alt=""
+                width={1000}
+                height={420}
+                priority
+                unoptimized={!canOptimizeImage(post.cover_image)}
+                sizes="(min-width: 640px) 36rem, 100vw"
+                className="aspect-[1000/420] w-full object-cover"
+              />
+            </PlateFigure>
+          )
+        }
+        footer={<BlogLetters comments={comments} url={post.url} expected={letters} />}
       >
-        {post.cover_image && (
-          // `.prose img` frames body images; the plate brings its own frame.
-          <PlateFigure tone={isSiteImage(post.cover_image) ? "color" : "photo"} className="[&_img]:border-0 [&_img]:p-0">
-            <Image
-              src={post.cover_image}
-              alt=""
-              width={1000}
-              height={420}
-              priority
-              unoptimized={!canOptimizeImage(post.cover_image)}
-              sizes="(min-width: 1024px) 66ch, 100vw"
-              className="aspect-[1000/420] w-full object-cover"
-            />
-          </PlateFigure>
-        )}
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={MARKDOWN}>
           {withoutFrontMatter(post.body_markdown ?? "")}
         </ReactMarkdown>

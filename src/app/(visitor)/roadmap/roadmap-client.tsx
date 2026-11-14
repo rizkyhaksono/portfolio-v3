@@ -1,9 +1,11 @@
 ﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
+import * as TabsPrimitive from "@radix-ui/react-tabs"
 import { buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRoadmapProgress } from "@/hooks/use-roadmap-progress"
 import type { RoadmapContent, RoadmapLevel } from "@/lib/mdx"
@@ -23,10 +25,8 @@ const LEVELS: [RoadmapLevel, string][] = [
 
 const NAME_KEY = "roadmap-cert-name"
 
-/** Under sm the slips stack above the panel and push it below the fold, so bring its heading into view. */
-const revealPanel = (id: string) => {
-  if (!matchMedia("(min-width: 640px)").matches) document.getElementById(`${id}-title`)?.scrollIntoView()
-}
+/** The course rows stack above the panel at every width and push it below the fold, so bring its heading into view. */
+const revealPanel = (id: string) => document.getElementById(`${id}-title`)?.scrollIntoView({ block: "start" })
 
 function Tick() {
   return (
@@ -40,12 +40,12 @@ function Tick() {
 function Certificate({ course, name, onName }: Readonly<{ course: string; name: string; onName: (name: string) => void }>) {
   const href = ogImageUrl({ course, name: name.trim() }, "/api/certificate")
   return (
-    <div className="mt-6 border-t border-foreground pt-4">
-      <p className="flex items-center gap-2 text-h4 text-foreground">
+    <div className="mt-10">
+      <p className="flex items-center gap-2 text-body text-foreground">
         <Tick />
         Course completed
       </p>
-      <label htmlFor={`${course}-name`} className="mt-4 block text-small font-semibold text-foreground">
+      <label htmlFor={`${course}-name`} className="mt-4 block text-small text-foreground">
         Name on the certificate
       </label>
       <Input id={`${course}-name`} value={name} onChange={(event) => onName(event.target.value)} maxLength={48} autoComplete="name" className="max-w-sm" />
@@ -56,19 +56,22 @@ function Certificate({ course, name, onName }: Readonly<{ course: string; name: 
   )
 }
 
-/** Hatched progress rule: the share of lessons done in this browser. */
+/** The share of lessons done in this browser; the words beside it carry the value. */
 function Progress({ done, total }: Readonly<{ done: number; total: number }>) {
   return (
-    <span aria-hidden className="mt-3 block h-1.5 border border-input">
-      <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+    <span aria-hidden className="mt-2 block h-1 rounded-full bg-muted">
+      <span className="block h-full rounded-full bg-foreground" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
     </span>
   )
 }
 
-/** One course open at a time: pick it from the index of slips, read its lessons below. The choice lives in the URL hash. */
+type LevelFilter = RoadmapLevel | "all"
+
+/** One course open at a time: pick it from the course rows, read its lessons below. The choice lives in the URL hash. */
 export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
   const { isLoaded, isModuleComplete, completedCount } = useRoadmapProgress()
   const [name, setName] = useState("")
+  const [level, setLevel] = useState<LevelFilter>("all")
   const ids = courses.map(({ course }) => course)
   const [open, setOpen] = useState(ids[0] ?? "")
   // A hash landing opens a panel after the effect, and the hash names no element, so the browser cannot scroll to it.
@@ -126,76 +129,101 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
     }
   }
 
+  if (courses.length === 0) return <StatusLine kind="empty">No courses published yet.</StatusLine>
+
   return (
-    <Tabs value={open} onValueChange={choose} className="mt-8">
-      <TabsList aria-label="Courses" className="grid grid-cols-1 gap-0 border-b-0 sm:grid-cols-2 lg:grid-cols-5">
+    <Tabs value={open} onValueChange={choose} orientation="vertical">
+      {/* Radix directly: the ui trigger is a segmented pill, and these are plain rows. */}
+      <TabsPrimitive.List aria-label="Courses" className="flex flex-col">
         {courses.map((course) => {
           const done = doneOf(course)
           const total = course.lessons.length
           const minutes = course.lessons.reduce((sum, lesson) => sum + minutesOf(lesson.meta.duration), 0)
           return (
-            <TabsTrigger
+            <TabsPrimitive.Trigger
               key={course.course}
               value={course.course}
               data-track="roadmap-course"
               data-track-course={course.course}
               // Radix activates on mousedown, so the panel is mounted by the time click fires.
               onClick={() => revealPanel(course.course)}
-              className="block h-full whitespace-normal border-b border-r-0 border-border px-4 py-3 sm:py-4 text-left font-normal text-muted-foreground hover:bg-muted hover:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground sm:border-r lg:[&:nth-child(5n)]:border-r-0"
+              className="group block w-full py-2 text-left"
             >
-              <span className="block text-h4 text-foreground">{courseTitle(course.course)}</span>
-              <span className="mt-1 hidden text-small tabular-nums sm:block">
-                {total} lessons{minutes > 0 && `, about ${minutes} minutes`}
+              <span className="block text-body text-foreground underline decoration-transparent decoration-1 underline-offset-4 group-hover:decoration-foreground/40 group-data-[state=active]:decoration-foreground">
+                {courseTitle(course.course)}
+              </span>
+              <span className="block text-body tabular-nums text-muted-foreground">
+                {total} lessons{minutes > 0 && `, about ${minutes} minutes`}.{" "}
+                {done === 0 ? "Not started." : done === total ? "Completed." : `${done} of ${total} done.`}
               </span>
               <Progress done={done} total={total} />
-              <span className="mt-1.5 block min-h-[1.35em] text-caption tabular-nums">
-                {done === 0 ? "Not started" : done === total ? "Completed" : `${done} of ${total} done`}
-              </span>
-            </TabsTrigger>
+            </TabsPrimitive.Trigger>
           )
         })}
-      </TabsList>
+      </TabsPrimitive.List>
 
       {courses.map((course) => {
         const { course: id, lessons } = course
         const done = doneOf(course)
         const minutes = lessons.reduce((total, lesson) => total + minutesOf(lesson.meta.duration), 0)
+        const levels = LEVELS.filter(([value]) => lessons.some((lesson) => (lesson.meta.level ?? "beginner") === value))
+        const shown = levels.some(([value]) => value === level) ? level : "all"
+
+        const rowsOf = (value: RoadmapLevel, label: string, marker: boolean) => {
+          const rows = lessons.filter((lesson) => (lesson.meta.level ?? "beginner") === value)
+          return (
+            <LedgerList key={value} marker={marker ? <h3>{label}</h3> : undefined}>
+              {rows.map(({ slug, meta }) => (
+                <LedgerRow key={slug} titleAs={marker ? "h4" : "h3"} title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
+                  <p>{meta.description}</p>
+                  {isLoaded && isModuleComplete(id, slug) && (
+                    <p className="mt-1 flex items-center gap-1.5 text-foreground">
+                      <Tick />
+                      Done
+                    </p>
+                  )}
+                </LedgerRow>
+              ))}
+            </LedgerList>
+          )
+        }
 
         return (
-          <TabsContent key={id} value={id} className="mt-12">
+          <TabsContent key={id} value={id} className="mt-14">
             <section aria-labelledby={`${id}-title`}>
               <h2 id={`${id}-title`} className="text-h2 text-balance text-foreground">
                 {courseTitle(id)}
               </h2>
-              <p className="mt-2 max-w-[60ch] text-body text-muted-foreground">
+              <p className="mt-1 text-body text-muted-foreground">
                 From beginner to advanced in {lessons.length} lessons{minutes > 0 && `, about ${minutes} minutes of reading`}.
                 {done > 0 && done < lessons.length && ` You have finished ${done}.`}
               </p>
 
-              {LEVELS.map(([level, label]) => {
-                const rows = lessons.filter((lesson) => (lesson.meta.level ?? "beginner") === level)
-                if (rows.length === 0) return null
-                return (
-                  <LedgerList key={level} marker={<h3>{label}</h3>} className="mt-6 md:grid-cols-[10rem_minmax(0,1fr)]">
-                    {rows.map(({ slug, meta }) => (
-                      <LedgerRow key={slug} titleAs="h4" title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
-                        <p>{meta.description}</p>
-                        {isLoaded && isModuleComplete(id, slug) && (
-                          <p className="mt-1 flex items-center gap-1.5 text-foreground">
-                            <Tick />
-                            Done
-                          </p>
-                        )}
-                      </LedgerRow>
+              {levels.length > 1 ? (
+                <Tabs value={shown} onValueChange={(value) => setLevel(value as LevelFilter)} className="mt-6">
+                  <TabsList aria-label="Level">
+                    <TabsTrigger value="all">All</TabsTrigger>
+                    {levels.map(([value, label]) => (
+                      <TabsTrigger key={value} value={value}>
+                        {label}
+                      </TabsTrigger>
                     ))}
-                  </LedgerList>
-                )
-              })}
+                  </TabsList>
+                  <TabsContent value="all">{levels.map(([value, label]) => rowsOf(value, label, true))}</TabsContent>
+                  {levels.map(([value, label]) => (
+                    <TabsContent key={value} value={value}>
+                      {rowsOf(value, label, false)}
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              ) : (
+                <div className="mt-6">{levels.map(([value, label]) => rowsOf(value, label, false))}</div>
+              )}
 
               {done === lessons.length ? (
                 <Certificate course={id} name={name} onName={saveName} />
               ) : (
-                <p className="mt-6 text-small text-muted-foreground">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
+                <p className="mt-10 text-small text-muted-foreground">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
               )}
             </section>
           </TabsContent>

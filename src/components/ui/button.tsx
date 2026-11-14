@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 // Destructive keeps its cross, so the danger never rests on colour alone.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[background-color,transform] duration-[var(--dur-press)] ease-out motion-safe:active:scale-[.98] disabled:pointer-events-none disabled:opacity-50 [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[background-color,transform] duration-press ease-out motion-safe:active:scale-[.98] disabled:pointer-events-none disabled:opacity-50 [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {

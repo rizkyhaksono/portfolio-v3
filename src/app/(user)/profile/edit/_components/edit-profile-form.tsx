@@ -103,9 +103,9 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex max-w-[66ch] flex-col gap-8" aria-busy={isSubmitting}>
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6" aria-busy={isSubmitting}>
         <fieldset className="flex flex-col gap-3" aria-busy={uploading}>
-          <legend className="mb-3 text-small font-semibold text-foreground">Cover image</legend>
+          <legend className="mb-3 text-small text-foreground">Cover image</legend>
           {bannerUrl ? (
             <PlateFigure>
               <div className="relative aspect-[3/1]">
@@ -113,7 +113,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
               </div>
             </PlateFigure>
           ) : (
-            <div className="flex aspect-[3/1] items-center justify-center border border-dashed border-input text-caption text-muted-foreground">
+            <div className="flex aspect-[3/1] items-center justify-center rounded-2xl bg-muted text-small text-muted-foreground">
               No cover yet.
             </div>
           )}
@@ -212,7 +212,7 @@ export function EditProfileForm({ profile }: Readonly<{ profile: ProfileData }>)
 
         <FormAlert>{errors.root?.message}</FormAlert>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-border pt-6">
+        <div className="flex flex-wrap justify-end gap-3 pt-2">
           {isDirty ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>

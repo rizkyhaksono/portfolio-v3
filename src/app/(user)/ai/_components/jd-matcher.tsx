@@ -32,25 +32,12 @@ const SHARE_LABEL: Record<ShareState, string> = { idle: "Share result", copied: 
 const bandOf = (score: number) => (score >= 70 ? "strong" : score >= 40 ? "partial" : "weak")
 const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-/** 0 to 100 ruler: hatched up to the score, ticks every ten, a 2px ink mark at the score. The numeral carries the value. */
-function FitRuler({ score }: Readonly<{ score: number }>) {
+/** The score as a bar on a rounded track; the numeral carries the value. */
+function FitBar({ score }: Readonly<{ score: number }>) {
   return (
-    <div aria-hidden className="mt-4">
-      <div className="relative h-6 border-b border-foreground">
-        <div className="bg-hatch absolute inset-y-0 left-0" style={{ width: `${score}%` }} />
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between">
-          {Array.from({ length: 11 }, (_, i) => (
-            <span key={i} className={i % 5 === 0 ? "h-3 w-px bg-foreground" : "h-1.5 w-px bg-foreground"} />
-          ))}
-        </div>
-        <span className="absolute inset-y-0 w-0.5 bg-foreground" style={{ left: `calc(${score}% - ${score / 50}px)` }} />
-      </div>
-      <div className="mt-1 flex justify-between text-caption tabular-nums text-muted-foreground">
-        <span>0</span>
-        <span>50</span>
-        <span>100</span>
-      </div>
-    </div>
+    <span aria-hidden className="mt-4 block h-1.5 rounded-full bg-muted">
+      <span className="block h-full rounded-full bg-foreground" style={{ width: `${score}%` }} />
+    </span>
   )
 }
 
@@ -58,7 +45,7 @@ function TagList({ title, items }: Readonly<{ title: string; items: string[] }>)
   if (items.length === 0) return null
   return (
     <div>
-      <h3 className="text-small font-semibold text-foreground">{title}</h3>
+      <h3 className="text-small text-foreground">{title}</h3>
       <ul role="list" className="mt-2 flex flex-wrap gap-1.5">
         {items.map((item, i) => (
           <li key={i}>
@@ -166,9 +153,9 @@ export default function JdMatcher() {
       {error && <ErrorNote>{error}</ErrorNote>}
 
       {result && (
-        <section aria-labelledby="ai-fit-title" className="space-y-6 border-t border-foreground pt-6">
+        <section aria-labelledby="ai-fit-title" className="space-y-6 pt-4">
           <div>
-            <h2 id="ai-fit-title" className="text-small font-semibold text-foreground">
+            <h2 id="ai-fit-title" className="text-small text-foreground">
               Fit score
             </h2>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
@@ -176,7 +163,7 @@ export default function JdMatcher() {
               <span className="text-lead text-muted-foreground">out of 100</span>
             </p>
             {result.verdict && <p className="mt-1 text-lead text-foreground">{result.verdict}</p>}
-            <FitRuler score={score} />
+            <FitBar score={score} />
           </div>
 
           {result.summary && <p className="text-body text-foreground">{result.summary}</p>}
@@ -186,7 +173,7 @@ export default function JdMatcher() {
 
           {result.gaps.length > 0 && (
             <div>
-              <h3 className="text-small font-semibold text-foreground">Gaps</h3>
+              <h3 className="text-small text-foreground">Gaps</h3>
               <div className="prose prose--chat mt-2">
                 <ul>
                   {result.gaps.map((g, i) => (
@@ -199,7 +186,7 @@ export default function JdMatcher() {
 
           {result.sources.length > 0 && (
             <div>
-              <h3 className="text-small font-semibold text-foreground">Drawn from</h3>
+              <h3 className="text-small text-foreground">Drawn from</h3>
               <ul role="list" className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-small tabular-nums text-foreground">
                 {result.sources.map((src, i) => {
                   const label = `${sentence(src.sourceType)}, ${Math.round(src.score * 100)}% match`
@@ -213,7 +200,7 @@ export default function JdMatcher() {
             </div>
           )}
 
-          <div className="border-t border-border pt-4">
+          <div>
             <Button variant="outline" onClick={shareResult}>
               <span aria-live="polite">{SHARE_LABEL[share]}</span>
             </Button>

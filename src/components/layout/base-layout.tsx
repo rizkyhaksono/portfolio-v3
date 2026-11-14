@@ -1,33 +1,36 @@
 import type { ReactNode } from "react"
 import Footer from "@/components/layout/footer"
 import { DeferredClientUtilities } from "@/components/layout/deferred-client-utilities"
-import { RunningHead, SHELL_WIDTH } from "@/components/layout/running-head"
+import { RunningHead } from "@/components/layout/running-head"
+import { PROSE_WIDTH, WIDE_WIDTH } from "@/lib/design-system"
 import { cn } from "@/lib/utils"
 
 interface BaseLayoutProps {
   children: ReactNode
-  /** Full-width slot above the page wrapper, inside main (home masthead only). */
-  bleed?: ReactNode
-  /** `compact` on /ai and /chat. */
+  /** `compact` on /chat. */
   footer?: "full" | "compact" | "none"
-  /** App-like page that fills the viewport below the running head and never scrolls itself (/chat). */
+  /** App-like page that fills the viewport below the head and never scrolls itself (/chat). */
   fit?: boolean
+  /** The 960px column for app-like pages (/tools, /chat); everything else reads in the 640px column. */
+  width?: "prose" | "wide"
 }
 
 /** Visitor shell. Reads no cookies, so pages under it can be static or ISR. */
-export default function BaseLayout({ children, bleed, footer = "full", fit = false }: Readonly<BaseLayoutProps>) {
+export default function BaseLayout({ children, footer = "full", fit = false, width = "prose" }: Readonly<BaseLayoutProps>) {
+  const wide = width === "wide"
+  const column = wide ? WIDE_WIDTH : PROSE_WIDTH
+
   if (fit) {
     // The page takes whatever the head and footer leave. Phones drop the footer for room; the menu carries its links.
     return (
       <div className="flex h-dvh flex-col">
-        <RunningHead />
+        <RunningHead wide={wide} />
         <main id="main" className="flex min-h-0 flex-1 flex-col">
-          {bleed}
-          <div className={`${SHELL_WIDTH} flex min-h-0 flex-1 flex-col overflow-hidden pt-8 sm:pt-12`}>{children}</div>
+          <div className={cn(column, "flex min-h-0 flex-1 flex-col overflow-hidden pt-8 sm:pt-10")}>{children}</div>
         </main>
         {footer !== "none" && (
           <div className="hidden shrink-0 md:block">
-            <Footer variant={footer} backToTop={false} />
+            <Footer variant={footer} wide={wide} />
           </div>
         )}
         <DeferredClientUtilities />
@@ -35,18 +38,14 @@ export default function BaseLayout({ children, bleed, footer = "full", fit = fal
     )
   }
 
-  const compact = footer === "compact"
-  const page = (
-    <>
-      <RunningHead />
-      <main id="main" className={cn(compact && "flex-1")}>
-        {bleed}
-        <div className={`${SHELL_WIDTH} pb-16 pt-8 sm:pb-24 sm:pt-12`}>{children}</div>
+  return (
+    <div className="flex min-h-svh flex-col">
+      <RunningHead wide={wide} />
+      <main id="main" className="flex-1">
+        <div className={cn(column, "pb-24 pt-12 sm:pt-16")}>{children}</div>
       </main>
-      {footer !== "none" && <Footer variant={footer} />}
+      {footer !== "none" && <Footer variant={footer} wide={wide} />}
       <DeferredClientUtilities />
-    </>
+    </div>
   )
-  // The one-line colophon would float mid-window under a short page, so it is held to the bottom.
-  return compact ? <div className="flex min-h-svh flex-col">{page}</div> : page
 }

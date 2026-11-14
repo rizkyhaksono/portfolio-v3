@@ -27,7 +27,7 @@ export function JapaneseQuizTab() {
   return (
     <div className="space-y-8">
       <fieldset>
-        <legend className="text-small font-semibold text-foreground">Level</legend>
+        <legend className="text-small text-foreground">Level</legend>
         {levels.status === "loading" && !levels.data ? (
           <ToolLoading>Loading levels…</ToolLoading>
         ) : (
@@ -109,7 +109,7 @@ function Quiz({ level }: Readonly<{ level: string }>) {
   if (quiz.status === "error") return <ToolError onRetry={quiz.retry}>The {level} quiz did not load.</ToolError>
   // Loading unmounts the round, so each new set starts from a clean score.
   if (quiz.status === "loading" || !quiz.data) return <ToolLoading>Dealing {level} questions…</ToolLoading>
-  if (quiz.data.length === 0) return <p className="text-body text-muted-foreground">No questions for {level} yet.</p>
+  if (quiz.data.length === 0) return <StatusLine kind="empty">No questions for {level} yet.</StatusLine>
 
   return <QuizRound questions={quiz.data} onAgain={quiz.retry} />
 }
@@ -131,7 +131,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
         <>Keep practising. <span lang="ja">がんばって!</span></>
       )
     return (
-      <div role="status" className="space-y-4 border-t border-foreground pt-6">
+      <div role="status" className="space-y-4">
         <p className="text-numeral tabular-nums text-foreground">
           {score} of {total}
         </p>
@@ -165,8 +165,8 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
         <p className="text-caption tabular-nums text-muted-foreground">
           Question {index + 1} of {total}. {score} right so far.
         </p>
-        <span aria-hidden className="mt-2 block h-3 border border-input">
-          <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${((index + 1) / total) * 100}%` }} />
+        <span aria-hidden className="mt-2 block h-1.5 overflow-hidden rounded-full bg-muted">
+          <span className="block h-full rounded-full bg-foreground" style={{ width: `${((index + 1) / total) * 100}%` }} />
         </span>
       </div>
 
@@ -194,13 +194,13 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
                   disabled={answered}
                   onClick={() => setChoice(option)}
                   className={cn(
-                    "flex min-h-11 w-full items-center gap-3 border p-3 text-left text-body transition-colors",
+                    "flex min-h-11 w-full items-center gap-3 rounded-lg border p-3 text-left text-body transition-colors duration-ui ease-out",
                     picked && !answered ? "border-foreground bg-foreground text-background" : "border-input text-foreground",
                     !answered && !picked && "hover:bg-muted",
                     isAnswer && "border-foreground",
                   )}
                 >
-                  <span aria-hidden className="flex size-7 shrink-0 items-center justify-center border border-current text-small">
+                  <span aria-hidden className="flex size-7 shrink-0 items-center justify-center rounded-md border border-current text-small">
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span className={cn("flex-1", isWrongPick && "line-through")}>{option}</span>

@@ -1,10 +1,9 @@
 /**
- * Shared design-system class tokens for Portfolio v3 (Langit Malang).
+ * Shared layout and surface tokens for Portfolio v3 (Langit Malang).
  *
  * Page-level surfaces never cast a shadow:
- * - solid:  hairline frame on the card ground (Card / FeatureCard)
- * - glass:  retired, same as solid (no blur, no translucency)
- * - inset:  muted ground, no border, for nested rows and tiles
+ * - solid:  hairline frame on the card ground
+ * - inset:  muted ground, no border, for tiles and nested rows
  */
 
 const SOLID = "rounded-2xl border border-border bg-card"
@@ -24,13 +23,22 @@ export const SURFACE_PADDING = {
   cozy: "p-4",
 } as const
 
-/** The one page width every route shares (running head, pages, colophon, error page). */
-export const SHELL_WIDTH = "mx-auto w-full max-w-[76rem] px-[clamp(20px,4vw,48px)]"
+/** The reading column every visitor page shares: 36rem, centred on the page, text left-aligned inside it. */
+export const PROSE_WIDTH = "mx-auto w-full max-w-[calc(36rem+2.5rem)] px-5 sm:max-w-[calc(36rem+3rem)] sm:px-6"
 
-/** Section spacing used by PageSection / home blocks. */
+/** The wider column for app-like pages (/tools, /chat). */
+export const WIDE_WIDTH = "mx-auto w-full max-w-[calc(60rem+2.5rem)] px-5 sm:max-w-[calc(60rem+3rem)] sm:px-6"
+
+/** Images stay exactly as wide as the reading column on every page, so their edges line up with the text. */
+export const BREAKOUT = ""
+
+/** @deprecated Use PROSE_WIDTH; kept so older call sites keep the reading column. */
+export const SHELL_WIDTH = PROSE_WIDTH
+
+/** Section rhythm on visitor pages. */
 export const SECTION_SPACING = {
-  section: "mt-12 sm:mt-16",
-  sectionGap: "mt-3",
+  section: "mt-14",
+  sectionGap: "mt-4",
 } as const
 
 export type SurfaceVariant = keyof typeof SURFACE

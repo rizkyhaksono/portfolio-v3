@@ -4,37 +4,16 @@ import { InkLink } from "@/components/ui/ink-link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AuthTabs } from "./_components/auth-tabs"
 
-/** Static ruled stand-in while the tabs read `?tab=` on the client. */
+/** Grey stand-ins while the tabs read `?tab=` on the client. */
 function AuthTabsFallback() {
   return (
     <div aria-hidden>
-      <div className="h-11 border-b border-border" />
+      <Skeleton className="h-6 w-56 rounded-md" />
       <div className="mt-8 flex flex-col gap-6">
-        <Skeleton className="h-[4.5rem]" />
-        <Skeleton className="h-[4.5rem]" />
-        <Skeleton className="h-10" />
+        <Skeleton className="h-[4.5rem] rounded-lg" />
+        <Skeleton className="h-[4.5rem] rounded-lg" />
+        <Skeleton className="h-10 rounded-lg" />
       </div>
-    </div>
-  )
-}
-
-const ACCOUNT_USES = [
-  { title: "Write in the public chat", detail: "Post and reply under your own name." },
-] as const
-
-/** The reversed block beside the form: what an account is for. */
-function AccountUses() {
-  return (
-    <div>
-      <p className="text-h2 text-balance">One account for the whole site.</p>
-      <ul className="mt-6 border-t border-background/30">
-        {ACCOUNT_USES.map(({ title, detail }) => (
-          <li key={title} className="border-b border-background/30 py-4">
-            <p className="text-lead">{title}</p>
-            <p className="mt-1 text-small text-background/80">{detail}</p>
-          </li>
-        ))}
-      </ul>
     </div>
   )
 }
@@ -43,8 +22,7 @@ export default function AuthPage() {
   return (
     <AuthShell
       title="Your account"
-      standfirst="Sign in with your email or Google, or create an account."
-      panel={<AccountUses />}
+      description="One account for the whole site, so you can post and reply in the public chat under your own name."
       footer={
         <p>
           By continuing you agree to the <InkLink href="/legal/terms">terms of service</InkLink> and the{" "}

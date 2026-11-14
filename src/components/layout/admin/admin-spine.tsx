@@ -4,7 +4,6 @@ import { useState, type MouseEvent } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
-import { Logo } from "@/components/ui/logo"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -147,7 +146,6 @@ function SpineAccount({ user }: Readonly<{ user?: AdminUser }>) {
 function Masthead() {
   return (
     <Link href={HOME} className="flex min-h-[var(--head-h)] items-center gap-2.5 border-b border-foreground px-6 text-foreground">
-      <Logo variant="mini" className="size-8" />
       <span className="leading-tight">
         <span className="block text-[1.125rem]">Rizky Haksono</span>
         <span className="block text-caption text-muted-foreground">Admin</span>

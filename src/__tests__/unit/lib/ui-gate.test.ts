@@ -54,19 +54,7 @@ describe("UI gate", () => {
 
   it("R1c: no print-era identity classes", () => {
     const identity = /(?<![\w-])(?:speckle|bg-paper-grain|ink-grain|engraving|tail-piece|reading-hairline|article-rail|masthead|ws__w|plate-(?:paper|night|swap))(?![\w-])/
-    const allow = [
-      // Masthead, wordscroll and engraving go with the home and shell rewrite (PR2).
-      "src/app/globals.css",
-      "src/app/page.tsx",
-      "src/components/layout/base-layout.tsx",
-      "src/components/layout/footer.tsx",
-      "src/components/ui/engraving.tsx",
-      "src/components/ui/word-scroll.tsx",
-      "src/__tests__/components/ui/word-scroll.test.tsx",
-      // Tail-piece, rail and hairline go with the article rewrite (PR3).
-      "src/components/ui/article-shell.tsx",
-    ]
-    expect(offenders(identity, { allow, within: NOT_HISTORY })).toEqual([])
+    expect(offenders(identity, { within: NOT_HISTORY })).toEqual([])
   })
 
   it("R2: themes only through tokens, never dark: classes", () => {
@@ -82,20 +70,25 @@ describe("UI gate", () => {
   it("R4: sizes, tracking and radius come from the scale", () => {
     const arbitrary = /rounded-\[|text-\[\d+(?:\.\d+)?px\]|tracking-\[|(?<![\w-])uppercase(?![\w-])/
     const allow = [
-      // The admin tabs and sidebar are rebuilt in PR5; the head nav in PR2.
+      // The admin tabs and sidebar are rebuilt in the admin PR.
       "src/app/(admin)/admin/dashboard/_components/collection.tsx",
       "src/app/(admin)/admin/dashboard/analytics/_components/analytics-dashboard.tsx",
       "src/app/(admin)/admin/dashboard/feedback/page.tsx",
       "src/components/layout/admin/admin-spine.tsx",
-      "src/components/layout/nav-links.tsx",
     ]
     expect(offenders(arbitrary, { allow, within: /^src\//, skipComments: true })).toEqual([])
   })
 
-  it("R6: gradients and blur live only in globals.css, the sky and the head bar", () => {
+  it("R6: gradients and blur live only in globals.css and the footer sky", () => {
     const decoration = /gradient-to|bg-gradient|radial-gradient|linear-gradient|backdrop-blur/
-    const allow = ["src/app/globals.css", "src/components/ui/sky.tsx", "src/components/layout/running-head.tsx"]
+    const allow = ["src/app/globals.css", "src/components/ui/sky.tsx"]
     expect(offenders(decoration, { allow, within: /^src\//, skipComments: true })).toEqual([])
+  })
+
+  it("R8: nothing casts a shadow", () => {
+    // Floating layers are separated by a hairline border; the owner asked for no shadows anywhere.
+    const shadow = /(?<![\w-])(?:drop-)?shadow-(?!none(?![\w-]))[\w[]|box-shadow|boxShadow/
+    expect(offenders(shadow, { within: /^(?:src\/(?!.*globals\.css$)|tailwind\.config\.ts$)/, skipComments: true })).toEqual([])
   })
 
   it("R5: no motion libraries or attention loops", () => {

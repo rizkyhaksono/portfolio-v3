@@ -74,7 +74,7 @@ function Images() {
       {failed && <ToolError onRetry={generate}>The image did not load. Try again in a moment.</ToolError>}
 
       {picture ? (
-        <PlateFigure tone="color" className="w-fit max-w-full">
+        <PlateFigure className="w-fit max-w-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={picture.url} alt={`A random ${picture.category} image`} className="mx-auto h-auto max-h-[32rem] w-auto max-w-full" />
         </PlateFigure>
@@ -112,7 +112,7 @@ function Quotes() {
       {error && <ToolError>{error}</ToolError>}
 
       {quote ? (
-        <figure className="border-l-2 border-foreground pl-5">
+        <figure>
           <blockquote className="max-w-[60ch] text-lead text-foreground">&ldquo;{quote.content}&rdquo;</blockquote>
           <figcaption className="mt-3 text-small text-muted-foreground">
             {quote.character.name}, {quote.anime.name}

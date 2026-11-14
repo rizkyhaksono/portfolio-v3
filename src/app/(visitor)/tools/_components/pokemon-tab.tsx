@@ -93,7 +93,7 @@ export function PokemonTab() {
             {loading
               ? Array.from({ length: 12 }, (_, i) => (
                   <li key={i}>
-                    <Skeleton className="h-48" />
+                    <Skeleton className="h-48 rounded-2xl" />
                   </li>
                 ))
               : list.data?.data.map((p) => (
@@ -101,15 +101,13 @@ export function PokemonTab() {
                     <button
                       type="button"
                       onClick={() => openDetail(p.id)}
-                      className="flex h-48 w-full flex-col items-center gap-1 border border-border p-3 text-center transition-colors hover:border-foreground"
+                      className="flex h-48 w-full flex-col items-center gap-1 rounded-2xl bg-muted p-3 text-center transition-colors duration-ui ease-out hover:bg-border"
                     >
-                      <PlateFigure tone="color" className="w-20 shrink-0">
-                        <span className="relative block aspect-square w-full">
-                          {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
-                        </span>
-                      </PlateFigure>
+                      <span className="relative block aspect-square w-20 shrink-0">
+                        {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
+                      </span>
                       <span className="mt-1 text-caption tabular-nums text-muted-foreground">{numbered(p.id)}</span>
-                      <span className="w-full truncate text-small font-semibold text-foreground">{sentence(p.name)}</span>
+                      <span className="w-full truncate text-small text-foreground">{sentence(p.name)}</span>
                       <span className="w-full truncate text-caption text-muted-foreground">{sentence(p.types.join(", "))}</span>
                     </button>
                   </li>
@@ -149,14 +147,14 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
       </DialogHeader>
 
       {p.image && (
-        <PlateFigure tone="color" className="mx-auto w-40">
+        <PlateFigure className="mx-auto w-40">
           <div className="relative aspect-square w-full">
             <Image src={p.image} alt={p.name} fill sizes="160px" className="object-contain" unoptimized />
           </div>
         </PlateFigure>
       )}
 
-      <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-border pt-3 text-small">
+      <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 text-small">
         <dt className="text-muted-foreground">Types</dt>
         <dd className="text-foreground">{sentence(p.types.join(", "))}</dd>
         <dt className="text-muted-foreground">Height</dt>
@@ -176,8 +174,8 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
             <li key={key} className="grid grid-cols-[7.5rem_2.5rem_minmax(0,1fr)] items-center gap-3 py-1 text-small">
               <span className="text-muted-foreground">{STAT_LABELS[key] ?? key}</span>
               <span className="text-right tabular-nums text-foreground">{value}</span>
-              <span aria-hidden className="block h-3 border border-input">
-                <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${Math.min(100, (value / 200) * 100)}%` }} />
+              <span aria-hidden className="block h-1.5 overflow-hidden rounded-full bg-muted">
+                <span className="block h-full rounded-full bg-foreground" style={{ width: `${Math.min(100, (value / 200) * 100)}%` }} />
               </span>
             </li>
           ))}

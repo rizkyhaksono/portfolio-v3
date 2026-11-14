@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getProvinces, getCities, getDistricts, getVillages, searchPostalCode } from "@/services/visitor/postal-code"
 import { ToolError, useToolData } from "./tool-status"
@@ -138,7 +139,7 @@ function ByPlace() {
       )}
 
       {village && postal.status !== "error" && (
-        <div aria-live="polite" className="border-t border-foreground pt-4">
+        <div aria-live="polite">
           {postal.status === "loading" ? (
             <p className="text-caption text-muted-foreground">Looking up the postal code…</p>
           ) : postal.data?.[0] ? (
@@ -149,7 +150,7 @@ function ByPlace() {
               <p className="text-numeral tabular-nums text-foreground">{postal.data[0].postal}</p>
             </>
           ) : (
-            <p className="text-body text-muted-foreground">No postal code on file for {villageName ?? "this village"}.</p>
+            <StatusLine kind="empty">No postal code on file for {villageName ?? "this village"}.</StatusLine>
           )}
         </div>
       )}
@@ -222,7 +223,7 @@ function ByCode() {
               </LedgerList>
             </>
           ) : (
-            <p className="text-body text-muted-foreground">No village uses postal code {query}.</p>
+            <StatusLine kind="empty">No village uses postal code {query}.</StatusLine>
           )}
         </div>
       )}

@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Logo } from "@/components/ui/logo"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatusLine } from "@/components/ui/status-line"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -99,18 +98,18 @@ interface UserData {
 const LIGHT: CSSProperties = { backgroundColor: THEME_HEX.light.background, color: THEME_HEX.light.foreground }
 const DARK: CSSProperties = { backgroundColor: THEME_HEX.dark.background, color: THEME_HEX.dark.foreground }
 
-/** The mini logo printed in each theme's own ink: paper, night, or half of each. */
+/** A type sample in each theme's own colours: light, dark, or half of each. */
 function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
   return (
     <span aria-hidden className="relative block size-16 shrink-0 border border-border">
       {mode !== "dark" && (
         <span className="absolute inset-0 flex items-center justify-center" style={LIGHT}>
-          <Logo variant="mini" className="size-10" />
+          <span className="text-h1">Aa</span>
         </span>
       )}
       {mode !== "light" && (
         <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={DARK}>
-          <Logo variant="mini" className="size-10" />
+          <span className="text-h1">Aa</span>
         </span>
       )}
     </span>

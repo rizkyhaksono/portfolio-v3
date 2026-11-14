@@ -16,12 +16,11 @@ interface LegalDocumentProps extends Omit<ArticleShellProps, "rail" | "railLabel
   sections: LegalSection[]
 }
 
-/** Legal pages on the Article pattern: § numbered sections, their contents in the rail. */
+/** Legal pages on the Article pattern: § numbered sections, their contents in the "On this page" disclosure. */
 export function LegalDocument({ sections, ...shell }: Readonly<LegalDocumentProps>) {
   return (
     <ArticleShell
       {...shell}
-      railLabel="On this page"
       rail={
         <ol role="list" className="flex flex-col gap-2">
           {sections.map(({ id, title }, index) => (

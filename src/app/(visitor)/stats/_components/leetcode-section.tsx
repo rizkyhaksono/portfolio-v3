@@ -3,6 +3,7 @@ import { InkChart } from "@/components/ui/ink-chart"
 import { InkHeatmap, type InkHeatmapWeek } from "@/components/ui/ink-heatmap"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
+import { StatusLine } from "@/components/ui/status-line"
 import { HatchBar } from "@/app/_components/contribution/wakatime-progress"
 import { STATS_PROFILES, STATS_PROFILE_URLS } from "@/commons/constants/stats-profiles"
 import type { LcCalendarDay, LeetCodeStats } from "@/services/visitor/leetcode"
@@ -46,8 +47,28 @@ function Summary({ stats }: Readonly<{ stats: NonNullable<LeetCodeStats> }>) {
   )
 }
 
-/** LeetCode figures: submissions heatmap, contest rating, topics as hatch bars, recent solves. */
-export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable<LeetCodeStats> }>) {
+/** LeetCode figures: submissions heatmap, contest rating, topics as share bars, recent solves; a failed line without data. */
+export default function LeetCodeSection({ stats }: Readonly<{ stats: LeetCodeStats }>) {
+  const profile = (
+    <InkLink
+      href={STATS_PROFILE_URLS.leetcode(STATS_PROFILES.leetcode)}
+      external
+      event="stats-profile-open"
+      eventData={{ platform: "leetcode" }}
+      className="inline-flex min-h-11 items-center md:min-h-0"
+    >
+      Profile
+    </InkLink>
+  )
+
+  if (!stats) {
+    return (
+      <PageSection id="leetcode" heading={{ title: "LeetCode", aside: profile }}>
+        <StatusLine kind="failed">LeetCode did not answer just now, so its figures are missing.</StatusLine>
+      </PageSection>
+    )
+  }
+
   const weeks = calendarWeeks(stats.calendar)
   const submissions = stats.calendar.reduce((sum, day) => sum + day.count, 0)
   const contest = stats.contestHistory.filter((c) => c.date).map((c) => ({ x: c.date, y: c.rating }))
@@ -59,34 +80,22 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
   return (
     <PageSection
       id="leetcode"
-      heading={{
-        title: "LeetCode",
-        description: <Summary stats={stats} />,
-        children: (
-          <p className="text-body">
-            <InkLink
-              href={STATS_PROFILE_URLS.leetcode(STATS_PROFILES.leetcode)}
-              external
-              event="stats-profile-open"
-              eventData={{ platform: "leetcode" }}
-              className="inline-flex min-h-11 items-center md:min-h-0"
-            >
-              The profile on LeetCode
-            </InkLink>
-          </p>
-        ),
-      }}
-      contentClassName="mt-8 space-y-12"
+      heading={{ title: "LeetCode", description: <Summary stats={stats} />, aside: profile }}
+      contentClassName="mt-6 space-y-10"
     >
-      {submissions > 0 && (
-        <div>
-          <h3 className="text-h4 text-foreground">Submissions, the last year</h3>
-          <p className="mt-1 text-small text-muted-foreground">
-            A streak of {n(stats.streak)} {stats.streak === 1 ? "day" : "days"} and {n(stats.totalActiveDays)} active days in all.
-          </p>
-          <InkHeatmap weeks={weeks} unit={["submission", "submissions"]} className="mt-4" />
-        </div>
-      )}
+      <div>
+        <h3 className="text-h4 text-foreground">Submissions, the last year</h3>
+        {submissions > 0 ? (
+          <>
+            <p className="mt-1 text-small text-muted-foreground">
+              A streak of {n(stats.streak)} {stats.streak === 1 ? "day" : "days"} and {n(stats.totalActiveDays)} active days in all.
+            </p>
+            <InkHeatmap weeks={weeks} unit={["submission", "submissions"]} className="mt-4" />
+          </>
+        ) : (
+          <StatusLine kind="empty" className="mt-1">No submissions in the last year.</StatusLine>
+        )}
+      </div>
 
       {contest.length > 1 && (
         <div>
@@ -95,35 +104,35 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
         </div>
       )}
 
-      <div className="grid gap-12 md:grid-cols-2">
-        {tags.length > 0 && (
-          <div>
-            <h3 className="text-h4 text-foreground">Solved by topic</h3>
-            <ul role="list" className="mt-3 border-t border-foreground pt-3">
-              {tags.map((t) => (
-                <HatchBar key={t.tagName} name={t.tagName} percent={(t.problemsSolved / maxTag) * 100} value={n(t.problemsSolved)} />
-              ))}
-            </ul>
-            {languages.length > 0 && <p className="mt-4 text-small text-muted-foreground">Written in {list.format(languages)}.</p>}
-          </div>
-        )}
+      {tags.length > 0 && (
+        <div>
+          <h3 className="text-h4 text-foreground">Solved by topic</h3>
+          <ul role="list" className="mt-2">
+            {tags.map((t) => (
+              <HatchBar key={t.tagName} name={t.tagName} percent={(t.problemsSolved / maxTag) * 100} value={n(t.problemsSolved)} />
+            ))}
+          </ul>
+          {languages.length > 0 && <p className="mt-3 text-small text-muted-foreground">Written in {list.format(languages)}.</p>}
+        </div>
+      )}
 
-        {stats.recent.length > 0 && (
-          <div>
-            <h3 className="text-h4 text-foreground">Recently solved</h3>
-            <LedgerList className="mt-3">
-              {stats.recent.slice(0, 6).map((r, i) => (
-                <LedgerRow
-                  key={`${r.titleSlug}-${i}`}
-                  href={`https://leetcode.com/problems/${r.titleSlug}/`}
-                  external
-                  title={r.title}
-                  titleAs="h4"
-                  meta={solvedOn(r.timestamp)}
-                />
-              ))}
-            </LedgerList>
-          </div>
+      <div>
+        <h3 className="text-h4 text-foreground">Recently solved</h3>
+        {stats.recent.length > 0 ? (
+          <LedgerList className="mt-2">
+            {stats.recent.slice(0, 6).map((r, i) => (
+              <LedgerRow
+                key={`${r.titleSlug}-${i}`}
+                href={`https://leetcode.com/problems/${r.titleSlug}/`}
+                external
+                title={r.title}
+                titleAs="h4"
+                meta={solvedOn(r.timestamp)}
+              />
+            ))}
+          </LedgerList>
+        ) : (
+          <StatusLine kind="empty" className="mt-1">No accepted solutions to show yet.</StatusLine>
         )}
       </div>
 

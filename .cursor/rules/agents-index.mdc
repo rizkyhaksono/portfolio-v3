@@ -20,7 +20,7 @@ Canonical entry: **`AGENTS.md`** (repo root).
 Human-readable design system (required reading for UI work):
 
 - `docs/ui/README.md`: index, the rules in one screen, the UI gate
-- `docs/ui/design-system.md`: tokens, Onest and the type scale, radii, the sky, motion
+- `docs/ui/design-system.md`: tokens, Onest and the type scale, radii, the footer sky, motion
 - `docs/ui/surfaces.md`: page, tile, frame, float
 - `docs/ui/page-shell.md`: BaseLayout, header, footer, page patterns
 - `docs/ui/components.md`: primitives, copy, Umami events

@@ -28,18 +28,19 @@ const STATUS_SQUARE = {
 } as const
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
   VariantProps<typeof badgeVariants> {
   /** 8px square before the word: filled = on/live, outline = off, dashed = draft/archived. */
   status?: keyof typeof STATUS_SQUARE
 }
 
+// A span, so a badge can sit inside a line of text (a <div> in a <p> breaks hydration).
 function Badge({ className, variant, status, children, ...props }: BadgeProps) {
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props}>
+    <span className={cn(badgeVariants({ variant }), className)} {...props}>
       {status && <span aria-hidden className={cn("size-2 shrink-0 border border-current", STATUS_SQUARE[status])} />}
       {children}
-    </div>
+    </span>
   )
 }
 

@@ -125,7 +125,7 @@ export function IeltsTab() {
           onClick={() => setFlipped((f) => !f)}
           onKeyDown={onCardKey}
           aria-describedby="ielts-hint"
-          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-border p-5 text-center transition-colors hover:border-foreground sm:p-8"
+          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 rounded-2xl bg-muted p-5 text-center transition-colors duration-ui ease-out hover:bg-border sm:p-8"
         >
           {flipped ? (
             <span className="flex flex-col gap-3">
@@ -150,7 +150,7 @@ export function IeltsTab() {
           )}
         </button>
       ) : (
-        <p className="flex min-h-[16rem] items-center justify-center border border-border text-body text-muted-foreground">No words in this topic.</p>
+        <p className="flex min-h-[16rem] items-center justify-center rounded-2xl bg-muted text-body text-muted-foreground">No words in this topic.</p>
       )}
       <p id="ielts-hint" className="text-caption text-muted-foreground">
         <span className="[@media(pointer:coarse)]:hidden">

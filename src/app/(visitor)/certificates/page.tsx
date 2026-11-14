@@ -2,6 +2,7 @@ import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { getLinkedinCertifications } from "@/services/visitor/linkedin"
 import { CertificationRow } from "@/app/_components/certification/certification-card"
 import { LedgerList } from "@/components/ui/ledger"
+import { PageHeader } from "@/components/ui/page-header"
 import { StatusLine } from "@/components/ui/status-line"
 
 export const revalidate = 3600
@@ -25,24 +26,16 @@ export default async function CertificatesPage() {
   for (const cert of certifications) years.set(yearOf(cert), [...(years.get(yearOf(cert)) ?? []), cert])
 
   return (
-    <div>
-      <header className="pb-8">
-        <h1 className="text-h1 text-balance text-foreground">Certificates</h1>
-        {certifications.length > 0 && (
-          <p className="mt-4 text-caption tabular-nums text-muted-foreground">
-            {certifications.length.toLocaleString("en")} certificates and courses on record, newest first.
-          </p>
-        )}
-      </header>
-      <div aria-hidden className="border-t border-foreground" />
+    <>
+      <PageHeader
+        title="Certificates"
+        description={certifications.length > 0 && `${certifications.length.toLocaleString("en")} certificates and courses on record, newest first.`}
+      />
 
       {certifications.length === 0 ? (
-        <StatusLine kind="failed" className="mt-8">
-          The record could not be loaded just now. Try again in a few minutes.
-        </StatusLine>
+        <StatusLine kind="failed">The record could not be loaded just now. Try again in a few minutes.</StatusLine>
       ) : (
-        // The head rule tops the first year, so its own top rule would stack under it.
-        <div className="mt-8 [&>:first-child]:border-t-0">
+        <div>
           {[...years].map(([year, rows]) => (
             <LedgerList key={year} marker={<h2>{year}</h2>}>
               {rows.map((cert) => (
@@ -52,6 +45,6 @@ export default async function CertificatesPage() {
           ))}
         </div>
       )}
-    </div>
+    </>
   )
 }

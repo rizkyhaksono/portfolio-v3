@@ -13,7 +13,7 @@ import { UmamiBootstrapScript } from "@/components/layout/umami-bootstrap-script
 import { THEME_HEX } from "@/lib/theme-hex"
 import "./globals.css"
 
-// Onest only (OFL): one variable family for the site, the admin and the cards.
+// Onest only (OFL): one clean sans in the spirit of Apple's SF, for the site, the admin and the cards.
 const fontSans = Onest({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
