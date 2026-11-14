@@ -59,7 +59,7 @@ Every visitor page is laid out like a Notion workspace: a grey page tree on the 
 
 ### Page title
 
-Every page opens with `PageHeader` (or `ArticleShell` on article pages): the title at `text-title sm:text-display` (32px, 40px from `sm`, weight 700), an optional muted description, and an optional slot for `Properties`, view tabs or a feed link. One per page.
+Every page opens with `PageHeader` (or `ArticleShell` on article pages): the title at `text-title sm:text-display` (28px on phones, 40px from `sm`, weight 700), the description `small` on phones and `body` from `sm`, an optional muted description, and an optional slot for `Properties`, view tabs or a feed link. One per page.
 
 ### Closing line
 

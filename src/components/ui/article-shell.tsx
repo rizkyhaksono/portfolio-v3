@@ -64,7 +64,7 @@ export function ArticleShell({
 
       <header className="border-b border-border pb-6">
         <h1 className="text-title text-balance text-foreground sm:text-display">{title}</h1>
-        {standfirst && <p className="mt-3 text-pretty text-body text-muted-foreground">{standfirst}</p>}
+        {standfirst && <p className="mt-2 text-pretty text-small text-muted-foreground sm:mt-3 sm:text-body">{standfirst}</p>}
         {properties && properties.length > 0 && <Properties items={properties} className="mt-5" />}
         {dateline && <p className="mt-3 text-small tabular-nums text-muted-foreground">{dateline}</p>}
         {meta && <div className="mt-2 flex flex-col gap-1 text-small text-muted-foreground">{meta}</div>}

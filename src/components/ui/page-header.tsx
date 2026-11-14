@@ -15,7 +15,7 @@ export function PageHeader({ title, description, children, className }: Readonly
   return (
     <header className={cn("mb-8", className)}>
       <h1 className="text-title text-balance text-foreground sm:text-display">{title}</h1>
-      {description && <p className="mt-3 text-pretty text-body text-muted-foreground">{description}</p>}
+      {description && <p className="mt-2 text-pretty text-small text-muted-foreground sm:mt-3 sm:text-body">{description}</p>}
       {children && <div className="mt-5">{children}</div>}
     </header>
   )

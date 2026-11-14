@@ -11,7 +11,8 @@ interface SectionHeadingProps {
   children?: React.ReactNode
 }
 
-const TITLE_SIZE = { h1: "text-h1", h2: "text-h2", h3: "text-h3" } as const
+// One step smaller on phones, so section titles do not crowd a 375px screen.
+const TITLE_SIZE = { h1: "text-h2 sm:text-h1", h2: "text-h3 sm:text-h2", h3: "text-h4 sm:text-h3" } as const
 
 /** A small section label in the reading column, with an optional link on its right. */
 export function SectionHeading({ title, description, as = "h2", className, titleClassName, aside, children }: Readonly<SectionHeadingProps>) {
@@ -23,7 +24,7 @@ export function SectionHeading({ title, description, as = "h2", className, title
         <Tag className={cn("text-balance text-foreground", TITLE_SIZE[as], titleClassName)}>{title}</Tag>
         {aside && <div className="shrink-0 text-small text-muted-foreground">{aside}</div>}
       </div>
-      {description && <p className="text-body text-muted-foreground">{description}</p>}
+      {description && <p className="text-small text-muted-foreground sm:text-body">{description}</p>}
       {children}
     </div>
   )

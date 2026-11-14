@@ -40,7 +40,7 @@ const firstSentence = (text: string) => plainText(text).split(/(?<=[.!?])\s/)[0]
 function Section({ id, title, children }: Readonly<{ id: string; title: string; children: ReactNode }>) {
   return (
     <section aria-labelledby={id} className="mt-12">
-      <h2 id={id} className="text-h2 text-foreground">
+      <h2 id={id} className="text-h3 text-foreground sm:text-h2">
         {title}
       </h2>
       <div className="mt-3">{children}</div>

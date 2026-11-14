@@ -57,6 +57,11 @@ const config = {
 					strong: 'hsl(var(--foreground) / 0.1)'
 				},
 				// Langit Malang: the home cover and the text selection only.
+				tip: {
+					DEFAULT: 'hsl(var(--tip) / <alpha-value>)',
+					foreground: 'hsl(var(--tip-foreground) / <alpha-value>)',
+					border: 'hsl(var(--tip-border) / <alpha-value>)'
+				},
 				sky: {
 					DEFAULT: 'hsl(var(--sky) / <alpha-value>)',
 					wash: 'hsl(var(--sky-wash) / <alpha-value>)'
@@ -75,7 +80,8 @@ const config = {
 				h3: ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
 				h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600', letterSpacing: '-0.01em' }],
 				h1: ['1.875rem', { lineHeight: '2.375rem', fontWeight: '600', letterSpacing: '-0.015em' }],
-				title: ['2rem', { lineHeight: '2.5rem', fontWeight: '700', letterSpacing: '-0.02em' }],
+				// Page titles on phones (28px); `sm:text-display` takes over from 640px.
+				title: ['1.75rem', { lineHeight: '2.25rem', fontWeight: '700', letterSpacing: '-0.02em' }],
 				display: ['2.5rem', { lineHeight: '3rem', fontWeight: '700', letterSpacing: '-0.02em' }],
 				numeral: ['2rem', { lineHeight: '2.5rem', fontWeight: '600', letterSpacing: '-0.015em' }]
 			},

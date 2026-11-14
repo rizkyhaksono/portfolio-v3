@@ -96,7 +96,7 @@ The `fontSize` keys in `tailwind.config.ts`, on Notion's scale: 14px for UI (sid
 | `h3` | 20 / 28 | 600 | Sheet and dialog titles |
 | `h2` | 24 / 32, -0.01em | 600 | Section headings on a page ("Projects", "Writing"), the auth title |
 | `h1` | 30 / 38, -0.015em | 600 | A heading 1 block |
-| `title` | 32 / 40, -0.02em | 700 | Page titles on phones |
+| `title` | 28 / 36, -0.02em | 700 | Page titles on phones |
 | `display` | 40 / 48, -0.02em | 700 | Page titles from `sm` (`text-title sm:text-display`) |
 | `numeral` | 32 / 40, -0.015em | 600 | Figures on `/stats` and the admin, with `tabular-nums` |
 
@@ -134,7 +134,7 @@ Notion's radii. `--radius` is 10px.
 
 ## Shadow, blur and gradients
 
-- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast and the hover tip are inverted slabs (`bg-foreground text-background`) with no border. The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
+- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast is an inverted slab (`bg-foreground text-background`); the hover tip is Notion's dark tooltip (`bg-tip text-tip-foreground`, near-black in light, a raised grey with a `border-tip-border` hairline in dark, never a light box). The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
 - **No blur.** The top bar is opaque `bg-background`; nothing is translucent. Scrims are a fixed `--scrim` fill, never blurred.
 - **No gradients.** None is left in the code: no gradient text, buttons, borders or backgrounds. The gate's R6 allowlist still names `globals.css` and the deleted `sky.tsx`; that is not a licence to add one.
 

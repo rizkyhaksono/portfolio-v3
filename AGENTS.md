@@ -96,7 +96,7 @@ One sans, **Onest** (variable, OFL), loaded once with `next/font/google` in `src
 | `h3` | 20 / 28 | 600 | Sheet and dialog titles |
 | `h2` | 24 / 32 | 600 | Section headings ("Projects", "Writing"), the auth title |
 | `h1` | 30 / 38 | 600 | A heading 1 block |
-| `title` | 32 / 40 | 700 | Page titles on phones |
+| `title` | 28 / 36 | 700 | Page titles on phones |
 | `display` | 40 / 48 | 700 | Page titles from `sm` (`text-title sm:text-display`) |
 | `numeral` | 32 / 40 | 600 | Figures on `/stats` and the admin |
 
@@ -178,7 +178,7 @@ Shared details agents trip on:
 
 - Primary buttons are ink (`bg-foreground text-background`), 6px, 32px tall; fields are 36px, 6px, with a 3:1 `border-input` (firmer than Notion on purpose, WCAG 1.4.11).
 - Nav and row icons come only from `SECTION_ICONS` (`src/components/layout/section-icons.tsx`); nav only from `src/commons/constants/navigation-menu.ts`.
-- Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`), an inverted slab. Never the native `title` attribute.
+- Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`), Notion's dark tooltip (`bg-tip`, `text-tip-foreground`, a `border-tip-border` hairline in dark), fading in over 100ms. Never the native `title` attribute.
 - Generated cards: build URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes.
 - `favicon.ico` must stay at `src/app/favicon.ico`: the container healthcheck fetches `/favicon.ico`.
 

@@ -210,7 +210,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
         return (
           <TabsContent key={id} value={id} className="mt-12">
             <section aria-labelledby={`${id}-title`}>
-              <h2 id={`${id}-title`} className="flex items-center gap-2 text-h2 text-balance text-foreground">
+              <h2 id={`${id}-title`} className="flex items-center gap-2 text-h3 text-balance text-foreground sm:text-h2">
                 <BookOpen aria-hidden strokeWidth={1.5} className="size-6 shrink-0" />
                 {courseTitle(id)}
               </h2>
