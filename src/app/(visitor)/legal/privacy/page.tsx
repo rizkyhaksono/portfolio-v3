@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { CalendarDays } from "lucide-react"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { LegalDocument } from "@/components/ui/legal-document"
 import { InkLink } from "@/components/ui/ink-link"
 import { getMetadataBaseUrl } from "@/lib/site-url"
@@ -154,7 +153,7 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalDocument
       title="Privacy policy"
-      icon={<SectionIcon href="/legal/privacy" />}
+
       properties={[{ label: "Last updated", icon: <CalendarDays aria-hidden />, value: <time dateTime="2026-10-19">19 October 2026</time> }]}
       next={{ href: "/legal/terms", title: "Terms of service" }}
       sections={sections}

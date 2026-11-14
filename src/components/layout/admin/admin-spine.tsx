@@ -78,12 +78,6 @@ export const ADMIN_PAGES: AdminPage[] = GROUPS.flatMap((group) => group.items)
 export const adminPageFor = (pathname: string) =>
   [...ADMIN_PAGES].sort((a, b) => b.href.length - a.href.length).find((page) => pathname.startsWith(page.href)) ?? ADMIN_PAGES[0]
 
-/** The page's 56px icon for its PageHeader, from the same map as the sidebar. */
-export function AdminPageIcon({ href }: Readonly<{ href: string }>) {
-  const Icon = ADMIN_PAGES.find((page) => page.href === href)?.icon ?? LayoutDashboard
-  return <Icon aria-hidden strokeWidth={1.25} />
-}
-
 const isCurrent = (pathname: string, href: string) => (href === HOME ? pathname === HOME : pathname.startsWith(href))
 
 // The visitor sidebar's row: 28px from lg (44px below), a 16px icon, grey text that inks and tints on hover and when current.

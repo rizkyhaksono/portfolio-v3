@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { GallerySkeleton, GroupLabelSkeleton, ListSkeleton, PageLoading } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -7,7 +6,7 @@ export default function Loading() {
   return (
     <PageLoading
       label="Loading the posts…"
-      icon={<SectionIcon href="/blog" />}
+
       title="Writing"
       description
       headerExtra={

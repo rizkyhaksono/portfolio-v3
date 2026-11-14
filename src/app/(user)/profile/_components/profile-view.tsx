@@ -66,12 +66,7 @@ export function ProfileView({ profile }: Readonly<{ profile: ProfileData }>) {
         </PlateFigure>
       )}
       <PageHeader
-        icon={
-          <Avatar className="size-16">
-            {portrait && <AvatarImage src={portrait} alt="" referrerPolicy="no-referrer" className="object-cover" />}
-            <AvatarFallback className="bg-tint-strong text-h3">{initials(profile.name)}</AvatarFallback>
-          </Avatar>
-        }
+
         title={<span className="[overflow-wrap:anywhere]">{profile.name}</span>}
         description={profile.headline || undefined}
       >

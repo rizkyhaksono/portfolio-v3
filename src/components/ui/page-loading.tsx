@@ -35,8 +35,6 @@ export function LoadingStatus({ children }: Readonly<{ children: ReactNode }>) {
 interface PageLoadingProps {
   /** Read out to screen readers, for example "Loading the posts…". */
   label: string
-  /** The page's own icon (`<SectionIcon href=… />`): it is known, so it shows as is. */
-  icon?: ReactNode
   /** The route's own h1, so the head is in place before the data arrives. */
   title: string
   /** Fixed text shows as is; `true` stands in a grey line for a description that comes with the data. */
@@ -48,12 +46,11 @@ interface PageLoadingProps {
   className?: string
 }
 
-/** A route's `loading.tsx` as a Notion page: the real icon and title, then grey blocks in the page's own shapes. */
-export function PageLoading({ label, icon, title, description, headerExtra, children, className }: Readonly<PageLoadingProps>) {
+/** A route's `loading.tsx` as a Notion page: the real title, then grey blocks in the page's own shapes. */
+export function PageLoading({ label, title, description, headerExtra, children, className }: Readonly<PageLoadingProps>) {
   return (
     <div aria-busy="true" className={className}>
       <PageHeader
-        icon={icon}
         title={title}
         description={
           description === true ? (
@@ -132,23 +129,20 @@ export function ListSkeleton({ rows = 5, className }: Readonly<{ rows?: number; 
 
 interface ArticleLoadingProps {
   label: string
-  /** The page icon, when the article has one (roadmap lessons). */
-  icon?: ReactNode
   /** The cover picture's shape, when the article usually has one ("aspect-[16/10]"). */
   cover?: string
   /** Property names the article always shows, with their icons; the values stand in as grey bars. */
   properties?: { label: string; icon: ReactNode }[]
 }
 
-/** `ArticleShell` in grey: cover, icon, title, standfirst, property rows, the hairline, then the text. */
-export function ArticleLoading({ label, icon, cover, properties = [] }: Readonly<ArticleLoadingProps>) {
+/** `ArticleShell` in grey: cover, title, standfirst, property rows, the hairline, then the text. */
+export function ArticleLoading({ label, cover, properties = [] }: Readonly<ArticleLoadingProps>) {
   return (
     <div aria-busy="true">
       <LoadingStatus>{label}</LoadingStatus>
       <div aria-hidden>
         {cover && <Skeleton className={cn("mb-10 w-full rounded-lg", cover)} />}
         <div className="border-b border-border pb-6">
-          {icon && <div className="mb-4 text-foreground [&>svg]:size-14 [&>svg]:stroke-[1.25]">{icon}</div>}
           <Line line="h-10 sm:h-12" bar="h-8 w-11/12 sm:h-9" />
           <Line line="h-10 sm:h-12" bar="h-8 w-1/2 sm:h-9" />
           <Line line="mt-3 h-6" bar="h-4 w-4/5" />

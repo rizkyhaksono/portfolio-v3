@@ -62,7 +62,7 @@ export default async function RoadmapLessonPage({ params }: Readonly<Props>) {
   return (
     <ArticleShell
       className={FADE_IN}
-      icon={<FileText />}
+
       title={meta.title}
       standfirst={meta.description}
       properties={properties}

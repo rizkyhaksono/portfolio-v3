@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { GroupLabelSkeleton, ListSkeleton, PageLoading, TextSkeleton } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -7,7 +6,7 @@ export default function Loading() {
   return (
     <PageLoading
       label="Loading the roadmap…"
-      icon={<SectionIcon href="/roadmap" />}
+
       title="Roadmap"
       description="Learning paths from first principles to advanced practice. Your progress stays in this browser."
     >

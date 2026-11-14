@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { PageLoading } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -15,7 +14,7 @@ function Field({ tall }: Readonly<{ tall?: boolean }>) {
 /** Shown while the form's profile loads (without it the profile page's skeleton stood in): the head, the cover, the fields. */
 export default function Loading() {
   return (
-    <PageLoading label="Loading your profile…" icon={<SectionIcon href="/profile" />} title="Edit your profile">
+    <PageLoading label="Loading your profile…" title="Edit your profile">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <Skeleton className="mb-1.5 h-3 w-24" />

@@ -6,7 +6,6 @@ import BaseLayout from "@/components/layout/base-layout"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badge"
 import { StatusLine } from "@/components/ui/status-line"
-import { SectionIcon } from "@/components/layout/section-icons"
 
 export const metadata: Metadata = {
   title: "Changelog | Rizky Haksono",
@@ -24,7 +23,7 @@ export default function ChangelogPage() {
   return (
     <BaseLayout>
       <PageHeader
-        icon={<SectionIcon href="/changelog" />}
+
         title="Changelog"
         description={
           <>

@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { PageHeader } from "@/components/ui/page-header"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { StatStrip, type StatItem } from "@/components/ui/stat-strip"
 import { FADE_IN } from "@/components/ui/page-loading"
 import ContributionSection from "@/app/_components/contribution"
@@ -46,7 +45,7 @@ export default async function StatsPage() {
 
   return (
     <>
-      <PageHeader icon={<SectionIcon href="/stats" />} title="Stats" description="Readers, status and practice figures, refreshed every fifteen minutes." />
+      <PageHeader title="Stats" description="Readers, status and practice figures, refreshed every fifteen minutes." />
 
       <div className={FADE_IN}>
         {strip.length > 0 && <StatStrip items={strip} className="sm:grid-cols-2" />}

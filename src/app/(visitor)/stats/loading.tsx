@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { ListSkeleton, PageLoading } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -12,7 +11,7 @@ export default function Loading() {
   return (
     <PageLoading
       label="Loading the figures…"
-      icon={<SectionIcon href="/stats" />}
+
       title="Stats"
       description="Readers, status and practice figures, refreshed every fifteen minutes."
     >

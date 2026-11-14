@@ -1,7 +1,6 @@
 import ChatClient from "./client"
 import { getInitialMessages, getCurrentUser } from "@/services/visitor/chat"
 import { Button } from "@/components/ui/button"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { PageHeader } from "@/components/ui/page-header"
 import { FADE_IN } from "@/components/ui/page-loading"
 import { StatusLine } from "@/components/ui/status-line"
@@ -14,7 +13,7 @@ export default async function ChatPage() {
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col">
       <PageHeader
-        icon={<SectionIcon href="/chat" />}
+
         title="Chat"
         description="A public room: say hello, ask a question or answer someone. Times are Jakarta time."
         className="mb-6 shrink-0"

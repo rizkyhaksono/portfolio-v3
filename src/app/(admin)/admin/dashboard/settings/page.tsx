@@ -22,7 +22,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatDay } from "@/components/layout/admin/admin-format"
-import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { switchTheme } from "@/components/layout/theme-toggle"
 import { THEME_HEX } from "@/lib/theme-hex"
 import {
@@ -84,6 +83,9 @@ const TIMEZONES = [
   ["Europe/London", "London"],
 ] as const
 
+/** The same picture the admin sidebar shows: an uploaded portrait first, then the sign-in one. */
+const portraitOf = (user: UserData) => user.avatarUrl ?? user.iconUrl ?? user.image
+
 interface UserData {
   id: string
   name: string
@@ -92,6 +94,8 @@ interface UserData {
   location?: string
   image?: string
   avatarUrl?: string
+  /** Where a Google sign-in keeps its picture; the sidebar reads it too (dashboard/layout.tsx). */
+  iconUrl?: string
   role?: string
   createdAt?: string
   emailVerified?: boolean
@@ -126,7 +130,7 @@ function AccountIdentity({ user, providers, children }: Readonly<{ user: UserDat
     <section aria-labelledby="account-name" className="max-w-2xl">
       <div className="flex items-center gap-4">
         <Avatar className="size-14">
-          {(user.avatarUrl ?? user.image) && <AvatarImage src={user.avatarUrl ?? user.image} alt="" referrerPolicy="no-referrer" />}
+          {portraitOf(user) && <AvatarImage src={portraitOf(user)} alt="" referrerPolicy="no-referrer" />}
           <AvatarFallback className="text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
@@ -257,7 +261,7 @@ export default function AdminSettingsPage() {
     }
   }
 
-  const header = <PageHeader icon={<AdminPageIcon href="/admin/dashboard/settings" />} title="Settings" description="Your account, what the bell counts, and how the admin looks." />
+  const header = <PageHeader title="Settings" description="Your account, what the bell counts, and how the admin looks." />
 
   if (state === "loading") {
     return (

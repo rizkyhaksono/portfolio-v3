@@ -13,8 +13,6 @@ interface ArticleLink {
 export interface ArticleShellProps {
   /** The page `h1`. */
   title: React.ReactNode
-  /** Notion's page icon above the title (`<SectionIcon href=… />`). */
-  icon?: React.ReactNode
   /** One muted line under the title. */
   standfirst?: React.ReactNode
   /** Notion's page properties under the title: Published, Reading time, Source, Tags. */
@@ -29,7 +27,7 @@ export interface ArticleShellProps {
   rail?: React.ReactNode
   /** Summary of the contents toggle. */
   railLabel?: string
-  /** The picture at the top of the page, above the icon and title (a post's cover, a project's screenshot). */
+  /** The picture at the top of the page, above the title (a post's cover, a project's screenshot). */
   cover?: React.ReactNode
   /** After the text, before previous / next (comments, claps). */
   footer?: React.ReactNode
@@ -41,12 +39,11 @@ export interface ArticleShellProps {
 }
 
 /**
- * Article pattern, as a Notion page (server, no cookies): the picture, the icon and the 40px title, the page's
+ * Article pattern, as a Notion page (server, no cookies): the picture and the 40px title, the page's
  * properties, a hairline, the text, then previous / next.
  */
 export function ArticleShell({
   title,
-  icon,
   standfirst,
   properties,
   dateline,
@@ -66,11 +63,6 @@ export function ArticleShell({
       {cover && <div className="mb-10">{cover}</div>}
 
       <header className="border-b border-border pb-6">
-        {icon && (
-          <div aria-hidden className="mb-4 text-foreground [&>svg]:size-14 [&>svg]:stroke-[1.25]">
-            {icon}
-          </div>
-        )}
         <h1 className="text-title text-balance text-foreground sm:text-display">{title}</h1>
         {standfirst && <p className="mt-3 text-pretty text-body text-muted-foreground">{standfirst}</p>}
         {properties && properties.length > 0 && <Properties items={properties} className="mt-5" />}

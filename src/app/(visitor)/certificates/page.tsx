@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/ui/page-header"
 import { FADE_IN } from "@/components/ui/page-loading"
 import { StatusLine } from "@/components/ui/status-line"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { cn } from "@/lib/utils"
 
 export const revalidate = 3600
@@ -32,7 +31,7 @@ export default async function CertificatesPage() {
   return (
     <>
       <PageHeader
-        icon={<SectionIcon href="/certificates" />}
+
         title="Certificates"
         description={certifications.length > 0 && `${certifications.length.toLocaleString("en")} certificates and courses on record, newest first.`}
       />

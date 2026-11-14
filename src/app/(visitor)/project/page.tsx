@@ -1,6 +1,5 @@
 import { getAllProject } from "@/services/visitor/project"
 import { media_socials } from "@/commons/constants/contact"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { InkLink } from "@/components/ui/ink-link"
 import { Gallery, MediaCard } from "@/components/ui/media-card"
 import { PageHeader } from "@/components/ui/page-header"
@@ -65,12 +64,11 @@ function ProjectGroup({ id, label, projects, lead }: Readonly<{ id: string; labe
 export default async function ProjectPage() {
   // A thrown fetch shows the failed line; Supabase errors already come back as an empty list.
   const projects = await getAllProject().catch(() => null)
-  const icon = <SectionIcon href="/project" />
 
   if (!projects) {
     return (
       <div>
-        <PageHeader icon={icon} title="Projects" />
+        <PageHeader title="Projects" />
         <StatusLine kind="failed">
           The projects did not load just now. Try again in a few minutes, or browse the code on{" "}
           <span className="whitespace-nowrap">
@@ -91,7 +89,7 @@ export default async function ProjectPage() {
   return (
     <div>
       <PageHeader
-        icon={icon}
+
         title="Projects"
         description={projects.length > 0 ? `${projects.length.toLocaleString("en")} projects. The hand-picked ones first.` : undefined}
       />
