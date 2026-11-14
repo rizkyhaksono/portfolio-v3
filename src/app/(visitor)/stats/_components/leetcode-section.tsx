@@ -1,3 +1,4 @@
+import { SquareCode } from "lucide-react"
 import { PageSection } from "@/components/ui/page-section"
 import { InkChart } from "@/components/ui/ink-chart"
 import { InkHeatmap, type InkHeatmapWeek } from "@/components/ui/ink-heatmap"
@@ -125,6 +126,7 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: LeetCodeSta
                 key={`${r.titleSlug}-${i}`}
                 href={`https://leetcode.com/problems/${r.titleSlug}/`}
                 external
+                icon={<SquareCode />}
                 title={r.title}
                 titleAs="h4"
                 meta={solvedOn(r.timestamp)}

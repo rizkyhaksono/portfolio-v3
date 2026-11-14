@@ -35,12 +35,12 @@ const sheetVariants = cva(
   {
     variants: {
       side: {
-        top: "inset-x-0 top-0 rounded-b-2xl border-b data-[state=closed]:slide-out-to-top-1 data-[state=open]:slide-in-from-top-1",
+        top: "inset-x-0 top-0 rounded-b-lg border-b data-[state=closed]:slide-out-to-top-1 data-[state=open]:slide-in-from-top-1",
         bottom:
-          "inset-x-0 bottom-0 rounded-t-2xl border-t data-[state=closed]:slide-out-to-bottom-1 data-[state=open]:slide-in-from-bottom-1",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left-1 data-[state=open]:slide-in-from-left-1 sm:max-w-sm sm:rounded-r-2xl",
+          "inset-x-0 bottom-0 rounded-t-lg border-t data-[state=closed]:slide-out-to-bottom-1 data-[state=open]:slide-in-from-bottom-1",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left-1 data-[state=open]:slide-in-from-left-1 sm:max-w-sm",
         right:
-          "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right-1 data-[state=open]:slide-in-from-right-1 sm:max-w-sm sm:rounded-l-2xl",
+          "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right-1 data-[state=open]:slide-in-from-right-1 sm:max-w-sm",
       },
     },
     defaultVariants: {
@@ -65,8 +65,8 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute right-2 top-2 inline-flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted disabled:pointer-events-none md:h-9 md:w-9">
-        <X className="h-5 w-5" strokeWidth={1.5} />
+      <SheetPrimitive.Close className="absolute right-2 top-2 inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-tint hover:text-foreground disabled:pointer-events-none md:size-8">
+        <X className="size-4" strokeWidth={1.5} />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>

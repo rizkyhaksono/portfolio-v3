@@ -1,16 +1,13 @@
 import { getAllProject } from "@/services/visitor/project"
-import { getPathReads } from "@/services/visitor/umami"
 import { media_socials } from "@/commons/constants/contact"
+import { SectionIcon } from "@/components/layout/section-icons"
 import { InkLink } from "@/components/ui/ink-link"
-import { LedgerList, LedgerRow } from "@/components/ui/ledger"
-import { MediaCard } from "@/components/ui/media-card"
+import { Gallery, MediaCard } from "@/components/ui/media-card"
 import { PageHeader } from "@/components/ui/page-header"
-import { PageSection } from "@/components/ui/page-section"
-import { ReaderCount } from "@/components/ui/reader-count"
 import { StatusLine } from "@/components/ui/status-line"
 import { selectFeaturedProjects } from "./featured"
-import { ProjectLinks, plateOf } from "./project-links"
-import { plainText } from "./safe-html"
+import { plateOf } from "./project-links"
+import { firstSentence, plainText } from "./safe-html"
 
 export const revalidate = 3600
 
@@ -35,14 +32,44 @@ function byYear(projects: Project[]) {
 
 const GITHUB = media_socials.find((social) => social.title === "GitHub")?.href ?? "https://github.com/rizkyhaksono"
 
+/** Notion's gallery view grouped by a property: a small muted label with the count, then the cards. */
+function ProjectGroup({ id, label, projects, lead }: Readonly<{ id: string; label: string; projects: Project[]; lead?: boolean }>) {
+  return (
+    <section aria-labelledby={id} className="mt-10 first:mt-0">
+      <h2 id={id} className="mb-2 flex items-baseline gap-2 text-small font-medium text-muted-foreground">
+        {label}
+        <span className="font-normal tabular-nums">
+          {projects.length}
+          <span className="sr-only"> {projects.length === 1 ? "project" : "projects"}</span>
+        </span>
+      </h2>
+      <Gallery>
+        {projects.map((project, i) => (
+          <li key={project.id}>
+            <MediaCard
+              href={`/project/${project.id}`}
+              image={plateOf(project)}
+              title={project.title}
+              description={firstSentence(plainText(project.description))}
+              meta={yearOf(project.created_at)}
+              priority={lead && i === 0}
+            />
+          </li>
+        ))}
+      </Gallery>
+    </section>
+  )
+}
+
 export default async function ProjectPage() {
   // A thrown fetch shows the failed line; Supabase errors already come back as an empty list.
-  const [projects, reads] = await Promise.all([getAllProject().catch(() => null), getPathReads()])
+  const projects = await getAllProject().catch(() => null)
+  const icon = <SectionIcon href="/project" />
 
   if (!projects) {
     return (
       <div>
-        <PageHeader title="Projects" />
+        <PageHeader icon={icon} title="Projects" />
         <StatusLine kind="failed">
           The projects did not load just now. Try again in a few minutes, or browse the code on{" "}
           <span className="whitespace-nowrap">
@@ -63,49 +90,17 @@ export default async function ProjectPage() {
   return (
     <div>
       <PageHeader
+        icon={icon}
         title="Projects"
         description={projects.length > 0 ? `${projects.length.toLocaleString("en")} projects. The hand-picked ones first.` : undefined}
       />
 
       {projects.length === 0 && <StatusLine kind="empty">No projects are listed right now.</StatusLine>}
 
-      {featured.length > 0 && (
-        <section aria-labelledby="featured" className="space-y-12">
-          <h2 id="featured" className="sr-only">
-            Hand-picked projects
-          </h2>
-          {featured.map((project, i) => (
-            <div key={project.id}>
-              <MediaCard
-                href={`/project/${project.id}`}
-                image={plateOf(project)}
-                title={project.title}
-                description={plainText(project.description)}
-                meta={yearOf(project.created_at)}
-                priority={i === 0}
-              />
-              <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
-              <ProjectLinks project={project} className="mt-1 text-small" />
-            </div>
-          ))}
-        </section>
-      )}
-
-      {rest.length > 0 && (
-        <PageSection heading={{ title: featured.length > 0 ? "More projects" : "All projects" }}>
-          {[...byYear(rest)].map(([year, rows]) => (
-            <LedgerList key={year} marker={<h3>{year}</h3>}>
-              {rows.map((project) => (
-                <LedgerRow key={project.id} title={project.title} href={`/project/${project.id}`} titleAs="h4">
-                  <p className="line-clamp-2">{plainText(project.description)}</p>
-                  <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-1" />
-                  <ProjectLinks project={project} className="mt-1 text-small" />
-                </LedgerRow>
-              ))}
-            </LedgerList>
-          ))}
-        </PageSection>
-      )}
+      {featured.length > 0 && <ProjectGroup id="hand-picked" label="Hand-picked" projects={featured} lead />}
+      {[...byYear(rest)].map(([year, rows], i) => (
+        <ProjectGroup key={year} id={`year-${year}`} label={year} projects={rows} lead={featured.length === 0 && i === 0} />
+      ))}
     </div>
   )
 }

@@ -51,28 +51,35 @@ const config = {
 					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
 					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
 				},
-				// Langit Malang accent: the sky band and the Marker only.
+				// Notion's translucent hover and selected fills, from the text colour so they work on page, sidebar and menus.
+				tint: {
+					DEFAULT: 'hsl(var(--foreground) / 0.06)',
+					strong: 'hsl(var(--foreground) / 0.1)'
+				},
+				// Langit Malang: the home cover and the text selection only.
 				sky: {
 					DEFAULT: 'hsl(var(--sky) / <alpha-value>)',
 					wash: 'hsl(var(--sky-wash) / <alpha-value>)'
 				}
 			},
-			// One sans (Onest), quiet sizes: 15/24 body, 24px page titles; hierarchy is colour first, weight second.
+			// One sans (Onest) on a Notion scale: 14px UI (sidebar, tables, properties, controls), 16/24 page text,
+			// 40px bold page titles, 30/24/20 headings at 600.
 			fontSize: {
 				xs: ['0.75rem', { lineHeight: '1rem' }],
-				caption: ['0.75rem', { lineHeight: '1.125rem' }],
-				small: ['0.8125rem', { lineHeight: '1.25rem' }],
-				body: ['0.9375rem', { lineHeight: '1.5rem' }],
-				prose: ['1rem', { lineHeight: '1.75rem' }],
-				lead: ['1rem', { lineHeight: '1.625rem' }],
-				h4: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
-				h3: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
-				h2: ['0.9375rem', { lineHeight: '1.5rem', fontWeight: '500' }],
-				h1: ['1.5rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }],
-				display: ['1.5rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }],
-				numeral: ['1.75rem', { lineHeight: '2rem', fontWeight: '500', letterSpacing: '-0.015em' }]
+				caption: ['0.75rem', { lineHeight: '1rem' }],
+				small: ['0.875rem', { lineHeight: '1.25rem' }],
+				body: ['1rem', { lineHeight: '1.5rem' }],
+				prose: ['1rem', { lineHeight: '1.625rem' }],
+				lead: ['1rem', { lineHeight: '1.5rem' }],
+				h4: ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],
+				h3: ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+				h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600', letterSpacing: '-0.01em' }],
+				h1: ['1.875rem', { lineHeight: '2.375rem', fontWeight: '600', letterSpacing: '-0.015em' }],
+				title: ['2rem', { lineHeight: '2.5rem', fontWeight: '700', letterSpacing: '-0.02em' }],
+				display: ['2.5rem', { lineHeight: '3rem', fontWeight: '700', letterSpacing: '-0.02em' }],
+				numeral: ['2rem', { lineHeight: '2.5rem', fontWeight: '600', letterSpacing: '-0.015em' }]
 			},
-			// Radius grows with surface size: fields and buttons md/lg, tiles 2xl, dots and switches full.
+			// Notion radii: 6px controls and menu rows (md), 10px cards, images and floating layers (lg), 4px tags (rounded).
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 0.25rem)',

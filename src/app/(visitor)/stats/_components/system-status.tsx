@@ -31,9 +31,9 @@ const StatusMark = ({ status }: { status: ServiceStatus }) => (
 
 function ServiceRow({ service }: Readonly<{ service: HealthService }>) {
   return (
-    <li className="grid gap-x-6 gap-y-1 rounded-xl px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
+    <li className="grid gap-x-6 gap-y-1 py-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-baseline">
       <div className="min-w-0">
-        <p className="break-words text-body text-foreground">{service.name}</p>
+        <p className="break-words text-small font-medium text-foreground">{service.name}</p>
         {service.detail && <p className="break-words text-caption text-muted-foreground">{service.detail}</p>}
       </div>
       <p className="flex items-center gap-2 text-small tabular-nums text-muted-foreground sm:justify-end">
@@ -104,7 +104,7 @@ export default function SystemStatus() {
         </div>
 
         {services.length > 0 && (
-          <ul role="list" className="-mx-3 mt-3">
+          <ul role="list" className="mt-3 divide-y divide-border border-y border-border">
             {services.map((service, index) => (
               <ServiceRow key={`${service.name}-${index}`} service={service} />
             ))}

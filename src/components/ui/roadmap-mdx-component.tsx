@@ -1,6 +1,8 @@
 import type { MDXComponents } from "mdx/types"
 import type { ComponentProps, ReactNode } from "react"
+import { FileText, Info, Lightbulb, TriangleAlert } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Callout } from "@/components/ui/callout"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { InkLink } from "@/components/ui/ink-link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -58,39 +60,46 @@ interface AsideProps {
   children?: ReactNode
 }
 
-/** A note on a muted tile: the title is the word that says what kind of note it is. */
-function Note({ title, children }: Readonly<AsideProps>) {
+interface AsideProps {
+  title?: ReactNode
+  icon?: ReactNode
+  children?: ReactNode
+}
+
+/** Notion's callout: the icon and the title word say what kind of note it is, so a warning never rests on colour. */
+function Note({ title, icon = <Info />, children }: Readonly<AsideProps>) {
   return (
-    <div role="note" className="my-6 rounded-2xl bg-muted px-4 py-3">
-      {title && <p className="text-h4 text-foreground">{title}</p>}
-      <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
+    <div role="note" className="my-5">
+      <Callout icon={icon}>
+        {title && <p className="font-semibold">{title}</p>}
+        <div className="[&>*+*]:mt-[0.75em]">{children}</div>
+      </Callout>
     </div>
   )
 }
 
-/** A warning is outlined rather than filled, so it differs from a note by shape as well as by word. */
-function Warning({ title = "Warning", children }: Readonly<AsideProps>) {
-  return (
-    <div role="note" className="my-6 rounded-2xl border border-border px-4 py-3">
-      <p className="text-h4 text-foreground">{title}</p>
-      <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
-    </div>
-  )
-}
-
-const Tip = ({ title = "Tip", children }: AsideProps) => <Note title={title}>{children}</Note>
+const Warning = ({ title = "Warning", children }: AsideProps) => (
+  <Note title={title} icon={<TriangleAlert />}>
+    {children}
+  </Note>
+)
+const Tip = ({ title = "Tip", children }: AsideProps) => (
+  <Note title={title} icon={<Lightbulb />}>
+    {children}
+  </Note>
+)
 const InfoCard = ({ title = "Note", children }: AsideProps) => <Note title={title}>{children}</Note>
 
 // <Alert><AlertTitle/><AlertDescription/></Alert> in older lessons prints as a note.
 const Alert = ({ children }: AsideProps) => <Note>{children}</Note>
-const AlertTitle = ({ children }: AsideProps) => <p className="text-h4 text-foreground">{children}</p>
+const AlertTitle = ({ children }: AsideProps) => <p className="font-semibold">{children}</p>
 const AlertDescription = ({ children }: AsideProps) => <div>{children}</div>
 
 function LearningObjectives({ objectives = [] }: Readonly<{ objectives?: string[] }>) {
   if (objectives.length === 0) return null
   return (
     <section className="my-6">
-      <p className="text-h4 text-foreground">Learning objectives</p>
+      <p className="font-semibold text-foreground">Learning objectives</p>
       <ul className="mt-2">
         {objectives.map((objective) => (
           <li key={objective}>{objective}</li>
@@ -109,7 +118,7 @@ function Resources({ title = "Further reading", resources = [] }: Readonly<{ tit
   if (resources.length === 0) return null
   return (
     <section className="my-6">
-      <p className="text-h4 text-foreground">{title}</p>
+      <p className="font-semibold text-foreground">{title}</p>
       <ul className="mt-2">
         {resources.map((resource) => (
           <li key={resource.href}>
@@ -123,11 +132,12 @@ function Resources({ title = "Further reading", resources = [] }: Readonly<{ tit
   )
 }
 
+/** Notion's link to a page: the page icon and its title, with a muted line under it. */
 function NextLesson({ title, description, href }: Readonly<{ title: string; description?: string; href?: string }>) {
   return (
-    <div className="my-10">
+    <div className="my-8">
       <p className="text-small text-muted-foreground">Next lesson</p>
-      <p className="text-body text-foreground">{href ? <InkLink href={href}>{title}</InkLink> : title}</p>
+      <p className="mt-1 font-medium text-foreground">{href ? <InkLink href={href} icon={<FileText strokeWidth={1.5} />}>{title}</InkLink> : title}</p>
       {description && <p className="mt-1 text-muted-foreground">{description}</p>}
     </div>
   )

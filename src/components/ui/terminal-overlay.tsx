@@ -214,15 +214,15 @@ export default function TerminalOverlay() {
             returnFocusRef.current?.focus({ preventScroll: true })
           }}
           onClick={() => inputRef.current?.focus()}
-          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground print:hidden"
+          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground print:hidden"
         >
           <div className="flex shrink-0 items-center justify-between border-b border-border pl-4">
             <DialogPrimitive.Title className="text-caption text-muted-foreground">Terminal</DialogPrimitive.Title>
             <DialogPrimitive.Close
               aria-label="Close terminal"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted md:h-9 md:w-9"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md text-muted-foreground hover:bg-tint hover:text-foreground md:h-8 md:w-8"
             >
-              <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
+              <X className="size-4" strokeWidth={1.5} aria-hidden />
             </DialogPrimitive.Close>
           </div>
 

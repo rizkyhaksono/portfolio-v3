@@ -3,19 +3,19 @@
 // globals.css and the OG/certificate routes; contrast.test.ts keeps it within ±1 of the tokens.
 export const THEME_HEX = {
   light: {
-    background: "#F8F8F6",
-    foreground: "#1F201D",
-    mutedForeground: "#62635E",
-    border: "#E2E2DE",
-    muted: "#EFEFEB",
+    background: "#FFFFFF",
+    foreground: "#37352F",
+    mutedForeground: "#6E6D69",
+    border: "#E9E9E7",
+    muted: "#F7F7F5",
     sky: "#2D5B8C",
   },
   dark: {
-    background: "#1A1A19",
-    foreground: "#ECECE8",
-    mutedForeground: "#A3A49E",
-    border: "#30312D",
-    muted: "#242522",
+    background: "#191919",
+    foreground: "#D4D4D4",
+    mutedForeground: "#9B9B9B",
+    border: "#2F2F2F",
+    muted: "#202020",
     sky: "#8DB6E6",
   },
 } as const

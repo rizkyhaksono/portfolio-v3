@@ -30,9 +30,9 @@ function hostOf(href: string) {
 }
 
 export function InkLink({ href, external, event, eventData, className, icon, children }: Readonly<InkLinkProps>) {
-  // Names read in full ink against muted prose, with a faint underline so colour is never the only cue (WCAG 1.4.1).
+  // Notion's inline link: ink with a grey underline that darkens on hover, so colour is never the only cue (WCAG 1.4.1).
   const classes = cn(
-    "text-foreground underline decoration-foreground/25 decoration-1 underline-offset-4 transition-[text-decoration-color] duration-ui ease-out hover:decoration-foreground",
+    "text-foreground underline decoration-foreground/40 decoration-1 underline-offset-[0.2em] transition-[text-decoration-color] duration-ui ease-out hover:decoration-foreground",
     icon && "whitespace-nowrap",
     className,
   )

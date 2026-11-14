@@ -27,16 +27,16 @@ function usePhase() {
 }
 
 /**
- * Langit Malang: the painted landscape the footer sits in. Back to front: a sky that follows the hour in Malang
+ * Langit Malang: the painted landscape of the home page's Notion cover (`variant="cover"`). Back to front: a sky that follows the hour in Malang
  * (dark mode is the night sky), the sun or the moon, drifting clouds, Arjuno and Semeru in haze, the name set
  * large between the far and near hills, then grass that moves in the wind, under a fine grain like a printed photo.
  * CSS and inline SVG only; decorative, so hidden from assistive tech.
  */
-export function Sky({ className }: Readonly<{ className?: string }>) {
+export function Sky({ className, variant = "band" }: Readonly<{ className?: string; variant?: "band" | "cover" }>) {
   const phase = usePhase()
 
   return (
-    <div aria-hidden data-print-hide data-sky={phase} className={cn("sky", className)}>
+    <div aria-hidden data-print-hide data-sky={phase} className={cn("sky", variant === "cover" && "sky--cover", className)}>
       <span className="sky__orb" />
       <span className="sky__star" style={{ left: "8%", top: "16%" }} />
       <span className="sky__star" style={{ left: "21%", top: "34%" }} />
@@ -61,7 +61,7 @@ export function Sky({ className }: Readonly<{ className?: string }>) {
         <path className="sky__hill sky__hill--far" d="M0 238 C 180 206, 340 204, 520 224 S 880 262, 1080 230 S 1340 198, 1440 214 L 1440 300 L 0 300 Z" />
       </svg>
 
-      <p className="sky__wordmark">rizkyhaksono</p>
+      {variant === "band" && <p className="sky__wordmark">rizkyhaksono</p>}
 
       <svg className="sky__front" viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice">
         <path className="sky__hill sky__hill--mid" d="M0 252 C 220 222, 420 230, 640 250 S 1020 280, 1220 248 S 1400 230, 1440 236 L 1440 300 L 0 300 Z" />
@@ -115,5 +115,16 @@ export function SkyToggle({ className }: Readonly<{ className?: string }>) {
     <button type="button" onClick={toggle} className={cn("sky-toggle", className)}>
       {paused ? "Play the sky" : "Pause the sky"}
     </button>
+  )
+}
+
+/** Notion's page cover, painted: the sky across the top of the page, 30% of the viewport tall. */
+export function SkyCover() {
+  return (
+    <div data-print-hide className="relative isolate h-[30vh] max-h-80 min-h-44 overflow-hidden">
+      <Sky variant="cover" />
+      {/* Not shown on screen, reachable by keyboard and screen readers (WCAG 2.2.2). */}
+      <SkyToggle className="sr-only left-4 top-4 rounded-md bg-background text-small text-foreground focus-visible:not-sr-only focus-visible:absolute focus-visible:px-2 focus-visible:py-1" />
+    </div>
   )
 }

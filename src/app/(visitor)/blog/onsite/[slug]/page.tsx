@@ -4,10 +4,10 @@ import { notFound } from "next/navigation"
 import { ArticleShell } from "@/components/ui/article-shell"
 import ClapButton from "@/components/ui/clap-button"
 import { PlateFigure } from "@/components/ui/plate-figure"
-import { ReaderCount } from "@/components/ui/reader-count"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
-import { dateline, minutesToRead } from "@/app/_components/blog/format"
+import { articleProperties } from "@/app/_components/blog/article-properties"
+import { minutesToRead } from "@/app/_components/blog/format"
 import { getSiteUrl, ogImageUrl } from "@/lib/site-url"
 import { canOptimizeImage } from "@/lib/image-hosts"
 import { getOnsiteBlogBySlug, getOnsiteBlogPosts } from "@/services/visitor/onsite-blog"
@@ -59,16 +59,9 @@ export default async function OnsiteArticlePage({ params }: Props) {
     <>
       <ArticleJsonLd title={post.title} description={post.description} path={path} image={post.coverImage} published={published} modified={post.updated_at} />
       <ArticleShell
-        back={{ href: "/blog", title: "All writing" }}
         title={post.title}
         standfirst={post.description || undefined}
-        dateline={dateline(published, minutesToRead(content))}
-        meta={
-          <>
-            <ReaderCount path={path} reads={reads} className="text-small" />
-            <p>Written for this site.</p>
-          </>
-        }
+        properties={articleProperties({ published, minutes: minutesToRead(content), source: "This site", path, reads })}
         cover={
           post.coverImage && (
             <PlateFigure>
@@ -86,7 +79,7 @@ export default async function OnsiteArticlePage({ params }: Props) {
           )
         }
         footer={
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-border pt-6">
             <ClapButton targetType="blog" targetId={post.slug} />
             <p className="text-small text-muted-foreground">If this was useful, a clap tells me so.</p>
           </div>

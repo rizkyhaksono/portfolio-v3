@@ -142,7 +142,7 @@ export default function WPMTest() {
         {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
       </p>
 
-      <p className="wpm-passage min-h-[9rem] rounded-2xl bg-muted p-5 text-body leading-loose">
+      <p className="wpm-passage min-h-[9rem] rounded-lg bg-muted p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
           const wordIndex = start + k
           return (

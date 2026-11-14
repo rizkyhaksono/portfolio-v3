@@ -22,15 +22,16 @@ export function Toaster() {
   if (!ready) return null
   return (
     <SonnerToaster
-      position="top-right"
+      position="bottom-center"
       theme="system"
       toastOptions={{
         classNames: {
-          toast: "!rounded-xl !border !border-border !bg-popover !text-popover-foreground !font-sans !shadow-none",
-          description: "!text-muted-foreground",
-          actionButton: "!rounded-md !bg-primary !text-primary-foreground",
-          cancelButton: "!rounded-md !bg-muted !text-foreground",
-          closeButton: "!rounded-full !border-border !bg-popover !text-foreground !shadow-none",
+          // Notion's toast: an inverted slab at the bottom of the page, no border and no shadow.
+          toast: "!rounded-lg !border-0 !bg-foreground !text-background !font-sans !text-small !shadow-none",
+          description: "!text-background/75",
+          actionButton: "!rounded-md !bg-background !text-foreground",
+          cancelButton: "!rounded-md !bg-background/15 !text-background",
+          closeButton: "!rounded-full !border-0 !bg-foreground !text-background !shadow-none",
         },
       }}
     />

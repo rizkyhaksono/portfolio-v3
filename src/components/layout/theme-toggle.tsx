@@ -43,7 +43,7 @@ export function ThemeToggle({ className }: Readonly<{ className?: string }>) {
       aria-label="Dark theme"
       aria-pressed={mounted ? isDark : undefined}
       data-tip={mounted && isDark ? "Switch to light" : "Switch to dark"}
-      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), className)}
+      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "size-11 text-muted-foreground hover:text-foreground lg:size-8", className)}
     >
       <Contrast strokeWidth={1.5} aria-hidden />
     </button>

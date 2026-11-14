@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-const MIN_READERS = 10
+export const MIN_READERS = 10
 
 interface ReaderCountProps {
   /** Exact page path, for example `/blog/my-post`. */

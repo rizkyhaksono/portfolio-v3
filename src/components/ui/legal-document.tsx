@@ -16,17 +16,20 @@ interface LegalDocumentProps extends Omit<ArticleShellProps, "rail" | "railLabel
   sections: LegalSection[]
 }
 
-/** Legal pages on the Article pattern: § numbered sections, their contents in the "On this page" disclosure. */
+/** Legal pages as Notion pages: § numbered sections, their contents in the "On this page" toggle. */
 export function LegalDocument({ sections, ...shell }: Readonly<LegalDocumentProps>) {
   return (
     <ArticleShell
       {...shell}
       rail={
-        <ol role="list" className="flex flex-col gap-2">
+        <ol role="list">
           {sections.map(({ id, title }, index) => (
-            <li key={id} className="grid grid-cols-[2.25rem_minmax(0,1fr)]">
-              <span className="tabular-nums">&sect;&nbsp;{index + 1}</span>
-              <InkLink href={`#${id}`} className="inline-flex min-h-11 items-center md:min-h-0 no-underline hover:underline">
+            <li key={id}>
+              <InkLink
+                href={`#${id}`}
+                className="-mx-1.5 flex min-h-11 items-center gap-2 rounded-md px-1.5 no-underline transition-colors hover:bg-tint md:min-h-8"
+              >
+                <span className="w-8 shrink-0 tabular-nums text-muted-foreground">&sect;&nbsp;{index + 1}</span>
                 {title}
               </InkLink>
             </li>
@@ -37,7 +40,7 @@ export function LegalDocument({ sections, ...shell }: Readonly<LegalDocumentProp
       {sections.map(({ id, title, body }, index) => (
         <Fragment key={id}>
           <h2 id={id}>
-            <span className="tabular-nums">&sect;&nbsp;{index + 1}</span> {title}
+            <span className="tabular-nums text-muted-foreground">&sect;&nbsp;{index + 1}</span> {title}
           </h2>
           {body}
         </Fragment>

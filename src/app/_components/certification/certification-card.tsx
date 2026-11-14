@@ -1,6 +1,6 @@
 import type { LinkedinCertification } from "@/commons/types/linkedin"
 import { InkLink } from "@/components/ui/ink-link"
-import { LedgerRow } from "@/components/ui/ledger"
+import { TableCell, TableRow } from "@/components/ui/table"
 
 /** A link a reader can check, or null when only the record exists: no link or a signed `licdn.com` URL (they expire). */
 export function verifyUrl(link?: string | null): string | null {
@@ -14,16 +14,15 @@ export function verifyUrl(link?: string | null): string | null {
   }
 }
 
-/** One credential as a row: the title, then issuer and date muted, with "Verify" when there is a link to check. */
+/** One credential as a Notion table row: name, issuer, date, and "Verify" when there is a link to check. */
 export function CertificationRow({ certification }: Readonly<{ certification: LinkedinCertification }>) {
   const href = verifyUrl(certification.link)
   return (
-    <LedgerRow title={certification.title}>
-      <span className="flex flex-wrap items-baseline gap-x-4">
-        <span>
-          {certification.provider}
-          {certification.issuedDisplay && `, ${certification.issuedDisplay}`}
-        </span>
+    <TableRow>
+      <TableCell className="font-medium text-foreground">{certification.title}</TableCell>
+      <TableCell className="text-foreground">{certification.provider}</TableCell>
+      <TableCell className="whitespace-nowrap text-muted-foreground">{certification.issuedDisplay || "Undated"}</TableCell>
+      <TableCell className="whitespace-nowrap">
         {href ? (
           <InkLink
             href={href}
@@ -35,9 +34,9 @@ export function CertificationRow({ certification }: Readonly<{ certification: Li
             Verify
           </InkLink>
         ) : (
-          <span>No public link</span>
+          <span className="text-muted-foreground">No public link</span>
         )}
-      </span>
-    </LedgerRow>
+      </TableCell>
+    </TableRow>
   )
 }

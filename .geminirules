@@ -9,7 +9,7 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 - Next.js 16 (App Router) + React 19
 - TypeScript (strict mode)
-- Styling: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the Langit Malang tokens
+- Styling: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled as monochrome Notion components
 - Testing: Jest + React Testing Library (unit), Playwright (e2e)
 - Package manager: bun
 
@@ -36,15 +36,16 @@ You are an expert full-stack TypeScript engineer working on this Next.js project
 
 ## UI rules (mandatory)
 
-Read the UI rules in [`AGENTS.md`](./AGENTS.md#ui-rules-mandatory) and [`docs/ui/`](./docs/ui/README.md) before any UI work; they win over this file. The design is **Langit Malang**: a calm reading page after joshpuckett.me, in light and dark, set in one clean sans (Onest), with a painted sky in the footer. The jest test `src/__tests__/unit/lib/ui-gate.test.ts` enforces it in CI through `bun run test`. The essentials:
+Read the UI rules in [`AGENTS.md`](./AGENTS.md#ui-rules-mandatory) and [`docs/ui/`](./docs/ui/README.md) before any UI work; they win over this file. The design is a **Notion workspace**: a grey sidebar, a thin top bar and Notion's 708px page column, monochrome in light and dark, set in one sans (Onest), with the painted Langit Malang sky as the home page's cover. The jest test `src/__tests__/unit/lib/ui-gate.test.ts` enforces it in CI through `bun run test`. The essentials:
 
-- Every visitor page uses `BaseLayout`: the handle "@rizkyhaksono" with a short rule under it at the top, one 36rem column (`width="wide"` on `/tools` and `/chat`), and the Langit Malang footer at the bottom. No sky at the top, no sticky or translucent header.
-- Prose in `text-muted-foreground`; names, titles and links in `text-foreground` (links through `InkLink`). Lists are plain rows (`LedgerList`, `LedgerRow`): a title with one muted line under it, no boxes, rules or hover backgrounds.
-- Colours only from the token classes; no hex, palette colours or `dark:` classes. Blue (`sky`, `sky-wash`) only in the footer sky and the text selection. The footer's grass greens are an illustration-only exception that lives in the `.sky` block of `globals.css`.
-- Sizes only from the `fontSize` keys (body 15/24, article prose 16/28, section labels 15/24 and page titles 24/32 at weight 500); weights 400 and 500 only; no `uppercase`, `tracking-[…]` or `text-[Npx]`. No serif, no handwritten face.
-- Radii only on real tiles and images (`rounded-2xl`) and on controls; no `rounded-[…]`. No dividers except the rule under the handle and the hairline inside the footer.
-- No shadows anywhere: floating layers (dialog, sheet, menu, select, toast, hover tip) are set apart by a hairline border only. No blur anywhere; no gradients outside `globals.css` and `sky.tsx`.
-- No motion libraries (framer-motion, `motion`, GSAP, Lenis). The footer sky plays at once; its pause toggle stays visually hidden until keyboard focus, phones get a still scene, and every animation stops under reduced motion.
+- Every visitor page uses `BaseLayout`, a Notion workspace: a grey sidebar (`bg-muted`, 15rem, `lg` and up) with the owner's row, the pages with 16px lucide icons (`SECTION_ICONS`), a "More" group, contact rows, a Light, Dark and System control and the legal links; below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet. A 44px top bar with the breadcrumb and the theme toggle. The 708px page column (`width="wide"` on `/tools` and `/chat`), ending on one quiet line (year, Malang time, email).
+- Every page opens with `PageHeader` (icon, 40px bold title via `text-title sm:text-display`, muted description). Content as Notion views and blocks: `Properties`, `LedgerList` / `LedgerRow` (list view), `MediaCard` in `Gallery` (gallery view), `Table` (table view), `ArticleShell` (article), `Callout` at most once per page.
+- Monochrome: page text and links in ink (`text-foreground`, links through `InkLink`), secondary text in `text-muted-foreground`, hover `bg-tint`, tags and selected items `bg-tint-strong`, ink primary buttons. Colours only from the token classes; no hex, palette colours or `dark:` classes. Blue (`sky`, `sky-wash`) only in the home cover and the text selection; the cover's grass greens are an illustration-only exception in the `.sky` block of `globals.css`.
+- Sizes only from the `fontSize` keys (small 14/20 for UI, body 16/24, prose 16/26, h2 24/32 at 600, page titles 40/48 at 700); weights 400 to 700; no `uppercase`, `tracking-[…]` or `text-[Npx]`. One sans, Onest; no serif, no handwritten face.
+- Notion radii: 4px tags (`rounded`), 6px controls and rows (`rounded-md`), 10px cards, images and floating layers (`rounded-lg`); no `rounded-[…]`. Fields are 36px with a 3:1 `border-input`. No boxes around sections.
+- No shadows anywhere: floating layers (dialog, sheet, menu, select) get a hairline border; the tooltip and toast are inverted. No blur anywhere; no gradients outside `globals.css` and `sky.tsx`.
+- The Langit Malang sky is the home page's cover only (`SkyCover`); there is no footer sky. Its pause toggle stays visually hidden until keyboard focus, phones get a still scene, and every animation stops under reduced motion. No motion libraries (framer-motion, `motion`, GSAP, Lenis).
+- Auth (`/auth`, `/admin/auth/login`) follows notion.so/login: one 320px centred column, a two-line title, a full-width ink button, "or continue with" Google, then "New here? Create an account". The admin keeps its own shell until its rebuild.
 - Copy in sentence case with plain verbs; no em dash in UI strings, no generic CTAs, no buzzwords.
 - Umami: `data-umami-event` only on `<button>` and external `target="_blank"` links; internal links use `data-track`.
 

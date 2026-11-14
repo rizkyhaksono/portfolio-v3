@@ -11,8 +11,6 @@ import { ToolError, ToolLoading, useToolData } from "./tool-status"
 const COINS = "bitcoin,ethereum,binancecoin,cardano,solana,polkadot"
 const loadPrices = () => getCryptoPrice(COINS).then((res) => res.data)
 const loadTrending = () => getTrendingCrypto().then((res) => res.data.slice(0, 10))
-// Outer cells sit on the page gutter; only this tool, so admin tables keep their padding.
-const FLUSH = "[&_th:first-child]:pl-0 [&_td:first-child]:pl-0 [&_th:last-child]:pr-0 [&_td:last-child]:pr-0"
 
 const usd = (value: number, compact = false) =>
   new Intl.NumberFormat("en-US", {
@@ -60,13 +58,13 @@ function Prices() {
   if (prices.status === "loading" || !prices.data) return <ToolLoading>Loading prices…</ToolLoading>
 
   return (
-    <Table className={FLUSH}>
-      <TableCaption>In US dollars. Change is over the last 24 hours.</TableCaption>
+    <Table>
+      <TableCaption className="text-left">In US dollars. Change is over the last 24 hours.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Coin</TableHead>
           <TableHead className="text-right">Price</TableHead>
-          <TableHead className="pr-0 text-right sm:pr-2">24 hours</TableHead>
+          <TableHead className="text-right">24 hours</TableHead>
           <TableHead className="hidden text-right sm:table-cell">Market cap</TableHead>
         </TableRow>
       </TableHeader>
@@ -77,7 +75,7 @@ function Prices() {
               <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{usd(coin.current_price)}</TableCell>
-            <TableCell className="pr-0 text-right sm:pr-2">
+            <TableCell className="text-right">
               <Change value={coin.price_change_percentage_24h} />
             </TableCell>
             <TableCell className="hidden text-right sm:table-cell">{usd(coin.market_cap, true)}</TableCell>
@@ -94,13 +92,13 @@ function Trending() {
   if (trending.status === "loading" || !trending.data) return <ToolLoading>Loading trending coins…</ToolLoading>
 
   return (
-    <Table className={FLUSH}>
-      <TableCaption>The coins people are searching for most right now, in order.</TableCaption>
+    <Table>
+      <TableCaption className="text-left">The coins people are searching for most right now, in order.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Coin</TableHead>
           <TableHead className="text-right">Price</TableHead>
-          <TableHead className="pr-0 text-right sm:pr-2">24 hours</TableHead>
+          <TableHead className="text-right">24 hours</TableHead>
           <TableHead className="hidden text-right sm:table-cell">Market cap rank</TableHead>
         </TableRow>
       </TableHeader>
@@ -111,7 +109,7 @@ function Trending() {
               <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-muted-foreground">Not reported</span>}</TableCell>
-            <TableCell className="pr-0 text-right sm:pr-2">
+            <TableCell className="text-right">
               {coin.price_usd > 0 ? <Change value={coin.price_change_24h} /> : <span className="text-muted-foreground">Not reported</span>}
             </TableCell>
             <TableCell className="hidden text-right sm:table-cell">{coin.market_cap_rank ?? "Unranked"}</TableCell>

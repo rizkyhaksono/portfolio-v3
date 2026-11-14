@@ -12,9 +12,9 @@ You are an expert full-stack TypeScript engineer working with Next.js. Produce p
 - **Next.js 16** (App Router) + React 19
 - **TypeScript** (strict mode)
 - **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
-- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the Langit Malang tokens
+- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled as monochrome Notion components
 - **Package Manager**: bun
-- **UI**: `docs/ui/` is the source of truth, summarised in `AGENTS.md`: Langit Malang (a calm sans reading page with a painted footer sky, light and dark), Onest only, tokens only, one page pattern per route, the UI gate test green (`bun run test`)
+- **UI**: `docs/ui/` is the source of truth, summarised in `AGENTS.md`: a Notion workspace (grey sidebar, top bar, 708px page column, monochrome Notion components, the Langit Malang sky as the home cover, light and dark), Onest only, tokens only, one page pattern per route, the UI gate test green (`bun run test`)
 
 Focus on: separation of concerns, strict typing, accessibility, performance, and comprehensive testing.
 
@@ -671,7 +671,7 @@ export function Example({ ...props }: ExampleProps) {
 
 ### UI Component Guidelines
 
-- **Use the shared primitives** in `src/components/ui/` (shadcn-based, restyled to the Langit Malang tokens)
+- **Use the shared primitives** in `src/components/ui/` (shadcn-based, restyled as monochrome Notion components)
 - **Add new shadcn components** using `bunx shadcn@latest add <component>`, then map its colours and radii onto the tokens and scale in `docs/ui/` and strip its shadows (no palette colours, `dark:` classes, arbitrary values or shadows)
 - **Restyle in place** rather than forking a second version of a primitive
 - **Use Tailwind CSS** with the design tokens for custom styling and layout

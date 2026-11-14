@@ -62,7 +62,7 @@ export function ToolSkeleton() {
     <div aria-busy="true" className="space-y-4">
       <span className="sr-only">Loading the tool…</span>
       <Skeleton className="h-10 w-full rounded-lg" />
-      <Skeleton className="h-64 w-full rounded-2xl" />
+      <Skeleton className="h-64 w-full rounded-lg" />
     </div>
   )
 }

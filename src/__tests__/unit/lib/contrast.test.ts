@@ -41,11 +41,6 @@ const contrast = (a: number[], b: number[]) => {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x)
   return (hi + 0.05) / (lo + 0.05)
 }
-/** `--sky-top` of the first `selector{…}` block that sets it. */
-const skyTop = (selector: string): Triple | undefined => {
-  const m = css.match(new RegExp(`${selector}\\s*\\{[^}]*--sky-top:\\s*(-?[\\d.]+)\\s+([\\d.]+)%\\s+([\\d.]+)%`))
-  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : undefined
-}
 const hex = (t: Triple) => "#" + rgb(t).map((c) => Math.round(c).toString(16).padStart(2, "0")).join("").toUpperCase()
 const withinOne = (a: string, b: string) =>
   [1, 3, 5].every((i) => Math.abs(parseInt(a.slice(i, i + 2), 16) - parseInt(b.slice(i, i + 2), 16)) <= 1)
@@ -68,22 +63,6 @@ describe.each([["light", light], ["dark", dark]])("%s theme contrast", (_theme, 
     expect(tokens[fg]).toBeDefined()
     expect(tokens[bg]).toBeDefined()
     expect(contrast(rgb(tokens[fg]), rgb(tokens[bg]))).toBeGreaterThanOrEqual(floor)
-  })
-})
-
-// Footer text sits in the upper sky, so it must read on every stop the sky can show: Malang's hour in light, night in dark.
-const SKY_STOPS = [
-  ...(["dawn", "day", "dusk", "evening"] as const).map((phase) => ["light", phase, light, skyTop(`\\.sky\\[data-sky="${phase}"\\]`)] as const),
-  ["dark", "night", dark, skyTop("\\.dark \\.sky[^{]*")] as const,
-]
-
-describe.each(SKY_STOPS)("%s footer sky at %s", (_theme, _phase, tokens, top) => {
-  it.each([
-    ["foreground", 7],
-    ["muted-foreground", 4.5],
-  ] as const)("%s over the sky is at least %d:1", (token, floor) => {
-    expect(top).toBeDefined()
-    expect(contrast(rgb(tokens[token]), rgb(top!))).toBeGreaterThanOrEqual(floor)
   })
 })
 

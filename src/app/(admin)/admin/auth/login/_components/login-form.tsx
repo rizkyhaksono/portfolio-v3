@@ -33,27 +33,29 @@ export function AdminLoginForm() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6" aria-busy={pending}>
-        <div className="space-y-2">
+    <div className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" aria-busy={pending}>
+        <div className="space-y-1.5">
           <Label htmlFor="admin-email">Email</Label>
           <Input id="admin-email" name="email" type="email" autoComplete="email" required disabled={pending} />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           <Label htmlFor="admin-password">Password</Label>
           <Input id="admin-password" name="password" type="password" autoComplete="current-password" required disabled={pending} />
         </div>
 
         <FormAlert>{error}</FormAlert>
 
-        <Button type="submit" className="h-10 w-full" disabled={pending}>
+        <Button type="submit" size="lg" className="w-full" disabled={pending}>
           {pending ? "Signing in…" : "Sign in to the dashboard"}
         </Button>
       </form>
 
-      <p className="text-center text-caption text-muted-foreground">
-        or
-      </p>
+      <div className="flex items-center gap-3 text-small text-muted-foreground">
+        <span aria-hidden className="h-px flex-1 bg-border" />
+        or continue with
+        <span aria-hidden className="h-px flex-1 bg-border" />
+      </div>
 
       <GoogleButton returnTo="/admin/dashboard" disabled={pending} />
     </div>

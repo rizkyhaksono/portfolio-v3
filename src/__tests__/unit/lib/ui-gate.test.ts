@@ -37,8 +37,9 @@ function offenders(pattern: RegExp, { allow = [], within, skipComments = false }
 const NOT_HISTORY = /^(?!content\/changelog\/)/
 
 describe("UI gate", () => {
-  it("R1: no print-era token classes (ink, paper, tint, rule)", () => {
-    const oldTokens = /(?<![\w-])(?:text|bg|border(?:-[trblxyse])?|divide|ring|fill|stroke|outline|decoration|from|to|via|caret|placeholder|shadow|accent)-(?:ink-soft|ink|paper|tint|rule-strong|rule)(?![\w-])/
+  // `tint` is not on the list: the name now belongs to Notion's hover fill (bg-tint, bg-tint-strong).
+  it("R1: no print-era token classes (ink, paper, rule)", () => {
+    const oldTokens = /(?<![\w-])(?:text|bg|border(?:-[trblxyse])?|divide|ring|fill|stroke|outline|decoration|from|to|via|caret|placeholder|shadow|accent)-(?:ink-soft|ink|paper|rule-strong|rule)(?![\w-])/
     expect(offenders(oldTokens)).toEqual([])
   })
 

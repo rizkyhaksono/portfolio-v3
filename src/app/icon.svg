@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <style>@media (prefers-color-scheme: dark) { rect { fill: #ECECE8 } text { fill: #1A1A19 } }</style>
-  <rect width="64" height="64" rx="14" fill="#1F201D"/>
-  <text x="32" y="46" text-anchor="middle" fill="#F8F8F6" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="600" font-size="40">R</text>
+  <style>@media (prefers-color-scheme: dark) { rect { fill: #D4D4D4 } text { fill: #191919 } }</style>
+  <rect width="64" height="64" rx="14" fill="#37352F"/>
+  <text x="32" y="46" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="600" font-size="40">R</text>
 </svg>
