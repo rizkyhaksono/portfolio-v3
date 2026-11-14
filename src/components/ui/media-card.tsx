@@ -35,11 +35,11 @@ export function MediaCard({ href, image, title, description, meta, priority, ext
             fill
             priority={priority}
             unoptimized={!canOptimizeImage(image)}
-            sizes="(min-width: 1024px) 48rem, (min-width: 640px) 40rem, 100vw"
+            sizes="(min-width: 640px) 36rem, 100vw"
             className="object-cover object-top transition-transform duration-500 ease-out [@media(hover:hover)]:motion-safe:group-hover:scale-[1.015]"
           />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center p-6 text-center text-body text-muted-foreground">{title}</span>
+          <span aria-hidden className="absolute inset-0 flex items-center justify-center p-6 text-center text-body text-muted-foreground">{title}</span>
         )}
       </div>
       <div className="mt-3 flex items-baseline justify-between gap-4">

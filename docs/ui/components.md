@@ -94,7 +94,7 @@ The tracker is gated to production with `data-domains`, `data-exclude-hash`, `da
 | `theme-toggle` | ThemeToggle | `to` |
 | `outbound-click` | InkLink `external` default | `host`, `area` |
 | `cta-click`, `resume-open` | Home bio and list links | `target` / `area` |
-| `social-click`, `email-click` | Contact, footer (email only) | `network`, `area` |
+| `social-click`, `email-click` | Home bio (`area: bio`), footer (`area: colophon`, social and email), home contact (`area: contact`, email) | `network`, `area` |
 | `cert-verify` | `/certificates` rows | `issuer` |
 | `contact-send` | Contact form | `status`: `ok`, `error`, `limited` |
 | `ai-error` | AI chat, OCR demo, JD matcher catch blocks | `feature`, `status` |

@@ -21,7 +21,7 @@ export default function ProjectImageViewer({ src, alt }: Readonly<ProjectImageVi
               src={src}
               alt=""
               fill
-              sizes="(min-width: 1024px) 48rem, (min-width: 640px) 40rem, 100vw"
+              sizes="(min-width: 640px) 36rem, 100vw"
               className="object-cover object-top"
               priority
               unoptimized={!canOptimizeImage(src)}

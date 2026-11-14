@@ -94,12 +94,6 @@
 
 /* Unlayered on purpose: always emitted (no content purge), still overridden by utilities below. */
 
-/* Plate frame: a screenshot or photo on the muted tile, in its own colours. */
-.plate {
-  position: relative;
-  background-color: hsl(var(--muted));
-}
-
 /* Pictures are not drag sources (Firefox: the dragstart guard in deferred-client-utilities). */
 img {
   -webkit-user-drag: none;
@@ -431,7 +425,7 @@ img {
   margin: 0;
   text-align: center;
   font-size: clamp(3.5rem, 17vw, 15rem);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: -0.045em;
   white-space: nowrap;

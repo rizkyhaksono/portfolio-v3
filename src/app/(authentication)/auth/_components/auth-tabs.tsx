@@ -25,7 +25,7 @@ export function AuthTabs() {
 
   return (
     <Tabs value={tab} onValueChange={show}>
-      <TabsList aria-label="Account" className="gap-5 rounded-none bg-transparent p-0">
+      <TabsList aria-label="Account" className="gap-5 overflow-visible rounded-none bg-transparent p-0">
         <TabsTrigger value="signin" className={trigger}>
           Sign in
         </TabsTrigger>

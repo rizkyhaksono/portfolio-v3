@@ -37,10 +37,9 @@ const withoutFrontMatter = (markdown: string) => markdown.replace(/^---\r?\n[\s\
 /** DEV fills an empty description with the body's opening, cut off with "..."; the body then repeats it. */
 const isClipped = (description?: string) => /(\.\.\.|…)$/u.test(description?.trim() ?? "")
 
-/** Render each article on its first request instead of at build: DEV.to rate-limits (429) bursts from CI. */
-export async function generateStaticParams() {
-  return []
-}
+// No generateStaticParams: the root layout reads headers() for the CSP nonce, so an on-demand ISR render of an
+// unbuilt slug threw DYNAMIC_SERVER_USAGE (500). Rendering per request, with the fetches cached by `next.revalidate`,
+// also keeps DEV.to (which rate-limits CI bursts) out of the build.
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -107,7 +106,7 @@ export default async function BlogArticlePage({ params }: Props) {
                 height={420}
                 priority
                 unoptimized={!canOptimizeImage(post.cover_image)}
-                sizes="(min-width: 1024px) 48rem, (min-width: 640px) 40rem, 100vw"
+                sizes="(min-width: 640px) 36rem, 100vw"
                 className="aspect-[1000/420] w-full object-cover"
               />
             </PlateFigure>

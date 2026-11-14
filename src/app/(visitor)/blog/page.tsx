@@ -55,7 +55,10 @@ export default async function BlogPage() {
 
       {lead ? (
         <>
-          <div>
+          <section aria-labelledby="latest">
+            <h2 id="latest" className="sr-only">
+              Latest
+            </h2>
             {/* The listener reads the nearest data-track, so the card reports like the rows below. */}
             <div data-track="blog-open" data-track-source={lead.source}>
               <MediaCard
@@ -73,7 +76,7 @@ export default async function BlogPage() {
             ) : (
               <ReaderCount path={lead.href} reads={reads} className="mt-1" />
             )}
-          </div>
+          </section>
 
           {rest.length > 0 && (
             <div className={SECTION_SPACING.section}>

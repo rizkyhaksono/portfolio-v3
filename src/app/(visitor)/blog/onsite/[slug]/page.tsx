@@ -79,7 +79,7 @@ export default async function OnsiteArticlePage({ params }: Props) {
                 height={675}
                 priority
                 unoptimized={!canOptimizeImage(post.coverImage)}
-                sizes="(min-width: 1024px) 48rem, (min-width: 640px) 40rem, 100vw"
+                sizes="(min-width: 640px) 36rem, 100vw"
                 className="aspect-video w-full object-cover"
               />
             </PlateFigure>

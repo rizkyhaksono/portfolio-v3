@@ -25,10 +25,8 @@ const LEVELS: [RoadmapLevel, string][] = [
 
 const NAME_KEY = "roadmap-cert-name"
 
-/** On phones the course rows push the panel below the fold, so bring its heading into view. */
-const revealPanel = (id: string) => {
-  if (!matchMedia("(min-width: 640px)").matches) document.getElementById(`${id}-title`)?.scrollIntoView()
-}
+/** The course rows stack above the panel at every width and push it below the fold, so bring its heading into view. */
+const revealPanel = (id: string) => document.getElementById(`${id}-title`)?.scrollIntoView({ block: "start" })
 
 function Tick() {
   return (
@@ -176,7 +174,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
           return (
             <LedgerList key={value} marker={marker ? <h3>{label}</h3> : undefined}>
               {rows.map(({ slug, meta }) => (
-                <LedgerRow key={slug} titleAs="h4" title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
+                <LedgerRow key={slug} titleAs={marker ? "h4" : "h3"} title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
                   <p>{meta.description}</p>
                   {isLoaded && isModuleComplete(id, slug) && (
                     <p className="mt-1 flex items-center gap-1.5 text-foreground">

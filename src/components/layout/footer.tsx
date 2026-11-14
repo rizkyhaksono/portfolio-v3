@@ -2,13 +2,16 @@ import Link from "next/link"
 import { EMAIL, media_socials } from "@/commons/constants/contact"
 import { LEGAL_LINKS, navTrack } from "@/commons/constants/navigation-menu"
 import { PROSE_WIDTH, WIDE_WIDTH } from "@/lib/design-system"
+import { InkLink } from "@/components/ui/ink-link"
 import { MalangClock, Sky, SkyToggle } from "@/components/ui/sky"
 import { cn } from "@/lib/utils"
 
 const linkClass =
   "inline-flex min-h-11 items-center text-small text-muted-foreground transition-colors duration-ui ease-out hover:text-foreground md:min-h-0"
 
+// Account sits here too: from lg up the menu (which also lists it) is hidden, so this is the way in on desktop.
 const SITE_LINKS = [
+  { href: "/profile", label: "Account" },
   { href: "/certificates", label: "Certificates" },
   { href: "/changelog", label: "Changelog" },
   ...LEGAL_LINKS,
@@ -44,7 +47,7 @@ function FooterLinks({ withSky }: Readonly<{ withSky: boolean }>) {
           </li>
         ))}
       <li>
-        <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="writing" className={linkClass}>
+        <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="blog" data-track-area="colophon" className={linkClass}>
           RSS
         </a>
       </li>
@@ -96,14 +99,9 @@ export default function Footer({ variant = "full", wide = false }: Readonly<{ va
         <p className="text-h1 text-foreground">@rizkyhaksono</p>
         <p className="mt-2 text-body text-muted-foreground">
           Write to me at{" "}
-          <a
-            href={`mailto:${EMAIL}`}
-            data-track="email-click"
-            data-track-area="colophon"
-            className="text-foreground underline-offset-4 hover:underline"
-          >
+          <InkLink href={`mailto:${EMAIL}`} event="email-click" eventData={{ area: "colophon" }} className="relative after:absolute after:-inset-3">
             {EMAIL}
-          </a>
+          </InkLink>
           .
         </p>
         <div className="mt-6">
