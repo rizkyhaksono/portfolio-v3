@@ -9,7 +9,7 @@ Every visitor page is laid out like a Notion workspace: a grey page tree on the 
 │ [R] Rizky Haksono «│ [≡] (below lg)  ⌂ Rizky Haksono / ✎ Writing          [◐]     │  top bar, 44px
 │                    ├──────────────────────────────────────────────────────────────┤
 │ ⌂ Home             │                                                              │
-│ ▦ Projects         │        ✎                                  page icon          │
+│ ▦ Projects         │                                                              │
 │ ✎ Writing          │        Writing                            40px bold title    │
 │ ⌖ Roadmap          │        Essays and notes on AI and ...     muted description  │
 │ ⚒ Tools            │                                                              │
@@ -37,12 +37,12 @@ Every visitor page is laid out like a Notion workspace: a grey page tree on the 
 `src/components/layout/sidebar.tsx` (the `aside`) and `sidebar-nav.tsx` (the tree, a client component).
 
 - **Where.** From `lg`, a sticky full-height `aside` (`aria-label="Site"`), 15rem wide through `.app-sidebar` in `globals.css`, `bg-muted`, no border. Below `lg` it is hidden and the same `SidebarNav` opens in the menu sheet.
-- **Owner's row** (`.sidebar-head`). The 20px portrait (`rounded`) and "Rizky Haksono" in `small` at weight 500, linking home, then the « button (`CollapseToggle`) on the desktop sidebar only.
+- **Owner's row** (`.sidebar-head`). The 20px portrait (`rounded`) and "Rizky Haksono" in `small` at weight 500, a link home, 32px from `lg` (36px below). Then the « button (`CollapseToggle`) on the desktop sidebar only, hidden until the head is hovered or holds focus (always shown on touch screens and in the rail). In the sheet the head keeps room for the close button.
 - **Main pages.** "Home", then the `NAV_SECTIONS` entries with `head` set (Projects, Writing, Roadmap, Tools, Stats, Chat), each with its 16px lucide icon from `SECTION_ICONS`.
 - **More.** A `caption` muted group label, then the other sections (Certificates, Changelog), Account (`/profile`) and the RSS feed.
-- **Bottom block** (pushed down with `mt-auto`): Send feedback (`data-open-feedback`), Email, GitHub and LinkedIn; then, over a hairline, one line with the legal links (Privacy, Terms) in `caption` on the left and the theme control on the right: three icon radios (`ThemeChoice`, a Radix radio group labelled "Theme"), Sun "Light theme", Moon "Dark theme" and Monitor "Theme from the device", 28px from `lg` (44px below), the checked one on `bg-tint-strong` in ink.
-- **Fold.** `CollapseToggle` folds the desktop sidebar to a 3.25rem icon rail and back, after Notion's « button. `aria-label` and `data-tip` read "Collapse the sidebar" or "Expand the sidebar", with `aria-expanded`. Folded, the width eases over 280ms, every `.sidebar-label` becomes screen-reader text so rows keep their names, `.sidebar-expanded-only` (the "More" label and the legal and theme line) hides, and `.sidebar-head` stacks the owner's row over the button. The state is `data-sidebar="collapsed"` on `<html>`: an inline script with the CSP nonce in `src/app/layout.tsx` sets it from localStorage `sidebar` before paint, so a returning visitor never sees the sidebar open and then close. Each change sends `sidebar-toggle` with `to: collapsed` or `open`. The menu sheet's tree never folds.
-- **Rows.** `text-small text-muted-foreground`, `rounded-md`, 28px tall from `lg` (44px below), a 16px icon with `strokeWidth={1.5}`, the hover tint at `duration-75`. Hover and the current page (`aria-current="page"`) get `bg-tint` and ink text; the current page is also weight 500.
+- **Bottom block** (pushed down with `mt-auto`): Send feedback (`data-open-feedback`), Email, GitHub and LinkedIn. Under it a hairline and one line: Privacy and Terms (`caption`, `navTrack`) on the left, `ThemeChoice` on the right (Sun, Moon, Monitor icon radios labelled "Light theme", "Dark theme", "Theme from the device"; `switchTheme()` and `theme-toggle`), 36px on phones, 28px or less from `lg`.
+- **Fold.** `CollapseToggle` folds the desktop sidebar to a 3.25rem icon rail and back, after Notion's « button. `aria-label` and `data-tip` read "Collapse the sidebar" or "Expand the sidebar", with `aria-expanded`. Folded, the width eases over 280ms, every `.sidebar-label` becomes screen-reader text so rows keep their names, `.sidebar-expanded-only` (the "More" label and the workspace row) hides, and only the expand button heads the rail. The state is `data-sidebar="collapsed"` on `<html>`: an inline script with the CSP nonce in `src/app/layout.tsx` sets it from localStorage `sidebar` before paint, so a returning visitor never sees the sidebar open and then close. Each change sends `sidebar-toggle` with `to: collapsed` or `open`. The menu sheet's tree never folds.
+- **Rows.** `text-small text-muted-foreground`, `rounded-md`, 28px tall from `lg` (36px below, denser than 44px by the owner's request; rows are full width, so WCAG 2.5.8 spacing holds), a 16px icon with `strokeWidth={1.5}`, the hover tint at `duration-75`. Hover and the current page (`aria-current="page"`) get `bg-tint` and ink text; the current page is also weight 500.
 - Internal rows use `navTrack(href, area)`; outside rows carry `data-umami-event="social-click"` with `area: sidebar` (or `menu` in the sheet).
 
 ### Top bar
@@ -55,11 +55,11 @@ Every visitor page is laid out like a Notion workspace: a grey page tree on the 
 
 ### Menu sheet
 
-`src/components/layout/contents-sheet.tsx`, loaded on first open by `contents-trigger.tsx`. Below `lg` the sidebar tree slides in from the left in a Radix sheet, `bg-muted`, 18rem wide (at most 85vw), with an sr-only "Menu" title. Any link or the feedback button inside closes it, and focus returns to the trigger.
+`src/components/layout/contents-sheet.tsx`, loaded on first open by `contents-trigger.tsx`. Below `lg` the sidebar tree slides in from the left in a Radix sheet, `bg-muted`, 5/6 of the screen wide (`w-5/6`, at most 20rem), over the dimmed page (`--scrim`), with an sr-only "Menu" title. Any link or the feedback button inside closes it, and focus returns to the trigger.
 
-### Page icon and title
+### Page title
 
-Every page opens with `PageHeader` (or `ArticleShell` on article pages): the page's lucide icon at 56px from `SECTION_ICONS` (`<SectionIcon href="/blog" />`), then the title at `text-title sm:text-display` (32px, 40px from `sm`, weight 700), an optional muted description, and an optional slot for `Properties`, view tabs or a feed link. One per page.
+Every page opens with `PageHeader` (or `ArticleShell` on article pages): the title at `text-title sm:text-display` (28px on phones, 40px from `sm`, weight 700), the description `small` on phones and `body` from `sm`, an optional muted description, and an optional slot for `Properties`, view tabs or a feed link. One per page.
 
 ### Closing line
 
@@ -129,7 +129,6 @@ Every route's `loading.tsx` mirrors its page, so nothing jumps when the data lan
 | Prop | Use |
 |---|---|
 | `label` | Read to screen readers through `LoadingStatus`, for example "Loading the posts…" |
-| `icon` | The page's own icon (`<SectionIcon href=… />`), shown as is |
 | `title` | The route's real h1 |
 | `description?` | Fixed text shows as is; `true` stands in a grey line for a description that comes with the data |
 | `headerExtra?` | What sits under the title on the real page (a feed link, properties) |

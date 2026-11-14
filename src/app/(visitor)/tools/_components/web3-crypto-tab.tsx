@@ -1,13 +1,12 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { Button } from "@/components/ui/button"
 import { InkChart } from "@/components/ui/ink-chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getCryptoChart, getCryptoPrice, getTrendingCrypto } from "@/services/visitor/web3"
 import { Skeleton } from "@/components/ui/skeleton"
-import { GROUP_LABEL, TableSkeleton, ToolError, useToolData } from "./tool-status"
+import { ChoiceGroup, TOOL_CONTROLS, TableSkeleton, ToolError, useToolData } from "./tool-status"
 
 const COINS = "bitcoin,ethereum,binancecoin,cardano,solana,polkadot"
 const loadPrices = () => getCryptoPrice(COINS).then((res) => res.data)
@@ -127,6 +126,8 @@ const CHART_COINS = [
   ["solana", "Solana"],
 ] as const
 const RANGES = [7, 30, 90] as const
+const COIN_OPTIONS = CHART_COINS.map(([id, name]) => ({ id, name }))
+const RANGE_OPTIONS = RANGES.map((d) => ({ id: d, name: `${d} days` }))
 
 type Point = { x: string; y: number }
 
@@ -156,31 +157,9 @@ function Chart() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-x-6">
-        <div role="group" aria-labelledby="chart-coin">
-          <p id="chart-coin" className={GROUP_LABEL}>
-            Coin
-          </p>
-          <div className="grid grid-cols-3 gap-2 sm:flex">
-          {CHART_COINS.map(([id, label]) => (
-            <Button key={id} type="button" variant={coin === id ? "default" : "outline"} aria-pressed={coin === id} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
-              {label}
-            </Button>
-          ))}
-          </div>
-        </div>
-        <div role="group" aria-labelledby="chart-period">
-          <p id="chart-period" className={GROUP_LABEL}>
-            Period
-          </p>
-          <div className="grid grid-cols-3 gap-2 sm:flex">
-          {RANGES.map((d) => (
-            <Button key={d} type="button" variant={days === d ? "default" : "outline"} aria-pressed={days === d} onClick={() => setDays(d)}>
-              {d} days
-            </Button>
-          ))}
-          </div>
-        </div>
+      <div className={TOOL_CONTROLS}>
+        <ChoiceGroup label="Coin" options={COIN_OPTIONS} value={coin} onChange={setCoin} event={{ name: "tool-chart", key: "coin" }} />
+        <ChoiceGroup label="Period" options={RANGE_OPTIONS} value={days} onChange={setDays} />
       </div>
 
       {chart.status === "error" ? (

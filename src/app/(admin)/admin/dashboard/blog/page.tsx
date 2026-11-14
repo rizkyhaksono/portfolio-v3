@@ -4,7 +4,6 @@ import { z } from "zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/ui/page-header"
-import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { formatDay } from "@/components/layout/admin/admin-format"
 import {
   createBlogPostClient,
@@ -95,7 +94,7 @@ const posts: CollectionProps<BlogPost, Values> = {
 export default function AdminBlogPage() {
   return (
     <>
-      <PageHeader icon={<AdminPageIcon href="/admin/dashboard/blog" />} title="Blog" description="Articles written here. Published ones show on /blog under Written here." />
+      <PageHeader title="Blog" description="Articles written here. Published ones show on /blog under Written here." />
       <Collection {...posts} />
     </>
   )

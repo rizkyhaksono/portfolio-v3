@@ -4,9 +4,11 @@
   /* Notion-style neutrals (white page, #F7F7F5 sidebar; #191919 / #202020 in dark): shadcn names as HSL triples (no hsl() wrapper) so every primitive follows.
      Contrast floors are pinned in src/__tests__/unit/lib/contrast.test.ts; hex copies live in lib/theme-hex.ts. */
   :root{--background:0 0% 100%;--foreground:45 7.8% 20%;--muted:60 11.1% 96.5%;--muted-foreground:48 2.3% 42.2%;--border:60 4.3% 91%;--input:48 2.2% 55.1%;--popover:0 0% 100%;--destructive:6.9 72.7% 44.5%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;
+  /* Notion's tooltip: near-black with white text in light; a raised grey with a hairline in dark (never a light box). */
+  --tip:0 0% 9%;--tip-foreground:0 0% 98%;--tip-border:0 0% 9%;
   --card:var(--background);--card-foreground:var(--foreground);--popover-foreground:var(--foreground);--primary:var(--foreground);--primary-foreground:var(--background);--secondary:var(--muted);--secondary-foreground:var(--foreground);--accent:var(--muted);--accent-foreground:var(--foreground);--destructive-foreground:var(--background);--ring:var(--foreground);--radius:.625rem;
   --head-h:2.75rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:0 0% 6% / .5}
-  .dark{--background:0 0% 9.8%;--foreground:0 0% 83.1%;--muted:0 0% 12.5%;--muted-foreground:0 0% 60.8%;--border:0 0% 18.4%;--input:0 0% 43.1%;--popover:0 0% 14.5%;--destructive:4.7 84.3% 67.5%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%}
+  .dark{--background:0 0% 9.8%;--foreground:0 0% 83.1%;--muted:0 0% 12.5%;--muted-foreground:0 0% 60.8%;--border:0 0% 18.4%;--input:0 0% 43.1%;--popover:0 0% 14.5%;--destructive:4.7 84.3% 67.5%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%;--tip:0 0% 15.3%;--tip-foreground:0 0% 92%;--tip-border:0 0% 23%}
 
   :root {
     color-scheme: light;
@@ -272,11 +274,37 @@ html[data-sidebar="collapsed"] .app-sidebar .sidebar-expanded-only {
   display: none;
 }
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-head {
-  flex-direction: column;
-  align-items: stretch;
+  justify-content: center;
+}
+/* Open, the « shows only on hover of the head (sidebar-nav.tsx); in the rail it is the only way back, so it stays. */
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-head button {
+  opacity: 1;
+}
+/* In the rail every row is an icon centred in its own square; the label is screen-reader text above. */
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-row {
+  justify-content: center;
+  gap: 0;
+  padding-inline: 0;
+  min-height: 2rem;
+}
+.sidebar-collapsed-only {
+  display: none;
+}
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-collapsed-only {
+  display: block;
 }
 
 @tailwind utilities;
+
+/* Phones: running text one step smaller (15/24), as the owner asked. Fields keep 16px (`text-base`) so iOS does not zoom. */
+@media (max-width: 639.98px) {
+  .text-body,
+  .text-prose,
+  .prose {
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
+  }
+}
 
 /* Theme switch (switchTheme in layout/theme-toggle.tsx): the whole page dissolves instead of flashing. */
 ::view-transition-old(root),

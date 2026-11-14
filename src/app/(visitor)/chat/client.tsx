@@ -85,21 +85,30 @@ interface MessageProps {
 
 const ACTION = "h-7 px-1.5 text-caption font-normal text-muted-foreground hover:text-foreground"
 
-/** A Notion comment: a small avatar, the name and time on one line, the text under it, and a tint on hover. */
+/**
+ * A Notion comment: a small avatar, the name and time on one line, the text under it, and a tint on hover.
+ * The site owner's messages sit on the right (the owner's request), so their answers stand apart from visitors'.
+ */
 function Message({ message, quoted, mine, canReply, onReply, onEdit, onDelete }: Readonly<MessageProps>) {
   const name = nameOf(message)
   const date = new Date(message.createdAt)
   const edited = message.updatedAt !== message.createdAt
+  const owner = message.user?.role === "ADMIN"
 
   return (
-    <article className="-mx-2 flex gap-2.5 rounded-md px-2 py-2 transition-colors duration-ui ease-out hover:bg-tint">
+    <article
+      className={cn(
+        "-mx-2 flex gap-2.5 rounded-md px-2 py-2 transition-colors duration-ui ease-out hover:bg-tint",
+        owner && "flex-row-reverse text-right",
+      )}
+    >
       <Avatar className="mt-0.5 size-6">
         <AvatarImage src={message.user?.avatarUrl ?? message.user?.iconUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
         <AvatarFallback className="bg-tint-strong text-caption">{name.charAt(0)}</AvatarFallback>
       </Avatar>
 
-      <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+      <div className={cn("min-w-0 flex-1", owner && "flex flex-col items-end")}>
+        <p className={cn("flex flex-wrap items-center gap-x-2 gap-y-0.5", owner && "flex-row-reverse")}>
           <span className="text-small font-medium text-foreground">{mine ? "You" : name}</span>
           {message.user?.role === "ADMIN" && <Badge>Site owner</Badge>}
           {!Number.isNaN(date.getTime()) && (
@@ -111,14 +120,14 @@ function Message({ message, quoted, mine, canReply, onReply, onEdit, onDelete }:
         </p>
 
         {quoted && (
-          <p className="mt-1 truncate border-l-2 border-border pl-2 text-small text-muted-foreground">
+          <p className={cn("mt-1 max-w-full truncate text-small text-muted-foreground", owner ? "border-r-2 border-border pr-2" : "border-l-2 border-border pl-2")}>
             In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
           </p>
         )}
         <p className="mt-0.5 max-w-[66ch] whitespace-pre-wrap break-words text-body text-foreground">{message.message}</p>
 
         {(canReply || mine) && (
-          <div className="-ml-1.5 mt-0.5 flex flex-wrap items-center gap-x-1">
+          <div className={cn("mt-0.5 flex flex-wrap items-center gap-x-1", owner ? "-mr-1.5 justify-end" : "-ml-1.5")}>
             {canReply && (
               <Button variant="ghost" size="sm" className={ACTION} aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
                 <Reply aria-hidden strokeWidth={1.5} />

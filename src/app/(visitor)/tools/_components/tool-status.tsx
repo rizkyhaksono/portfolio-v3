@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useId, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatusLine } from "@/components/ui/status-line"
+import { cn } from "@/lib/utils"
 
 type Status = "loading" | "ready" | "error"
 
@@ -79,6 +80,50 @@ export function TableSkeleton({ label, rows = 6 }: Readonly<{ label: string; row
 
 /** The small muted name above a group of choice buttons, matching `Label`. */
 export const GROUP_LABEL = "mb-1 text-caption font-medium text-muted-foreground"
+
+/** A tool's row of settings: label-and-control blocks side by side, bottoms aligned, wrapping on phones. */
+export const TOOL_CONTROLS = "flex flex-wrap items-end gap-x-6 gap-y-4"
+
+interface ChoiceGroupProps<T extends string | number> {
+  label: string
+  options: readonly { id: T; name: string }[]
+  value: T
+  onChange: (id: T) => void
+  disabled?: boolean
+  /** Umami event sent by each option, with the option's id under `data-umami-event-<key>`. */
+  event?: { name: string; key: string }
+}
+
+/** One-of-several choice as pressed buttons: the chosen one sits on the grey fill, as a Notion selected item. */
+export function ChoiceGroup<T extends string | number>({ label, options, value, onChange, disabled, event }: Readonly<ChoiceGroupProps<T>>) {
+  const labelId = useId()
+  return (
+    <div role="group" aria-labelledby={labelId}>
+      <p id={labelId} className={GROUP_LABEL}>
+        {label}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((o) => {
+          const on = o.id === value
+          return (
+            <Button
+              key={o.id}
+              type="button"
+              variant={on ? "secondary" : "outline"}
+              aria-pressed={on}
+              disabled={disabled}
+              onClick={() => onChange(o.id)}
+              className={cn(on && "border border-transparent bg-tint-strong")}
+              {...(event && { "data-umami-event": event.name, [`data-umami-event-${event.key}`]: o.id })}
+            >
+              {o.name}
+            </Button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 /** Grey stand-ins while a tool's code arrives. */
 export function ToolSkeleton() {

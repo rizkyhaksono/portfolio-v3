@@ -6,7 +6,6 @@ import BaseLayout from "@/components/layout/base-layout"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badge"
 import { StatusLine } from "@/components/ui/status-line"
-import { SectionIcon } from "@/components/layout/section-icons"
 
 export const metadata: Metadata = {
   title: "Changelog | Rizky Haksono",
@@ -24,7 +23,7 @@ export default function ChangelogPage() {
   return (
     <BaseLayout>
       <PageHeader
-        icon={<SectionIcon href="/changelog" />}
+
         title="Changelog"
         description={
           <>
@@ -48,7 +47,7 @@ export default function ChangelogPage() {
         <div>
           {changelogs.map(({ meta, content, slug }) => (
             <article key={slug} id={slug} className="scroll-mt-16 border-t border-border py-10 first:border-t-0 first:pt-0">
-              <h2 className="text-h2 text-balance text-foreground">
+              <h2 className="text-h3 text-balance text-foreground sm:text-h2">
                 <Badge className="mr-2 align-middle font-medium tabular-nums">
                   <span className="sr-only">Version </span>
                   {meta.version}

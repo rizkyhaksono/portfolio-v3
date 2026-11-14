@@ -6,7 +6,7 @@ export default function Loading() {
   return (
     <ArticleLoading
       label="Loading the lesson…"
-      icon={<FileText />}
+
       properties={[
         { label: "Course", icon: <BookOpen /> },
         { label: "Lesson", icon: <ListOrdered /> },

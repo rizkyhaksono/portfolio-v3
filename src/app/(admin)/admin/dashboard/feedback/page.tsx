@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { InkLink } from "@/components/ui/ink-link"
 import { StatusLine } from "@/components/ui/status-line"
 import { PageHeader } from "@/components/ui/page-header"
-import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import { getFeedbackClient, updateFeedbackStatusClient, type AdminFeedback, type FeedbackStatus } from "@/services/admin/feedback"
 import { formatDay, httpUrl, timeAgo } from "@/components/layout/admin/admin-format"
@@ -74,7 +73,7 @@ export default function FeedbackAdminPage() {
 
   return (
     <>
-      <PageHeader icon={<AdminPageIcon href="/admin/dashboard/feedback" />} title="Feedback" description="Messages from the feedback form on the site, newest first." />
+      <PageHeader title="Feedback" description="Messages from the feedback form on the site, newest first." />
       <ViewTabs
         label="Show feedback"
         tabs={FILTERS.map((f) => ({ label: f.label, current: filter === f.value, onSelect: () => setFilter(f.value) }))}

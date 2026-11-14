@@ -105,12 +105,18 @@ test.describe('Footer and sidebar', () => {
     await page.goto('/');
     const sidebar = page.getByRole('complementary', { name: 'Site' });
     const wide = (await sidebar.boundingBox())?.width ?? 0;
-    await page.getByRole('button', { name: 'Collapse the sidebar' }).click();
+    // Like Notion's «, the button shows on hover of the head and on keyboard focus.
+    const collapse = page.getByRole('button', { name: 'Collapse the sidebar' });
+    await expect(collapse).toHaveCSS('opacity', '0');
+    await collapse.focus();
+    await expect(collapse).toHaveCSS('opacity', '1');
+    await collapse.click();
     await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeLessThan(wide / 2);
     // The links keep their names for screen readers while only the icons show.
     await expect(sidebar.getByRole('link', { name: 'Writing', exact: true })).toBeAttached();
     await page.reload();
     await expect(page.getByRole('button', { name: 'Expand the sidebar' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Expand the sidebar' })).toHaveCSS('opacity', '1');
     await page.getByRole('button', { name: 'Expand the sidebar' }).click();
     await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeGreaterThan(200);
   });

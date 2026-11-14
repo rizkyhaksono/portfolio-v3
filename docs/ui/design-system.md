@@ -96,7 +96,7 @@ The `fontSize` keys in `tailwind.config.ts`, on Notion's scale: 14px for UI (sid
 | `h3` | 20 / 28 | 600 | Sheet and dialog titles |
 | `h2` | 24 / 32, -0.01em | 600 | Section headings on a page ("Projects", "Writing"), the auth title |
 | `h1` | 30 / 38, -0.015em | 600 | A heading 1 block |
-| `title` | 32 / 40, -0.02em | 700 | Page titles on phones |
+| `title` | 28 / 36, -0.02em | 700 | Page titles on phones |
 | `display` | 40 / 48, -0.02em | 700 | Page titles from `sm` (`text-title sm:text-display`) |
 | `numeral` | 32 / 40, -0.015em | 600 | Figures on `/stats` and the admin, with `tabular-nums` |
 
@@ -127,14 +127,14 @@ Notion's radii. `--radius` is 10px.
 |---|---|---|---|
 | Dots | `rounded-full` | | Switch, radio, avatar on the home page, status dots |
 | Tags | `rounded` | 4px | `Badge`, `Chip`, inline code, the owner's 20px portrait in the sidebar |
-| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, the theme radios, list rows, toggles, callouts, the hover tip |
+| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, list rows, toggles, callouts, the hover tip |
 | Cards and layers | `rounded-lg` | 10px | `MediaCard`, `Card`, `Surface`, `PlateFigure` images, the contact form, the mention preview, dialogs, menus, select content, toasts |
 
 `rounded-sm` (2px) exists but has no use. `rounded-xl` and `rounded-2xl` are not part of the scale; do not use them. Never `rounded-[…]`.
 
 ## Shadow, blur and gradients
 
-- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast and the hover tip are inverted slabs (`bg-foreground text-background`) with no border. The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
+- **No shadows anywhere.** `boxShadow` is gone from `tailwind.config.ts`. Floating layers (dialog, alert dialog, sheet, popover, dropdown menu, select content, terminal overlay) are set apart by a hairline `border-border`; the toast is an inverted slab (`bg-foreground text-background`); the hover tip is Notion's dark tooltip (`bg-tip text-tip-foreground`, near-black in light, a raised grey with a `border-tip-border` hairline in dark, never a light box). The shared primitives apply this; feature code does not. The UI gate (R8) fails on any `shadow-*` class except `shadow-none`, and on `box-shadow` outside `globals.css`.
 - **No blur.** The top bar is opaque `bg-background`; nothing is translucent. Scrims are a fixed `--scrim` fill, never blurred.
 - **No gradients.** None is left in the code: no gradient text, buttons, borders or backgrounds. The gate's R6 allowlist still names `globals.css` and the deleted `sky.tsx`; that is not a licence to add one.
 
@@ -154,7 +154,7 @@ All of it is CSS or platform native, quick and Notion-like. No motion library.
 
 | Motion | How | Timing |
 |---|---|---|
-| Row hover | `bg-tint` comes in on sidebar rows, list rows, gallery cards, the breadcrumb, the theme radios and mentions | `duration-75` |
+| Row hover | `bg-tint` comes in on sidebar rows, list rows, gallery cards, the breadcrumb and mentions | `duration-75` |
 | Button hover | `bg-tint` or the ink button's fill | `--dur-press` |
 | Link underline | The grey underline turns full ink | `--dur-ui` |
 | Toggle | The triangle (`ChevronRight`) turns 90 degrees; accordion content opens by height | `--dur-ui` |
@@ -187,7 +187,7 @@ Scroll reveal or fade-up on sections, parallax, scroll-jacking or anything tied 
 
 - next-themes with `attribute="class"`, `defaultTheme="system"` and `enableSystem`. `ThemeProvider` receives the CSP nonce so its script runs before paint and dark-OS visitors never see a light frame.
 - Light and dark are equal: Notion's white page with a #F7F7F5 sidebar, and Notion's #191919 page with a #202020 sidebar.
-- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and, at the bottom right of the sidebar beside Privacy and Terms, three icon radios (`ThemeChoice` in `sidebar-nav.tsx`): Sun "Light theme", Moon "Dark theme" and Monitor "Theme from the device", the checked one on `bg-tint-strong`. They hide while the sidebar is folded.
+- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and, on the sidebar's bottom line (`ThemeChoice` in `sidebar-nav.tsx`), three icon radios: Sun ("Light theme"), Moon ("Dark theme") and Monitor ("Theme from the device"), the checked one on `bg-tint-strong`; 36px on phones, 28px from `lg`. They hide while the sidebar is folded.
 - `switchTheme()` in `src/components/layout/theme-toggle.tsx` is the one path for theme changes. Do not call `setTheme` directly from new code.
 - `color-scheme` follows the theme. The viewport `themeColor` is an array with one entry per `prefers-color-scheme`, read from `THEME_HEX`, as is the manifest.
 

@@ -3,7 +3,6 @@ import { InkChart } from "@/components/ui/ink-chart"
 import { StatusLine } from "@/components/ui/status-line"
 import { PageHeader } from "@/components/ui/page-header"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import type { FullUmamiAnalytics } from "@/services/visitor/umami"
 import type { UmamiMetric } from "@/commons/types/umami"
@@ -77,7 +76,7 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
   return (
     <>
       <PageHeader
-        icon={<AdminPageIcon href="/admin/dashboard/analytics" />}
+
         title="Analytics"
         description={here > 0 ? `${count(here)} ${here === 1 ? "person" : "people"} here in the last five minutes.` : "Nobody here in the last five minutes."}
       />

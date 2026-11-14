@@ -2,7 +2,7 @@
 
 **This folder is the source of truth for every UI decision in Portfolio v3.** The agent files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.geminirules`, `.cursorrules`, `.github/copilot-instructions.md`, `.cursor/rules/*.mdc`) point here or summarise it. When a summary and these docs disagree, these docs win; when these docs and the code disagree, the code in the files listed at the end wins and the docs get fixed. Code tokens live in `src/app/globals.css`, `tailwind.config.ts`, `src/lib/design-system.ts` and `src/lib/theme-hex.ts`.
 
-The site is laid out like a Notion workspace, equally good in light and dark. Every visitor page has Notion's grey sidebar with the owner's row and the pages with their icons, a thin top bar with the page's path and the theme toggle, then the page in Notion's 708px column: an icon above a 40px bold title, a muted description, properties, and the content as Notion blocks and views (list, gallery, table, callout, toggle). Everything is monochrome: ink, grey and translucent tints, set in one sans, Onest. The home page has a photo as Notion's page cover. Blue appears only in the text selection. Each page ends on one quiet line. The admin uses the same Notion shell.
+The site is laid out like a Notion workspace, equally good in light and dark. Every visitor page has Notion's grey sidebar with the owner's row and the pages with their icons, a thin top bar with the page's path and the theme toggle, then the page in Notion's 708px column: a 40px bold title, a muted description, properties, and the content as Notion blocks and views (list, gallery, table, callout, toggle). Everything is monochrome: ink, grey and translucent tints, set in one sans, Onest. The home page has a photo as Notion's page cover. Blue appears only in the text selection. Each page ends on one quiet line. The admin uses the same Notion shell.
 
 ## Index
 
@@ -60,7 +60,7 @@ Build toward these docs, never toward old code: when you touch a file, move it t
 - Tokens: `src/app/globals.css` (`:root`, `.dark`, `.prose`, `::selection`, the collapsible sidebar's `.app-sidebar` rules), `tailwind.config.ts` (colours with `tint`, `fontSize`, `borderRadius`, durations, the `out` easing), `src/lib/design-system.ts` (`SURFACE`, `SECTION_SPACING`, `PROSE_WIDTH`, `WIDE_WIDTH`)
 - Hex copies: `src/lib/theme-hex.ts` (`THEME_HEX`)
 - Font: `src/app/layout.tsx` (Onest via `next/font/google`, `--font-sans`)
-- Shell: `src/app/layout.tsx` (the inline script that sets `data-sidebar` before paint), `src/components/layout/base-layout.tsx`, `sidebar.tsx`, `sidebar-nav.tsx` (`CollapseToggle`, the theme radios), `top-bar.tsx`, `breadcrumb.tsx`, `contents-trigger.tsx`, `contents-sheet.tsx`, `section-icons.tsx`, `footer.tsx`, `auth-shell.tsx`
+- Shell: `src/app/layout.tsx` (the inline script that sets `data-sidebar` before paint), `src/components/layout/base-layout.tsx`, `sidebar.tsx`, `sidebar-nav.tsx` (`CollapseToggle`, `ThemeChoice` and the legal links on the bottom line), `top-bar.tsx`, `breadcrumb.tsx`, `contents-trigger.tsx`, `contents-sheet.tsx`, `section-icons.tsx`, `footer.tsx`, `auth-shell.tsx`
 - Theme: `src/components/layout/theme-provider.tsx`, `theme-toggle.tsx` (`switchTheme()`)
 - Home: `src/app/page.tsx`, `src/components/ui/page-cover.tsx` (`PageCover`) with `src/assets/cover/home.webp`, `src/app/_components/home/mention.tsx` (`Mention`); the closing line's clock is `src/components/ui/malang-clock.tsx` (`MalangClock`)
 - Loading: `src/components/ui/page-loading.tsx` (`PageLoading`, the skeleton shapes, `FADE_IN`)

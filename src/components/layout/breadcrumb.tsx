@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Fragment } from "react"
 import { LEGAL_LINKS, NAV_SECTIONS, isCurrentPath, navTrack } from "@/commons/constants/navigation-menu"
 import { SectionIcon } from "@/components/layout/section-icons"
+import { cn } from "@/lib/utils"
 
 const PAGES = [...NAV_SECTIONS, ...LEGAL_LINKS, { href: "/profile", label: "Account" }]
 
@@ -32,7 +33,8 @@ export function Breadcrumb() {
                 {...navTrack(href, "head")}
               >
                 <SectionIcon href={href} className="size-4 shrink-0" />
-                <span className="truncate">{label}</span>
+                {/* On phones the home crumb is its icon only once a section follows, so the section name never truncates. */}
+                <span className={cn("truncate", i === 0 && crumbs.length > 1 && "max-sm:sr-only")}>{label}</span>
               </Link>
             </li>
           </Fragment>

@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { LoadingStatus } from "@/components/ui/page-loading"
 import { PageHeader } from "@/components/ui/page-header"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -16,7 +15,7 @@ export default function Loading() {
   return (
     <div aria-busy="true" className="flex min-h-0 w-full flex-1 flex-col">
       <PageHeader
-        icon={<SectionIcon href="/chat" />}
+
         title="Chat"
         description="A public room: say hello, ask a question or answer someone. Times are Jakarta time."
         className="mb-6 shrink-0"

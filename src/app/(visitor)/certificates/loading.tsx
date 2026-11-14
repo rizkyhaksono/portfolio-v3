@@ -1,4 +1,3 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { GroupLabelSkeleton, PageLoading } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -8,7 +7,7 @@ const ROWS = ["w-3/4", "w-1/2", "w-5/6", "w-2/3", "w-3/5", "w-4/5", "w-1/2", "w-
 /** Shown while the certificates load: the head, then the newest year's table with the real column names. */
 export default function Loading() {
   return (
-    <PageLoading label="Loading the certificates…" icon={<SectionIcon href="/certificates" />} title="Certificates" description>
+    <PageLoading label="Loading the certificates…" title="Certificates" description>
       <GroupLabelSkeleton />
       <Table className="min-w-[40rem] table-fixed">
         <TableHeader>

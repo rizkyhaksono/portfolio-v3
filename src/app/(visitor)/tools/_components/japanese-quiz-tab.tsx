@@ -26,7 +26,7 @@ export function JapaneseQuizTab() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <fieldset>
         <legend className={GROUP_LABEL}>Level</legend>
         {levels.status === "loading" && !levels.data ? (
@@ -44,13 +44,13 @@ export function JapaneseQuizTab() {
               <Button
                 key={l.code}
                 type="button"
-                variant={level === l.code ? "default" : "outline"}
+                variant={level === l.code ? "secondary" : "outline"}
                 aria-pressed={level === l.code}
                 onClick={() => setLevel(l.code)}
-                className="h-auto w-full flex-col items-start gap-0 px-2 py-2 sm:w-auto sm:px-4"
+                className={cn("h-auto w-full flex-col items-start gap-0 px-2 py-2 sm:w-auto sm:px-4", level === l.code && "border border-transparent bg-tint-strong")}
               >
                 {l.code}
-                <span className="hyphens-auto whitespace-normal text-left text-caption font-normal">{l.name}</span>
+                <span className="hyphens-auto whitespace-normal text-left text-caption font-normal text-muted-foreground">{l.name}</span>
               </Button>
             ))}
           </div>

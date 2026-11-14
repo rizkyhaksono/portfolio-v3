@@ -1,5 +1,4 @@
 import { FileText, Rss } from "lucide-react"
-import { SectionIcon } from "@/components/layout/section-icons"
 import { StatusLine } from "@/components/ui/status-line"
 import { InkLink } from "@/components/ui/ink-link"
 import { LedgerList, LedgerRow } from "@/components/ui/ledger"
@@ -39,7 +38,7 @@ export default async function BlogPage() {
   return (
     <div>
       <PageHeader
-        icon={<SectionIcon href="/blog" />}
+
         title="Writing"
         description={posts.length > 0 ? sourcesSentence(posts) : undefined}
       >

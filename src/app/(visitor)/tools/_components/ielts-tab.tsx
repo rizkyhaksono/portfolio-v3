@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { GROUP_LABEL } from "./tool-status"
+import { ChoiceGroup } from "./tool-status"
+
+const TOPIC_OPTIONS = IELTS_TOPICS.map((t) => ({ id: t, name: t }))
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -99,17 +101,8 @@ export function IeltsTab() {
           </SelectContent>
         </Select>
       </div>
-      <div role="group" aria-labelledby="ielts-topics" className="hidden sm:block">
-        <p id="ielts-topics" className={GROUP_LABEL}>
-          Topic
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {IELTS_TOPICS.map((t) => (
-            <Button key={t} type="button" variant={t === topic ? "default" : "outline"} aria-pressed={t === topic} onClick={() => pickTopic(t)}>
-              {t}
-            </Button>
-          ))}
-        </div>
+      <div className="hidden sm:block">
+        <ChoiceGroup label="Topic" options={TOPIC_OPTIONS} value={topic} onChange={pickTopic} />
       </div>
 
       <p className="text-caption tabular-nums text-muted-foreground">

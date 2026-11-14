@@ -1,10 +1,9 @@
-import { SectionIcon } from "@/components/layout/section-icons"
 import { ListSkeleton, PageLoading } from "@/components/ui/page-loading"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /** A section heading as on the page, so the figures below it arrive under a heading already in place. */
 function Heading({ children }: Readonly<{ children: string }>) {
-  return <p className="mt-12 text-h2 text-foreground">{children}</p>
+  return <p className="mt-12 text-h3 text-foreground sm:text-h2">{children}</p>
 }
 
 /** Shown while the figures load: four number blocks, the readers chart and rows, then the coding calendar. */
@@ -12,7 +11,7 @@ export default function Loading() {
   return (
     <PageLoading
       label="Loading the figures…"
-      icon={<SectionIcon href="/stats" />}
+
       title="Stats"
       description="Readers, status and practice figures, refreshed every fifteen minutes."
     >

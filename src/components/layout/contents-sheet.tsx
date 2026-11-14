@@ -26,7 +26,8 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
         onClickCapture={(event) => {
           if ((event.target as HTMLElement).closest("a, button[data-open-feedback]")) onOpenChange(false)
         }}
-        className="flex w-72 max-w-[85vw] flex-col gap-0 overflow-y-auto bg-muted p-0 pt-12 sm:max-w-72"
+        // About 85% of a phone (5/6), at most 20rem on larger phones and tablets; the overlay dims the page.
+        className="flex w-5/6 max-w-xs flex-col gap-0 overflow-y-auto bg-muted p-0 sm:max-w-xs"
       >
         <SheetTitle className="sr-only">Menu</SheetTitle>
         <SidebarNav area="menu" className="flex-1" />

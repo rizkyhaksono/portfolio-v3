@@ -7,7 +7,7 @@ const EDGE = 8
 
 /**
  * One tooltip for every `[data-tip]` element, shown the moment the pointer arrives (native `title`
- * waits about a second). SVG marks follow the cursor; other elements anchor below, or above when
+ * waits about a second). SVG marks follow the cursor; `data-tip-rail` rows sit to the right; other elements anchor below, or above when
  * there is no room. Touch shows it on tap. Hidden from assistive tech: every tip repeats an
  * accessible name or a text table that is already on the page.
  */
@@ -19,13 +19,16 @@ export function HoverTip() {
     if (!tip) return
     let current: Element | null = null
 
-    const place = (x: number, y: number, anchor?: DOMRect) => {
+    const place = (x: number, y: number, anchor?: DOMRect, beside = false) => {
       const { width, height } = tip.getBoundingClientRect()
       const vw = window.innerWidth
       const vh = window.innerHeight
       let left: number
       let top: number
-      if (anchor) {
+      if (anchor && beside) {
+        left = anchor.right + GAP
+        top = anchor.top + anchor.height / 2 - height / 2
+      } else if (anchor) {
         left = anchor.left + anchor.width / 2 - width / 2
         top = anchor.bottom + GAP
         if (top + height > vh - EDGE) top = anchor.top - height - GAP
@@ -42,11 +45,13 @@ export function HoverTip() {
 
     const show = (el: Element, x: number, y: number) => {
       const text = el.getAttribute("data-tip")
-      if (!text) return hide()
+      // Rail rows name themselves only while the sidebar is folded; open, their label is already on screen.
+      const rail = el.hasAttribute("data-tip-rail")
+      if (!text || (rail && document.documentElement.dataset.sidebar !== "collapsed")) return hide()
       current = el
       tip.textContent = text
       tip.hidden = false
-      place(x, y, el instanceof SVGElement ? undefined : el.getBoundingClientRect())
+      place(x, y, el instanceof SVGElement ? undefined : el.getBoundingClientRect(), rail)
     }
 
     const hide = () => {
@@ -111,7 +116,7 @@ export function HoverTip() {
       ref={ref}
       hidden
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[100] max-w-[min(18rem,calc(100vw-1rem))] rounded-md bg-foreground px-2 py-1 text-caption font-medium text-background"
+      className="pointer-events-none fixed left-0 top-0 z-[100] max-w-[min(18rem,calc(100vw-1rem))] rounded-md border border-tip-border bg-tip px-2 py-1 text-caption font-medium text-tip-foreground animate-in fade-in-0 zoom-in-95 duration-100"
     />
   )
 }

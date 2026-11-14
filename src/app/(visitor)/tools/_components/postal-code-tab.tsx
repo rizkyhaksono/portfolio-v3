@@ -141,7 +141,7 @@ function ByPlace() {
       {village && postal.status !== "error" && (
         <div aria-live="polite">
           {postal.status === "loading" ? (
-            <p className="text-caption text-muted-foreground">Looking up the postal code…</p>
+            <StatusLine kind="loading">Looking up the postal code…</StatusLine>
           ) : postal.data?.[0] ? (
             <>
               <p className="text-caption text-muted-foreground">
@@ -208,7 +208,7 @@ function ByCode() {
           {hits.status === "error" ? (
             <ToolError onRetry={hits.retry}>The lookup did not answer.</ToolError>
           ) : hits.status === "loading" ? (
-            <p className="text-caption text-muted-foreground">Looking up {query}…</p>
+            <StatusLine kind="loading">Looking up {query}…</StatusLine>
           ) : hits.data?.length ? (
             <>
               <p className="text-caption text-muted-foreground">

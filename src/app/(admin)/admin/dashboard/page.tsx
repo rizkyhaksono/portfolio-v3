@@ -6,7 +6,6 @@ import { InkLink } from "@/components/ui/ink-link"
 import { PageHeader } from "@/components/ui/page-header"
 import { StatusLine } from "@/components/ui/status-line"
 import { FileText, LayoutGrid, PenLine } from "lucide-react"
-import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { getBlogData } from "@/services/visitor/blog"
 import { getAllProject } from "@/services/visitor/project"
 import { floorTo, getActiveVisitors, getPathReads, getUmamiStats } from "@/services/visitor/umami"
@@ -68,7 +67,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <>
-      <PageHeader icon={<AdminPageIcon href="/admin/dashboard" />} title="Dashboard" description="Today on the site, what waits for you, and what people read." />
+      <PageHeader title="Dashboard" description="Today on the site, what waits for you, and what people read." />
       <StatStrip
         items={[
           { label: "Views today", value: figure(today?.pageviews) },

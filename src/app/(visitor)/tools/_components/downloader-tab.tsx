@@ -16,7 +16,7 @@ import {
 } from "@/services/visitor/downloader"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
 import { httpUrl } from "@/lib/utils"
-import { GROUP_LABEL, ToolError } from "./tool-status"
+import { ChoiceGroup, ToolError } from "./tool-status"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
 
@@ -92,24 +92,7 @@ export function DownloaderTab() {
 
   return (
     <div className="space-y-6">
-      <div role="group" aria-labelledby="download-platform">
-        <p id="download-platform" className={GROUP_LABEL}>
-          Platform
-        </p>
-        <div className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-        {PLATFORMS.map((p) => (
-          <Button
-            key={p.id}
-            type="button"
-            variant={platformId === p.id ? "default" : "outline"}
-            aria-pressed={platformId === p.id}
-            onClick={() => setPlatformId(p.id)}
-          >
-            {p.name}
-          </Button>
-        ))}
-        </div>
-      </div>
+      <ChoiceGroup label="Platform" options={PLATFORMS} value={platformId} onChange={setPlatformId} />
 
       <form onSubmit={handleDownload} className="max-w-xl space-y-1">
         <Label htmlFor="download-url">{platform.name} link</Label>
@@ -137,7 +120,7 @@ export function DownloaderTab() {
       {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
 
       {result?.type === "instagram" && (
-        <article className="space-y-4 rounded-lg border border-border p-4 sm:p-5">
+        <article className="max-w-xl space-y-4 rounded-lg border border-border p-4 sm:p-5">
           <Badge variant="outline" status="outline">
             Preview only
           </Badge>
