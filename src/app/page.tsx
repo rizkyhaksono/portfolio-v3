@@ -26,6 +26,7 @@ import { getLinkedinRecommendations } from "@/services/visitor/linkedin"
 import { EMAIL, media_socials } from "@/commons/constants/contact"
 import { RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
 import { startOf } from "@/lib/career-dates"
+import { runSpans } from "@/lib/run-spans"
 
 export const revalidate = 900
 
@@ -236,6 +237,8 @@ type Entry = { id: string | number; title: string; subtitle: string; duration: s
 
 /** A Notion table of records; the rows keep the organisation in `title` and the role or study in `subtitle`. */
 function RecordTable({ entries, first, second }: Readonly<{ entries: Entry[]; first: string; second: string }>) {
+  // Back-to-back roles at one company share a merged company cell.
+  const spans = runSpans(entries, (entry) => entry.title.trim().toLowerCase())
   return (
     <div className="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:px-0">
       <Table className="min-w-[34rem]">
@@ -247,10 +250,14 @@ function RecordTable({ entries, first, second }: Readonly<{ entries: Entry[]; fi
           </TableRow>
         </TableHeader>
         <TableBody>
-          {entries.map((entry) => (
+          {entries.map((entry, i) => (
             <TableRow key={entry.id}>
               <TableCell className="font-medium text-foreground">{entry.subtitle.trim() || entry.title}</TableCell>
-              <TableCell className="text-muted-foreground">{entry.title}</TableCell>
+              {spans[i] > 0 && (
+                <TableCell rowSpan={spans[i]} className="text-muted-foreground">
+                  {entry.title}
+                </TableCell>
+              )}
               <TableCell className="whitespace-nowrap text-muted-foreground">{entry.duration.replace(" - ", " to ")}</TableCell>
             </TableRow>
           ))}
