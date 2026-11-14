@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { getRandomWords, type Language } from "./wpm-random-text"
 import { scoreWord, summarize } from "./score"
-import { GROUP_LABEL } from "../tool-status"
+import { ChoiceGroup, TOOL_CONTROLS } from "../tool-status"
 
 const DURATIONS = [15, 30, 60, 120] as const
 type Duration = (typeof DURATIONS)[number]
@@ -30,29 +30,6 @@ const CHAR: Record<CharState, string> = {
   wrong: "bg-foreground text-background",
   caret: "text-foreground underline decoration-2 underline-offset-4",
   todo: "text-muted-foreground",
-}
-
-function ChoiceGroup<T extends string | number>({
-  label,
-  options,
-  value,
-  onChange,
-  disabled,
-}: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
-  return (
-    <div role="group" aria-label={label}>
-      <p aria-hidden className={GROUP_LABEL}>
-        {label}
-      </p>
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-        {options.map((o) => (
-          <Button key={o.id} type="button" variant={o.id === value ? "default" : "outline"} aria-pressed={o.id === value} disabled={disabled} onClick={() => onChange(o.id)}>
-            {o.name}
-          </Button>
-        ))}
-      </div>
-    </div>
-  )
 }
 
 export default function WPMTest() {
@@ -119,7 +96,7 @@ export default function WPMTest() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:flex sm:flex-wrap sm:items-end sm:gap-x-8">
+      <div className={TOOL_CONTROLS}>
         <ChoiceGroup
           label="Length"
           options={DURATIONS.map((d) => ({ id: d, name: `${d} seconds` }))}
@@ -128,7 +105,7 @@ export default function WPMTest() {
           disabled={phase === "running"}
         />
         <ChoiceGroup label="Language" options={LANGUAGES} value={language} onChange={setLanguage} disabled={phase === "running"} />
-        <div className="-ml-3 flex gap-1 sm:ml-0">
+        <div className="flex gap-1">
           <Button variant="ghost" onClick={() => restart(true)} disabled={phase === "running"}>
             New words
           </Button>

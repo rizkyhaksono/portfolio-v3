@@ -15,10 +15,11 @@ import { switchTheme } from "@/components/layout/theme-toggle"
 import { track } from "@/lib/analytics"
 import { cn } from "@/lib/utils"
 
-// Notion's sidebar row: 28px (44px on touch), a 16px icon, grey text that inks and tints on hover and when current.
+// Notion's sidebar row: 28px from lg, 36px on phones (denser than 44px by the owner's choice; full-width rows keep
+// the WCAG 2.5.8 spacing), a 16px icon, grey text that inks and tints on hover and when current.
 // `data-tip-rail` names the icon on hover only while the sidebar is folded (hover-tip.tsx).
 const ROW =
-  "sidebar-row flex min-h-11 w-full items-center gap-2 rounded-md px-2 text-left text-small text-muted-foreground transition-colors duration-75 ease-out hover:bg-tint hover:text-foreground aria-[current=page]:bg-tint aria-[current=page]:font-medium aria-[current=page]:text-foreground lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
+  "sidebar-row flex min-h-9 w-full items-center gap-2 rounded-md px-2 text-left text-small text-muted-foreground transition-colors duration-75 ease-out hover:bg-tint hover:text-foreground aria-[current=page]:bg-tint aria-[current=page]:font-medium aria-[current=page]:text-foreground lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
 
 const GITHUB = media_socials.find(({ title }) => title === "GitHub")!.href
 const LINKEDIN = media_socials.find(({ title }) => title === "LinkedIn")!.href
@@ -53,7 +54,7 @@ const THEMES = [
   { value: "system", label: "Theme from the device", Icon: Monitor },
 ] as const
 
-/** Notion's appearance setting, small: three icon buttons for light, dark and the device's choice. */
+/** Notion's appearance setting, small: three icon buttons for light, dark and the device's choice. 36px on phones, 28px from lg. */
 function ThemeChoice() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -76,7 +77,7 @@ function ThemeChoice() {
           value={value}
           aria-label={label}
           data-tip={label}
-          className="inline-flex size-11 items-center justify-center rounded-md text-muted-foreground transition-colors duration-75 hover:bg-tint hover:text-foreground data-[state=checked]:bg-tint-strong data-[state=checked]:text-foreground lg:size-7"
+          className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors duration-75 hover:bg-tint hover:text-foreground data-[state=checked]:bg-tint-strong data-[state=checked]:text-foreground lg:size-7"
         >
           <Icon aria-hidden className="size-4" strokeWidth={1.5} />
         </RadioGroup.Item>
@@ -109,7 +110,8 @@ function CollapseToggle() {
       aria-label={label}
       aria-expanded={!collapsed}
       data-tip={label}
-      className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-75 hover:bg-tint hover:text-foreground lg:size-7"
+      // Notion shows « only while the pointer is on the header; keyboard focus and touch screens always see it.
+      className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition duration-75 hover:bg-tint hover:text-foreground focus-visible:opacity-100 group-hover/head:opacity-100 group-focus-within/head:opacity-100 lg:size-7 [@media(hover:none)]:opacity-100"
     >
       {collapsed ? <PanelLeftOpen aria-hidden className="size-4" strokeWidth={1.5} /> : <PanelLeftClose aria-hidden className="size-4" strokeWidth={1.5} />}
     </button>
@@ -122,22 +124,23 @@ function RailDivider() {
 }
 
 function GroupLabel({ children }: Readonly<{ children: ReactNode }>) {
-  return <p className="sidebar-expanded-only mb-0.5 mt-5 px-2 text-caption font-medium text-muted-foreground">{children}</p>
+  return <p className="sidebar-expanded-only mb-0.5 mt-3 px-2 text-caption font-medium text-muted-foreground">{children}</p>
 }
 
 /**
  * The Notion-style page tree: the owner's row, the main pages, the rest under "More", then the ways to reach
- * out and the legal pages. Used by the desktop sidebar and the menu sheet on smaller screens.
+ * out and the legal pages beside the theme. Used by the desktop sidebar and the menu sheet on smaller screens.
  */
 export function SidebarNav({ area = "sidebar", collapsible = false, className }: Readonly<{ area?: NavArea; collapsible?: boolean; className?: string }>) {
   const pathname = usePathname()
 
   return (
     <div className={cn("flex min-h-full flex-col px-2 pb-3 pt-2", className)}>
-      <div className="sidebar-head flex items-center gap-1">
+      {/* In the sheet the head leaves room for the sheet's close button. */}
+      <div className={cn("sidebar-head group/head flex items-center gap-1", !collapsible && "pr-11")}>
         <Link
           href="/"
-          className="sidebar-expanded-only flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-9"
+          className="sidebar-expanded-only flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-8"
           {...navTrack("/", area)}
         >
           <Image src="/rizky.jpg" alt="" width={20} height={20} className="size-5 shrink-0 rounded object-cover" />
@@ -146,7 +149,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
         {collapsible && <CollapseToggle />}
       </div>
 
-      <nav aria-label="Sections" className="mt-2">
+      <nav aria-label="Sections" className="mt-1">
         <ul role="list">
           <PageRow href="/" label="Home" area={area} pathname={pathname} />
           {NAV_SECTIONS.filter((section) => section.head).map(({ href, label }) => (
@@ -169,7 +172,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
         </ul>
       </nav>
 
-      <div className="mt-auto pt-6">
+      <div className="mt-auto pt-4">
         <RailDivider />
         <ul role="list" aria-label="Contact">
           <li>
@@ -192,21 +195,21 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
           </OutRow>
         </ul>
         <div className="sidebar-expanded-only mt-3 flex items-center justify-between gap-2 border-t border-border pt-2">
-        <ul role="list" aria-label="Legal" className="flex gap-1">
-          {LEGAL_LINKS.map(({ href, label }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-                className="inline-flex min-h-11 items-center rounded-md px-1.5 text-caption text-muted-foreground transition-colors hover:bg-tint hover:text-foreground aria-[current=page]:text-foreground lg:min-h-6"
-                {...navTrack(href, area)}
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <ThemeChoice />
+          <ul role="list" aria-label="Legal" className="flex gap-1">
+            {LEGAL_LINKS.map(({ href, label }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
+                  className="inline-flex min-h-9 items-center rounded-md px-1.5 text-caption text-muted-foreground transition-colors hover:bg-tint hover:text-foreground aria-[current=page]:text-foreground lg:min-h-6"
+                  {...navTrack(href, area)}
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <ThemeChoice />
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { PlateFigure } from "@/components/ui/plate-figure"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getAnimeImage, getAnimeQuote, type AnimeImageType, type AnimeQuote } from "@/services/visitor/anime"
 import { StatusLine } from "@/components/ui/status-line"
-import { GROUP_LABEL, ToolError } from "./tool-status"
+import { ChoiceGroup, TOOL_CONTROLS, ToolError } from "./tool-status"
 
 // Waifu and neko are hidden on purpose (the owner's call in 55c7fa7); the service still serves them, so add them back here.
 const CATEGORIES: { id: AnimeImageType; name: string }[] = [
@@ -51,19 +51,8 @@ function Images() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
-        <div role="group" aria-labelledby="anime-category">
-          <p id="anime-category" className={GROUP_LABEL}>
-            Category
-          </p>
-          <div className="grid grid-cols-3 gap-2 sm:flex">
-            {CATEGORIES.map((c) => (
-              <Button key={c.id} type="button" variant={category === c.id ? "default" : "outline"} aria-pressed={category === c.id} onClick={() => setCategory(c.id)}>
-                {c.name}
-              </Button>
-            ))}
-          </div>
-        </div>
+      <div className={TOOL_CONTROLS}>
+        <ChoiceGroup label="Category" options={CATEGORIES} value={category} onChange={setCategory} />
 
         <div className="flex gap-2">
           <Button type="button" onClick={generate} disabled={loading} aria-busy={loading} data-umami-event="anime-generate" data-umami-event-category={category} className="flex-1 sm:flex-none">

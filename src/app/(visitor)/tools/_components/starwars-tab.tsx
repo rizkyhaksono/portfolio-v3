@@ -44,7 +44,7 @@ function Gallery({ load, aspect, label }: Readonly<{ load: (page: number) => Pro
   return (
     <div className="space-y-6">
       {failure}
-      <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4 xl:grid-cols-6 [&>li]:min-w-0">
+      <ul role="list" aria-busy={loading} className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 [&>li]:min-w-0">
         {loading
           ? Array.from({ length: 12 }, (_, i) => (
               <li key={i} className="overflow-hidden rounded-lg border border-border">

@@ -27,6 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { stripHtml } from "@/components/layout/admin/admin-format"
 import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import { cn } from "@/lib/utils"
@@ -134,8 +135,8 @@ function LoadingRows({ label }: Readonly<{ label: string }>) {
 }
 
 /**
- * One admin collection as a Notion database: view tabs for the filters with "New {noun}" on the right, an
- * editor frame above the table when adding or editing, then the table with a "..." menu per row.
+ * One admin collection as a Notion database: view tabs for the filters with "New {noun}" on the right, then the
+ * full-width table with a "..." menu per row. Adding or editing opens the form in a dialog.
  */
 export function Collection<T extends { id: string }, V extends FormValues>({
   noun,
@@ -156,14 +157,17 @@ export function Collection<T extends { id: string }, V extends FormValues>({
 }: Readonly<CollectionProps<T, V>>) {
   const [items, setItems] = useState<T[]>([])
   const [state, setState] = useState<"loading" | "ready" | "failed">("loading")
-  // null: no editor; "new": adding; an item: editing it.
-  const [slip, setSlip] = useState<"new" | T | null>(null)
+  // What the dialog shows ("new" or the row being edited); kept while it fades out so the form does not flash.
+  const [slip, setSlip] = useState<"new" | T>("new")
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [discarding, setDiscarding] = useState(false)
   const [doomed, setDoomed] = useState<T | null>(null)
   const [filter, setFilter] = useState(0)
-  const slipRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const newRef = useRef<HTMLButtonElement>(null)
 
   const form = useForm<V>({ resolver: zodResolver(schema), defaultValues: blank as DefaultValues<V> })
-  const editing = slip !== null && slip !== "new" ? slip : null
+  const editing = slip === "new" ? null : slip
 
   const refresh = useCallback(async () => {
     try {
@@ -178,18 +182,37 @@ export function Collection<T extends { id: string }, V extends FormValues>({
     void refresh()
   }, [refresh])
 
-  useEffect(() => {
-    if (slip) slipRef.current?.scrollIntoView({ block: "start" })
-  }, [slip])
-
   const open = (item: T | null) => {
     form.reset(item ? toValues(item) : blank)
     setSlip(item ?? "new")
+    setEditorOpen(true)
   }
 
   const close = () => {
-    form.reset(blank)
-    setSlip(null)
+    setDiscarding(false)
+    setEditorOpen(false)
+  }
+
+  const hasEdits = () => {
+    const start: Partial<FormValues> = form.formState.defaultValues ?? {}
+    const now = form.getValues()
+    // shortcut: rich fields compare as text because TipTap normalises the HTML on mount ("" becomes "<p></p>"),
+    // so a formatting-only change closes without asking; compare normalised HTML if that ever bites.
+    return fields.some(({ name, kind }) =>
+      kind === "rich" ? stripHtml(String(now[name] ?? "")) !== stripHtml(String(start[name] ?? "")) : (now[name] ?? "") !== (start[name] ?? ""),
+    )
+  }
+
+  // Esc, the outside click, the close button and Cancel all come through here.
+  const requestClose = () => (hasEdits() ? setDiscarding(true) : close())
+
+  // Back to the row (or "New") that opened the dialog; the row menu's item is gone by then.
+  const returnFocus = (event: Event) => {
+    const target = editing ? sectionRef.current?.querySelector<HTMLElement>(`[data-row="${CSS.escape(editing.id)}"]`) : newRef.current
+    if (target) {
+      event.preventDefault()
+      target.focus()
+    }
   }
 
   const onSubmit = async (values: V) => {
@@ -207,7 +230,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
     try {
       await remove(item)
       toast.success(`Deleted the ${noun}.`)
-      if (editing?.id === item.id) close()
+      if (editorOpen && editing?.id === item.id) close()
       await refresh()
     } catch {
       toast.error(`Could not delete the ${noun}. Try again.`)
@@ -222,7 +245,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
   const actions = (
     <>
       {tools?.(items)}
-      <Button size="sm" onClick={() => open(null)} disabled={slip === "new"}>
+      <Button ref={newRef} size="sm" onClick={() => open(null)}>
         <Plus strokeWidth={1.5} aria-hidden />
         New {noun}
       </Button>
@@ -230,7 +253,7 @@ export function Collection<T extends { id: string }, V extends FormValues>({
   )
 
   return (
-    <section aria-label={heading} className="w-full">
+    <section ref={sectionRef} aria-label={heading} className="w-full">
       {filters && state === "ready" ? (
         <>
           <ViewTabs
@@ -247,59 +270,6 @@ export function Collection<T extends { id: string }, V extends FormValues>({
             {note}
           </p>
           <div className="flex items-center gap-1.5">{actions}</div>
-        </div>
-      )}
-
-      {slip && (
-        <div ref={slipRef} className="mt-6 max-w-2xl scroll-mt-16 rounded-lg border border-border p-4 sm:p-6">
-          <div className="flex items-start justify-between gap-4">
-            <h3 className="min-w-0 text-h3 text-foreground [overflow-wrap:anywhere]">{editing ? view(editing).title : `New ${noun}`}</h3>
-            <Button type="button" variant="ghost" size="icon" onClick={close} aria-label="Close the editor" className="-mr-2 -mt-1 text-muted-foreground hover:text-foreground">
-              <X strokeWidth={1.5} aria-hidden />
-            </Button>
-          </div>
-          <Form {...form}>
-            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mt-5 grid gap-5 sm:grid-cols-2">
-              {fields.map(({ name, label, kind = "text", placeholder, note: hint, half }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name as Path<V>}
-                  render={({ field }) => (
-                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0")}>
-                      <div className="space-y-1">
-                        <FormLabel>{label}</FormLabel>
-                        {hint && <FormDescription>{hint}</FormDescription>}
-                      </div>
-                      {kind === "rich" ? (
-                        // The editor is a contenteditable, not a labelable control, so it carries its own name.
-                        <RichTextEditor content={String(field.value ?? "")} onChange={field.onChange} placeholder={placeholder} label={label} />
-                      ) : (
-                        <FormControl>
-                          {kind === "switch" ? (
-                            <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
-                          ) : kind === "textarea" ? (
-                            <Textarea {...field} value={String(field.value ?? "")} rows={3} placeholder={placeholder} />
-                          ) : (
-                            <Input {...field} value={String(field.value ?? "")} type={kind} placeholder={placeholder} />
-                          )}
-                        </FormControl>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
-              <div className="flex flex-wrap gap-2 sm:col-span-2">
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? "Saving…" : editing ? `Save ${noun}` : `Add ${noun}`}
-                </Button>
-                <Button type="button" variant="ghost" onClick={close}>
-                  Cancel
-                </Button>
-              </div>
-            </form>
-          </Form>
         </div>
       )}
 
@@ -339,11 +309,12 @@ export function Collection<T extends { id: string }, V extends FormValues>({
             </TableHeader>
             <TableBody>
               {rows.map(({ item, row }) => (
-                <TableRow key={item.id} className={cn("hover:bg-tint", editing?.id === item.id && "bg-tint")}>
+                <TableRow key={item.id} className={cn("hover:bg-tint", editorOpen && editing?.id === item.id && "bg-tint")}>
                   <TableCell className="py-1 align-middle">
                     <button
                       type="button"
                       data-tip="Edit"
+                      data-row={item.id}
                       onClick={() => open(item)}
                       className="block min-h-11 w-full truncate rounded text-left font-medium text-foreground underline decoration-transparent underline-offset-4 transition-colors hover:decoration-foreground/40 md:min-h-7"
                     >
@@ -370,6 +341,71 @@ export function Collection<T extends { id: string }, V extends FormValues>({
             </TableBody>
           </Table>
         ))}
+
+      <Dialog open={editorOpen} onOpenChange={(next) => !next && requestClose()}>
+        <DialogContent aria-describedby={undefined} onCloseAutoFocus={returnFocus} className="max-w-3xl p-4 sm:p-6">
+          <DialogHeader>
+            <DialogTitle className="pr-10 text-foreground [overflow-wrap:anywhere]">{editing ? view(editing).title : `New ${noun}`}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5 sm:grid-cols-2">
+              {fields.map(({ name, label, kind = "text", placeholder, note: hint, half }) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name as Path<V>}
+                  render={({ field }) => (
+                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0")}>
+                      <div className="space-y-1">
+                        <FormLabel>{label}</FormLabel>
+                        {hint && <FormDescription>{hint}</FormDescription>}
+                      </div>
+                      {kind === "rich" ? (
+                        // The editor is a contenteditable, not a labelable control, so it carries its own name.
+                        <RichTextEditor content={String(field.value ?? "")} onChange={field.onChange} placeholder={placeholder} label={label} />
+                      ) : (
+                        <FormControl>
+                          {kind === "switch" ? (
+                            <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+                          ) : kind === "textarea" ? (
+                            <Textarea {...field} value={String(field.value ?? "")} rows={3} placeholder={placeholder} />
+                          ) : (
+                            <Input {...field} value={String(field.value ?? "")} type={kind} placeholder={placeholder} />
+                          )}
+                        </FormControl>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <DialogFooter className="sm:col-span-2">
+                <Button type="button" variant="ghost" onClick={requestClose}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  {submitting ? "Saving…" : editing ? `Save ${noun}` : `Add ${noun}`}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={discarding} onOpenChange={setDiscarding}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard your changes?</AlertDialogTitle>
+            <AlertDialogDescription>The edits to this {noun} are not saved yet.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction className={buttonVariants({ variant: "destructive" })} onClick={close}>
+              Discard changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog open={doomed !== null} onOpenChange={(next) => !next && setDoomed(null)}>
         <AlertDialogContent>

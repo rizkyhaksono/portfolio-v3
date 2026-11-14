@@ -7,7 +7,7 @@ Restyle shared primitives in place; never fork a second version. Prefer them ove
 | Primitive | Path | Role |
 |---|---|---|
 | `BaseLayout` | `components/layout/base-layout.tsx` | Visitor and user shell, see [page-shell.md](./page-shell.md) |
-| `Sidebar`, `SidebarNav` | `components/layout/sidebar.tsx`, `sidebar-nav.tsx` | The grey page tree (lg and up), also used inside the menu sheet. `CollapseToggle` folds the desktop one to an icon rail; `ThemeChoice` is the three theme radios |
+| `Sidebar`, `SidebarNav` | `components/layout/sidebar.tsx`, `sidebar-nav.tsx` | The grey page tree (lg and up), also used inside the menu sheet. `CollapseToggle` folds the desktop one to an icon rail; `ThemeChoice` is the three theme icon radios on the bottom line beside Privacy and Terms |
 | `TopBar`, `Breadcrumb` | `components/layout/top-bar.tsx`, `breadcrumb.tsx` | The 44px bar with the Menu button, the path and the theme toggle |
 | `ContentsTrigger`, `ContentsSheet` | `components/layout/contents-trigger.tsx`, `contents-sheet.tsx` | "Menu" below lg: the sidebar tree in a left sheet |
 | `SECTION_ICONS`, `SectionIcon` | `components/layout/section-icons.tsx` | One lucide icon per page, shared by the sidebar, the breadcrumb and page headers |
@@ -40,7 +40,7 @@ Restyle shared primitives in place; never fork a second version. Prefer them ove
 | `NotFoundView` | `components/ui/not-found-view.tsx` | 404, error and empty states |
 | `AuthShell` | `components/layout/auth-shell.tsx` | Notion's sign-in page |
 | `AdminSidebar`, `AdminMenu`, `AdminTopHeader`, `NotificationBell`, `ViewTabs` | `components/layout/admin/*` | The admin's Notion shell, see [platforms.md](./platforms.md#admin) |
-| `Collection` | `app/(admin)/admin/dashboard/_components/collection.tsx` | An admin collection as a Notion table with an inline editor |
+| `Collection` | `app/(admin)/admin/dashboard/_components/collection.tsx` | An admin collection as a full-width Notion table; adding and editing open a dialog |
 
 Deleted, so do not bring them back: the handle header (`running-head.tsx`), the footer sky band, the painted sky cover, `WordScroll`, `Logo` and its art, `Engraving`, `Eyebrow`, `Marker`, and every old identity class the gate's R1c rule names.
 
@@ -63,7 +63,7 @@ Deleted, so do not bring them back: the handle header (`running-head.tsx`), the 
 - **Floating layers.** Dialog, alert dialog, sheet, popover, dropdown menu, select content and the terminal overlay use the float surface (`bg-popover`, `rounded-lg`, hairline) and a fixed scrim. Menus and select content fade with a small zoom from 0.97; dialogs fade and zoom over `--dur-sheet`; sheets slide fully. Menu items are 28px, `text-small`, `focus:bg-tint`. Esc closes; focus returns to the trigger.
 - **Mentions.** `Mention` in running text: the name in ink at weight 500 with a grey underline and a 16px picture or icon before it, `hover:bg-tint` at `duration-75`. On hover (after 150ms) or keyboard focus a 18rem preview card on the float surface fades in and rises 4px: the picture at 16:9 on the grey ground, the title, up to three muted lines. The card is `aria-hidden` and hidden on devices without hover. Internal links, so the event goes through `data-track="mention-click"`.
 - **Tooltip and toast.** Inverted, as in Notion: `bg-foreground text-background`, no border, no shadow. The hover tip is `rounded-md` `caption` at weight 500; the toast is `rounded-lg` `small` at the bottom centre.
-- **Icons.** lucide only, 16px in rows, buttons and properties, 20px in the Menu button, 56px as a page icon, `strokeWidth={1.5}` (1.25 for page icons). Functional only. `react-icons` and `@radix-ui/react-icons` are gone; do not add them back. No emoji in UI.
+- **Icons.** lucide only, 16px in rows, buttons and properties, 20px in the Menu button, `strokeWidth={1.5}`. Pages have no title icon. Functional only. `react-icons` and `@radix-ui/react-icons` are gone; do not add them back. No emoji in UI.
 - **Code.** A server `<pre>` on a tile, system mono, `tabIndex={0}`, no syntax colours. Inline code is a grey wash (ink at 8%), 4px corners, in ink. The client `CopyButton` keeps the `Click Copy Code` event.
 - **Prose.** `.prose` in `globals.css` (no typography plugin): Notion's page text, Onest at the `prose` size (16/26) in ink, headings at weight 600 in a 1.5, 1.25, 1 em ladder, links as `InkLink`, quotes with a 3px ink bar, hairline tables with a grey head row, images on the grey ground, hairline `hr`. `.prose--chat` for chat replies at the body size.
 - **Media.** `PlateFigure` and gallery cards show pictures in their own colours on `bg-muted`. Size the picture in the caller so the ground reserves its space (no layout shift). No hover scaling.
@@ -138,7 +138,7 @@ Content counts read "Read by 1,204 people in the last 30 days." and hide below 1
 
 - Visible focus on every control; Esc closes layers and focus returns.
 - `aria-current="page"` on the current sidebar row and breadcrumb crumb.
-- 44px tap targets on phones and coarse pointers (`min-h-11`, `size-11`); Notion's 28 to 32px rows only from `md` or `lg` (the sidebar and top bar from `lg`).
+- 44px tap targets on phones and coarse pointers (`min-h-11`, `size-11`); Notion's 28 to 32px rows only from `md` or `lg` (the sidebar and top bar from `lg`). Exception by owner request: sidebar and menu sheet rows are 36px on phones (`min-h-9`), full width, so WCAG 2.5.8 spacing holds.
 - Field borders at 3:1 (`border-input`).
 - State by icon and word, never colour alone.
 - A text alternative for every chart.

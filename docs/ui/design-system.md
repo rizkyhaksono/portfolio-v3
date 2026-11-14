@@ -127,7 +127,7 @@ Notion's radii. `--radius` is 10px.
 |---|---|---|---|
 | Dots | `rounded-full` | | Switch, radio, avatar on the home page, status dots |
 | Tags | `rounded` | 4px | `Badge`, `Chip`, inline code, the owner's 20px portrait in the sidebar |
-| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, the theme radios, list rows, toggles, callouts, the hover tip |
+| Controls | `rounded-md` | 6px | Buttons, fields, select triggers, sidebar and menu rows, list rows, toggles, callouts, the hover tip |
 | Cards and layers | `rounded-lg` | 10px | `MediaCard`, `Card`, `Surface`, `PlateFigure` images, the contact form, the mention preview, dialogs, menus, select content, toasts |
 
 `rounded-sm` (2px) exists but has no use. `rounded-xl` and `rounded-2xl` are not part of the scale; do not use them. Never `rounded-[…]`.
@@ -154,7 +154,7 @@ All of it is CSS or platform native, quick and Notion-like. No motion library.
 
 | Motion | How | Timing |
 |---|---|---|
-| Row hover | `bg-tint` comes in on sidebar rows, list rows, gallery cards, the breadcrumb, the theme radios and mentions | `duration-75` |
+| Row hover | `bg-tint` comes in on sidebar rows, list rows, gallery cards, the breadcrumb and mentions | `duration-75` |
 | Button hover | `bg-tint` or the ink button's fill | `--dur-press` |
 | Link underline | The grey underline turns full ink | `--dur-ui` |
 | Toggle | The triangle (`ChevronRight`) turns 90 degrees; accordion content opens by height | `--dur-ui` |
@@ -187,7 +187,7 @@ Scroll reveal or fade-up on sections, parallax, scroll-jacking or anything tied 
 
 - next-themes with `attribute="class"`, `defaultTheme="system"` and `enableSystem`. `ThemeProvider` receives the CSP nonce so its script runs before paint and dark-OS visitors never see a light frame.
 - Light and dark are equal: Notion's white page with a #F7F7F5 sidebar, and Notion's #191919 page with a #202020 sidebar.
-- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and, at the bottom right of the sidebar beside Privacy and Terms, three icon radios (`ThemeChoice` in `sidebar-nav.tsx`): Sun "Light theme", Moon "Dark theme" and Monitor "Theme from the device", the checked one on `bg-tint-strong`. They hide while the sidebar is folded.
+- Two controls: the top bar's `ThemeToggle` (labelled "Dark theme", `aria-pressed`, flips light and dark) and, on the sidebar's bottom line (`ThemeChoice` in `sidebar-nav.tsx`), three icon radios: Sun ("Light theme"), Moon ("Dark theme") and Monitor ("Theme from the device"), the checked one on `bg-tint-strong`; 36px on phones, 28px from `lg`. They hide while the sidebar is folded.
 - `switchTheme()` in `src/components/layout/theme-toggle.tsx` is the one path for theme changes. Do not call `setTheme` directly from new code.
 - `color-scheme` follows the theme. The viewport `themeColor` is an array with one entry per `prefers-color-scheme`, read from `THEME_HEX`, as is the manifest.
 

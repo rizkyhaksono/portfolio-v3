@@ -48,11 +48,11 @@ Full detail: [`docs/ui/README.md`](docs/ui/README.md) (source of truth), [`desig
 
 The site is laid out like a Notion workspace, equally good in light and dark: a grey sidebar with the page tree, a thin top bar with the page's path, then each page in Notion's 708px column as an icon, a 40px bold title, properties and Notion blocks and views. Everything is monochrome (ink, grey and translucent tints) in one sans, Onest. The home page has a photo as Notion's page cover; the only blue left is the text selection fill.
 
-- **Public site:** every page uses `BaseLayout`. From `lg`, a sticky grey sidebar (`bg-muted`, 15rem) holds the owner's row (portrait and "Rizky Haksono", linking home), Home and the main pages with their 16px lucide icons from `SECTION_ICONS`, a "More" group (Certificates, Changelog, Account, RSS feed), the contact rows (Send feedback, Email, GitHub, LinkedIn), then one line with the legal links (Privacy, Terms) beside the theme control: three icon radios, Sun (light), Moon (dark) and Monitor (the device's choice). From `lg`, `CollapseToggle` (the « button in the owner's row, `sidebar-nav.tsx`) folds the sidebar to a 3.25rem icon rail and back: the width eases over 280ms, the labels (`.sidebar-label`) drop to screen-reader text, and the group label and the legal and theme line (`.sidebar-expanded-only`) hide. The state is `<html data-sidebar="collapsed">`, set before paint by an inline nonce script in `src/app/layout.tsx` and kept in localStorage `sidebar`. Below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet. The top bar is 44px, sticky and opaque: the breadcrumb (home, then the section) and the theme toggle. Then the page column (`PROSE_WIDTH`, 708px), centred right of the sidebar, every line left-aligned. `/tools` and `/chat` use the full-width page (`width="wide"`). The page ends on one quiet line: the year, the hour in Malang and the email.
+- **Public site:** every page uses `BaseLayout`. From `lg`, a sticky grey sidebar (`bg-muted`, 15rem) holds the owner's row (portrait and "Rizky Haksono", a link home), Home and the main pages with their 16px lucide icons from `SECTION_ICONS`, a "More" group (Certificates, Changelog, Account, RSS feed), then the contact rows (Send feedback, Email, GitHub, LinkedIn) and a bottom line with Privacy and Terms beside three theme icon radios (Sun, Moon, Monitor). Rows are 28px from `lg` and 36px on phones (denser than the 44px rule by the owner's request; each row stays full width with WCAG 2.5.8 spacing). From `lg`, `CollapseToggle` (the « button in the owner's row, `sidebar-nav.tsx`; it shows on hover or focus of the head, as in Notion, and always in the rail) folds the sidebar to a 3.25rem icon rail and back: the width eases over 280ms, the labels (`.sidebar-label`) drop to screen-reader text, and the group label, the owner's row and the bottom line (`.sidebar-expanded-only`) hide; the theme stays in the top bar. The state is `<html data-sidebar="collapsed">`, set before paint by an inline nonce script in `src/app/layout.tsx` and kept in localStorage `sidebar`. Below `lg`, a "Menu" button in the top bar opens the same tree in a left sheet, 5/6 of the screen wide (at most 20rem), over a dimmed page. The top bar is 44px, sticky and opaque: the breadcrumb (home, then the section) and the theme toggle. Then the page column (`PROSE_WIDTH`, 708px), centred right of the sidebar, every line left-aligned. `/tools` and `/chat` use the full-width page (`width="wide"`). The page ends on one quiet line: the year, the hour in Malang and the email.
 - **Colour use:** page text, titles and links in `text-foreground`; secondary text (sidebar rows, descriptions, property names, meta, table heads) in `text-muted-foreground`. Hover is `bg-tint`, never colour. Links go through `InkLink`: ink with a grey underline that turns full ink on hover.
-- **Admin:** the same Notion shell (`components/layout/admin/*`): a grey sidebar with grouped pages, a 44px top bar with the breadcrumb, the notifications bell (opens on click) and the theme toggle, then full-width content. Collections are Notion tables with an inline editor above the table. No blue.
+- **Admin:** the same Notion shell (`components/layout/admin/*`): a grey sidebar with grouped pages, a 44px top bar with the breadcrumb, the notifications bell (opens on click) and the theme toggle, then full-width content. Collections are full-width Notion tables; adding or editing opens a dialog. No blue.
 - **Auth:** laid out like notion.so/login, see below.
-- **Themes:** `defaultTheme="system"`; the sidebar's radios are labelled "Light theme", "Dark theme" and "Theme from the device", the top bar's toggle "Dark theme"; every change goes through `switchTheme()`.
+- **Themes:** `defaultTheme="system"`; the sidebar's theme radios are labelled "Light theme", "Dark theme" and "Theme from the device", the top bar's toggle "Dark theme"; every change goes through `switchTheme()`.
 - **Name and icon:** the owner's portrait and name as text. The favicon is a plain "R" tile. There is no logo mark and no handwritten face.
 
 ### Tokens
@@ -155,7 +155,7 @@ Floating layers, after Notion: dropdown menus (`--dur-ui`) and select content (1
 
 | Pattern | Component | Routes |
 |---|---|---|
-| Page | `ui/page-header.tsx` (icon above a 40px bold title via `text-title sm:text-display`, muted description), `ui/properties.tsx` | Every visitor page |
+| Page | `ui/page-header.tsx` (a 40px bold title via `text-title sm:text-display`, muted description; no page icon), `ui/properties.tsx` | Every visitor page |
 | List view | `ui/ledger.tsx` (`LedgerList`, `LedgerRow`): an optional 16px icon, the title in ink at weight 500, one muted line, meta on the right, the whole row a link that tints on hover, a small muted group label | Home Writing, `/blog` rows, `/roadmap` lessons |
 | Gallery view | `MediaCard` in `Gallery` (`ui/media-card.tsx`): hairline cards, 10px, the picture on the grey ground, title and a property under it, two columns (three from `lg`) | Home Projects, `/project`, the newest `/blog` posts |
 | Table view | `ui/table.tsx`: hairline cells, grey head cells | Home Work experience and Education, `/certificates`, admin collections |
@@ -163,7 +163,7 @@ Floating layers, after Notion: dropdown menus (`--dur-ui`) and select content (1
 | Cabinet | `tools/_components/tool-shell.tsx` (`ToolCabinet`: a gallery of tool cards grouped Play, Practise and Look things up, above the open tool, state in `?tab=`), `ui/pager.tsx`, `width="wide"`; view tabs on `/ai` | `/tools`, `/ai` |
 | Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home Contact, admin Feedback |
 | Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar`: solid fills, text alternatives | `/stats`, admin Home and Analytics |
-| Admin | `components/layout/admin/*` and `app/(admin)/**`: the Notion shell (grey grouped sidebar, 44px top bar, full-width content), a `PageHeader` per page, collections as Notion tables with an inline editor | `/admin/dashboard/*` |
+| Admin | `components/layout/admin/*` and `app/(admin)/**`: the Notion shell (grey grouped sidebar, 44px top bar, full-width content), a `PageHeader` per page, collections as full-width Notion tables with a dialog editor | `/admin/dashboard/*` |
 | Auth | `layout/auth-shell.tsx`: notion.so/login | `/auth/*`, `/admin/auth/login` |
 | Profile card | A definition list in a frame | `/profile`, `/profile/edit`, admin Settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
@@ -177,7 +177,7 @@ Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `footer?: 'full' | 'com
 Shared details agents trip on:
 
 - Primary buttons are ink (`bg-foreground text-background`), 6px, 32px tall; fields are 36px, 6px, with a 3:1 `border-input` (firmer than Notion on purpose, WCAG 1.4.11).
-- Page icons come only from `SECTION_ICONS` (`src/components/layout/section-icons.tsx`); nav only from `src/commons/constants/navigation-menu.ts`.
+- Nav and row icons come only from `SECTION_ICONS` (`src/components/layout/section-icons.tsx`); nav only from `src/commons/constants/navigation-menu.ts`.
 - Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`), an inverted slab. Never the native `title` attribute.
 - Generated cards: build URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes.
 - `favicon.ico` must stay at `src/app/favicon.ico`: the container healthcheck fetches `/favicon.ico`.
@@ -221,7 +221,7 @@ Some rules carry a shrinking allowlist of files that still break them while the 
 1. Read `prd/feature.md`, then `prd/progress.md`, then `docs/ui/`, then the existing patterns in code.
 2. Prefer shared primitives over ad-hoc bordered `div`s. When you touch an old-look file, move it to the new rules; never copy an old pattern into new code.
 3. Validate input at boundaries; fail fast; map errors to honest messages.
-4. Keep UI accessible: visible focus, `aria-current`, labels, keyboard navigation, Esc closes and focus returns, 44px targets on phones and coarse pointers (`min-h-11`), chart text alternatives.
+4. Keep UI accessible: visible focus, `aria-current`, labels, keyboard navigation, Esc closes and focus returns, 44px targets on phones and coarse pointers (`min-h-11`; sidebar and menu sheet rows are 36px by owner request), chart text alternatives.
 5. Update `prd/progress.md` when a task is done.
 6. Before claiming completion: `bunx tsc --noEmit`, `bun run test` (includes the UI gate and the contrast guard), and `bun run build --webpack` for anything that touches routes or config.
 

@@ -274,6 +274,10 @@ html[data-sidebar="collapsed"] .app-sidebar .sidebar-expanded-only {
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-head {
   justify-content: center;
 }
+/* Open, the « shows only on hover of the head (sidebar-nav.tsx); in the rail it is the only way back, so it stays. */
+html[data-sidebar="collapsed"] .app-sidebar .sidebar-head button {
+  opacity: 1;
+}
 /* In the rail every row is an icon centred in its own square; the label is screen-reader text above. */
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-row {
   justify-content: center;
