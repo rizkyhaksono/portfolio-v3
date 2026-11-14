@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { ArrowUp, Pencil, RefreshCw, Reply, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -110,7 +109,6 @@ function Message({ message, quoted, mine, canReply, onReply, onEdit, onDelete }:
       <div className={cn("min-w-0 flex-1", owner && "flex flex-col items-end")}>
         <p className={cn("flex flex-wrap items-center gap-x-2 gap-y-0.5", owner && "flex-row-reverse")}>
           <span className="text-small font-medium text-foreground">{mine ? "You" : name}</span>
-          {message.user?.role === "ADMIN" && <Badge>Site owner</Badge>}
           {!Number.isNaN(date.getTime()) && (
             <time dateTime={message.createdAt} suppressHydrationWarning className="text-caption text-muted-foreground">
               {STAMP.format(date)}

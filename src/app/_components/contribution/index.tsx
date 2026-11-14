@@ -60,11 +60,11 @@ export default async function ContributionSection() {
       </div>
 
       <div>
-        <h3 className="text-h4 text-foreground">Coding time, the last seven days</h3>
+        <h3 className="text-h4 text-foreground">Coding time, all time</h3>
         {wakaFailed ? (
           <StatusLine kind="failed" className="mt-3">WakaTime did not answer just now, so the coding time is missing.</StatusLine>
         ) : languages.length === 0 ? (
-          <StatusLine kind="empty" className="mt-1">No coding time logged in the last seven days.</StatusLine>
+          <StatusLine kind="empty" className="mt-1">No coding time logged yet.</StatusLine>
         ) : (
           <>
             <p className="mt-1 text-small text-muted-foreground">
@@ -79,7 +79,7 @@ export default async function ContributionSection() {
                   value={
                     <>
                       {formatHours(hours, minutes)}
-                      <span className="sr-only">, {Math.round(percent)}% of the week</span>
+                      <span className="sr-only">, {Math.round(percent)}% of all coding time</span>
                     </>
                   }
                 />
