@@ -1,4 +1,5 @@
-import { ExternalLink, Github } from "lucide-react"
+import { ExternalLink } from "lucide-react"
+import { Github } from "@/components/ui/brand-icons"
 import { InkLink } from "@/components/ui/ink-link"
 import { cn, httpUrl } from "@/lib/utils"
 import type { getAllProject } from "@/services/visitor/project"

@@ -56,7 +56,7 @@ const nextConfig: NextConfig = {
       ...OPTIMIZED_IMAGE_HOSTS.map((hostname) => ({ protocol: "https" as const, hostname })),
     ],
     formats: ["image/webp"],
-    deviceSizes: [640, 828, 1200, 1600],
+    deviceSizes: [640, 828, 1200, 1600, 2048, 2560],
     imageSizes: [32, 64, 128, 256],
     minimumCacheTTL: 60 * 60 * 24 * 30,
     unoptimized: false,

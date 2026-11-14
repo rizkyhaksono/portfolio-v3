@@ -2,7 +2,7 @@ import Image from "next/image"
 import type { CommentItemProps } from "@/commons/types/blog"
 import { InkLink } from "@/components/ui/ink-link"
 import { StatusLine } from "@/components/ui/status-line"
-import { safeHtml } from "@/app/(visitor)/project/safe-html"
+import { RichText } from "@/app/(visitor)/project/rich-text"
 import { canOptimizeImage } from "@/lib/image-hosts"
 import { httpUrl } from "@/lib/utils"
 import { formatDay, toDate } from "./format"
@@ -27,7 +27,7 @@ function Comment({ comment }: Readonly<{ comment: CommentItemProps }>) {
           <span className="font-medium text-foreground">{name}</span>
           {date && <time dateTime={date.toISOString()}>{formatDay(date)}</time>}
         </p>
-        <div className="prose prose--chat mt-0.5 break-words" dangerouslySetInnerHTML={{ __html: safeHtml(comment.body_html ?? "") }} />
+        <RichText className="prose prose--chat mt-0.5 break-words" html={comment.body_html ?? ""} />
         {replies.length > 0 && (
           <ol role="list" aria-label="Replies" className="mt-5 flex flex-col gap-5">
             {replies.map((reply) => (
