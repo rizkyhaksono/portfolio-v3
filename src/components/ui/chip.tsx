@@ -5,10 +5,10 @@ interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
   icon?: React.ReactNode
 }
 
-/** Inline Tag (tech, category). Same look as `Badge variant="outline"`, as a span. */
+/** Inline tag (tech, category): Notion's grey select tag, as a span. */
 export function Chip({ icon, className, children, ...props }: Readonly<ChipProps>) {
   return (
-    <span className={cn(badgeVariants({ variant: "outline" }), className)} {...props}>
+    <span className={cn(badgeVariants({ variant: "default" }), className)} {...props}>
       {icon}
       {children}
     </span>

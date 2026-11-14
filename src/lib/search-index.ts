@@ -78,9 +78,9 @@ export async function getAllSearchDocs(): Promise<SearchDoc[]> {
       id: `roadmap/${lesson.slug}`,
       type: "roadmap",
       title: lesson.meta.title,
-      description: [lesson.meta.description, stripMdx(lesson.content).slice(0, 320)]
+      description: [lesson.meta.description?.replace(/\.$/, ""), stripMdx(lesson.content).slice(0, 320)]
         .filter(Boolean)
-        .join(" — "),
+        .join(". "),
       url: `/roadmap/${lesson.slug}`,
       tags: [lesson.meta.category, lesson.meta.course, lesson.meta.difficulty].filter(
         (value): value is string => Boolean(value),

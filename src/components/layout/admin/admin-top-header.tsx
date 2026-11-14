@@ -1,39 +1,46 @@
 "use client"
 
+import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { buttonVariants } from "@/components/ui/button"
+import { Shield } from "lucide-react"
 import { ThemeToggle } from "@/components/layout/theme-toggle"
-import { cn } from "@/lib/utils"
-import { ADMIN_PAGES, AdminMenu, type AdminUser } from "./admin-spine"
+import { AdminMenu, adminPageFor, type AdminUser } from "./admin-spine"
 import { NotificationBell } from "./notification-bell"
 
-// Longest matching href wins, so /admin/dashboard/blog is "Blog", not "Dashboard".
-const titleFor = (pathname: string) =>
-  [...ADMIN_PAGES].sort((a, b) => b.href.length - a.href.length).find((page) => pathname.startsWith(page.href))?.title ??
-  "Dashboard"
+const CRUMB =
+  "flex min-h-11 min-w-0 items-center gap-1.5 rounded-md px-1.5 text-foreground transition-colors hover:bg-tint lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
 
-/** The page's one heading, plus the site link, notifications and the theme. Pages do not repeat their title. */
+/** Notion's top bar for the admin: the menu below lg, "Admin / page", then notifications and the theme. */
 export function AdminTopHeader({ user }: Readonly<{ user?: AdminUser }>) {
   const pathname = usePathname()
+  const page = adminPageFor(pathname)
+  const Icon = page.icon
 
   return (
-    <header className="bg-paper-grain sticky top-0 z-30 border-b border-rule">
-      <div className="flex min-h-[var(--head-h)] items-center gap-3 px-4 sm:px-6 lg:px-10">
-        <AdminMenu user={user} />
-        <h1 className="min-w-0 truncate font-display text-h3 text-ink">{titleFor(pathname)}</h1>
-        <div className="ml-auto flex items-center gap-1">
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener"
-            aria-label="View site (opens in a new tab)"
-            className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}
-          >
-            View site
-          </a>
-          <NotificationBell />
-          <ThemeToggle />
-        </div>
+    <header className="sticky top-0 z-30 flex h-[var(--head-h)] shrink-0 items-center gap-1 bg-background px-2 sm:px-3">
+      <AdminMenu user={user} className="lg:hidden" />
+      <nav aria-label="Breadcrumb" className="min-w-0">
+        <ol className="flex min-w-0 items-center text-small">
+          <li className="shrink-0">
+            <Link href="/admin/dashboard" className={CRUMB}>
+              <Shield aria-hidden strokeWidth={1.5} />
+              Admin
+            </Link>
+          </li>
+          <li aria-hidden className="px-0.5 text-muted-foreground">
+            /
+          </li>
+          <li className="min-w-0">
+            <Link href={page.href} aria-current={pathname === page.href ? "page" : undefined} className={CRUMB}>
+              <Icon aria-hidden strokeWidth={1.5} />
+              <span className="truncate">{page.title}</span>
+            </Link>
+          </li>
+        </ol>
+      </nav>
+      <div className="ml-auto flex shrink-0 items-center">
+        <NotificationBell />
+        <ThemeToggle />
       </div>
     </header>
   )

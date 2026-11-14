@@ -1,13 +1,13 @@
-// The only nav source: running head, Contents, colophon, command palette and terminal overlay read it.
+// The only nav source: the sidebar, the breadcrumb, the menu sheet, the command palette and the terminal overlay read it.
 
-export type NavArea = "head" | "menu" | "colophon"
+export type NavArea = "head" | "menu" | "colophon" | "sidebar"
 
 export interface NavSection {
   href: string
   label: string
   /** One roman line under the italic label in Contents. */
   note: string
-  /** Running head: `md` shows from 768px, `lg` from 1024px; absent means Contents and colophon only. */
+  /** In the sidebar's first group (the main pages); absent means the "More" group. */
   head?: "md" | "lg"
   column: "read" | "try" | "site"
 }
@@ -15,10 +15,10 @@ export interface NavSection {
 export const NAV_SECTIONS: readonly NavSection[] = [
   { href: "/project", label: "Projects", note: "Systems I have built and shipped.", head: "md", column: "read" },
   { href: "/blog", label: "Writing", note: "Essays and notes on AI and engineering.", head: "md", column: "read" },
-  { href: "/chat", label: "Chat", note: "A public room for leaving a message.", head: "lg", column: "try" },
   { href: "/roadmap", label: "Roadmap", note: "Learning paths, from first principles up.", head: "lg", column: "read" },
   { href: "/tools", label: "Tools", note: "Quizzes, a typing test and small utilities.", head: "lg", column: "try" },
   { href: "/stats", label: "Stats", note: "Readers, coding time and live API health.", head: "lg", column: "site" },
+  { href: "/chat", label: "Chat", note: "A public room for leaving a message.", head: "lg", column: "try" },
   { href: "/certificates", label: "Certificates", note: "Certificates and courses on record.", column: "read" },
   { href: "/changelog", label: "Changelog", note: "What changed on this site, and when.", column: "site" },
 ]

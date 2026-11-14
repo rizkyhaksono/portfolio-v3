@@ -74,3 +74,6 @@ export const plainText = (html: string) =>
     .trim()
     .replace(/^●\s*/, "")
     .replace(/([.!?:;])?\s*●\s*/g, (_, stop?: string) => `${stop ?? "."} `)
+
+/** The first sentence of plain text, for a gallery card's one muted line; the whole text when it has no full stop. */
+export const firstSentence = (text: string) => text.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? text

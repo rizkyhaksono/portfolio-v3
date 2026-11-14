@@ -1,4 +1,4 @@
-import { dateline, excerpt } from "./format"
+import { excerpt, minutesLabel } from "./format"
 
 describe("excerpt", () => {
   it("keeps short text whole, without tags", () => {
@@ -22,10 +22,9 @@ describe("excerpt", () => {
   })
 })
 
-describe("dateline", () => {
-  it("reads as sentences", () => {
-    expect(dateline("2026-03-03T02:00:00Z", 6)).toBe("Published 3 March 2026. 6 minutes to read.")
-    expect(dateline(undefined, 1)).toBe("1 minute to read.")
-    expect(dateline("not a date")).toBeUndefined()
+describe("minutesLabel", () => {
+  it("counts in words", () => {
+    expect(minutesLabel(6)).toBe("6 minutes")
+    expect(minutesLabel(1)).toBe("1 minute")
   })
 })

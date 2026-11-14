@@ -18,7 +18,7 @@ function VoiceToggle({
       <Button type="button" size="icon" variant={on ? "default" : "outline"} aria-pressed={on} aria-label={label} disabled={disabled} onClick={onClick}>
         {icon}
       </Button>
-      <span aria-live="polite" className="font-display text-caption text-ink-soft">
+      <span aria-live="polite" className="text-caption text-muted-foreground">
         {word}
       </span>
     </span>

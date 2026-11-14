@@ -13,6 +13,8 @@ interface InkLinkProps {
   /** Enum-like values only, never PII. */
   eventData?: EventData
   className?: string
+  /** A 16px mark before the label (a site's logo, a lucide icon) that shows where the link goes. */
+  icon?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -27,8 +29,23 @@ function hostOf(href: string) {
   }
 }
 
-export function InkLink({ href, external, event, eventData, className, children }: Readonly<InkLinkProps>) {
-  const classes = cn("text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2", className)
+export function InkLink({ href, external, event, eventData, className, icon, children }: Readonly<InkLinkProps>) {
+  // Notion's inline link: ink with a grey underline that darkens on hover, so colour is never the only cue (WCAG 1.4.1).
+  const classes = cn(
+    "text-foreground underline decoration-foreground/40 decoration-1 underline-offset-[0.2em] transition-[text-decoration-color] duration-ui ease-out hover:decoration-foreground",
+    icon && "whitespace-nowrap",
+    className,
+  )
+  const label = icon ? (
+    <>
+      <span aria-hidden className="mr-1 inline-block size-4 align-[-0.2em] [&>svg]:size-4">
+        {icon}
+      </span>
+      {children}
+    </>
+  ) : (
+    children
+  )
 
   if (external) {
     return (
@@ -41,7 +58,7 @@ export function InkLink({ href, external, event, eventData, className, children 
         data-umami-event-host={hostOf(href)}
         {...prefixed("data-umami-event-", eventData)}
       >
-        {children}
+        {label}
         {/* Not `sr-only`: an absolute box in an inline-flex link sits on the first letter (flex static position).
             In flow it stays after the text; clip-path hides it whatever the positioning. */}
         <span className="-mr-px inline-block size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]"> (opens in a new tab)</span>
@@ -52,7 +69,7 @@ export function InkLink({ href, external, event, eventData, className, children 
   // Umami's own click handler turns same-tab links into full reloads, so internal links use the data-track listener.
   return (
     <Link href={href} className={classes} data-track={event} {...(event ? prefixed("data-track-", eventData) : {})}>
-      {children}
+      {label}
     </Link>
   )
 }

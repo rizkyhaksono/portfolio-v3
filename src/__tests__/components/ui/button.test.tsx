@@ -49,7 +49,7 @@ describe('Button Component', () => {
 describe('buttonVariants', () => {
   it('generates correct classes for default variant', () => {
     const classes = buttonVariants()
-    expect(classes).toContain('bg-primary')
+    expect(classes).toContain('bg-foreground')
   })
 
   it('generates correct classes for destructive variant', () => {
@@ -64,6 +64,6 @@ describe('buttonVariants', () => {
 
   it('generates correct classes for small size', () => {
     const classes = buttonVariants({ size: 'sm' })
-    expect(classes).toContain('h-8')
+    expect(classes).toContain('h-7')
   })
 })

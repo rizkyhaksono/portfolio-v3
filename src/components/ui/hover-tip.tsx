@@ -111,7 +111,7 @@ export function HoverTip() {
       ref={ref}
       hidden
       aria-hidden
-      className="pointer-events-none fixed left-0 top-0 z-[100] max-w-[min(18rem,calc(100vw-1rem))] border border-ink bg-paper px-2 py-1 text-small text-ink shadow-[3px_3px_0_hsl(var(--ink))]"
+      className="pointer-events-none fixed left-0 top-0 z-[100] max-w-[min(18rem,calc(100vw-1rem))] rounded-md bg-foreground px-2 py-1 text-caption font-medium text-background"
     />
   )
 }

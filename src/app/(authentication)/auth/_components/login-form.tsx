@@ -45,11 +45,11 @@ export default function LoginForm({ createdEmail }: Readonly<LoginFormProps>) {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      {createdEmail && <p className="text-body text-ink">Your account is ready. Sign in with the password you just chose.</p>}
+    <div className="flex flex-col gap-6">
+      {createdEmail && <p className="text-small text-foreground">Your account is ready. Sign in with the password you just chose.</p>}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleLogin)} noValidate className="flex flex-col gap-6" aria-busy={isSubmitting}>
+        <form onSubmit={form.handleSubmit(handleLogin)} noValidate className="flex flex-col gap-4" aria-busy={isSubmitting}>
           <FormField
             control={form.control}
             name="email"
@@ -80,15 +80,17 @@ export default function LoginForm({ createdEmail }: Readonly<LoginFormProps>) {
 
           <FormAlert>{errors.root?.message}</FormAlert>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
       </Form>
 
-      <p className="flex items-center gap-4 font-display text-caption text-ink-soft before:h-px before:flex-1 before:bg-rule before:content-[''] after:h-px after:flex-1 after:bg-rule after:content-['']">
-        or
-      </p>
+      <div className="flex items-center gap-3 text-small text-muted-foreground">
+        <span aria-hidden className="h-px flex-1 bg-border" />
+        or continue with
+        <span aria-hidden className="h-px flex-1 bg-border" />
+      </div>
 
       <GoogleButton disabled={isSubmitting} />
     </div>

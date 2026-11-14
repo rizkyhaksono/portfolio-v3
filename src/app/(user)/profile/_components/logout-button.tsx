@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { performVisitorLogout } from "@/lib/visitor-logout"
 
@@ -18,7 +19,10 @@ export function LogoutButton() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline">Log out</Button>
+        <Button variant="ghost">
+          <LogOut aria-hidden strokeWidth={1.5} />
+          Log out
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

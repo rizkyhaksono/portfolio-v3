@@ -48,7 +48,7 @@ export default function ToolsLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout>
+    <BaseLayout width="wide">
       {children}
     </BaseLayout>
   )

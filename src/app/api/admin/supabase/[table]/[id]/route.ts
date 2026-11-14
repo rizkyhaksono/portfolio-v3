@@ -40,7 +40,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "The change was not saved. Try again." }, { status: 400 })
     }
     if (!data?.length) {
-      return NextResponse.json({ error: "Row not found — nothing was updated" }, { status: 404 })
+      return NextResponse.json({ error: "Row not found, nothing was updated" }, { status: 404 })
     }
     revalidateTag("supabase", "max")
     return NextResponse.json({ data: data[0] })
@@ -63,7 +63,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "The row was not deleted. Try again." }, { status: 400 })
     }
     if (!data?.length) {
-      return NextResponse.json({ error: "Row not found — nothing was deleted" }, { status: 404 })
+      return NextResponse.json({ error: "Row not found, nothing was deleted" }, { status: 404 })
     }
     revalidateTag("supabase", "max")
     return NextResponse.json({ data: data[0] })

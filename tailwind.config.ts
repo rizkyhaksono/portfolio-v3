@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss"
-import { fontFamily } from "tailwindcss/defaultTheme"
 
 const config = {
 	darkMode: ["class"],
@@ -7,15 +6,7 @@ const config = {
 	prefix: "",
 	theme: {
 		fontFamily: {
-			sans: [
-				'var(--font-sans)',
-				...fontFamily.sans
-			],
-			// Same face as sans: hierarchy comes from the size tokens' weight and tracking.
-			display: [
-				'var(--font-sans)',
-				...fontFamily.sans
-			],
+			sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
 			mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace']
 		},
 		container: {
@@ -27,72 +18,81 @@ const config = {
 		},
 		extend: {
 			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+				border: 'hsl(var(--border) / <alpha-value>)',
+				input: 'hsl(var(--input) / <alpha-value>)',
+				ring: 'hsl(var(--ring) / <alpha-value>)',
+				background: 'hsl(var(--background) / <alpha-value>)',
+				foreground: 'hsl(var(--foreground) / <alpha-value>)',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: 'hsl(var(--primary) / <alpha-value>)',
+					foreground: 'hsl(var(--primary-foreground) / <alpha-value>)'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: 'hsl(var(--secondary) / <alpha-value>)',
+					foreground: 'hsl(var(--secondary-foreground) / <alpha-value>)'
 				},
 				destructive: {
-					DEFAULT: 'hsl(var(--destructive))',
-					foreground: 'hsl(var(--destructive-foreground))'
+					DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
+					foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)'
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					DEFAULT: 'hsl(var(--muted) / <alpha-value>)',
+					foreground: 'hsl(var(--muted-foreground) / <alpha-value>)'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'hsl(var(--accent) / <alpha-value>)',
+					foreground: 'hsl(var(--accent-foreground) / <alpha-value>)'
 				},
 				popover: {
-					DEFAULT: 'hsl(var(--popover))',
-					foreground: 'hsl(var(--popover-foreground))'
+					DEFAULT: 'hsl(var(--popover) / <alpha-value>)',
+					foreground: 'hsl(var(--popover-foreground) / <alpha-value>)'
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
+					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
 				},
-				ink: 'hsl(var(--ink) / <alpha-value>)',
-				'ink-soft': 'hsl(var(--ink-soft) / <alpha-value>)',
-				paper: 'hsl(var(--paper) / <alpha-value>)',
-				tint: 'hsl(var(--tint) / <alpha-value>)',
-				rule: 'hsl(var(--rule) / <alpha-value>)',
-				'rule-strong': 'hsl(var(--rule-strong) / <alpha-value>)'
+				// Notion's translucent hover and selected fills, from the text colour so they work on page, sidebar and menus.
+				tint: {
+					DEFAULT: 'hsl(var(--foreground) / 0.06)',
+					strong: 'hsl(var(--foreground) / 0.1)'
+				},
+				// Langit Malang: the home cover and the text selection only.
+				sky: {
+					DEFAULT: 'hsl(var(--sky) / <alpha-value>)',
+					wash: 'hsl(var(--sky-wash) / <alpha-value>)'
+				}
 			},
-			// Fluid 375 -> 1280px. Weight and tracking carry the hierarchy; balance lives on the elements.
+			// One sans (Onest) on a Notion scale: 14px UI (sidebar, tables, properties, controls), 16/24 page text,
+			// 40px bold page titles, 30/24/20 headings at 600.
 			fontSize: {
-				xs: ['0.75rem', { lineHeight: '1.4' }],
-				caption: ['0.75rem', { lineHeight: '1.4' }],
-				small: ['0.8125rem', { lineHeight: '1.45' }],
-				body: ['clamp(0.9375rem, 0.9116rem + 0.1105vw, 1rem)', { lineHeight: '1.55' }],
-				prose: ['clamp(1rem, 0.9741rem + 0.1105vw, 1.0625rem)', { lineHeight: '1.6' }],
-				lead: ['clamp(1.0625rem, 1.0107rem + 0.221vw, 1.1875rem)', { lineHeight: '1.45' }],
-				h4: ['1rem', { lineHeight: '1.35', fontWeight: '600' }],
-				h3: ['clamp(1.125rem, 1.0732rem + 0.221vw, 1.25rem)', { lineHeight: '1.3', fontWeight: '600', letterSpacing: '-0.01em' }],
-				h2: ['clamp(1.375rem, 1.1678rem + 0.884vw, 1.875rem)', { lineHeight: '1.15', fontWeight: '700', letterSpacing: '-0.02em' }],
-				h1: ['clamp(1.875rem, 1.5124rem + 1.547vw, 2.75rem)', { lineHeight: '1.08', fontWeight: '700', letterSpacing: '-0.025em' }],
-				display: ['clamp(2.75rem, 1.1961rem + 6.6298vw, 6.5rem)', { lineHeight: '0.9', fontWeight: '600', letterSpacing: '-0.04em' }],
-				numeral: ['clamp(2rem, 1.5856rem + 1.768vw, 3rem)', { lineHeight: '1', fontWeight: '600', letterSpacing: '-0.02em' }]
+				xs: ['0.75rem', { lineHeight: '1rem' }],
+				caption: ['0.75rem', { lineHeight: '1rem' }],
+				small: ['0.875rem', { lineHeight: '1.25rem' }],
+				body: ['1rem', { lineHeight: '1.5rem' }],
+				prose: ['1rem', { lineHeight: '1.625rem' }],
+				lead: ['1rem', { lineHeight: '1.5rem' }],
+				h4: ['1rem', { lineHeight: '1.5rem', fontWeight: '600' }],
+				h3: ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+				h2: ['1.5rem', { lineHeight: '2rem', fontWeight: '600', letterSpacing: '-0.01em' }],
+				h1: ['1.875rem', { lineHeight: '2.375rem', fontWeight: '600', letterSpacing: '-0.015em' }],
+				title: ['2rem', { lineHeight: '2.5rem', fontWeight: '700', letterSpacing: '-0.02em' }],
+				display: ['2.5rem', { lineHeight: '3rem', fontWeight: '700', letterSpacing: '-0.02em' }],
+				numeral: ['2rem', { lineHeight: '2.5rem', fontWeight: '600', letterSpacing: '-0.015em' }]
 			},
-			// Radius 0 everywhere; `full` only for radio dots.
+			// Notion radii: 6px controls and menu rows (md), 10px cards, images and floating layers (lg), 4px tags (rounded).
 			borderRadius: {
-				none: '0px',
-				DEFAULT: '0px',
-				sm: '0px',
-				md: '0px',
-				lg: '0px',
-				xl: '0px',
-				'2xl': '0px',
-				'3xl': '0px',
-				full: '9999px'
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 0.25rem)',
+				sm: 'calc(var(--radius) - 0.5rem)'
+			},
+			// Named so the class is not ambiguous with tailwindcss-animate's animation duration (which drops `duration-[var(...)]`).
+			transitionDuration: {
+				press: "var(--dur-press)",
+				ui: "var(--dur-ui)",
+				sheet: "var(--dur-sheet)",
+			},
+			transitionTimingFunction: {
+				out: 'var(--ease-out)'
 			},
 			keyframes: {
 				'accordion-down': {

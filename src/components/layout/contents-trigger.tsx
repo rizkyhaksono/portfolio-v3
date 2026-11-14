@@ -2,12 +2,13 @@
 
 import { useRef, useState } from "react"
 import dynamic from "next/dynamic"
+import { PanelLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// The sheet pulls in Radix Dialog, RadioGroup and next-themes (~25 KB gz); load it on first open, not with every page.
+// The sheet pulls in Radix Dialog; load it on first open, not with every page.
 const ContentsSheet = dynamic(() => import("./contents-sheet").then((module) => module.ContentsSheet), { ssr: false })
 
-/** The menu button in the running head (below 1024px): two printed rules, no label on screen. */
+/** Notion's sidebar button in the top bar below lg, named "Menu" for screen readers. */
 export function ContentsTrigger({ className }: Readonly<{ className?: string }>) {
   const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)
@@ -27,11 +28,9 @@ export function ContentsTrigger({ className }: Readonly<{ className?: string }>)
           setLoaded(true)
           setOpen(true)
         }}
-        className={cn("-mr-2.5 inline-flex size-11 items-center justify-center text-ink", className)}
+        className={cn("inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-tint hover:text-foreground", className)}
       >
-        <svg aria-hidden viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="square">
-          <path d="M3 9h18M3 15h18" />
-        </svg>
+        <PanelLeft aria-hidden className="size-5" strokeWidth={1.5} />
       </button>
       {loaded && <ContentsSheet open={open} onOpenChange={setOpen} returnFocus={trigger} />}
     </>

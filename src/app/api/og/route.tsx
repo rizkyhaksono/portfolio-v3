@@ -1,10 +1,12 @@
 import { ImageResponse } from "next/og"
 import { JOB_TITLE } from "@/commons/constants/author"
-import { PRINT_HEX } from "@/lib/print-hex"
+import { THEME_HEX } from "@/lib/theme-hex"
 import { CARD_HEADERS, loadPrintAssets, RULE_HEX } from "./print-assets"
 
-// Node, not edge: the font and the mark are files read from disk.
+// Node, not edge: the font is a file read from disk.
 export const runtime = "nodejs"
+
+const { background, foreground, mutedForeground } = THEME_HEX.light
 
 const SECTION: Record<string, string> = {
   blog: "Writing",
@@ -20,7 +22,7 @@ export async function GET(request: Request) {
   const section = SECTION[(searchParams.get("type") ?? "").toLowerCase()] ?? "Portfolio"
 
   try {
-    const { font, mark } = await loadPrintAssets()
+    const { font } = await loadPrintAssets()
 
     return new ImageResponse(
       (
@@ -32,34 +34,26 @@ export async function GET(request: Request) {
             flexDirection: "column",
             justifyContent: "space-between",
             padding: "56px 72px",
-            backgroundColor: PRINT_HEX.paper,
-            color: PRINT_HEX.ink,
+            backgroundColor: background,
+            color: foreground,
             fontFamily: "Plus Jakarta Sans",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={mark} width={126} height={112} alt="" />
-            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <span style={{ fontSize: 34 }}>Rizky Haksono</span>
-              <span style={{ fontSize: 22, color: PRINT_HEX.inkSoft }}>{JOB_TITLE}</span>
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <span style={{ fontSize: 34 }}>Rizky Haksono</span>
+            <span style={{ fontSize: 22, color: mutedForeground }}>{JOB_TITLE}</span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ fontSize: title.length > 90 ? 52 : title.length > 50 ? 64 : 76, lineHeight: 1.05 }}>{title}</div>
             {subtitle ? (
-              <div style={{ display: "block", fontSize: 28, lineHeight: 1.35, color: PRINT_HEX.inkSoft, lineClamp: 2 }}>{subtitle}</div>
+              <div style={{ display: "block", fontSize: 28, lineHeight: 1.35, color: mutedForeground, lineClamp: 2 }}>{subtitle}</div>
             ) : null}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            {/* The double rule under every printed page head: ink, a 3px gap, a hairline. */}
-            <div style={{ display: "flex", height: 5, borderTop: `1px solid ${PRINT_HEX.ink}`, borderBottom: `1px solid ${RULE_HEX}` }} />
-            <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, fontSize: 24, color: PRINT_HEX.inkSoft }}>
-              <span>{section}</span>
-              <span>natee.my.id</span>
-            </div>
+          <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 16, fontSize: 24, color: mutedForeground, borderTop: `1px solid ${RULE_HEX}` }}>
+            <span>{section}</span>
+            <span>natee.my.id</span>
           </div>
         </div>
       ),

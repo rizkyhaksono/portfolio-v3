@@ -17,7 +17,7 @@ const formSchema = z.object({
 })
 
 interface SignupFormProps {
-  /** Called with the new account's email so the sign-in tab can take over. */
+  /** Called with the new account's email so the sign-in form can take over. */
   onCreated: (email: string) => void
 }
 
@@ -42,7 +42,7 @@ export default function SignupForm({ onCreated }: Readonly<SignupFormProps>) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleRegister)} noValidate className="flex flex-col gap-6" aria-busy={isSubmitting}>
+      <form onSubmit={form.handleSubmit(handleRegister)} noValidate className="flex flex-col gap-4" aria-busy={isSubmitting}>
         <FormField
           control={form.control}
           name="name"
@@ -88,7 +88,7 @@ export default function SignupForm({ onCreated }: Readonly<SignupFormProps>) {
 
         <FormAlert>{errors.root?.message}</FormAlert>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? "Creating your account…" : "Create account"}
         </Button>
       </form>

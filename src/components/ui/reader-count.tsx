@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-const MIN_READERS = 10
+export const MIN_READERS = 10
 
 interface ReaderCountProps {
   /** Exact page path, for example `/blog/my-post`. */
@@ -16,7 +16,7 @@ export function ReaderCount({ path, reads, className }: Readonly<ReaderCountProp
   if (readers < MIN_READERS) return null
 
   return (
-    <p className={cn("font-display text-caption tabular-nums text-ink-soft", className)}>
+    <p className={cn("text-caption tabular-nums text-muted-foreground", className)}>
       Read by {readers.toLocaleString("en")} people in the last 30 days.
     </p>
   )

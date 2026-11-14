@@ -1,20 +1,19 @@
 /**
- * Shared design-system class tokens for Portfolio v3 (one ink on paper).
+ * Shared layout and surface tokens for Portfolio v3 (Notion-style pages in the Langit Malang site).
  *
- * Surfaces are ruled frames on the paper itself, never filled cards:
- * - solid:  hairline frame, transparent ground (Card / FeatureCard)
- * - glass:  retired, same as solid (no blur, no translucency)
- * - inset:  tint ground for nested rows and code
+ * Page-level surfaces never cast a shadow:
+ * - solid:  hairline frame on the card ground
+ * - inset:  muted ground, no border, for tiles and nested rows
  */
 
-const SOLID = "rounded-none border border-border bg-transparent"
+const SOLID = "rounded-lg border border-border bg-card"
 
 export const SURFACE = {
   solid: SOLID,
   solidHover: "hover:border-foreground/20",
   glass: SOLID,
   glassNoBlur: SOLID,
-  inset: "bg-muted",
+  inset: "rounded-lg bg-muted",
 } as const
 
 /** Default content padding for solid cards and feature boxes. */
@@ -24,12 +23,21 @@ export const SURFACE_PADDING = {
   cozy: "p-4",
 } as const
 
-/** The one page width every route shares (running head, pages, colophon, error page). */
-export const SHELL_WIDTH = "mx-auto w-full max-w-[76rem] px-[clamp(20px,4vw,48px)]"
+/** Notion's page column: 708px of content, centred in the space right of the sidebar, text left-aligned inside it. */
+export const PROSE_WIDTH = "mx-auto w-full max-w-[calc(44.25rem+3rem)] px-6 sm:max-w-[calc(44.25rem+6rem)] sm:px-12"
 
-/** Section spacing used by PageSection / home blocks. */
+/** Notion's "full width" page, for app-like pages (/tools, /chat). */
+export const WIDE_WIDTH = "mx-auto w-full max-w-[90rem] px-6 sm:px-12 lg:px-24"
+
+/** Images stay exactly as wide as the reading column on every page, so their edges line up with the text. */
+export const BREAKOUT = ""
+
+/** @deprecated Use PROSE_WIDTH; kept so older call sites keep the reading column. */
+export const SHELL_WIDTH = PROSE_WIDTH
+
+/** Section rhythm on visitor pages: a Notion heading block sits well clear of the block above it. */
 export const SECTION_SPACING = {
-  section: "mt-12 sm:mt-16",
+  section: "mt-12",
   sectionGap: "mt-3",
 } as const
 

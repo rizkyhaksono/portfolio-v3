@@ -1,7 +1,10 @@
-import Link from "next/link"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { InkChart } from "@/components/ui/ink-chart"
 import { StatusLine } from "@/components/ui/status-line"
+import { PageHeader } from "@/components/ui/page-header"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
+import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import type { FullUmamiAnalytics } from "@/services/visitor/umami"
 import type { UmamiMetric } from "@/commons/types/umami"
 
@@ -24,29 +27,43 @@ function duration(seconds: number) {
 const change = (what: string, delta?: number) =>
   delta === undefined || delta === 0 ? `${what} unchanged` : `${what} ${delta > 0 ? "up" : "down"} ${count(Math.abs(delta))}`
 
-/** One dimension as a ruled list: name, count, and a hatched bar for its share of the top row. */
-function MetricLedger({ title, items, format, limit = 8 }: Readonly<{ title: string; items: UmamiMetric[]; format?: (x: string) => string; limit?: number }>) {
+/** One dimension as a Notion table: the name with a thin bar for its share of the top row, then the count. */
+function MetricTable({ title, column, items, format, limit = 8 }: Readonly<{ title: string; column: string; items: UmamiMetric[]; format?: (x: string) => string; limit?: number }>) {
   const max = Math.max(1, ...items.map((item) => item.y))
+  const id = `metric-${title.toLowerCase().replace(/\W+/g, "-")}`
 
   return (
-    <section className="min-w-0">
-      <h2 className="font-display text-h4 text-ink">{title}</h2>
+    <section aria-labelledby={id} className="min-w-0">
+      <h2 id={id} className="text-h4 text-foreground">
+        {title}
+      </h2>
       {items.length === 0 ? (
-        <p className="mt-2 border-t border-rule pt-2 text-small text-ink-soft">Nothing recorded in this range.</p>
+        <p className="mt-2 text-small text-muted-foreground">Nothing recorded in this range.</p>
       ) : (
-        <ul className="mt-2 border-t border-ink">
-          {items.slice(0, limit).map((item, i) => (
-            <li key={`${item.x}-${i}`} className="border-b border-rule py-2">
-              <div className="flex items-baseline justify-between gap-4 text-small">
-                <span className="min-w-0 truncate text-ink">{format ? format(item.x) : item.x || "Unknown"}</span>
-                <span className="shrink-0 tabular-nums text-ink-soft">{count(item.y)}</span>
-              </div>
-              <span aria-hidden className="mt-1 block h-1.5">
-                <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${(item.y / max) * 100}%` }} />
-              </span>
-            </li>
-          ))}
-        </ul>
+        <Table aria-labelledby={id} className="mt-2 table-fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead>{column}</TableHead>
+              <TableHead className="w-24 text-right">Count</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.slice(0, limit).map((item, i) => {
+              const name = format ? format(item.x) : item.x || "Unknown"
+              return (
+                <TableRow key={`${item.x}-${i}`}>
+                  <TableCell className="pb-2">
+                    <span className="block truncate text-foreground">{name}</span>
+                    <span aria-hidden className="mt-1 block h-0.5 rounded-full bg-tint">
+                      <span className="block h-full rounded-full bg-muted-foreground" style={{ width: `${(item.y / max) * 100}%` }} />
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right text-muted-foreground">{count(item.y)}</TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       )}
     </section>
   )
@@ -58,28 +75,26 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
   const here = data.activeVisitors
 
   return (
-    <div className="w-full max-w-[60rem]">
-      <nav aria-label="Range" className="flex flex-wrap gap-x-6 border-b border-rule">
-        {(Object.keys(RANGES) as RangeId[]).map((id) => (
-          <Link
-            key={id}
-            href={`/admin/dashboard/analytics?range=${id}`}
-            aria-current={id === range ? "page" : undefined}
-            className="-mb-px inline-flex min-h-10 items-center border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-ink-soft transition-colors hover:text-ink aria-[current=page]:border-ink aria-[current=page]:text-ink [@media(pointer:coarse)]:min-h-11"
-          >
-            Last {RANGES[id].label}
-          </Link>
-        ))}
-      </nav>
+    <>
+      <PageHeader
+        icon={<AdminPageIcon href="/admin/dashboard/analytics" />}
+        title="Analytics"
+        description={here > 0 ? `${count(here)} ${here === 1 ? "person" : "people"} here in the last five minutes.` : "Nobody here in the last five minutes."}
+      />
 
-      <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
-        {here > 0 ? `${count(here)} ${here === 1 ? "person" : "people"} here in the last five minutes.` : "Nobody here in the last five minutes."}
-      </p>
+      <ViewTabs
+        label="Range"
+        tabs={(Object.keys(RANGES) as RangeId[]).map((id) => ({
+          label: `Last ${RANGES[id].label}`,
+          href: `/admin/dashboard/analytics?range=${id}`,
+          current: id === range,
+        }))}
+      />
 
       {s ? (
         <>
           <StatStrip
-            className="mt-4"
+            className="mt-6"
             items={[
               { label: "Views", value: count(s.pageviews) },
               { label: "Visitors", value: count(s.visitors) },
@@ -87,20 +102,17 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
               { label: "Bounce rate", value: s.visits > 0 ? `${Math.round((s.bounces / s.visits) * 100)}%` : "–" },
             ]}
           />
-          <p className="mt-3 text-small text-ink-soft">
+          <p className="mt-3 text-small text-muted-foreground">
             {s.visits > 0 && `An average visit lasts ${duration(Math.round(s.totaltime / s.visits))}. `}
             {s.comparison && `${change("Views", s.comparison.pageviews)} and ${change("visitors", s.comparison.visitors).toLowerCase()} on ${span}.`}
           </p>
 
-          <section className="mt-12">
-            <h2 className="font-display text-h3 text-ink">Views and sessions</h2>
-            <p className="mt-1 font-display text-caption text-ink-soft">Views as the hatched line, sessions dashed.</p>
-            <InkChart
-              className="mt-2"
-              points={data.series.pageviews}
-              dashed={data.series.sessions}
-              label={`Views and sessions, last ${label}`}
-            />
+          <section aria-labelledby="views-and-sessions" className="mt-12">
+            <h2 id="views-and-sessions" className="text-h2 text-foreground">
+              Views and sessions
+            </h2>
+            <p className="mt-1 text-small text-muted-foreground">Views as the solid line, sessions dashed.</p>
+            <InkChart className="mt-3" points={data.series.pageviews} dashed={data.series.sessions} label={`Views and sessions, last ${label}`} />
           </section>
         </>
       ) : (
@@ -109,19 +121,21 @@ export default function AnalyticsDashboard({ data, range }: Readonly<{ data: Ful
         </StatusLine>
       )}
 
-      <div className="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
-        <MetricLedger title="Events" items={data.events} limit={50} />
-        <MetricLedger title="Pages" items={data.pages} format={(path) => (path === "/" ? "Home" : path)} />
-        <MetricLedger title="Referrers" items={data.referrers} format={(host) => host || "Direct"} />
-        <MetricLedger title="Countries" items={data.countries} />
-        <MetricLedger title="Regions" items={data.regions} />
-        <MetricLedger title="Cities" items={data.cities} />
-        <MetricLedger title="Browsers" items={data.browsers} />
-        <MetricLedger title="Operating systems" items={data.os} />
-        <MetricLedger title="Devices" items={data.devices} />
-        <MetricLedger title="Screen sizes" items={data.screens} />
-        <MetricLedger title="Languages" items={data.languages} />
+      <div className="mt-12 grid gap-x-12 gap-y-10 lg:grid-cols-2">
+        <MetricTable title="Events" column="Event" items={data.events} limit={50} />
+        <MetricTable title="Pages" column="Path" items={data.pages} format={(path) => (path === "/" ? "Home" : path)} />
       </div>
-    </div>
+      <div className="mt-10 grid gap-x-12 gap-y-10 md:grid-cols-2 2xl:grid-cols-3">
+        <MetricTable title="Referrers" column="Host" items={data.referrers} format={(host) => host || "Direct"} />
+        <MetricTable title="Countries" column="Country" items={data.countries} />
+        <MetricTable title="Regions" column="Region" items={data.regions} />
+        <MetricTable title="Cities" column="City" items={data.cities} />
+        <MetricTable title="Browsers" column="Browser" items={data.browsers} />
+        <MetricTable title="Operating systems" column="System" items={data.os} />
+        <MetricTable title="Devices" column="Device" items={data.devices} />
+        <MetricTable title="Screen sizes" column="Size" items={data.screens} />
+        <MetricTable title="Languages" column="Language" items={data.languages} />
+      </div>
+    </>
   )
 }

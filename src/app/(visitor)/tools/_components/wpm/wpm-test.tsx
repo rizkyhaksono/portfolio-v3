@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { StatStrip } from "@/components/ui/stat-strip"
 import { getRandomWords, type Language } from "./wpm-random-text"
 import { scoreWord, summarize } from "./score"
+import { GROUP_LABEL } from "../tool-status"
 
 const DURATIONS = [15, 30, 60, 120] as const
 type Duration = (typeof DURATIONS)[number]
@@ -25,10 +26,10 @@ type Phase = "idle" | "running" | "done"
 type CharState = "right" | "wrong" | "caret" | "todo"
 
 const CHAR: Record<CharState, string> = {
-  right: "text-ink",
-  wrong: "bg-ink text-paper",
-  caret: "text-ink underline decoration-2 underline-offset-4",
-  todo: "text-ink-soft",
+  right: "text-foreground",
+  wrong: "bg-foreground text-background",
+  caret: "text-foreground underline decoration-2 underline-offset-4",
+  todo: "text-muted-foreground",
 }
 
 function ChoiceGroup<T extends string | number>({
@@ -40,12 +41,12 @@ function ChoiceGroup<T extends string | number>({
 }: Readonly<{ label: string; options: { id: T; name: string }[]; value: T; onChange: (id: T) => void; disabled: boolean }>) {
   return (
     <div role="group" aria-label={label}>
-      <p aria-hidden className="text-small font-semibold text-ink">
+      <p aria-hidden className={GROUP_LABEL}>
         {label}
       </p>
-      <div className="mt-1 grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {options.map((o) => (
-          <Button key={o.id} type="button" size="sm" variant={o.id === value ? "default" : "outline"} aria-pressed={o.id === value} disabled={disabled} onClick={() => onChange(o.id)}>
+          <Button key={o.id} type="button" variant={o.id === value ? "default" : "outline"} aria-pressed={o.id === value} disabled={disabled} onClick={() => onChange(o.id)}>
             {o.name}
           </Button>
         ))}
@@ -127,22 +128,22 @@ export default function WPMTest() {
           disabled={phase === "running"}
         />
         <ChoiceGroup label="Language" options={LANGUAGES} value={language} onChange={setLanguage} disabled={phase === "running"} />
-        <div className="flex gap-x-6">
-          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(true)} disabled={phase === "running"}>
+        <div className="-ml-3 flex gap-1 sm:ml-0">
+          <Button variant="ghost" onClick={() => restart(true)} disabled={phase === "running"}>
             New words
           </Button>
-          <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(false)} disabled={phase === "idle"}>
+          <Button variant="ghost" onClick={() => restart(false)} disabled={phase === "idle"}>
             Restart
           </Button>
         </div>
       </div>
 
       {/* One fixed line on phones: nothing above the field may grow while the keyboard is open. */}
-      <p className="font-display text-caption tabular-nums text-ink-soft sm:hidden">
+      <p className="text-caption tabular-nums text-muted-foreground sm:hidden">
         {Math.max(0, timeLeft)} seconds left{phase !== "idle" && `, ${wpm} words a minute`}.
       </p>
 
-      <p className="wpm-passage min-h-[9rem] border border-rule p-5 text-body leading-loose">
+      <p className="wpm-passage min-h-[9rem] rounded-lg bg-muted p-5 text-body leading-loose">
         {words.slice(start, start + WINDOW).map((word, k) => {
           const wordIndex = start + k
           return (
@@ -183,8 +184,8 @@ export default function WPMTest() {
       )}
 
       {phase === "done" && (
-        <div role="status" className="space-y-4 border-t border-ink pt-6">
-          <p className="font-display text-h3 text-ink">
+        <div role="status" className="space-y-4">
+          <p className="text-body text-foreground">
             Time is up: {wpm} words a minute at {accuracy}% accuracy.
           </p>
           <div className="flex flex-wrap gap-3">

@@ -1,19 +1,20 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react"
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { CalendarDays, Fingerprint, KeyRound, Mail, UserRound } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { PageHeader } from "@/components/ui/page-header"
+import { Properties } from "@/components/ui/properties"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Logo } from "@/components/ui/logo"
 import { Skeleton } from "@/components/ui/skeleton"
 import { StatusLine } from "@/components/ui/status-line"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -21,7 +22,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { formatDay } from "@/components/layout/admin/admin-format"
-import { PRINT_HEX } from "@/lib/print-hex"
+import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
+import { switchTheme } from "@/components/layout/theme-toggle"
+import { THEME_HEX } from "@/lib/theme-hex"
 import {
   getAdminSettingsClient,
   getCurrentUserClient,
@@ -61,8 +64,8 @@ const BELL_SOURCES: { name: keyof NotificationValues; label: string; note: strin
 ]
 
 const THEMES = [
-  { value: "light", label: "Paper" },
-  { value: "dark", label: "Night" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
   { value: "system", label: "System" },
 ] as const
 
@@ -96,66 +99,55 @@ interface UserData {
 }
 
 // The CSS tokens flip with the active theme, so each half pins its own theme's colours through the hex copies.
-const PAPER: CSSProperties = { backgroundColor: PRINT_HEX.paper, color: PRINT_HEX.ink }
-const NIGHT: CSSProperties = { backgroundColor: PRINT_HEX.night, color: PRINT_HEX.nightInk }
+const LIGHT: CSSProperties = { backgroundColor: THEME_HEX.light.background, color: THEME_HEX.light.foreground }
+const DARK: CSSProperties = { backgroundColor: THEME_HEX.dark.background, color: THEME_HEX.dark.foreground }
 
-/** The mini logo printed in each theme's own ink: paper, night, or half of each. */
+/** A type sample in each theme's own colours: light, dark, or half of each. */
 function Swatch({ mode }: Readonly<{ mode: (typeof THEMES)[number]["value"] }>) {
   return (
-    <span aria-hidden className="relative block size-16 shrink-0 border border-rule">
+    <span aria-hidden className="relative block h-16 w-24 shrink-0 overflow-hidden rounded-md border border-border">
       {mode !== "dark" && (
-        <span className="absolute inset-0 flex items-center justify-center" style={PAPER}>
-          <Logo variant="mini" className="size-10" />
+        <span className="absolute inset-0 flex items-center justify-center" style={LIGHT}>
+          <span className="text-h1">Aa</span>
         </span>
       )}
       {mode !== "light" && (
-        <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={NIGHT}>
-          <Logo variant="mini" className="size-10" />
+        <span className={`absolute inset-0 flex items-center justify-center ${mode === "system" ? "[clip-path:inset(0_0_0_50%)]" : ""}`} style={DARK}>
+          <span className="text-h1">Aa</span>
         </span>
       )}
     </span>
   )
 }
 
-/** Portrait, name and the account lines on the settings card. */
-function AccountIdentity({ user, providers }: Readonly<{ user: UserData; providers: string[] }>) {
+/** Portrait and name, then the account's facts as Notion properties. */
+function AccountIdentity({ user, providers, children }: Readonly<{ user: UserData; providers: string[]; children: ReactNode }>) {
   return (
-    <>
-      <header className="flex items-end gap-5 pb-6">
-        <Avatar className="size-20">
+    <section aria-labelledby="account-name" className="max-w-2xl">
+      <div className="flex items-center gap-4">
+        <Avatar className="size-14">
           {(user.avatarUrl ?? user.image) && <AvatarImage src={user.avatarUrl ?? user.image} alt="" referrerPolicy="no-referrer" />}
-          <AvatarFallback className="font-display text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
+          <AvatarFallback className="text-h3">{user.name?.charAt(0) || "A"}</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <h2 className="font-display text-h2 text-ink [overflow-wrap:anywhere]">{user.name || "Admin"}</h2>
-          {user.location && <p className="mt-1 font-display text-lead text-ink-soft">{user.location}</p>}
+          <h2 id="account-name" className="text-h3 text-foreground [overflow-wrap:anywhere]">
+            {user.name || "Admin"}
+          </h2>
+          {user.location && <p className="text-small text-muted-foreground">{user.location}</p>}
         </div>
-      </header>
-      <div aria-hidden className="border-t border-ink" />
-      <dl className="mt-6">
-        <Leader term="Email">
-          {user.email || "None"}
-          {user.emailVerified && ", verified"}
-        </Leader>
-        <Leader term="Role">{sentence(user.role || "admin")}</Leader>
-        <Leader term="Member since">{formatDay(user.createdAt) || "Unknown"}</Leader>
-        <Leader term="Signs in with">{providers.length > 0 ? providers.join(", ") : "Email and password"}</Leader>
-        <Leader term="User ID">{user.id}</Leader>
-      </dl>
-    </>
-  )
-}
-
-/** A definition row with a dotted leader between term and value. */
-function Leader({ term, children }: Readonly<{ term: string; children: React.ReactNode }>) {
-  return (
-    <div className="flex items-baseline gap-2 py-1.5 text-small">
-      <dt className="flex min-w-0 flex-1 items-baseline gap-2 text-ink-soft">
-        {term}
-        <span aria-hidden className="min-w-6 flex-1 border-b border-dotted border-rule-strong" />
-      </dt>
-      <dd className="min-w-0 text-right tabular-nums text-ink [overflow-wrap:anywhere]">{children}</dd>
-    </div>
+      </div>
+      {children}
+      <Properties
+        className="mt-5"
+        items={[
+          { label: "Email", icon: <Mail strokeWidth={1.5} aria-hidden />, value: `${user.email || "None"}${user.emailVerified ? ", verified" : ""}` },
+          { label: "Role", icon: <UserRound strokeWidth={1.5} aria-hidden />, value: sentence(user.role || "admin") },
+          { label: "Member since", icon: <CalendarDays strokeWidth={1.5} aria-hidden />, value: formatDay(user.createdAt) || "Unknown" },
+          { label: "Signs in with", icon: <KeyRound strokeWidth={1.5} aria-hidden />, value: providers.length > 0 ? providers.join(", ") : "Email and password" },
+          { label: "User ID", icon: <Fingerprint strokeWidth={1.5} aria-hidden />, value: <span className="break-all font-mono text-caption">{user.id}</span> },
+        ]}
+      />
+    </section>
   )
 }
 
@@ -265,71 +257,69 @@ export default function AdminSettingsPage() {
     }
   }
 
+  const header = <PageHeader icon={<AdminPageIcon href="/admin/dashboard/settings" />} title="Settings" description="Your account, what the bell counts, and how the admin looks." />
+
   if (state === "loading") {
     return (
-      <div aria-busy="true" className="w-full max-w-[44rem] border border-ink p-[3px]">
-        <p className="sr-only">Loading settings</p>
-        <div className="border border-rule p-5 sm:p-8">
-          <div className="flex items-end gap-5 pb-6">
-            <Skeleton className="size-20" />
-            <div className="flex-1 space-y-3">
-              <Skeleton className="h-8 w-1/2" />
-              <Skeleton className="h-4 w-1/3" />
-            </div>
+      <>
+        {header}
+        <div aria-busy="true" className="max-w-2xl">
+          <p className="sr-only">Loading settings</p>
+          <div className="flex items-center gap-4">
+            <Skeleton className="size-14 rounded-full" />
+            <Skeleton className="h-6 w-48" />
           </div>
-          <div aria-hidden className="border-t border-ink" />
-          <div className="mt-6 space-y-3">
-            {[0, 1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-4 w-full" />
+          <div className="mt-5 space-y-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-5 w-full" />
             ))}
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
   if (state === "failed" || !user) {
     return (
-      <StatusLine
-        kind="failed"
-        className="w-full max-w-[44rem]"
-        action={
-          <Button variant="outline" size="sm" onClick={() => { void load() }}>
-            Try again
-          </Button>
-        }
-      >
-        Your account did not load. The API may be down for a moment.
-      </StatusLine>
+      <>
+        {header}
+        <StatusLine
+          kind="failed"
+          action={
+            <Button variant="outline" size="sm" onClick={() => { void load() }}>
+              Try again
+            </Button>
+          }
+        >
+          Your account did not load. The API may be down for a moment.
+        </StatusLine>
+      </>
     )
   }
 
   const providers = (user.oauthAccounts ?? []).map((account) => sentence(account.provider || account.providerId || "OAuth"))
 
   return (
-    <div className="w-full max-w-[44rem]">
-      <article className="border border-ink p-[3px]">
-        <div className="border border-rule p-5 sm:p-8">
-          <AccountIdentity user={user} providers={providers} />
-
-          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} aria-busy={uploading}>
-              {uploading ? "Uploading…" : "Change portrait"}
-            </Button>
-            <p className="text-caption text-ink-soft">PNG, JPG, GIF or WebP, up to 2 MB.</p>
-            <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={onPortrait} />
-          </div>
+    <>
+      {header}
+      <AccountIdentity user={user} providers={providers}>
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} aria-busy={uploading}>
+            {uploading ? "Uploading…" : "Change portrait"}
+          </Button>
+          <p className="text-caption text-muted-foreground">PNG, JPG, GIF or WebP, up to 2 MB.</p>
+          <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="hidden" onChange={onPortrait} />
         </div>
-      </article>
+      </AccountIdentity>
 
-      <div className="mt-12">
+      <div className="mt-12 max-w-2xl">
         <SourceTabs
           tabs={[
             {
               id: "profile",
               label: "Profile",
               content: (
-                <Card className="p-4 sm:p-6">
+                <div>
                   <Form {...profileForm}>
                     <form noValidate onSubmit={profileForm.handleSubmit(onProfile)} className="grid gap-5 sm:grid-cols-2">
                       {(
@@ -376,25 +366,25 @@ export default function AdminSettingsPage() {
                       </div>
                     </form>
                   </Form>
-                </Card>
+                </div>
               ),
             },
             {
               id: "notifications",
               label: "Notifications",
               content: (
-                <Card className="p-4 sm:p-6">
-                  <p className="text-small text-ink-soft">Choose what the bell in the head counts.</p>
+                <div>
+                  <p className="text-small text-muted-foreground">Choose what the bell in the top bar counts.</p>
                   <Form {...notificationForm}>
                     <form onSubmit={notificationForm.handleSubmit(onNotifications)} className="mt-4">
-                      <div className="border-t border-ink">
+                      <div>
                         {BELL_SOURCES.map(({ name, label, note }) => (
                           <FormField
                             key={name}
                             control={notificationForm.control}
                             name={name}
                             render={({ field }) => (
-                              <FormItem className="flex items-center justify-between gap-4 space-y-0 border-b border-rule py-3">
+                              <FormItem className="flex items-center justify-between gap-4 space-y-0 border-b border-border py-3 last:border-b-0">
                                 <div className="space-y-0.5">
                                   <FormLabel>{label}</FormLabel>
                                   <FormDescription>{note}</FormDescription>
@@ -412,27 +402,27 @@ export default function AdminSettingsPage() {
                       </Button>
                     </form>
                   </Form>
-                </Card>
+                </div>
               ),
             },
             {
               id: "appearance",
               label: "Appearance",
               content: (
-                <Card className="p-4 sm:p-6">
+                <div>
                   <RadioGroup
                     value={theme}
-                    onValueChange={setTheme}
+                    onValueChange={(to) => switchTheme(setTheme, to)}
                     aria-labelledby="settings-theme"
                     className="gap-0"
                   >
-                    <p id="settings-theme" className="font-display text-h4 text-ink">
+                    <p id="settings-theme" className="text-small font-medium text-foreground">
                       Theme
                     </p>
-                    <p className="mt-1 text-small text-ink-soft">Applies at once, in this browser.</p>
+                    <p className="mt-1 text-small text-muted-foreground">Applies at once, in this browser.</p>
                     <div className="mt-4 flex flex-wrap gap-x-8 gap-y-4">
                       {THEMES.map(({ value, label }) => (
-                        <Label key={value} className="flex cursor-pointer flex-col items-start gap-2 text-base font-normal">
+                        <Label key={value} className="flex cursor-pointer flex-col items-start gap-2 text-small font-normal">
                           <Swatch mode={value} />
                           <span className="flex min-h-11 items-center gap-2 md:min-h-0">
                             <RadioGroupItem value={value} />
@@ -444,7 +434,7 @@ export default function AdminSettingsPage() {
                   </RadioGroup>
 
                   <Form {...appearanceForm}>
-                    <form onSubmit={appearanceForm.handleSubmit(onAppearance)} className="mt-8 grid gap-5 border-t border-rule pt-6 sm:grid-cols-2">
+                    <form onSubmit={appearanceForm.handleSubmit(onAppearance)} className="mt-8 grid gap-5 border-t border-border pt-6 sm:grid-cols-2">
                       <FormField
                         control={appearanceForm.control}
                         name="language"
@@ -500,12 +490,12 @@ export default function AdminSettingsPage() {
                       </div>
                     </form>
                   </Form>
-                </Card>
+                </div>
               ),
             },
           ]}
         />
       </div>
-    </div>
+    </>
   )
 }

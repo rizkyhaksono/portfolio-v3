@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react"
-import Link from "next/link"
+import { ArrowUp, Pencil, RefreshCw, Reply, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { InkLink } from "@/components/ui/ink-link"
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -72,63 +73,71 @@ interface ChatClientProps {
 
 const nameOf = (message: PublicChatMessage) => message.user?.name || "Anonymous"
 
-interface LetterProps {
+interface MessageProps {
   message: PublicChatMessage
   quoted: PublicChatMessage | null
+  mine: boolean
   canReply: boolean
-  canManage: boolean
   onReply: (m: PublicChatMessage) => void
   onEdit: (m: PublicChatMessage) => void
   onDelete: (m: PublicChatMessage) => void
 }
 
-/** One letter: the writer, the text, a dateline sentence. Replies sit behind a left rule. */
-function Letter({ message, quoted, canReply, canManage, onReply, onEdit, onDelete }: Readonly<LetterProps>) {
+const ACTION = "h-7 px-1.5 text-caption font-normal text-muted-foreground hover:text-foreground"
+
+/** A Notion comment: a small avatar, the name and time on one line, the text under it, and a tint on hover. */
+function Message({ message, quoted, mine, canReply, onReply, onEdit, onDelete }: Readonly<MessageProps>) {
   const name = nameOf(message)
   const date = new Date(message.createdAt)
   const edited = message.updatedAt !== message.createdAt
 
   return (
-    <article className={cn(quoted && "ml-3 border-l border-ink pl-4 sm:ml-8")}>
-      <div className="flex items-center gap-3">
-        <Avatar className="size-8">
-          <AvatarImage src={message.user?.avatarUrl ?? message.user?.iconUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
-          <AvatarFallback className="text-xs">{name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div className="flex min-w-0 flex-wrap items-center gap-x-2 text-body">
-          <span className="font-semibold text-ink">{name}</span>
-          {message.user?.role === "ADMIN" && <Badge variant="outline">Site owner</Badge>}
-        </div>
-      </div>
+    <article className="-mx-2 flex gap-2.5 rounded-md px-2 py-2 transition-colors duration-ui ease-out hover:bg-tint">
+      <Avatar className="mt-0.5 size-6">
+        <AvatarImage src={message.user?.avatarUrl ?? message.user?.iconUrl ?? undefined} alt="" referrerPolicy="no-referrer" />
+        <AvatarFallback className="bg-tint-strong text-caption">{name.charAt(0)}</AvatarFallback>
+      </Avatar>
 
-      {quoted && (
-        <p className="mt-2 truncate font-display text-caption text-ink-soft">
-          In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
+      <div className="min-w-0 flex-1">
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+          <span className="text-small font-medium text-foreground">{mine ? "You" : name}</span>
+          {message.user?.role === "ADMIN" && <Badge>Site owner</Badge>}
+          {!Number.isNaN(date.getTime()) && (
+            <time dateTime={message.createdAt} suppressHydrationWarning className="text-caption text-muted-foreground">
+              {STAMP.format(date)}
+              {edited && ", edited"}
+            </time>
+          )}
         </p>
-      )}
-      <p className="mt-2 max-w-[66ch] whitespace-pre-wrap break-words text-body text-ink">{message.message}</p>
 
-      <div className="mt-1 flex flex-wrap items-center gap-x-5">
-        {!Number.isNaN(date.getTime()) && (
-          <time dateTime={message.createdAt} suppressHydrationWarning className="font-display text-caption text-ink-soft">
-            {STAMP.format(date)}
-            {edited && ", edited"}
-          </time>
+        {quoted && (
+          <p className="mt-1 truncate border-l-2 border-border pl-2 text-small text-muted-foreground">
+            In reply to {nameOf(quoted)}: &ldquo;{quoted.message}&rdquo;
+          </p>
         )}
-        {canReply && (
-          <Button variant="ghost" size="sm" className="px-0" aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
-            Reply
-          </Button>
-        )}
-        {canManage && (
-          <>
-            <Button variant="ghost" size="sm" className="px-0" aria-label="Edit your message" onClick={() => onEdit(message)}>
-              Edit
-            </Button>
-            <Button variant="ghost" size="sm" className="px-0" aria-label="Delete your message" onClick={() => onDelete(message)}>
-              Delete
-            </Button>
-          </>
+        <p className="mt-0.5 max-w-[66ch] whitespace-pre-wrap break-words text-body text-foreground">{message.message}</p>
+
+        {(canReply || mine) && (
+          <div className="-ml-1.5 mt-0.5 flex flex-wrap items-center gap-x-1">
+            {canReply && (
+              <Button variant="ghost" size="sm" className={ACTION} aria-label={`Reply to ${name}`} onClick={() => onReply(message)}>
+                <Reply aria-hidden strokeWidth={1.5} />
+                Reply
+              </Button>
+            )}
+            {mine && (
+              <>
+                <Button variant="ghost" size="sm" className={ACTION} aria-label="Edit your message" onClick={() => onEdit(message)}>
+                  <Pencil aria-hidden strokeWidth={1.5} />
+                  Edit
+                </Button>
+                <Button variant="ghost" size="sm" className={ACTION} aria-label="Delete your message" onClick={() => onDelete(message)}>
+                  <Trash2 aria-hidden strokeWidth={1.5} />
+                  Delete
+                </Button>
+              </>
+            )}
+          </div>
         )}
       </div>
     </article>
@@ -258,32 +267,33 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-6 py-2">
-        <p className="font-display text-caption tabular-nums text-ink-soft">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-6 border-b border-border pb-1.5">
+        <p className="text-small font-medium tabular-nums text-muted-foreground">
           {stream.length === 1 ? "1 message" : `${stream.length} messages`}
         </p>
-        <Button variant="ghost" size="sm" className="ml-auto px-0" disabled={isPending} onClick={() => startTransition(() => router.refresh())}>
+        <Button variant="ghost" size="sm" className="-mr-2 text-muted-foreground hover:text-foreground" disabled={isPending} onClick={() => startTransition(() => router.refresh())}>
+          <RefreshCw aria-hidden strokeWidth={1.5} />
           {isPending ? "Updating…" : "Refresh"}
         </Button>
       </div>
 
-      <div ref={listRef} tabIndex={0} aria-label="Messages" className="min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-rule">
+      <div ref={listRef} tabIndex={0} aria-label="Messages" className="-mx-2 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
       {stream.length === 0 ? (
         <StatusLine kind="empty" className="py-10">
           No messages yet. Yours could be the first.
         </StatusLine>
       ) : (
-        <ol role="list">
+        <ol role="list" className="flex flex-col gap-0.5 px-2 py-3">
           {stream.map((m, index) => {
             const isMine = currentUser?.id === m.userId
             const newest = index === stream.length - 1
             return (
-              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined} className="py-5">
-                <Letter
+              <li key={m.id} id={newest ? "chat-newest" : undefined} ref={newest ? newestRef : undefined}>
+                <Message
                   message={m}
                   quoted={m.replyToId ? byId.get(m.replyToId) ?? null : null}
+                  mine={isMine}
                   canReply={Boolean(currentUser) && !isMine}
-                  canManage={isMine}
                   onReply={handleReply}
                   onEdit={handleEdit}
                   onDelete={setPendingDelete}
@@ -296,18 +306,19 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
       </div>
 
       {currentUser ? (
-        <form onSubmit={handleSendMessage} className="shrink-0 border-t border-ink pb-4 pt-3">
-          <div className="flex items-baseline justify-between gap-4">
-            <Label htmlFor="chat-message" className="truncate">
+        <form onSubmit={handleSendMessage} className="shrink-0 border-t border-border pt-3">
+          <div className="flex min-h-7 items-center justify-between gap-4">
+            <Label htmlFor="chat-message" className={cn("truncate", !(replyTo || editingMessage) && "sr-only")}>
               {composerLabel}
             </Label>
             {(replyTo || editingMessage) && (
-              <Button type="button" variant="ghost" size="sm" className="px-0" onClick={cancelReplyOrEdit}>
+              <Button type="button" variant="ghost" size="sm" className="-mr-2 text-muted-foreground hover:text-foreground" onClick={cancelReplyOrEdit}>
                 Cancel
               </Button>
             )}
           </div>
-          <div className="mt-1 flex items-end gap-3">
+          {/* Notion's comment box: the field and its send button share one bordered box, which takes the focus ring. */}
+          <div className="flex items-end gap-2 rounded-lg border border-input bg-background p-1.5 pl-3 transition-colors duration-ui ease-out focus-within:border-foreground focus-within:ring-1 focus-within:ring-foreground">
             <Textarea
               id="chat-message"
               ref={textareaRef}
@@ -315,25 +326,25 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isPending}
-              rows={2}
+              rows={1}
+              placeholder="Write a message"
               aria-describedby="chat-hint"
-              className="max-h-40 min-h-11 flex-1 resize-none"
+              className="max-h-40 min-h-8 flex-1 resize-none border-0 bg-transparent px-0 py-1.5 focus-visible:ring-0"
             />
-            <Button type="submit" disabled={!inputMessage.trim() || isPending}>
+            <Button type="submit" size="sm" disabled={!inputMessage.trim() || isPending}>
+              <ArrowUp aria-hidden strokeWidth={1.5} />
               {isPending ? "Sending…" : editingMessage ? "Save" : "Send"}
             </Button>
           </div>
-          <p id="chat-hint" className="mt-1 font-display text-caption text-ink-soft">
+          <p id="chat-hint" className="mt-1.5 text-caption text-muted-foreground">
             <span className="[@media(pointer:coarse)]:hidden">Enter sends. Shift and Enter start a new line.</span>
             <span className="hidden [@media(pointer:coarse)]:inline">Enter starts a new line. Send posts the message.</span>
           </p>
         </form>
       ) : (
-        <div className="shrink-0 border-t border-ink py-3">
-          <Button asChild size="sm">
-            <Link href="/auth?redirect=/chat">Sign in to write a message</Link>
-          </Button>
-        </div>
+        <p className="shrink-0 border-t border-border pt-3 text-small text-muted-foreground">
+          <InkLink href="/auth?redirect=/chat">Sign in</InkLink> to post and reply under your own name.
+        </p>
       )}
 
       <AlertDialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>

@@ -1,15 +1,20 @@
 import { getRoadmapIndex } from "@/lib/mdx"
+import { SectionIcon } from "@/components/layout/section-icons"
+import { PageHeader } from "@/components/ui/page-header"
+import { FADE_IN } from "@/components/ui/page-loading"
 import { RoadmapClient } from "./roadmap-client"
 
 export default function CourseRoadmap() {
   return (
-    <div>
-      <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Roadmap</h1>
-        <p className="mt-4 font-display text-caption text-ink-soft">Your progress stays in this browser.</p>
-      </header>
-      <div aria-hidden className="border-t border-ink" />
-      <RoadmapClient courses={getRoadmapIndex()} />
-    </div>
+    <>
+      <PageHeader
+        icon={<SectionIcon href="/roadmap" />}
+        title="Roadmap"
+        description="Learning paths from first principles to advanced practice. Your progress stays in this browser."
+      />
+      <div className={FADE_IN}>
+        <RoadmapClient courses={getRoadmapIndex()} />
+      </div>
+    </>
   )
 }

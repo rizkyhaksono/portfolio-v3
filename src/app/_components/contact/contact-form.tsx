@@ -15,6 +15,9 @@ import { checkContactRateLimit, formatRemainingTime, recordContactSubmission } f
 // Cloudflare's script loads only once someone starts filling the form in.
 const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), { ssr: false })
 
+// Notion form questions: the label in ink at 14px above its field.
+const LABEL = "text-small font-medium text-foreground"
+
 type Status = { kind: "idle" | "sending" | "sent" } | { kind: "error"; message: string }
 type Field = "email" | "name" | "message"
 type FieldElement = HTMLInputElement | HTMLTextAreaElement
@@ -122,29 +125,44 @@ export function ContactForm() {
       noValidate
       data-private
       aria-describedby="contact-status"
-      className="space-y-6"
+      className="space-y-4 rounded-lg border border-border p-4 sm:p-6"
     >
-      <div className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="contact-email">Your email</Label>
-          <Input id="contact-email" type="email" autoComplete="email" required disabled={busy} {...fieldProps("email")} />
-          {fieldError("email")}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="contact-name">Your name</Label>
-          <Input id="contact-name" autoComplete="name" required disabled={busy} {...fieldProps("name")} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="contact-name" className={LABEL}>
+            Name
+          </Label>
+          <Input id="contact-name" autoComplete="name" placeholder="Your name" required disabled={busy} {...fieldProps("name")} />
           {fieldError("name")}
         </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="contact-email" className={LABEL}>
+            Email
+          </Label>
+          <Input id="contact-email" type="email" autoComplete="email" placeholder="you@example.com" required disabled={busy} {...fieldProps("email")} />
+          {fieldError("email")}
+        </div>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="contact-message">Message</Label>
-        <Textarea id="contact-message" rows={6} maxLength={5000} required disabled={busy} className="resize-y" {...fieldProps("message")} />
+      <div className="space-y-1.5">
+        <Label htmlFor="contact-message" className={LABEL}>
+          Message
+        </Label>
+        <Textarea
+          id="contact-message"
+          rows={5}
+          maxLength={5000}
+          placeholder="What are you working on, and how can I help?"
+          required
+          disabled={busy}
+          className="resize-y"
+          {...fieldProps("message")}
+        />
         {fieldError("message")}
       </div>
 
-      {/* Reserved at the widget's height so mounting it does not shift the button. */}
-      <div className="min-h-[65px]">
-        {armed && (
+      {/* Appears once the form is touched; the shift follows the visitor's own input, so it is not layout shift. */}
+      {armed && (
+        <div className="min-h-[65px]">
           <Turnstile
             siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
             onSuccess={setToken}
@@ -152,14 +170,14 @@ export function ContactForm() {
             onExpire={() => setToken("")}
             options={{ theme: resolvedTheme === "dark" ? "dark" : "light" }}
           />
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <Button type="submit" disabled={busy}>
-          {busy ? "Sending…" : "Send the message"}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+        <Button type="submit" size="lg" disabled={busy}>
+          {busy ? "Sending…" : "Send message"}
         </Button>
-        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 font-display text-small text-ink">
+        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 text-small text-foreground">
           {status.kind === "sent" && (
             <>
               <Check aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />

@@ -1,13 +1,26 @@
 "use client"
 
-import { useState, type MouseEvent } from "react"
+import { useRef, useState, type MouseEvent } from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Menu } from "lucide-react"
-import { Logo } from "@/components/ui/logo"
-import { Button } from "@/components/ui/button"
+import {
+  Briefcase,
+  ChartColumn,
+  ExternalLink,
+  GraduationCap,
+  Inbox,
+  LayoutDashboard,
+  LayoutGrid,
+  LogOut,
+  PanelLeft,
+  PenLine,
+  Route,
+  Settings,
+  type LucideIcon,
+} from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +34,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import { performAdminLogout } from "@/lib/admin-logout"
+import { cn } from "@/lib/utils"
 
 export interface AdminUser {
   name: string
@@ -28,64 +42,55 @@ export interface AdminUser {
   avatarUrl?: string
 }
 
+export interface AdminPage {
+  title: string
+  href: string
+  icon: LucideIcon
+}
+
 const HOME = "/admin/dashboard"
 
-const SECTIONS = [
+const GROUPS: { label: string; items: AdminPage[] }[] = [
   {
     label: "Overview",
     items: [
-      { title: "Dashboard", href: HOME },
-      { title: "Analytics", href: `${HOME}/analytics` },
+      { title: "Dashboard", href: HOME, icon: LayoutDashboard },
+      { title: "Analytics", href: `${HOME}/analytics`, icon: ChartColumn },
     ],
   },
   {
-    label: "Manage",
+    label: "Content",
     items: [
-      { title: "Projects", href: `${HOME}/project` },
-      { title: "Work experience", href: `${HOME}/work` },
-      { title: "Education", href: `${HOME}/education` },
-      { title: "Career", href: `${HOME}/career` },
-      { title: "Blog", href: `${HOME}/blog` },
-      { title: "Feedback", href: `${HOME}/feedback` },
+      { title: "Projects", href: `${HOME}/project`, icon: LayoutGrid },
+      { title: "Work experience", href: `${HOME}/work`, icon: Briefcase },
+      { title: "Education", href: `${HOME}/education`, icon: GraduationCap },
+      { title: "Career", href: `${HOME}/career`, icon: Route },
+      { title: "Blog", href: `${HOME}/blog`, icon: PenLine },
     ],
   },
-  { label: "Account", items: [{ title: "Settings", href: `${HOME}/settings` }] },
-] as const
+  { label: "Inbox", items: [{ title: "Feedback", href: `${HOME}/feedback`, icon: Inbox }] },
+  { label: "Account", items: [{ title: "Settings", href: `${HOME}/settings`, icon: Settings }] },
+]
 
-export const ADMIN_PAGES: { title: string; href: string }[] = SECTIONS.flatMap((section) => [...section.items])
+export const ADMIN_PAGES: AdminPage[] = GROUPS.flatMap((group) => group.items)
+
+// Longest matching href wins, so /admin/dashboard/blog is "Blog", not "Dashboard".
+export const adminPageFor = (pathname: string) =>
+  [...ADMIN_PAGES].sort((a, b) => b.href.length - a.href.length).find((page) => pathname.startsWith(page.href)) ?? ADMIN_PAGES[0]
+
+/** The page's 56px icon for its PageHeader, from the same map as the sidebar. */
+export function AdminPageIcon({ href }: Readonly<{ href: string }>) {
+  const Icon = ADMIN_PAGES.find((page) => page.href === href)?.icon ?? LayoutDashboard
+  return <Icon aria-hidden strokeWidth={1.25} />
+}
 
 const isCurrent = (pathname: string, href: string) => (href === HOME ? pathname === HOME : pathname.startsWith(href))
 
-/** Section lists; the current page is the inverted row (ink ground, paper text). */
-function SpineNav({ onNavigate }: Readonly<{ onNavigate?: () => void }>) {
-  const pathname = usePathname()
+// The visitor sidebar's row: 28px from lg (44px below), a 16px icon, grey text that inks and tints on hover and when current.
+const ROW =
+  "flex min-h-11 w-full items-center gap-2 rounded-md px-2 text-left text-small text-muted-foreground transition-colors duration-ui ease-out hover:bg-tint hover:text-foreground aria-[current=page]:bg-tint aria-[current=page]:font-medium aria-[current=page]:text-foreground lg:min-h-7 [&>svg]:size-4 [&>svg]:shrink-0"
 
-  return (
-    <nav aria-label="Admin" className="flex flex-col gap-6 px-3 py-5">
-      {SECTIONS.map((section) => (
-        <div key={section.label}>
-          <p className="px-3 pb-1 font-display text-caption text-ink-soft">{section.label}</p>
-          <ul className="border-t border-rule">
-            {section.items.map((item) => (
-              <li key={item.href} className="border-b border-rule">
-                <Link
-                  href={item.href}
-                  onClick={onNavigate}
-                  aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
-                  className="flex min-h-10 items-center px-3 text-[15px] text-ink transition-colors hover:bg-tint aria-[current=page]:bg-ink aria-[current=page]:font-semibold aria-[current=page]:text-paper [@media(pointer:coarse)]:min-h-11"
-                >
-                  {item.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
-  )
-}
-
-function LogoutButton() {
+function LogoutRow() {
   const [pending, setPending] = useState(false)
 
   const logout = async (event: MouseEvent) => {
@@ -103,9 +108,10 @@ function LogoutButton() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full">
+        <button type="button" className={ROW}>
+          <LogOut aria-hidden strokeWidth={1.5} />
           Log out
-        </Button>
+        </button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -123,72 +129,109 @@ function LogoutButton() {
   )
 }
 
-function SpineAccount({ user }: Readonly<{ user?: AdminUser }>) {
+/** The admin page tree: workspace row, grouped pages, the site link, then the signed-in user and Log out. */
+export function AdminSidebarNav({ user, className }: Readonly<{ user?: AdminUser; className?: string }>) {
+  const pathname = usePathname()
   const name = user?.name || "Admin"
+
   return (
-    <div className="border-t border-ink px-6 py-4">
-      <div className="flex items-center gap-3">
-        <Avatar className="size-9">
-          {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />}
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <p className="truncate text-small font-semibold text-ink">{name}</p>
-          {user?.email && <p className="truncate text-caption text-ink-soft">{user.email}</p>}
+    <div className={cn("flex min-h-full flex-col px-2 pb-3 pt-2", className)}>
+      <Link href={HOME} className="flex min-h-11 items-center gap-2 rounded-md px-2 py-1 transition-colors hover:bg-tint lg:min-h-9">
+        <Image src="/rizky.jpg" alt="" width={20} height={20} className="size-5 shrink-0 rounded object-cover" />
+        <span className="min-w-0 leading-tight">
+          <span className="block truncate text-small font-medium text-foreground">Rizky Haksono</span>
+          <span className="block text-caption text-muted-foreground">Admin</span>
+        </span>
+      </Link>
+
+      <nav aria-label="Admin" className="mt-1">
+        {GROUPS.map((group) => (
+          <div key={group.label}>
+            <p className="mb-0.5 mt-5 px-2 text-caption font-medium text-muted-foreground">{group.label}</p>
+            <ul role="list">
+              {group.items.map(({ title, href, icon: Icon }) => (
+                <li key={href}>
+                  <Link href={href} aria-current={isCurrent(pathname, href) ? "page" : undefined} className={ROW}>
+                    <Icon aria-hidden strokeWidth={1.5} />
+                    <span className="truncate">{title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <ul role="list" className="mt-5">
+          <li>
+            <a href="/" target="_blank" rel="noopener" className={ROW}>
+              <ExternalLink aria-hidden strokeWidth={1.5} />
+              Open the site
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div className="mt-auto pt-6">
+        <div className="flex items-center gap-2 px-2 py-1.5">
+          <Avatar className="size-6">
+            {user?.avatarUrl && <AvatarImage src={user.avatarUrl} alt="" referrerPolicy="no-referrer" />}
+            <AvatarFallback className="bg-tint-strong text-caption">{name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 leading-tight">
+            <p className="truncate text-small font-medium text-foreground">{name}</p>
+            {user?.email && <p className="truncate text-caption text-muted-foreground">{user.email}</p>}
+          </div>
         </div>
-      </div>
-      <div className="mt-3">
-        <LogoutButton />
+        <LogoutRow />
       </div>
     </div>
   )
 }
 
-function Masthead() {
+/** The grey sidebar from lg, sticky at full height. */
+export function AdminSidebar({ user }: Readonly<{ user?: AdminUser }>) {
   return (
-    <Link href={HOME} className="flex min-h-[var(--head-h)] items-center gap-2.5 border-b border-ink px-6 text-ink">
-      <Logo variant="mini" className="size-8" />
-      <span className="leading-tight">
-        <span className="block font-display text-[1.125rem]">Rizky Haksono</span>
-        <span className="block text-caption text-ink-soft">Admin</span>
-      </span>
-    </Link>
-  )
-}
-
-/** Desktop spine: fixed to the left edge, `--admin-rail` wide, ruled in ink. */
-export function AdminSpine({ user }: Readonly<{ user?: AdminUser }>) {
-  return (
-    <aside className="bg-paper-grain fixed inset-y-0 left-0 z-40 hidden w-[var(--admin-rail)] flex-col border-r border-ink md:flex">
-      <Masthead />
-      <div className="flex-1 overflow-y-auto">
-        <SpineNav />
-      </div>
-      <SpineAccount user={user} />
+    <aside aria-label="Admin" className="sticky top-0 hidden h-svh w-60 shrink-0 overflow-y-auto bg-muted lg:block">
+      <AdminSidebarNav user={user} />
     </aside>
   )
 }
 
-/** Phones and small tablets: the same spine in a sheet that closes as soon as a page is chosen. */
-export function AdminMenu({ user }: Readonly<{ user?: AdminUser }>) {
+/** Below lg: the "Menu" button opens the same tree in a left sheet, which closes once a page is chosen. */
+export function AdminMenu({ user, className }: Readonly<{ user?: AdminUser; className?: string }>) {
   const [open, setOpen] = useState(false)
+  const trigger = useRef<HTMLButtonElement>(null)
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className="-ml-2 md:hidden">
-          <Menu strokeWidth={1.5} aria-hidden />
-          Menu
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" aria-describedby={undefined} className="flex w-[min(18rem,85vw)] flex-col gap-0 p-0">
-        <SheetTitle className="sr-only">Admin menu</SheetTitle>
-        <Masthead />
-        <div className="flex-1 overflow-y-auto">
-          <SpineNav onNavigate={() => setOpen(false)} />
-        </div>
-        <SpineAccount user={user} />
-      </SheetContent>
-    </Sheet>
+    <>
+      <button
+        ref={trigger}
+        type="button"
+        aria-label="Menu"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen(true)}
+        className={cn("inline-flex size-11 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-tint hover:text-foreground", className)}
+      >
+        <PanelLeft aria-hidden className="size-5" strokeWidth={1.5} />
+      </button>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent
+          side="left"
+          aria-describedby={undefined}
+          onCloseAutoFocus={(event) => {
+            event.preventDefault()
+            trigger.current?.focus({ preventScroll: true })
+          }}
+          onClickCapture={(event) => {
+            if ((event.target as HTMLElement).closest("a")) setOpen(false)
+          }}
+          className="flex w-72 max-w-[85vw] flex-col gap-0 overflow-y-auto bg-muted p-0 pt-12 sm:max-w-72"
+        >
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <AdminSidebarNav user={user} className="flex-1" />
+        </SheetContent>
+      </Sheet>
+    </>
   )
 }

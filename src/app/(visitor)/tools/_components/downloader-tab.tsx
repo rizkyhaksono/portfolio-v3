@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { PlateFigure } from "@/components/ui/plate-figure"
 import {
   downloadFromFacebook,
   downloadFromInstagram,
@@ -17,7 +16,7 @@ import {
 } from "@/services/visitor/downloader"
 import type { DownloadResult, InstagramDownloadData } from "@/commons/types/tools"
 import { httpUrl } from "@/lib/utils"
-import { ToolError } from "./tool-status"
+import { GROUP_LABEL, ToolError } from "./tool-status"
 
 type Platform = "tiktok" | "facebook" | "instagram" | "youtube" | "twitter"
 
@@ -93,12 +92,15 @@ export function DownloaderTab() {
 
   return (
     <div className="space-y-6">
-      <div role="group" aria-label="Platform" className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+      <div role="group" aria-labelledby="download-platform">
+        <p id="download-platform" className={GROUP_LABEL}>
+          Platform
+        </p>
+        <div className="grid min-w-0 grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {PLATFORMS.map((p) => (
           <Button
             key={p.id}
             type="button"
-            size="sm"
             variant={platformId === p.id ? "default" : "outline"}
             aria-pressed={platformId === p.id}
             onClick={() => setPlatformId(p.id)}
@@ -106,11 +108,12 @@ export function DownloaderTab() {
             {p.name}
           </Button>
         ))}
+        </div>
       </div>
 
-      <form onSubmit={handleDownload} className="space-y-2">
+      <form onSubmit={handleDownload} className="max-w-xl space-y-1">
         <Label htmlFor="download-url">{platform.name} link</Label>
-        <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
           <Input
             id="download-url"
             type="url"
@@ -122,11 +125,11 @@ export function DownloaderTab() {
             aria-describedby="download-note"
             className="min-w-0 flex-1"
           />
-          <Button type="submit" disabled={!url.trim() || isLoading} aria-busy={isLoading} className="w-full sm:w-auto">
+          <Button type="submit" disabled={!url.trim() || isLoading} aria-busy={isLoading} className="w-full sm:h-9 sm:w-auto">
             {isLoading ? "Fetching…" : "Download"}
           </Button>
         </div>
-        <p id="download-note" className="text-caption text-ink-soft">
+        <p id="download-note" className="pt-1 text-caption text-muted-foreground">
           {platform.note}
         </p>
       </form>
@@ -134,16 +137,16 @@ export function DownloaderTab() {
       {error && <ToolError onRetry={() => handleDownload()}>{error}</ToolError>}
 
       {result?.type === "instagram" && (
-        <article className="space-y-4 border border-rule p-5">
+        <article className="space-y-4 rounded-lg border border-border p-4 sm:p-5">
           <Badge variant="outline" status="outline">
             Preview only
           </Badge>
-          <h3 className="font-display text-h4 text-ink">Instagram post found</h3>
-          {result.data.note && <p className="text-small text-ink-soft">{result.data.note}</p>}
+          <h3 className="text-h4 text-foreground">Instagram post found</h3>
+          {result.data.note && <p className="text-small text-muted-foreground">{result.data.note}</p>}
 
           <dl className="flex flex-wrap items-center gap-x-3 gap-y-1 text-small">
-            <dt className="text-ink-soft">Shortcode</dt>
-            <dd className="min-w-0 break-all text-ink">{result.data.shortcode}</dd>
+            <dt className="text-muted-foreground">Shortcode</dt>
+            <dd className="min-w-0 break-all text-foreground">{result.data.shortcode}</dd>
             <dd>
               <Button variant="ghost" size="sm" onClick={() => copyShortcode(result.data.shortcode)}>
                 <span aria-live="polite">{copied ? "Copied" : "Copy"}</span>
@@ -169,26 +172,24 @@ export function DownloaderTab() {
               </Button>
             )}
           </div>
-          <p className="font-display text-caption text-ink-soft">Open the direct link, then save the video or image from your browser.</p>
+          <p className="text-caption text-muted-foreground">Open the direct link, then save the video or image from your browser.</p>
         </article>
       )}
 
       {result?.type === "standard" &&
         (downloadLinks.length ? (
-          <article className="border border-rule">
+          <article className="max-w-xl overflow-hidden rounded-lg border border-border">
             {result.data.thumbnail && result.data.thumbnail !== "/no-image.jpg" && (
-              <PlateFigure className="p-3 pb-0">
-                <div className="relative aspect-video w-full">
-                  <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
-                </div>
-              </PlateFigure>
+              <div className="relative aspect-video w-full border-b border-border bg-muted">
+                <Image src={result.data.thumbnail} alt="" fill sizes="(min-width: 1024px) 40rem, 100vw" className="object-cover" unoptimized />
+              </div>
             )}
-            <div className="space-y-4 p-5">
+            <div className="space-y-4 p-4 sm:p-5">
               <Badge variant="outline" status="filled">
                 Ready
               </Badge>
-              <h3 className="line-clamp-2 break-words font-display text-h4 text-ink">{result.data.title}</h3>
-              <p className="font-display text-caption text-ink-soft">
+              <h3 className="line-clamp-2 break-words text-h4 text-foreground">{result.data.title}</h3>
+              <p className="text-caption text-muted-foreground">
                 {[`From ${platform.name}`, result.data.author && `by ${result.data.author}`, result.data.duration && `${result.data.duration} long`]
                   .filter(Boolean)
                   .join(", ")}

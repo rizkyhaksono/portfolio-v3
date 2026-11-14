@@ -44,9 +44,9 @@ export function Pager({ page, totalPages, hrefFor, onPage, loading, className }:
   }
 
   return (
-    <nav aria-label="Pagination" aria-busy={loading || undefined} className={cn("flex items-center justify-between gap-4 border-t border-rule pt-4", className)}>
+    <nav aria-label="Pagination" aria-busy={loading || undefined} className={cn("flex items-center justify-between gap-4 pt-4", className)}>
       {step(page - 1, "Previous", "prev")}
-      <p className="font-display text-caption tabular-nums text-ink-soft">
+      <p className="text-caption tabular-nums text-muted-foreground">
         Page {page} of {totalPages}
       </p>
       {step(page + 1, "Next", "next")}

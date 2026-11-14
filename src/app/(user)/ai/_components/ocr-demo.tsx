@@ -128,7 +128,7 @@ export default function OcrDemo() {
   return (
     <div className="grid gap-8 lg:grid-cols-2">
       <div className="min-w-0 space-y-5">
-        <p className="max-w-[60ch] text-body text-ink-soft">
+        <p className="max-w-[60ch] text-body text-muted-foreground">
           Upload a photo or scan of a document. Etan names the kind of document and pulls its fields out as JSON. Nothing
           is stored.
         </p>
@@ -147,11 +147,11 @@ export default function OcrDemo() {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex h-48 w-full flex-col items-center justify-center gap-2 border border-dashed border-rule-strong px-4 text-center text-ink transition-colors [transition-duration:var(--dur-ui)] hover:bg-tint"
+            className="flex h-48 w-full flex-col items-center justify-center gap-2 border border-dashed border-input px-4 text-center text-foreground transition-colors [transition-duration:var(--dur-ui)] hover:bg-muted"
           >
             <Upload className="size-5" strokeWidth={1.5} aria-hidden />
             <span className="text-body font-semibold">Choose a document image</span>
-            <span className="font-display text-caption text-ink-soft">PNG, JPEG, WebP or HEIC. Large photos are resized first.</span>
+            <span className="text-caption text-muted-foreground">PNG, JPEG, WebP or HEIC. Large photos are resized first.</span>
           </button>
         )}
         <input
@@ -165,10 +165,10 @@ export default function OcrDemo() {
         />
 
         <fieldset>
-          <legend className="text-small font-semibold text-ink">What Etan should do</legend>
+          <legend className="text-small font-semibold text-foreground">What Etan should do</legend>
           <RadioGroup value={mode} onValueChange={(v) => setMode(v as Mode)} className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
             {MODES.map((m) => (
-              <label key={m.id} className="flex items-center gap-2 text-body text-ink [@media(pointer:coarse)]:min-h-11">
+              <label key={m.id} className="flex items-center gap-2 text-body text-foreground [@media(pointer:coarse)]:min-h-11">
                 <RadioGroupItem value={m.id} />
                 {m.label}
               </label>
@@ -183,13 +183,13 @@ export default function OcrDemo() {
       </div>
 
       <div className="min-w-0">
-        <h2 className="text-small font-semibold text-ink">Result</h2>
+        <h2 className="text-small font-semibold text-foreground">Result</h2>
         {result ? (
-          <pre tabIndex={0} className="mt-2 max-h-[60svh] overflow-auto whitespace-pre-wrap break-words bg-tint p-4 text-[0.84375rem] leading-[1.55] text-ink sm:max-h-96">
+          <pre tabIndex={0} className="mt-2 max-h-[60svh] overflow-auto whitespace-pre-wrap break-words bg-muted p-4 text-[0.84375rem] leading-[1.55] text-foreground sm:max-h-96">
             {JSON.stringify(result.parsed ?? result.raw, null, 2)}
           </pre>
         ) : (
-          <p aria-live="polite" className="mt-2 font-display text-caption text-ink-soft">
+          <p aria-live="polite" className="mt-2 text-caption text-muted-foreground">
             {loading ? "Reading the document…" : "The fields appear here as JSON once the document is read."}
           </p>
         )}

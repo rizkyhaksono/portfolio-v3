@@ -6,8 +6,8 @@ import { IELTS_WORDS, IELTS_TOPICS, type IeltsWord } from "@/commons/constants/i
 import { Button } from "@/components/ui/button"
 import { Chip } from "@/components/ui/chip"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { badgeVariants } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
+import { GROUP_LABEL } from "./tool-status"
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -27,7 +27,7 @@ async function playPronunciation(word: string) {
     const audio: string | undefined = data?.[0]?.phonetics?.find((p: { audio?: string }) => p.audio)?.audio
     if (audio) await new Audio(audio.startsWith("http") ? audio : `https:${audio}`).play()
   } catch {
-    /* offline / not found — flashcards still work */
+    /* offline or not found: flashcards still work */
   }
 }
 
@@ -83,38 +83,36 @@ export function IeltsTab() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <Select value={topic} onValueChange={pickTopic}>
-        <SelectTrigger aria-label="Topic" className="sm:hidden">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
+    <div className="flex max-w-3xl flex-col gap-5">
+      <div className="space-y-1 sm:hidden">
+        <Label htmlFor="ielts-topic">Topic</Label>
+        <Select value={topic} onValueChange={pickTopic}>
+          <SelectTrigger id="ielts-topic">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {IELTS_TOPICS.map((t) => (
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div role="group" aria-labelledby="ielts-topics" className="hidden sm:block">
+        <p id="ielts-topics" className={GROUP_LABEL}>
+          Topic
+        </p>
+        <div className="flex flex-wrap gap-2">
           {IELTS_TOPICS.map((t) => (
-            <SelectItem key={t} value={t}>
+            <Button key={t} type="button" variant={t === topic ? "default" : "outline"} aria-pressed={t === topic} onClick={() => pickTopic(t)}>
               {t}
-            </SelectItem>
+            </Button>
           ))}
-        </SelectContent>
-      </Select>
-      <div role="group" aria-label="Topic" className="hidden flex-wrap gap-2 sm:flex">
-        {IELTS_TOPICS.map((t) => (
-          <button
-            key={t}
-            type="button"
-            aria-pressed={t === topic}
-            onClick={() => pickTopic(t)}
-            className={cn(
-              badgeVariants({ variant: "outline" }),
-              "min-h-8 transition-colors hover:border-ink [@media(pointer:coarse)]:min-h-11",
-              t === topic && "border-ink bg-ink text-paper",
-            )}
-          >
-            {t}
-          </button>
-        ))}
+        </div>
       </div>
 
-      <p className="font-display text-caption tabular-nums text-ink-soft">
+      <p className="text-caption tabular-nums text-muted-foreground">
         {filtered.length ? `Card ${index + 1} of ${filtered.length}.` : "No cards in this topic."} You know {known.size} and are still learning{" "}
         {learning.size}.
       </p>
@@ -125,13 +123,13 @@ export function IeltsTab() {
           onClick={() => setFlipped((f) => !f)}
           onKeyDown={onCardKey}
           aria-describedby="ielts-hint"
-          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-rule p-5 text-center transition-colors hover:border-ink sm:p-8"
+          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 rounded-lg border border-border bg-background p-5 text-center transition-colors duration-ui ease-out hover:bg-tint sm:p-8"
         >
           {flipped ? (
             <span className="flex flex-col gap-3">
-              <span className="font-display text-h4 text-ink">{card.word}</span>
-              <span className="text-body text-ink">{card.definition}</span>
-              <span className="font-display text-body text-ink-soft">&ldquo;{card.example}&rdquo;</span>
+              <span className="text-h4 text-foreground">{card.word}</span>
+              <span className="text-body text-foreground">{card.definition}</span>
+              <span className="text-body text-muted-foreground">&ldquo;{card.example}&rdquo;</span>
               <span className="mt-1 flex flex-wrap justify-center gap-1.5">
                 {card.synonyms.map((s) => (
                   <Chip key={s}>{s}</Chip>
@@ -144,15 +142,15 @@ export function IeltsTab() {
                 <Chip>{card.pos}</Chip>
                 <Chip>{card.topic}</Chip>
               </span>
-              <span className="font-display text-h2 text-ink [overflow-wrap:anywhere] sm:text-h1">{card.word}</span>
-              <span className="text-caption text-ink-soft">Select to see the meaning</span>
+              <span className="text-h2 text-foreground [overflow-wrap:anywhere] sm:text-h1">{card.word}</span>
+              <span className="text-caption text-muted-foreground">Select to see the meaning</span>
             </>
           )}
         </button>
       ) : (
-        <p className="flex min-h-[16rem] items-center justify-center border border-rule font-display text-body text-ink-soft">No words in this topic.</p>
+        <p className="flex min-h-[16rem] items-center justify-center rounded-lg border border-border text-body text-muted-foreground">No words in this topic.</p>
       )}
-      <p id="ielts-hint" className="font-display text-caption text-ink-soft">
+      <p id="ielts-hint" className="text-caption text-muted-foreground">
         <span className="[@media(pointer:coarse)]:hidden">
           Select the card or press Space to turn it. While it has focus, the left and right arrows move between cards.
         </span>
@@ -161,34 +159,32 @@ export function IeltsTab() {
 
       <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
         <div className="contents sm:flex sm:gap-2">
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => go(-1)} disabled={!card}>
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => go(-1)} disabled={!card}>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => go(1)} disabled={!card}>
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => go(1)} disabled={!card}>
             Next
           </Button>
-          <Button variant="outline" size="sm" className="col-span-2 w-full sm:w-auto" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
+          <Button variant="outline" className="col-span-2 w-full sm:w-auto" onClick={() => card && playPronunciation(card.word)} disabled={!card}>
             Listen
           </Button>
         </div>
         <div className="contents sm:flex sm:gap-2">
-          <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => mark("learning")} disabled={!card}>
+          <Button variant="outline" className="w-full sm:w-auto" onClick={() => mark("learning")} disabled={!card}>
             Still learning
           </Button>
-          <Button size="sm" className="w-full sm:w-auto" onClick={() => mark("known")} disabled={!card}>
+          <Button className="w-full sm:w-auto" onClick={() => mark("known")} disabled={!card}>
             Know it
           </Button>
         </div>
       </div>
 
-      <div className="flex gap-x-6">
-        <Button variant="ghost" size="sm" className="px-0" onClick={() => restart(shuffle(IELTS_WORDS))}>
+      <div className="-ml-3 flex gap-1">
+        <Button variant="ghost" onClick={() => restart(shuffle(IELTS_WORDS))}>
           Shuffle
         </Button>
         <Button
           variant="ghost"
-          size="sm"
-          className="px-0"
           onClick={() => {
             setKnown(new Set())
             setLearning(new Set())

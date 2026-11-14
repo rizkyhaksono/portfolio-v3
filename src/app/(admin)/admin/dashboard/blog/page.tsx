@@ -3,6 +3,8 @@
 import { z } from "zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { PageHeader } from "@/components/ui/page-header"
+import { AdminPageIcon } from "@/components/layout/admin/admin-spine"
 import { formatDay } from "@/components/layout/admin/admin-format"
 import {
   createBlogPostClient,
@@ -46,8 +48,8 @@ const posts: CollectionProps<BlogPost, Values> = {
   noun: "post",
   plural: "posts",
   heading: "Written here",
-  note: "On-site articles. Published ones show on /blog under Written here.",
-  schema,
+  columns: { text: "Summary", meta: "Date" },
+    schema,
   blank: { title: "", slug: "", description: "", coverImage: "", content: "", published: false },
   fields: [
     { name: "title", label: "Title" },
@@ -91,5 +93,10 @@ const posts: CollectionProps<BlogPost, Values> = {
 }
 
 export default function AdminBlogPage() {
-  return <Collection {...posts} />
+  return (
+    <>
+      <PageHeader icon={<AdminPageIcon href="/admin/dashboard/blog" />} title="Blog" description="Articles written here. Published ones show on /blog under Written here." />
+      <Collection {...posts} />
+    </>
+  )
 }

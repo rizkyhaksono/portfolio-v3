@@ -3,3 +3,6 @@ export const media_socials = [
   { title: "LinkedIn", href: "https://linkedin.com/in/rizkyhaksono" },
   { title: "Instagram", href: "https://instagram.com/rizkyhaksonoo" },
 ]
+
+/** The one public address: footer, home contact line, legal pages. */
+export const EMAIL = "mrizkyhaksono@gmail.com"

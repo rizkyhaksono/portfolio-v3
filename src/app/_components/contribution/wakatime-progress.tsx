@@ -22,17 +22,19 @@ interface HatchBarProps {
   value: ReactNode
 }
 
-/** One hatched bar in a `<ul>`: name, share (45° hatch, ink edge), figure. Server-rendered, no motion. */
+/** One row in a `<ul>`: name and figure on a line, a solid rounded share bar under them. Server-rendered, no motion. */
 export function HatchBar({ name, percent, value }: Readonly<HatchBarProps>) {
   const width = Math.min(100, Math.max(0, percent))
 
   return (
-    <li className="grid grid-cols-[6.5rem_minmax(0,1fr)_5.5rem] items-center gap-3 py-1.5 text-small sm:grid-cols-[8rem_minmax(0,1fr)_6rem]">
-      <span className="break-words leading-tight text-ink">{name}</span>
-      <span aria-hidden className="block h-3 border border-rule-strong">
-        <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${width}%` }} />
+    <li className="py-2">
+      <div className="flex items-baseline justify-between gap-4 text-small">
+        <span className="min-w-0 break-words text-foreground">{name}</span>
+        <span className="shrink-0 tabular-nums text-muted-foreground">{value}</span>
+      </div>
+      <span aria-hidden className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-muted">
+        <span className="block h-full rounded-full bg-foreground" style={{ width: `${width}%` }} />
       </span>
-      <span className="text-right tabular-nums text-ink-soft">{value}</span>
     </li>
   )
 }

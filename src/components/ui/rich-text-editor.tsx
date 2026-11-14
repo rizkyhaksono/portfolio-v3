@@ -49,9 +49,9 @@ const GROUPS: Tool[][] = [
 /** Inset toolbar; a pressed tool prints inverted (ink ground) and says so with aria-pressed. */
 function Toolbar({ editor }: Readonly<{ editor: Editor }>) {
   return (
-    <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-rule bg-tint p-1">
+    <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-1 border-b border-border bg-muted p-1">
       {GROUPS.map((group, i) => (
-        <div key={i} className="flex items-center gap-1 [&:not(:first-child)]:border-l [&:not(:first-child)]:border-rule [&:not(:first-child)]:pl-1">
+        <div key={i} className="flex items-center gap-1 [&:not(:first-child)]:border-l [&:not(:first-child)]:border-border [&:not(:first-child)]:pl-1">
           {group.map(({ label, icon: Icon, run, active }) => {
             const pressed = active ? editor.isActive(...active) : undefined
             return (
@@ -63,7 +63,7 @@ function Toolbar({ editor }: Readonly<{ editor: Editor }>) {
                 aria-pressed={pressed}
                 disabled={!run(editor.can().chain().focus()).run()}
                 onClick={() => run(editor.chain().focus()).run()}
-                className="inline-flex size-8 items-center justify-center text-ink transition-colors hover:bg-paper active:translate-y-px disabled:opacity-40 aria-pressed:bg-ink aria-pressed:text-paper [@media(pointer:coarse)]:size-11"
+                className="inline-flex size-8 items-center justify-center text-foreground transition-colors hover:bg-background active:translate-y-px disabled:opacity-40 aria-pressed:bg-foreground aria-pressed:text-background [@media(pointer:coarse)]:size-11"
               >
                 <Icon className="size-4" strokeWidth={1.5} aria-hidden />
               </button>
@@ -100,7 +100,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Write somethi
   }, [content, editor])
 
   return (
-    <div className={cn("border border-input transition-colors focus-within:border-ink focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring", className)}>
+    <div className={cn("border border-input transition-colors focus-within:border-foreground focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring", className)}>
       {editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>

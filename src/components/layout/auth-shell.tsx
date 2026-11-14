@@ -1,55 +1,44 @@
+import Image from "next/image"
 import Link from "next/link"
-
-import { Logo } from "@/components/ui/logo"
 import { cn } from "@/lib/utils"
 
 interface AuthShellProps {
   title: React.ReactNode
-  /** One italic lead line under the title. */
-  standfirst?: React.ReactNode
-  /** Under the form, behind a hairline: terms, a way back. */
+  /** The grey second line under the title, as on Notion's sign-in page. */
+  description?: React.ReactNode
+  /** Short muted lines under the form: the terms, a way back. */
   footer?: React.ReactNode
-  /** Content for the reversed ink block beside the form (from md). Without it the shell is one narrow column. */
-  panel?: React.ReactNode
   children: React.ReactNode
+  className?: string
 }
 
-/** Auth pattern (server, no cookies): a form slip with baseline fields, optionally beside a reversed ink block. */
-export function AuthShell({ title, standfirst, footer, panel, children }: Readonly<AuthShellProps>) {
+/**
+ * Auth pattern (server, no cookies), after Notion's sign-in page: the owner's name top left, then one 320px column
+ * in the middle of the page with a two-line title (ink, then grey), the form, and the small print under it.
+ */
+export function AuthShell({ title, description, footer, children, className }: Readonly<AuthShellProps>) {
   return (
-    <main
-      id="main"
-      className={cn(
-        "mx-auto grid min-h-svh w-full content-center px-[clamp(20px,4vw,48px)] py-10 sm:py-16",
-        // 5 : 7 as fractions, so the gap sits between the two columns only.
-        panel ? "max-w-[68rem] gap-12 md:grid-cols-[5fr_7fr] lg:gap-16" : "max-w-[30rem]",
-      )}
-    >
-      {panel && (
-        // Reversed out of the ink like a cut in a newspaper: paper type on ink, which flips with the theme.
-        <aside className="ink-grain hidden bg-ink p-8 text-paper md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
-          <Logo variant="mini" className="w-20" />
-          {panel}
-        </aside>
-      )}
-
-      <div className="flex min-w-0 flex-col">
-        <Link href="/" className="inline-flex w-fit items-center gap-3 text-body font-semibold text-ink hover:underline [@media(pointer:coarse)]:min-h-11">
-          <Logo variant="mini" className={cn("size-8", panel && "md:hidden")} />
+    <div className="flex min-h-svh flex-col bg-background">
+      <header className="flex h-14 items-center px-3 sm:px-5">
+        <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors hover:bg-tint md:min-h-8">
+          <Image src="/rizky.jpg" alt="" width={20} height={20} className="size-5 rounded object-cover" />
           Rizky Haksono
         </Link>
+      </header>
 
-        <header className="mt-10 pb-6">
-          <h1 className="speckle font-display text-h2 text-balance text-ink">{title}</h1>
-          {standfirst && <p className="mt-3 max-w-[46ch] text-pretty font-display text-lead text-ink-soft">{standfirst}</p>}
-        </header>
-        <div aria-hidden className="border-t border-ink" />
+      <main id="main" className="flex flex-1 justify-center px-6 pb-16 pt-[6vh] sm:pt-[10vh]">
+        <div className={cn("w-full max-w-xs", className)}>
+          <header className="mb-8 text-center">
+            <h1 className="text-balance text-h2 text-foreground">{title}</h1>
+            {description && <p className="text-balance text-h2 text-muted-foreground">{description}</p>}
+          </header>
 
-        <div className="mt-8">{children}</div>
+          {children}
 
-        {footer && <div className="mt-10 border-t border-rule pt-4 text-small text-ink-soft">{footer}</div>}
-      </div>
-    </main>
+          {footer && <div className="mt-10 flex flex-col items-center gap-2 text-center text-caption text-muted-foreground">{footer}</div>}
+        </div>
+      </main>
+    </div>
   )
 }
 

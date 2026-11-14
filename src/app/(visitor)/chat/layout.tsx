@@ -35,7 +35,7 @@ export default function ChatLayout({
   children: React.ReactNode
 }>) {
   return (
-    <BaseLayout footer="compact" fit>
+    <BaseLayout footer="compact" fit width="wide">
       {children}
     </BaseLayout>
   )

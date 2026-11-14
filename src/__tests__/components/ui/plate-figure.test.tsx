@@ -6,24 +6,16 @@ import { PlateFigure } from '@/components/ui/plate-figure'
 const frameOf = (container: HTMLElement) => container.querySelector('figure > div')!
 
 describe('PlateFigure', () => {
-  it('prints a photo as a duotone plate inside the double-rule frame', () => {
+  it('sets the picture on the grey tile with soft corners', () => {
     const { container } = render(
-      <PlateFigure>
+      <PlateFigure caption="Info Pangan Jakarta">
         <img src="/x.jpg" alt="" />
       </PlateFigure>,
     )
-    expect(frameOf(container)).toHaveClass('border', 'border-ink')
-    expect(frameOf(container).querySelector('.plate img')).toBeInTheDocument()
-  })
-
-  it('keeps the picture in colour when the tone is color', () => {
-    const { container } = render(
-      <PlateFigure tone="color">
-        <img src="/x.jpg" alt="" />
-      </PlateFigure>,
-    )
-    expect(container.querySelector('.plate')).toBeNull()
-    expect(container.querySelector('img')).toBeInTheDocument()
+    expect(frameOf(container)).toHaveClass('rounded-lg', 'bg-muted', 'overflow-hidden')
+    expect(frameOf(container)).not.toHaveClass('border-foreground')
+    expect(frameOf(container).querySelector('img')).toBeInTheDocument()
+    expect(container.querySelector('figcaption')).toHaveTextContent('Info Pangan Jakarta')
   })
 
   it('outlines the whole frame in ink when a control inside is keyboard-focused, since the photo clips its own outline', () => {

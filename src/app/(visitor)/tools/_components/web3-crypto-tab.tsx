@@ -1,17 +1,17 @@
 "use client"
 
 import { useCallback, useState } from "react"
+import { Button } from "@/components/ui/button"
 import { InkChart } from "@/components/ui/ink-chart"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getCryptoChart, getCryptoPrice, getTrendingCrypto } from "@/services/visitor/web3"
-import { ToolError, ToolLoading, useToolData } from "./tool-status"
+import { Skeleton } from "@/components/ui/skeleton"
+import { GROUP_LABEL, TableSkeleton, ToolError, useToolData } from "./tool-status"
 
 const COINS = "bitcoin,ethereum,binancecoin,cardano,solana,polkadot"
 const loadPrices = () => getCryptoPrice(COINS).then((res) => res.data)
 const loadTrending = () => getTrendingCrypto().then((res) => res.data.slice(0, 10))
-// Outer cells sit on the page gutter; only this tool, so admin tables keep their padding.
-const FLUSH = "[&_th:first-child]:pl-0 [&_td:first-child]:pl-0 [&_th:last-child]:pr-0 [&_td:last-child]:pr-0"
 
 const usd = (value: number, compact = false) =>
   new Intl.NumberFormat("en-US", {
@@ -24,7 +24,7 @@ const usd = (value: number, compact = false) =>
 
 /** Direction as a word, never as a colour. */
 function Change({ value }: Readonly<{ value: number }>) {
-  if (!Number.isFinite(value)) return <span className="text-ink-soft">Not reported</span>
+  if (!Number.isFinite(value)) return <span className="text-muted-foreground">Not reported</span>
   return (
     <>
       {value >= 0 ? "Up" : "Down"} {Math.abs(value).toFixed(2)}%
@@ -56,16 +56,16 @@ export function Web3CryptoTab() {
 function Prices() {
   const prices = useToolData(loadPrices)
   if (prices.status === "error") return <ToolError onRetry={prices.retry}>Prices did not load.</ToolError>
-  if (prices.status === "loading" || !prices.data) return <ToolLoading>Loading prices…</ToolLoading>
+  if (prices.status === "loading" || !prices.data) return <TableSkeleton label="Loading prices…" />
 
   return (
-    <Table className={FLUSH}>
-      <TableCaption>In US dollars. Change is over the last 24 hours.</TableCaption>
+    <Table>
+      <TableCaption className="text-left">In US dollars. Change is over the last 24 hours.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Coin</TableHead>
           <TableHead className="text-right">Price</TableHead>
-          <TableHead className="pr-0 text-right sm:pr-2">24 hours</TableHead>
+          <TableHead className="text-right">24 hours</TableHead>
           <TableHead className="hidden text-right sm:table-cell">Market cap</TableHead>
         </TableRow>
       </TableHeader>
@@ -73,10 +73,10 @@ function Prices() {
         {prices.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-ink">{coin.name}</span> <span className="text-ink-soft">{coin.symbol}</span>
+              <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
             <TableCell className="text-right">{usd(coin.current_price)}</TableCell>
-            <TableCell className="pr-0 text-right sm:pr-2">
+            <TableCell className="text-right">
               <Change value={coin.price_change_percentage_24h} />
             </TableCell>
             <TableCell className="hidden text-right sm:table-cell">{usd(coin.market_cap, true)}</TableCell>
@@ -90,16 +90,16 @@ function Prices() {
 function Trending() {
   const trending = useToolData(loadTrending)
   if (trending.status === "error") return <ToolError onRetry={trending.retry}>Trending coins did not load.</ToolError>
-  if (trending.status === "loading" || !trending.data) return <ToolLoading>Loading trending coins…</ToolLoading>
+  if (trending.status === "loading" || !trending.data) return <TableSkeleton label="Loading trending coins…" rows={10} />
 
   return (
-    <Table className={FLUSH}>
-      <TableCaption>The coins people are searching for most right now, in order.</TableCaption>
+    <Table>
+      <TableCaption className="text-left">The coins people are searching for most right now, in order.</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Coin</TableHead>
           <TableHead className="text-right">Price</TableHead>
-          <TableHead className="pr-0 text-right sm:pr-2">24 hours</TableHead>
+          <TableHead className="text-right">24 hours</TableHead>
           <TableHead className="hidden text-right sm:table-cell">Market cap rank</TableHead>
         </TableRow>
       </TableHeader>
@@ -107,11 +107,11 @@ function Trending() {
         {trending.data.map((coin) => (
           <TableRow key={coin.id}>
             <TableCell>
-              <span className="font-semibold text-ink">{coin.name}</span> <span className="text-ink-soft">{coin.symbol}</span>
+              <span className="text-foreground">{coin.name}</span> <span className="text-muted-foreground">{coin.symbol}</span>
             </TableCell>
-            <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-ink-soft">Not reported</span>}</TableCell>
-            <TableCell className="pr-0 text-right sm:pr-2">
-              {coin.price_usd > 0 ? <Change value={coin.price_change_24h} /> : <span className="text-ink-soft">Not reported</span>}
+            <TableCell className="text-right">{coin.price_usd > 0 ? usd(coin.price_usd) : <span className="text-muted-foreground">Not reported</span>}</TableCell>
+            <TableCell className="text-right">
+              {coin.price_usd > 0 ? <Change value={coin.price_change_24h} /> : <span className="text-muted-foreground">Not reported</span>}
             </TableCell>
             <TableCell className="hidden text-right sm:table-cell">{coin.market_cap_rank ?? "Unranked"}</TableCell>
           </TableRow>
@@ -139,7 +139,7 @@ const toPoints = (prices: unknown[]): Point[] =>
 
 const day = (x: string) => new Date(`${x.slice(0, 10)}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" })
 
-/** Price history as one ink line: pick a coin and a window; the sentence underneath says what happened. */
+/** Price history as one line: pick a coin and a window; the sentence above says what happened. */
 function Chart() {
   const [coin, setCoin] = useState<(typeof CHART_COINS)[number][0]>("bitcoin")
   const [days, setDays] = useState<(typeof RANGES)[number]>(30)
@@ -154,35 +154,48 @@ function Chart() {
   const low = points.reduce<Point | undefined>((a, p) => (!a || p.y < a.y ? p : a), undefined)
   const change = first && last ? ((last.y - first.y) / first.y) * 100 : NaN
 
-  const choice = (active: boolean) =>
-    `min-h-10 border px-3 text-small [@media(pointer:coarse)]:min-h-11 ${active ? "border-ink bg-ink text-paper" : "border-rule-strong text-ink hover:border-ink"}`
-
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <div role="group" aria-label="Coin" className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-x-6">
+        <div role="group" aria-labelledby="chart-coin">
+          <p id="chart-coin" className={GROUP_LABEL}>
+            Coin
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:flex">
           {CHART_COINS.map(([id, label]) => (
-            <button key={id} type="button" aria-pressed={coin === id} className={choice(coin === id)} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
+            <Button key={id} type="button" variant={coin === id ? "default" : "outline"} aria-pressed={coin === id} onClick={() => setCoin(id)} data-umami-event="tool-chart" data-umami-event-coin={id}>
               {label}
-            </button>
+            </Button>
           ))}
+          </div>
         </div>
-        <div role="group" aria-label="Period" className="flex gap-2">
+        <div role="group" aria-labelledby="chart-period">
+          <p id="chart-period" className={GROUP_LABEL}>
+            Period
+          </p>
+          <div className="grid grid-cols-3 gap-2 sm:flex">
           {RANGES.map((d) => (
-            <button key={d} type="button" aria-pressed={days === d} className={choice(days === d)} onClick={() => setDays(d)}>
+            <Button key={d} type="button" variant={days === d ? "default" : "outline"} aria-pressed={days === d} onClick={() => setDays(d)}>
               {d} days
-            </button>
+            </Button>
           ))}
+          </div>
         </div>
       </div>
 
       {chart.status === "error" ? (
         <ToolError onRetry={chart.retry}>The price history did not load.</ToolError>
       ) : points.length < 2 ? (
-        <ToolLoading>Loading the price history…</ToolLoading>
+        <div aria-busy="true" className="space-y-5">
+          <span role="status" className="sr-only">
+            Loading the price history…
+          </span>
+          <Skeleton className="h-5 w-full max-w-xl" />
+          <Skeleton className="h-56 w-full rounded-lg" />
+        </div>
       ) : (
         <>
-          <p className="max-w-[60ch] text-body text-ink">
+          <p className="max-w-[60ch] text-body text-foreground">
             {name} is {change >= 0 ? "up" : "down"} {Math.abs(change).toFixed(1)}% over the last {days} days, from {usd(first!.y)} to {usd(last!.y)}.
             {high && low && ` Its high was ${usd(high.y)} on ${day(high.x)}; its low was ${usd(low.y)} on ${day(low.x)}.`}
           </p>
@@ -195,7 +208,7 @@ function Chart() {
             height={220}
             className={chart.status === "loading" ? "opacity-60" : undefined}
           />
-          <p className="font-display text-caption text-ink-soft">In US dollars, from CoinGecko through this site's API. Not financial advice.</p>
+          <p className="text-caption text-muted-foreground">In US dollars, from CoinGecko through this site&apos;s API. Not financial advice.</p>
         </>
       )}
     </div>

@@ -6,17 +6,17 @@ import { useForm, type DefaultValues, type Path } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
+import { ExternalLink, MoreHorizontal, Pencil, Plus, Trash2, X } from "lucide-react"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Skeleton } from "@/components/ui/skeleton"
-import { InkLink } from "@/components/ui/ink-link"
-import { LedgerList, LedgerRow } from "@/components/ui/ledger"
 import { StatusLine } from "@/components/ui/status-line"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,15 +26,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { stripHtml } from "@/components/layout/admin/admin-format"
+import { ViewTabs } from "@/components/layout/admin/view-tabs"
 import { cn } from "@/lib/utils"
 
-// TipTap only loads once a slip with a rich field opens.
+// TipTap only loads once an editor with a rich field opens.
 const RichTextEditor = dynamic(() => import("@/components/ui/rich-text-editor").then((m) => m.RichTextEditor), {
   ssr: false,
-  loading: () => <Skeleton className="h-[12.5rem] w-full" />,
+  loading: () => <Skeleton className="h-48 w-full" />,
 })
 
 export type FormValues = Record<string, string | boolean | null | undefined>
@@ -51,9 +51,9 @@ export interface Field<V extends FormValues> {
 
 export interface RowView {
   title: string
-  /** Right-hand column: a duration, a dateline. */
+  /** The date column: a duration, a dateline. */
   meta?: string
-  /** One or two lines under the title. Editor HTML is stripped. */
+  /** The property column. Editor HTML is stripped. */
   text?: string | null
   /** A page for the row (the public page, the live project), opened in a new tab. */
   link?: { href: string; label: string } | null
@@ -64,9 +64,12 @@ export interface CollectionProps<T extends { id: string }, V extends FormValues>
   /** Singular, used in buttons and dialogs: "project", "post". */
   noun: string
   plural: string
+  /** Names the table for screen readers. */
   heading: string
   /** Where the rows live and who reads them. */
   note?: string
+  /** Head cells of the property and date columns. */
+  columns?: { text: string; meta: string }
   schema: z.ZodType<V>
   blank: V
   fields: Field<V>[]
@@ -77,45 +80,69 @@ export interface CollectionProps<T extends { id: string }, V extends FormValues>
   toValues: (item: T) => V
   view: (item: T) => RowView
   filters?: { label: string; test: (item: T) => boolean }[]
-  /** Extra header actions (export, for example). */
+  /** Extra view actions (export, for example). */
   tools?: (items: T[]) => React.ReactNode
 }
 
-function DeleteRow({ noun, title, onConfirm }: Readonly<{ noun: string; title: string; onConfirm: () => void }>) {
+const sentence = (word: string) => word.charAt(0).toLocaleUpperCase("en") + word.slice(1)
+
+/** One row's "..." menu: Edit, the public page when there is one, and Delete (which asks first). */
+function RowMenu({ title, link, onEdit, onDelete }: Readonly<{ title: string; link?: RowView["link"]; onEdit: () => void; onDelete: () => void }>) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          Delete<span className="sr-only"> {title}</span>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="size-11 text-muted-foreground hover:text-foreground md:size-7" aria-label={`Actions for ${title}`}>
+          <MoreHorizontal strokeWidth={1.5} aria-hidden />
         </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Delete “{title}”?</AlertDialogTitle>
-          <AlertDialogDescription>The {noun} is removed for good. This cannot be undone.</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Keep it</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button variant="destructive" onClick={onConfirm}>
-              Delete {noun}
-            </Button>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onSelect={onEdit}>
+          <Pencil className="size-4" strokeWidth={1.5} aria-hidden />
+          Edit
+        </DropdownMenuItem>
+        {link && (
+          <DropdownMenuItem asChild>
+            <a href={link.href} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="size-4" strokeWidth={1.5} aria-hidden />
+              {link.label}
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={onDelete} className="text-destructive focus:text-destructive">
+          <Trash2 className="size-4" strokeWidth={1.5} aria-hidden />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function LoadingRows({ label }: Readonly<{ label: string }>) {
+  return (
+    <div aria-busy="true" aria-label={label} className="mt-2">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex items-center gap-6 border-b border-border px-2 py-2.5">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="hidden h-4 flex-1 md:block" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+      ))}
+    </div>
   )
 }
 
 /**
- * One admin table as a ledger with a form slip: rows with Edit and Delete, a framed form above them for
- * adding or editing, static skeleton rows while loading, and a retry when the source does not answer.
+ * One admin collection as a Notion database: view tabs for the filters with "New {noun}" on the right, an
+ * editor frame above the table when adding or editing, then the table with a "..." menu per row.
  */
 export function Collection<T extends { id: string }, V extends FormValues>({
   noun,
   plural,
   heading,
   note,
+  columns = { text: "Details", meta: "Date" },
   schema,
   blank,
   fields,
@@ -129,8 +156,9 @@ export function Collection<T extends { id: string }, V extends FormValues>({
 }: Readonly<CollectionProps<T, V>>) {
   const [items, setItems] = useState<T[]>([])
   const [state, setState] = useState<"loading" | "ready" | "failed">("loading")
-  // null: no slip; "new": adding; an item: editing it.
+  // null: no editor; "new": adding; an item: editing it.
   const [slip, setSlip] = useState<"new" | T | null>(null)
+  const [doomed, setDoomed] = useState<T | null>(null)
   const [filter, setFilter] = useState(0)
   const slipRef = useRef<HTMLDivElement>(null)
 
@@ -187,55 +215,58 @@ export function Collection<T extends { id: string }, V extends FormValues>({
   }
 
   const shown = filters ? items.filter(filters[filter].test) : items
+  const rows = shown.map((item) => ({ item, row: view(item) }))
+  const hasStatus = rows.some(({ row }) => row.status)
   const submitting = form.formState.isSubmitting
 
-  return (
-    <section className="w-full max-w-[60rem]">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0">
-          <h2 className="font-display text-h3 text-ink">{heading}</h2>
-          <p className="mt-1 font-display text-caption text-ink-soft">
-            {note}
-            {state === "ready" && ` ${items.length} ${items.length === 1 ? noun : plural}.`}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {tools?.(items)}
-          <Button size="sm" onClick={() => open(null)} disabled={slip === "new"}>
-            Add {noun}
-          </Button>
-        </div>
-      </div>
+  const actions = (
+    <>
+      {tools?.(items)}
+      <Button size="sm" onClick={() => open(null)} disabled={slip === "new"}>
+        <Plus strokeWidth={1.5} aria-hidden />
+        New {noun}
+      </Button>
+    </>
+  )
 
-      {filters && state === "ready" && (
-        <div role="group" aria-label={`Filter ${plural}`} className="mt-4 flex flex-wrap gap-x-6 border-b border-rule">
-          {filters.map(({ label, test }, i) => (
-            <button
-              key={label}
-              type="button"
-              aria-pressed={filter === i}
-              onClick={() => setFilter(i)}
-              className="-mb-px inline-flex min-h-10 items-center gap-1.5 border-b-2 border-transparent pb-1.5 pt-2 text-[15px] font-semibold text-ink-soft transition-colors hover:text-ink aria-pressed:border-ink aria-pressed:text-ink [@media(pointer:coarse)]:min-h-11"
-            >
-              {label}
-              <span className="font-display font-normal tabular-nums">{items.filter(test).length}</span>
-            </button>
-          ))}
+  return (
+    <section aria-label={heading} className="w-full">
+      {filters && state === "ready" ? (
+        <>
+          <ViewTabs
+            label={`Filter ${plural}`}
+            tabs={filters.map(({ label, test }, i) => ({ label, count: items.filter(test).length, current: filter === i, onSelect: () => setFilter(i) }))}
+            actions={actions}
+          />
+          {note && <p className="mt-2 text-caption text-muted-foreground">{note}</p>}
+        </>
+      ) : (
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <p className="min-w-0 text-small text-muted-foreground">
+            {state === "ready" && `${items.length} ${items.length === 1 ? noun : plural}. `}
+            {note}
+          </p>
+          <div className="flex items-center gap-1.5">{actions}</div>
         </div>
       )}
 
       {slip && (
-        <Card ref={slipRef} className="mt-6 scroll-mt-[calc(var(--head-h)+1rem)] p-4 sm:p-6">
-          <h3 className="font-display text-h4 text-ink">{editing ? `Edit “${view(editing).title}”` : `New ${noun}`}</h3>
+        <div ref={slipRef} className="mt-6 max-w-2xl scroll-mt-16 rounded-lg border border-border p-4 sm:p-6">
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="min-w-0 text-h3 text-foreground [overflow-wrap:anywhere]">{editing ? view(editing).title : `New ${noun}`}</h3>
+            <Button type="button" variant="ghost" size="icon" onClick={close} aria-label="Close the editor" className="-mr-2 -mt-1 text-muted-foreground hover:text-foreground">
+              <X strokeWidth={1.5} aria-hidden />
+            </Button>
+          </div>
           <Form {...form}>
-            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mt-4 grid gap-5 sm:grid-cols-2">
+            <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mt-5 grid gap-5 sm:grid-cols-2">
               {fields.map(({ name, label, kind = "text", placeholder, note: hint, half }) => (
                 <FormField
                   key={name}
                   control={form.control}
                   name={name as Path<V>}
                   render={({ field }) => (
-                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0 border-y border-rule py-3")}>
+                    <FormItem className={cn(!half && "sm:col-span-2", kind === "switch" && "flex items-center justify-between gap-4 space-y-0")}>
                       <div className="space-y-1">
                         <FormLabel>{label}</FormLabel>
                         {hint && <FormDescription>{hint}</FormDescription>}
@@ -259,29 +290,20 @@ export function Collection<T extends { id: string }, V extends FormValues>({
                   )}
                 />
               ))}
-              <div className="flex flex-wrap gap-3 sm:col-span-2">
+              <div className="flex flex-wrap gap-2 sm:col-span-2">
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Saving…" : editing ? `Save ${noun}` : `Add ${noun}`}
                 </Button>
-                <Button type="button" variant="outline" onClick={close}>
+                <Button type="button" variant="ghost" onClick={close}>
                   Cancel
                 </Button>
               </div>
             </form>
           </Form>
-        </Card>
+        </div>
       )}
 
-      {state === "loading" && (
-        <ul aria-busy="true" aria-label={`Loading ${plural}`} className="mt-6 divide-y divide-rule border-t border-ink">
-          {[0, 1, 2, 3].map((i) => (
-            <li key={i} className="space-y-2 py-4">
-              <Skeleton className="h-5 w-1/2" />
-              <Skeleton className="h-3 w-3/4" />
-            </li>
-          ))}
-        </ul>
-      )}
+      {state === "loading" && <LoadingRows label={`Loading ${plural}`} />}
 
       {state === "failed" && (
         <StatusLine
@@ -298,39 +320,78 @@ export function Collection<T extends { id: string }, V extends FormValues>({
       )}
 
       {state === "ready" &&
-        (shown.length === 0 ? (
-          <StatusLine kind="empty" className="mt-6 border-y border-rule py-8">
-            {items.length === 0 ? `No ${plural} yet. Add the first one above.` : `No ${plural} match this filter.`}
+        (rows.length === 0 ? (
+          <StatusLine kind="empty" className="mt-6">
+            {items.length === 0 ? `No ${plural} yet. Add the first one with New ${noun}.` : `No ${plural} match this filter.`}
           </StatusLine>
         ) : (
-          <LedgerList className="mt-6">
-            {shown.map((item) => {
-              const row = view(item)
-              const text = stripHtml(row.text)
-              return (
-                <LedgerRow key={item.id} title={row.title} meta={row.meta} className={cn(editing?.id === item.id && "bg-tint")}>
-                  {row.status && (
-                    <Badge variant="outline" status={row.status.mark} className="mb-1.5">
-                      {row.status.word}
-                    </Badge>
+          <Table aria-label={heading} className={cn("table-fixed", filters ? "mt-2" : "mt-3")}>
+            <TableHeader className={cn(filters && "[&_tr]:border-t-0")}>
+              <TableRow>
+                <TableHead className="w-auto md:w-1/3">Title</TableHead>
+                <TableHead className="hidden md:table-cell">{columns.text}</TableHead>
+                {hasStatus && <TableHead className="w-28">Status</TableHead>}
+                <TableHead className="hidden w-48 sm:table-cell">{columns.meta}</TableHead>
+                <TableHead className="w-14 md:w-10">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map(({ item, row }) => (
+                <TableRow key={item.id} className={cn("hover:bg-tint", editing?.id === item.id && "bg-tint")}>
+                  <TableCell className="py-1 align-middle">
+                    <button
+                      type="button"
+                      data-tip="Edit"
+                      onClick={() => open(item)}
+                      className="block min-h-11 w-full truncate rounded text-left font-medium text-foreground underline decoration-transparent underline-offset-4 transition-colors hover:decoration-foreground/40 md:min-h-7"
+                    >
+                      {row.title}
+                    </button>
+                    {row.meta && <span className="-mt-2 block truncate pb-1 text-caption text-muted-foreground sm:hidden">{row.meta}</span>}
+                  </TableCell>
+                  <TableCell className="hidden truncate align-middle text-muted-foreground md:table-cell">{stripHtml(row.text)}</TableCell>
+                  {hasStatus && (
+                    <TableCell className="align-middle">
+                      {row.status && (
+                        <Badge status={row.status.mark} variant="secondary">
+                          {sentence(row.status.word)}
+                        </Badge>
+                      )}
+                    </TableCell>
                   )}
-                  {text && <p className="line-clamp-2">{text}</p>}
-                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <Button variant="outline" size="sm" onClick={() => open(item)}>
-                      Edit<span className="sr-only"> {row.title}</span>
-                    </Button>
-                    <DeleteRow noun={noun} title={row.title} onConfirm={() => { void onDelete(item) }} />
-                    {row.link && (
-                      <InkLink href={row.link.href} external className="ml-2 text-small">
-                        {row.link.label}
-                      </InkLink>
-                    )}
-                  </div>
-                </LedgerRow>
-              )
-            })}
-          </LedgerList>
+                  <TableCell className="hidden truncate align-middle text-muted-foreground sm:table-cell">{row.meta}</TableCell>
+                  <TableCell className="p-0 text-right align-middle">
+                    <RowMenu title={row.title} link={row.link} onEdit={() => open(item)} onDelete={() => setDoomed(item)} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ))}
+
+      <AlertDialog open={doomed !== null} onOpenChange={(next) => !next && setDoomed(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete “{doomed ? view(doomed).title : ""}”?</AlertDialogTitle>
+            <AlertDialogDescription>The {noun} is removed for good. This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep it</AlertDialogCancel>
+            <AlertDialogAction
+              className={buttonVariants({ variant: "destructive" })}
+              onClick={() => {
+                if (doomed) void onDelete(doomed)
+                setDoomed(null)
+              }}
+            >
+              <X strokeWidth={1.5} aria-hidden />
+              Delete {noun}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   )
 }

@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><title>Rizky Haksono</title><rect width="64" height="64" fill="rgb(30 60 158)"/><path fill="rgb(243 236 220)" d="M4 8h8v48H4z M28 8h8v48h-8z M52 8h8v48h-8z M4 8h32v8H4z M4 28h56v8H4z M8 32h2l22 22v2h-6L8 38z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <style>@media (prefers-color-scheme: dark) { rect { fill: #D4D4D4 } text { fill: #191919 } }</style>
+  <rect width="64" height="64" rx="14" fill="#37352F"/>
+  <text x="32" y="46" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="600" font-size="40">R</text>
+</svg>
