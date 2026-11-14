@@ -11,10 +11,10 @@ export default async function ChatPage() {
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col">
       <header className="shrink-0 pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Chat</h1>
-        <p className="mt-4 font-display text-caption text-ink-soft">Times are Jakarta time.</p>
+        <h1 className="speckle text-h1 text-balance text-foreground">Chat</h1>
+        <p className="mt-4 text-caption text-muted-foreground">Times are Jakarta time.</p>
       </header>
-      <div aria-hidden className="shrink-0 border-t border-ink" />
+      <div aria-hidden className="shrink-0 border-t border-foreground" />
 
       {initialMessages ? (
         <ChatClient initialMessages={initialMessages} currentUser={currentUser} />

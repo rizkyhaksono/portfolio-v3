@@ -202,7 +202,7 @@ img {
   }
 }
 
-/* Ink grain: a reversed field (bg-ink) takes the other theme's paper grain, so it shares the page's texture. */
+/* Ink grain: a reversed field (bg-foreground) takes the other theme's paper grain, so it shares the page's texture. */
 .ink-grain {
   background-image: url("../assets/paper/grain-dark.webp");
   background-size: 128px 128px;

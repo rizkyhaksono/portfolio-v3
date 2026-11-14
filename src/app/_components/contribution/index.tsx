@@ -12,7 +12,7 @@ import { HatchBar, formatHours, type WakatimeLanguage } from "./wakatime-progres
 const valueOf = <T,>(result: PromiseSettledResult<T>) => (result.status === "fulfilled" ? result.value : undefined)
 
 function Numeral({ children }: Readonly<{ children: ReactNode }>) {
-  return <span className="font-display text-[1.6em] leading-none tabular-nums text-ink">{children}</span>
+  return <span className="text-[1.6em] leading-none tabular-nums text-foreground">{children}</span>
 }
 
 /** GitHub year, WakaTime week and two learning numerals; each part (and the section) hides without data. */
@@ -56,8 +56,8 @@ export default async function ContributionSection() {
     <PageSection id="activity" heading={{ title: "Activity" }} className={DEFERRED_SECTION} contentClassName="mt-6 space-y-12">
       {total > 0 && (
         <div>
-          <h3 className="font-display text-h4 text-ink">GitHub, the last year</h3>
-          <p className="mt-1 text-small text-ink-soft">
+          <h3 className="text-h4 text-foreground">GitHub, the last year</h3>
+          <p className="mt-1 text-small text-muted-foreground">
             {total.toLocaleString("en")} contributions; the busiest day had {busiest.toLocaleString("en")}.
           </p>
           <InkHeatmap weeks={weeks} className="mt-4" />
@@ -66,8 +66,8 @@ export default async function ContributionSection() {
 
       {languages.length > 0 && (
         <div>
-          <h3 className="font-display text-h4 text-ink">Coding time, the last seven days</h3>
-          <p className="mt-1 text-small text-ink-soft">
+          <h3 className="text-h4 text-foreground">Coding time, the last seven days</h3>
+          <p className="mt-1 text-small text-muted-foreground">
             {formatHours(hours, minutes)} across the {languages.length === 1 ? "language" : `${languages.length} languages`} below.
           </p>
           <ul role="list" className="mt-4 max-w-[40rem]">
@@ -89,7 +89,7 @@ export default async function ContributionSection() {
       )}
 
       {facts.length > 0 && (
-        <p className="max-w-[40ch] text-body text-ink">
+        <p className="max-w-[40ch] text-body text-foreground">
           Elsewhere, {facts[0]}
           {facts[1] && <> and {facts[1]}</>}.
         </p>

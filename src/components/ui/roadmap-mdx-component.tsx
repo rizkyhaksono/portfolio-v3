@@ -61,8 +61,8 @@ interface AsideProps {
 /** A note set off by a left rule: the title is the word that says what kind of note it is. */
 function Note({ title, children }: Readonly<AsideProps>) {
   return (
-    <div role="note" className="my-6 border-l border-ink pl-4">
-      {title && <p className="font-display text-h4 text-ink">{title}</p>}
+    <div role="note" className="my-6 border-l border-foreground pl-4">
+      {title && <p className="text-h4 text-foreground">{title}</p>}
       <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
     </div>
   )
@@ -71,8 +71,8 @@ function Note({ title, children }: Readonly<AsideProps>) {
 /** A warning is framed all round, so it differs from a note by shape as well as by word. */
 function Warning({ title = "Warning", children }: Readonly<AsideProps>) {
   return (
-    <div role="note" className="my-6 border border-ink p-4">
-      <p className="font-display text-h4 text-ink">{title}</p>
+    <div role="note" className="my-6 border border-foreground p-4">
+      <p className="text-h4 text-foreground">{title}</p>
       <div className="mt-1 [&>*+*]:mt-[0.75em]">{children}</div>
     </div>
   )
@@ -83,14 +83,14 @@ const InfoCard = ({ title = "Note", children }: AsideProps) => <Note title={titl
 
 // <Alert><AlertTitle/><AlertDescription/></Alert> in older lessons prints as a note.
 const Alert = ({ children }: AsideProps) => <Note>{children}</Note>
-const AlertTitle = ({ children }: AsideProps) => <p className="font-display text-h4 text-ink">{children}</p>
+const AlertTitle = ({ children }: AsideProps) => <p className="text-h4 text-foreground">{children}</p>
 const AlertDescription = ({ children }: AsideProps) => <div>{children}</div>
 
 function LearningObjectives({ objectives = [] }: Readonly<{ objectives?: string[] }>) {
   if (objectives.length === 0) return null
   return (
-    <section className="my-6 border-y border-rule py-4">
-      <p className="font-display text-h4 text-ink">Learning objectives</p>
+    <section className="my-6 border-y border-border py-4">
+      <p className="text-h4 text-foreground">Learning objectives</p>
       <ul className="mt-2">
         {objectives.map((objective) => (
           <li key={objective}>{objective}</li>
@@ -109,7 +109,7 @@ function Resources({ title = "Further reading", resources = [] }: Readonly<{ tit
   if (resources.length === 0) return null
   return (
     <section className="my-6">
-      <p className="font-display text-h4 text-ink">{title}</p>
+      <p className="text-h4 text-foreground">{title}</p>
       <ul className="mt-2">
         {resources.map((resource) => (
           <li key={resource.href}>
@@ -125,10 +125,10 @@ function Resources({ title = "Further reading", resources = [] }: Readonly<{ tit
 
 function NextLesson({ title, description, href }: Readonly<{ title: string; description?: string; href?: string }>) {
   return (
-    <div className="my-8 border-t border-ink pt-4">
-      <p className="font-display text-caption text-ink-soft">Next lesson</p>
-      <p className="font-display text-h3 text-ink">{href ? <InkLink href={href}>{title}</InkLink> : title}</p>
-      {description && <p className="mt-1 text-ink-soft">{description}</p>}
+    <div className="my-8 border-t border-foreground pt-4">
+      <p className="text-caption text-muted-foreground">Next lesson</p>
+      <p className="text-h3 text-foreground">{href ? <InkLink href={href}>{title}</InkLink> : title}</p>
+      {description && <p className="mt-1 text-muted-foreground">{description}</p>}
     </div>
   )
 }

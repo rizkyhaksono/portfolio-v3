@@ -40,12 +40,12 @@ function Tick() {
 function Certificate({ course, name, onName }: Readonly<{ course: string; name: string; onName: (name: string) => void }>) {
   const href = ogImageUrl({ course, name: name.trim() }, "/api/certificate")
   return (
-    <div className="mt-6 border-t border-ink pt-4">
-      <p className="flex items-center gap-2 font-display text-h4 text-ink">
+    <div className="mt-6 border-t border-foreground pt-4">
+      <p className="flex items-center gap-2 text-h4 text-foreground">
         <Tick />
         Course completed
       </p>
-      <label htmlFor={`${course}-name`} className="mt-4 block text-small font-semibold text-ink">
+      <label htmlFor={`${course}-name`} className="mt-4 block text-small font-semibold text-foreground">
         Name on the certificate
       </label>
       <Input id={`${course}-name`} value={name} onChange={(event) => onName(event.target.value)} maxLength={48} autoComplete="name" className="max-w-sm" />
@@ -59,8 +59,8 @@ function Certificate({ course, name, onName }: Readonly<{ course: string; name: 
 /** Hatched progress rule: the share of lessons done in this browser. */
 function Progress({ done, total }: Readonly<{ done: number; total: number }>) {
   return (
-    <span aria-hidden className="mt-3 block h-1.5 border border-rule-strong">
-      <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
+    <span aria-hidden className="mt-3 block h-1.5 border border-input">
+      <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${total ? (done / total) * 100 : 0}%` }} />
     </span>
   )
 }
@@ -141,14 +141,14 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
               data-track-course={course.course}
               // Radix activates on mousedown, so the panel is mounted by the time click fires.
               onClick={() => revealPanel(course.course)}
-              className="block h-full whitespace-normal border-b border-r-0 border-rule px-4 py-3 sm:py-4 text-left font-normal text-ink-soft hover:bg-tint hover:text-ink data-[state=active]:border-b-2 data-[state=active]:border-ink data-[state=active]:bg-tint data-[state=active]:text-ink sm:border-r lg:[&:nth-child(5n)]:border-r-0"
+              className="block h-full whitespace-normal border-b border-r-0 border-border px-4 py-3 sm:py-4 text-left font-normal text-muted-foreground hover:bg-muted hover:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-foreground data-[state=active]:bg-muted data-[state=active]:text-foreground sm:border-r lg:[&:nth-child(5n)]:border-r-0"
             >
-              <span className="block font-display text-h4 text-ink">{courseTitle(course.course)}</span>
+              <span className="block text-h4 text-foreground">{courseTitle(course.course)}</span>
               <span className="mt-1 hidden text-small tabular-nums sm:block">
                 {total} lessons{minutes > 0 && `, about ${minutes} minutes`}
               </span>
               <Progress done={done} total={total} />
-              <span className="mt-1.5 block min-h-[1.35em] font-display text-caption tabular-nums">
+              <span className="mt-1.5 block min-h-[1.35em] text-caption tabular-nums">
                 {done === 0 ? "Not started" : done === total ? "Completed" : `${done} of ${total} done`}
               </span>
             </TabsTrigger>
@@ -164,10 +164,10 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
         return (
           <TabsContent key={id} value={id} className="mt-12">
             <section aria-labelledby={`${id}-title`}>
-              <h2 id={`${id}-title`} className="font-display text-h2 text-balance text-ink">
+              <h2 id={`${id}-title`} className="text-h2 text-balance text-foreground">
                 {courseTitle(id)}
               </h2>
-              <p className="mt-2 max-w-[60ch] text-body text-ink-soft">
+              <p className="mt-2 max-w-[60ch] text-body text-muted-foreground">
                 From beginner to advanced in {lessons.length} lessons{minutes > 0 && `, about ${minutes} minutes of reading`}.
                 {done > 0 && done < lessons.length && ` You have finished ${done}.`}
               </p>
@@ -181,7 +181,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
                       <LedgerRow key={slug} titleAs="h4" title={meta.title} href={`/roadmap/${slug}`} meta={meta.duration}>
                         <p>{meta.description}</p>
                         {isLoaded && isModuleComplete(id, slug) && (
-                          <p className="mt-1 flex items-center gap-1.5 text-ink">
+                          <p className="mt-1 flex items-center gap-1.5 text-foreground">
                             <Tick />
                             Done
                           </p>
@@ -195,7 +195,7 @@ export function RoadmapClient({ courses }: Readonly<{ courses: Course[] }>) {
               {done === lessons.length ? (
                 <Certificate course={id} name={name} onName={saveName} />
               ) : (
-                <p className="mt-6 text-small text-ink-soft">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
+                <p className="mt-6 text-small text-muted-foreground">Finish all {lessons.length} lessons to download a certificate with your name on it.</p>
               )}
             </section>
           </TabsContent>

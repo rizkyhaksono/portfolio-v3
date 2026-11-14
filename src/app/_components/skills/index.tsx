@@ -31,18 +31,18 @@ const FOCUS_SKILLS = [
 export default function SkillSection() {
   return (
     <PageSection id="skills" heading={{ title: "Skills" }} contentClassName="mt-6">
-      <ul role="list" className="border-b border-ink">
+      <ul role="list" className="border-b border-foreground">
         {FOCUS_SKILLS.map((group, i) => (
           <li
             key={group.name}
             style={{ "--i": i } as CSSProperties}
-            className="bg-paper-grain border-t border-ink pb-8 md:sticky md:top-[calc(var(--head-h)+1rem+var(--i)*3.25rem)] md:min-h-[55svh]"
+            className="bg-paper-grain border-t border-foreground pb-8 md:sticky md:top-[calc(var(--head-h)+1rem+var(--i)*3.25rem)] md:min-h-[55svh]"
           >
-            <h3 className="flex min-h-[3.25rem] items-center font-display text-h3 text-ink">{group.name}</h3>
-            <p className="text-small text-ink-soft">{group.note}</p>
+            <h3 className="flex min-h-[3.25rem] items-center text-h3 text-foreground">{group.name}</h3>
+            <p className="text-small text-muted-foreground">{group.note}</p>
             <ul role="list" className="mt-6 grid grid-cols-2 gap-x-6 sm:gap-x-10">
               {group.skills.map((skill) => (
-                <li key={skill} className="border-t border-rule py-2 text-body text-ink">
+                <li key={skill} className="border-t border-border py-2 text-body text-foreground">
                   {skill}
                 </li>
               ))}

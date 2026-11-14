@@ -22,14 +22,14 @@ describe('Logo', () => {
     const paths = svg.querySelectorAll('path')
     expect(paths[0]).toHaveAttribute('d', LOGO_ART.glyph)
     expect(paths[1]).toHaveAttribute('d', LOGO_ART.marks)
-    expect(paths[1]).toHaveClass('stroke-ink', 'opacity-60')
+    expect(paths[1]).toHaveClass('stroke-foreground', 'opacity-60')
   })
 
   it('reverses the glyph out of an ink tile', () => {
     const { container } = render(<Logo variant="tile" />)
-    expect(container.querySelector('rect')).toHaveClass('fill-ink')
+    expect(container.querySelector('rect')).toHaveClass('fill-foreground')
     const glyph = container.querySelector('path')
-    expect(glyph).toHaveClass('fill-paper')
+    expect(glyph).toHaveClass('fill-background')
     expect(glyph).toHaveAttribute('d', LOGO_ART.glyph)
   })
 })

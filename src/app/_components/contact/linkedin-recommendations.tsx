@@ -11,9 +11,9 @@ export default async function RecommendationsSection() {
   return (
     <PageSection id="recommendations" heading={{ title: "Recommendations" }} className={DEFERRED_SECTION} contentClassName="mt-6 gap-16 lg:columns-2">
       {quotes.map((rec) => (
-        <figure key={rec.id} className="mb-10 max-w-[62ch] break-inside-avoid border-l border-ink pl-5 last:mb-0">
-          <blockquote className="font-display text-prose text-ink">{rec.message.trim()}</blockquote>
-          <figcaption className="mt-3 text-small text-ink-soft">{rec.name}, on LinkedIn</figcaption>
+        <figure key={rec.id} className="mb-10 max-w-[62ch] break-inside-avoid border-l border-foreground pl-5 last:mb-0">
+          <blockquote className="text-prose text-foreground">{rec.message.trim()}</blockquote>
+          <figcaption className="mt-3 text-small text-muted-foreground">{rec.name}, on LinkedIn</figcaption>
         </figure>
       ))}
     </PageSection>

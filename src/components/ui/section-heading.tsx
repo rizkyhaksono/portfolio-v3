@@ -33,12 +33,12 @@ export function SectionHeading({
   return (
     <div className={cn("flex flex-col gap-2", align === "center" && "items-center text-center", className)}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Tag className={cn("speckle font-display text-balance text-ink", TITLE_SIZE[as], titleClassName)}>
+      <Tag className={cn("speckle text-balance text-foreground", TITLE_SIZE[as], titleClassName)}>
         {title}
         {accent && <> <em>{accent}</em></>}
       </Tag>
       {description && (
-        <p className={cn("max-w-[60ch] text-body text-ink-soft", align === "center" && "mx-auto")}>
+        <p className={cn("max-w-[60ch] text-body text-muted-foreground", align === "center" && "mx-auto")}>
           {description}
         </p>
       )}

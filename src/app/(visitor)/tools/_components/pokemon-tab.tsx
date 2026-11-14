@@ -78,7 +78,7 @@ export function PokemonTab() {
         <Button type="submit">Look up</Button>
       </form>
       {missing && (
-        <p id="pokemon-search-error" className="-mt-3 flex gap-2 font-display text-caption text-ink">
+        <p id="pokemon-search-error" className="-mt-3 flex gap-2 text-caption text-foreground">
           <X aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />
           No Pokémon called &ldquo;{missing}&rdquo;. Check the spelling, or try its number.
         </p>
@@ -101,16 +101,16 @@ export function PokemonTab() {
                     <button
                       type="button"
                       onClick={() => openDetail(p.id)}
-                      className="flex h-48 w-full flex-col items-center gap-1 border border-rule p-3 text-center transition-colors hover:border-ink"
+                      className="flex h-48 w-full flex-col items-center gap-1 border border-border p-3 text-center transition-colors hover:border-foreground"
                     >
                       <PlateFigure tone="color" className="w-20 shrink-0">
                         <span className="relative block aspect-square w-full">
                           {p.image && <Image src={p.image} alt="" fill sizes="80px" className="object-contain" unoptimized />}
                         </span>
                       </PlateFigure>
-                      <span className="mt-1 font-display text-caption tabular-nums text-ink-soft">{numbered(p.id)}</span>
-                      <span className="w-full truncate text-small font-semibold text-ink">{sentence(p.name)}</span>
-                      <span className="w-full truncate text-caption text-ink-soft">{sentence(p.types.join(", "))}</span>
+                      <span className="mt-1 text-caption tabular-nums text-muted-foreground">{numbered(p.id)}</span>
+                      <span className="w-full truncate text-small font-semibold text-foreground">{sentence(p.name)}</span>
+                      <span className="w-full truncate text-caption text-muted-foreground">{sentence(p.types.join(", "))}</span>
                     </button>
                   </li>
                 ))}
@@ -145,7 +145,7 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
     <>
       <DialogHeader>
         <DialogTitle>{sentence(p.name)}</DialogTitle>
-        <p className="font-display text-caption tabular-nums text-ink-soft">{numbered(p.id)}</p>
+        <p className="text-caption tabular-nums text-muted-foreground">{numbered(p.id)}</p>
       </DialogHeader>
 
       {p.image && (
@@ -156,28 +156,28 @@ function PokemonSheet({ pokemon: p }: Readonly<{ pokemon: PokemonDetail }>) {
         </PlateFigure>
       )}
 
-      <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-rule pt-3 text-small">
-        <dt className="text-ink-soft">Types</dt>
-        <dd className="text-ink">{sentence(p.types.join(", "))}</dd>
-        <dt className="text-ink-soft">Height</dt>
-        <dd className="tabular-nums text-ink">{(p.height / 10).toFixed(1)} m</dd>
-        <dt className="text-ink-soft">Weight</dt>
-        <dd className="tabular-nums text-ink">{(p.weight / 10).toFixed(1)} kg</dd>
-        <dt className="text-ink-soft">Abilities</dt>
-        <dd className="capitalize text-ink">
+      <dl className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-4 gap-y-1.5 border-t border-border pt-3 text-small">
+        <dt className="text-muted-foreground">Types</dt>
+        <dd className="text-foreground">{sentence(p.types.join(", "))}</dd>
+        <dt className="text-muted-foreground">Height</dt>
+        <dd className="tabular-nums text-foreground">{(p.height / 10).toFixed(1)} m</dd>
+        <dt className="text-muted-foreground">Weight</dt>
+        <dd className="tabular-nums text-foreground">{(p.weight / 10).toFixed(1)} kg</dd>
+        <dt className="text-muted-foreground">Abilities</dt>
+        <dd className="capitalize text-foreground">
           {p.abilities.map((a) => `${a.name.replace(/-/g, " ")}${a.isHidden ? " (hidden)" : ""}`).join(", ")}
         </dd>
       </dl>
 
       <div>
-        <h3 className="font-display text-h4 text-ink">Base stats</h3>
+        <h3 className="text-h4 text-foreground">Base stats</h3>
         <ul role="list" className="mt-2">
           {Object.entries(p.stats).map(([key, value]) => (
             <li key={key} className="grid grid-cols-[7.5rem_2.5rem_minmax(0,1fr)] items-center gap-3 py-1 text-small">
-              <span className="text-ink-soft">{STAT_LABELS[key] ?? key}</span>
-              <span className="text-right tabular-nums text-ink">{value}</span>
-              <span aria-hidden className="block h-3 border border-rule-strong">
-                <span className="bg-hatch block h-full border-r border-ink" style={{ width: `${Math.min(100, (value / 200) * 100)}%` }} />
+              <span className="text-muted-foreground">{STAT_LABELS[key] ?? key}</span>
+              <span className="text-right tabular-nums text-foreground">{value}</span>
+              <span aria-hidden className="block h-3 border border-input">
+                <span className="bg-hatch block h-full border-r border-foreground" style={{ width: `${Math.min(100, (value / 200) * 100)}%` }} />
               </span>
             </li>
           ))}

@@ -37,7 +37,7 @@ const AlertDialogContent = React.forwardRef<
       ref={ref}
       className={cn(
         // Centred by inset + auto margins (not translate) so the 4px enter offset is the only transform.
-        "fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto gap-4 border border-ink bg-paper p-6 text-ink shadow-[3px_3px_0_hsl(var(--ink))] data-[state]:[animation-duration:var(--dur-sheet)] data-[state]:[animation-timing-function:var(--ease-print)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-1 data-[state=open]:slide-in-from-bottom-1",
+        "fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto gap-4 border border-foreground bg-background p-6 text-foreground shadow-[3px_3px_0_hsl(var(--ink))] data-[state]:[animation-duration:var(--dur-sheet)] data-[state]:[animation-timing-function:var(--ease-print)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-1 data-[state=open]:slide-in-from-bottom-1",
         className
       )}
       {...props}
@@ -80,7 +80,7 @@ const AlertDialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Title
     ref={ref}
-    className={cn("font-display text-h3", className)}
+    className={cn("text-h3", className)}
     {...props}
   />
 ))

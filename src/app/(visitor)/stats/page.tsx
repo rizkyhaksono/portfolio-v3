@@ -44,12 +44,12 @@ export default async function StatsPage() {
   return (
     <BaseLayout>
       <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Stats</h1>
-        <p className="mt-4 text-balance font-display text-caption text-ink-soft">
+        <h1 className="speckle text-h1 text-balance text-foreground">Stats</h1>
+        <p className="mt-4 text-balance text-caption text-muted-foreground">
           Readers, status and practice figures, refreshed every fifteen minutes.
         </p>
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       {strip.length > 0 && <StatStrip items={strip} className="mt-8 border-t-0" />}
       <ReadersFigures stats={stats} daily={daily} reads={reads} />

@@ -6,7 +6,7 @@ import { RESUME_GOOGLE_DRIVE_URL } from "@/commons/constants/external-links"
 import { SECTION_SPACING } from "@/lib/design-system"
 
 const DROP_CAP =
-  "first-letter:float-left first-letter:mr-2 first-letter:mt-[0.06em] first-letter:font-display first-letter:text-[4.6em] first-letter:font-bold first-letter:leading-[0.78] first-letter:text-ink"
+  "first-letter:float-left first-letter:mr-2 first-letter:mt-[0.06em] first-letter:text-[4.6em] first-letter:font-bold first-letter:leading-[0.78] first-letter:text-foreground"
 
 export default function AboutSection() {
   return (

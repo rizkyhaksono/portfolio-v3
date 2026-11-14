@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils"
 
 // The Tag look shared by Badge and Chip: 12px roman in a 1px frame. Status is shape plus word, never colour.
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-none border px-2 py-0.5 text-xs leading-snug text-ink",
+  "inline-flex items-center gap-1.5 rounded-none border px-2 py-0.5 text-xs leading-snug text-foreground",
   {
     variants: {
       variant: {
-        default: "border-ink",
-        secondary: "border-rule-strong",
-        destructive: "border-ink font-semibold",
-        outline: "border-rule-strong",
+        default: "border-foreground",
+        secondary: "border-input",
+        destructive: "border-foreground font-semibold",
+        outline: "border-input",
       },
     },
     defaultVariants: {

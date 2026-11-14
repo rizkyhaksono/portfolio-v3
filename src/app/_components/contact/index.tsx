@@ -22,7 +22,7 @@ export default function ContactSection() {
       heading={{ title: "Contact" }}
       contentClassName="mt-6 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] md:gap-16"
     >
-      <div className="space-y-4 text-body text-ink">
+      <div className="space-y-4 text-body text-foreground">
         <p>
           Write to{" "}
           <InkLink href={`mailto:${EMAIL}`} event="email-click" eventData={{ area: "contact" }} className="break-all">

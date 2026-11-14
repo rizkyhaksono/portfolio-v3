@@ -27,8 +27,8 @@ export default async function ReadersSection() {
     <PageSection id="readers" heading={{ title: "Readers" }} className={DEFERRED_SECTION} contentClassName="mt-6">
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] md:items-end md:gap-12">
         <div>
-          <p className="speckle font-display text-numeral tabular-nums text-ink">{views.toLocaleString("en")}</p>
-          <p className="mt-2 text-small text-ink-soft">
+          <p className="speckle text-numeral tabular-nums text-foreground">{views.toLocaleString("en")}</p>
+          <p className="mt-2 text-small text-muted-foreground">
             Pages read in the last 30 days. {change(stats?.comparison?.pageviews)}
           </p>
           <ReadingNow className="mt-1" />
@@ -38,7 +38,7 @@ export default async function ReadersSection() {
 
       {top.length > 0 && (
         <>
-          <h3 className="mt-12 font-display text-h3 text-ink">Most read</h3>
+          <h3 className="mt-12 text-h3 text-foreground">Most read</h3>
           <LedgerList className="mt-3">
             {top.map(({ path, readers, title }) => (
               <LedgerRow key={path} href={path} title={title} titleAs="h4" meta={`${readers.toLocaleString("en")} readers`} />

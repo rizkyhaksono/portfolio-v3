@@ -24,10 +24,10 @@ export default function TypingSection({ data }: Readonly<{ data: MonkeyTypeUserD
 
   return (
     <PageSection id="typing" heading={{ title: "Typing" }} contentClassName="mt-4 space-y-8">
-      <p className="max-w-[60ch] text-body text-ink-soft">
+      <p className="max-w-[60ch] text-body text-muted-foreground">
         {data.bestWpm > 0 && (
           <>
-            The best 25-word test on MonkeyType ran at <span className="font-display tabular-nums text-ink">{data.bestWpm}</span> words a
+            The best 25-word test on MonkeyType ran at <span className="tabular-nums text-foreground">{data.bestWpm}</span> words a
             minute with {data.bestAccuracy}% accuracy.{" "}
           </>
         )}

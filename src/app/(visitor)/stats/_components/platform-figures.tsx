@@ -11,13 +11,13 @@ const n = (value: number) => value.toLocaleString("en")
 
 function Figures({ rows }: Readonly<{ rows: Figure[] }>) {
   return (
-    <dl className="mt-3 divide-y divide-rule border-y border-rule">
+    <dl className="mt-3 divide-y divide-border border-y border-border">
       {rows
         .filter((row): row is [string, number] => row[1] != null)
         .map(([label, value]) => (
           <div key={label} className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-4 py-2">
-            <dt className="text-small text-ink-soft">{label}</dt>
-            <dd className="font-display text-body tabular-nums text-ink">{n(value)}</dd>
+            <dt className="text-small text-muted-foreground">{label}</dt>
+            <dd className="text-body tabular-nums text-foreground">{n(value)}</dd>
           </div>
         ))}
     </dl>
@@ -27,7 +27,7 @@ function Figures({ rows }: Readonly<{ rows: Figure[] }>) {
 function Platform({ platform, title, children }: Readonly<{ platform: ProfileKey; title: string; children: React.ReactNode }>) {
   return (
     <div>
-      <h3 className="font-display text-h3 text-ink">{title}</h3>
+      <h3 className="text-h3 text-foreground">{title}</h3>
       {children}
       <p className="mt-3 text-body">
         <InkLink
@@ -62,7 +62,7 @@ export default function PlatformFigures({ chess, npm }: Readonly<{ chess: ChessS
             ]}
           />
           {chess.totalGames > 0 && (
-            <p className="mt-3 text-small text-ink-soft">
+            <p className="mt-3 text-small text-muted-foreground">
               {n(chess.wins)} wins, {n(chess.losses)} losses and {n(chess.draws)} draws across {n(chess.totalGames)} games.
             </p>
           )}

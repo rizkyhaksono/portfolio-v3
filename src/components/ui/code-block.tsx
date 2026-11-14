@@ -17,12 +17,12 @@ function textOf(node: ReactNode): string {
 /** Server specimen box: tint ground, system mono, no syntax colours; the copy button is the only island. */
 function Specimen({ text, lang, className }: Readonly<{ text: string; lang?: string; className?: string }>) {
   return (
-    <div className="my-6 bg-tint">
-      <div className="flex min-h-9 items-center justify-between gap-4 border-b border-rule px-4">
-        <span className="font-display text-caption text-ink-soft">{lang}</span>
+    <div className="my-6 bg-muted">
+      <div className="flex min-h-9 items-center justify-between gap-4 border-b border-border px-4">
+        <span className="text-caption text-muted-foreground">{lang}</span>
         <CopyButton text={text} lang={lang} />
       </div>
-      <pre tabIndex={0} className="overflow-x-auto p-4 font-mono text-[0.84375rem] leading-[1.55] text-ink">
+      <pre tabIndex={0} className="overflow-x-auto p-4 font-mono text-[0.84375rem] leading-[1.55] text-foreground">
         <code className={className}>{text}</code>
       </pre>
     </div>
@@ -35,7 +35,7 @@ const CodeBlock = ({ className, children, node: _node, ...props }: CodeBlockProp
 
   if (!className?.includes("language-") && !code.includes("\n")) {
     return (
-      <code className="bg-tint px-[0.3em] py-[0.1em] font-mono text-[0.85em]" {...props}>
+      <code className="bg-muted px-[0.3em] py-[0.1em] font-mono text-[0.85em]" {...props}>
         {children}
       </code>
     );

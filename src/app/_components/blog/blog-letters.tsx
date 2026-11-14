@@ -10,13 +10,13 @@ function Letter({ comment }: Readonly<{ comment: CommentItemProps }>) {
 
   return (
     <li>
-      <p className="font-display text-caption text-ink-soft">
+      <p className="text-caption text-muted-foreground">
         {comment.user?.name || "A reader"} wrote
         {date && <> on <time dateTime={date.toISOString()}>{formatDay(date)}</time></>}.
       </p>
       <div className="prose prose--chat mt-2 break-words" dangerouslySetInnerHTML={{ __html: safeHtml(comment.body_html ?? "") }} />
       {replies.length > 0 && (
-        <ol role="list" aria-label="Replies" className="mt-6 flex flex-col gap-6 border-l border-rule pl-4 sm:pl-6">
+        <ol role="list" aria-label="Replies" className="mt-6 flex flex-col gap-6 border-l border-border pl-4 sm:pl-6">
           {replies.map((reply) => (
             <Letter key={reply.id_code} comment={reply} />
           ))}
@@ -35,8 +35,8 @@ interface BlogLettersProps {
 /** DEV comments printed as letters (server, no JS); replies sit behind a left rule. */
 export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps>) {
   return (
-    <section id="letters" aria-labelledby="letters-title" className="mt-12 border-t border-ink pt-6">
-      <h2 id="letters-title" className="font-display text-h3 text-ink">
+    <section id="letters" aria-labelledby="letters-title" className="mt-12 border-t border-foreground pt-6">
+      <h2 id="letters-title" className="text-h3 text-foreground">
         Letters
       </h2>
       {comments.length > 0 ? (
@@ -50,7 +50,7 @@ export default function BlogLetters({ comments, url }: Readonly<BlogLettersProps
           No letters yet.
         </StatusLine>
       )}
-      <p className="mt-8 text-small text-ink-soft">
+      <p className="mt-8 text-small text-muted-foreground">
         Write one on{" "}
         <InkLink href={url} external>
           DEV Community

@@ -13,8 +13,8 @@ interface StatusLineProps {
 export function StatusLine({ kind, children, action, className }: Readonly<StatusLineProps>) {
   if (kind === "failed") {
     return (
-      <div role="alert" className={cn("flex flex-col items-start gap-3 border border-ink p-4 sm:flex-row sm:items-center sm:gap-6", className)}>
-        <p className="flex gap-2 font-display text-body text-ink">
+      <div role="alert" className={cn("flex flex-col items-start gap-3 border border-foreground p-4 sm:flex-row sm:items-center sm:gap-6", className)}>
+        <p className="flex gap-2 text-body text-foreground">
           <X aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0" />
           <span>{children}</span>
         </p>
@@ -27,7 +27,7 @@ export function StatusLine({ kind, children, action, className }: Readonly<Statu
     <div className={cn("flex flex-col items-start gap-3", className)}>
       <p
         role={kind === "loading" ? "status" : undefined}
-        className={kind === "loading" ? "font-display text-caption text-ink-soft" : "text-body text-ink-soft"}
+        className={kind === "loading" ? "text-caption text-muted-foreground" : "text-body text-muted-foreground"}
       >
         {children}
       </p>

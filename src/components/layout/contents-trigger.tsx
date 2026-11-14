@@ -27,7 +27,7 @@ export function ContentsTrigger({ className }: Readonly<{ className?: string }>)
           setLoaded(true)
           setOpen(true)
         }}
-        className={cn("-mr-2.5 inline-flex size-11 items-center justify-center text-ink", className)}
+        className={cn("-mr-2.5 inline-flex size-11 items-center justify-center text-foreground", className)}
       >
         <svg aria-hidden viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="square">
           <path d="M3 9h18M3 15h18" />

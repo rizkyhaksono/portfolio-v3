@@ -12,7 +12,7 @@ describe('PlateFigure', () => {
         <img src="/x.jpg" alt="" />
       </PlateFigure>,
     )
-    expect(frameOf(container)).toHaveClass('border', 'border-ink')
+    expect(frameOf(container)).toHaveClass('border', 'border-foreground')
     expect(frameOf(container).querySelector('.plate img')).toBeInTheDocument()
   })
 

@@ -39,9 +39,9 @@ export default function AIHub({ initialTab }: Readonly<{ initialTab?: string }>)
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Etan AI</h1>
+        <h1 className="speckle text-h1 text-balance text-foreground">Etan AI</h1>
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       <Tabs value={tab} onValueChange={select} className="mt-6 sm:mt-8">
         <TabsList aria-label="Etan AI tools">

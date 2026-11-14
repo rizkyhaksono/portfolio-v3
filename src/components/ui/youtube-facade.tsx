@@ -21,8 +21,8 @@ export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTube
 
   return (
     <figure className={cn("my-6", className)}>
-      <div className="border border-ink p-[3px]">
-        <div className="border border-rule">
+      <div className="border border-foreground p-[3px]">
+        <div className="border border-border">
           {playing ? (
             <iframe
               ref={(frame) => frame?.focus()}
@@ -50,7 +50,7 @@ export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTube
                 decoding="async"
                 className="h-full w-full object-cover"
               />
-              <span className="absolute left-1/2 top-1/2 z-[2] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 bg-ink px-4 py-2 text-small font-semibold text-paper group-hover:underline group-active:translate-y-[calc(-50%+1px)]">
+              <span className="absolute left-1/2 top-1/2 z-[2] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 bg-foreground px-4 py-2 text-small font-semibold text-background group-hover:underline group-active:translate-y-[calc(-50%+1px)]">
                 <Play className="size-4" strokeWidth={1.5} aria-hidden />
                 Play video<span className="sr-only">: {title}</span>
               </span>
@@ -58,7 +58,7 @@ export function YouTubeFacade({ id, title, lesson, className }: Readonly<YouTube
           )}
         </div>
       </div>
-      <figcaption className="mt-2 font-display text-caption text-ink-soft">{title}</figcaption>
+      <figcaption className="mt-2 text-caption text-muted-foreground">{title}</figcaption>
     </figure>
   )
 }

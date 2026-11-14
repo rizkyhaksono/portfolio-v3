@@ -36,16 +36,16 @@ const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 function FitRuler({ score }: Readonly<{ score: number }>) {
   return (
     <div aria-hidden className="mt-4">
-      <div className="relative h-6 border-b border-ink">
+      <div className="relative h-6 border-b border-foreground">
         <div className="bg-hatch absolute inset-y-0 left-0" style={{ width: `${score}%` }} />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between">
           {Array.from({ length: 11 }, (_, i) => (
-            <span key={i} className={i % 5 === 0 ? "h-3 w-px bg-ink" : "h-1.5 w-px bg-ink"} />
+            <span key={i} className={i % 5 === 0 ? "h-3 w-px bg-foreground" : "h-1.5 w-px bg-foreground"} />
           ))}
         </div>
-        <span className="absolute inset-y-0 w-0.5 bg-ink" style={{ left: `calc(${score}% - ${score / 50}px)` }} />
+        <span className="absolute inset-y-0 w-0.5 bg-foreground" style={{ left: `calc(${score}% - ${score / 50}px)` }} />
       </div>
-      <div className="mt-1 flex justify-between font-display text-caption tabular-nums text-ink-soft">
+      <div className="mt-1 flex justify-between text-caption tabular-nums text-muted-foreground">
         <span>0</span>
         <span>50</span>
         <span>100</span>
@@ -58,7 +58,7 @@ function TagList({ title, items }: Readonly<{ title: string; items: string[] }>)
   if (items.length === 0) return null
   return (
     <div>
-      <h3 className="text-small font-semibold text-ink">{title}</h3>
+      <h3 className="text-small font-semibold text-foreground">{title}</h3>
       <ul role="list" className="mt-2 flex flex-wrap gap-1.5">
         {items.map((item, i) => (
           <li key={i}>
@@ -138,7 +138,7 @@ export default function JdMatcher() {
 
   return (
     <div className="max-w-[66ch] space-y-5">
-      <p className="text-body text-ink-soft">
+      <p className="text-body text-muted-foreground">
         Paste a job description. Etan weighs it against Rizky&apos;s real experience and says where he fits and where he
         does not.
       </p>
@@ -155,7 +155,7 @@ export default function JdMatcher() {
           disabled={loading}
           aria-describedby="ai-jd-hint"
         />
-        <p id="ai-jd-hint" className="mt-1 font-display text-caption text-ink-soft">
+        <p id="ai-jd-hint" className="mt-1 text-caption text-muted-foreground">
           At least {MIN_LENGTH} characters, up to 6,000.
         </p>
       </div>
@@ -166,27 +166,27 @@ export default function JdMatcher() {
       {error && <ErrorNote>{error}</ErrorNote>}
 
       {result && (
-        <section aria-labelledby="ai-fit-title" className="space-y-6 border-t border-ink pt-6">
+        <section aria-labelledby="ai-fit-title" className="space-y-6 border-t border-foreground pt-6">
           <div>
-            <h2 id="ai-fit-title" className="text-small font-semibold text-ink">
+            <h2 id="ai-fit-title" className="text-small font-semibold text-foreground">
               Fit score
             </h2>
             <p className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <span className="font-display text-numeral tabular-nums text-ink">{score}</span>
-              <span className="font-display text-lead text-ink-soft">out of 100</span>
+              <span className="text-numeral tabular-nums text-foreground">{score}</span>
+              <span className="text-lead text-muted-foreground">out of 100</span>
             </p>
-            {result.verdict && <p className="mt-1 font-display text-lead text-ink">{result.verdict}</p>}
+            {result.verdict && <p className="mt-1 text-lead text-foreground">{result.verdict}</p>}
             <FitRuler score={score} />
           </div>
 
-          {result.summary && <p className="text-body text-ink">{result.summary}</p>}
+          {result.summary && <p className="text-body text-foreground">{result.summary}</p>}
 
           <TagList title="Matching skills" items={result.matchingSkills} />
           <TagList title="Relevant experience" items={result.matchingProjects} />
 
           {result.gaps.length > 0 && (
             <div>
-              <h3 className="text-small font-semibold text-ink">Gaps</h3>
+              <h3 className="text-small font-semibold text-foreground">Gaps</h3>
               <div className="prose prose--chat mt-2">
                 <ul>
                   {result.gaps.map((g, i) => (
@@ -199,8 +199,8 @@ export default function JdMatcher() {
 
           {result.sources.length > 0 && (
             <div>
-              <h3 className="text-small font-semibold text-ink">Drawn from</h3>
-              <ul role="list" className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-small tabular-nums text-ink">
+              <h3 className="text-small font-semibold text-foreground">Drawn from</h3>
+              <ul role="list" className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-small tabular-nums text-foreground">
                 {result.sources.map((src, i) => {
                   const label = `${sentence(src.sourceType)}, ${Math.round(src.score * 100)}% match`
                   return (
@@ -213,7 +213,7 @@ export default function JdMatcher() {
             </div>
           )}
 
-          <div className="border-t border-rule pt-4">
+          <div className="border-t border-border pt-4">
             <Button variant="outline" onClick={shareResult}>
               <span aria-live="polite">{SHARE_LABEL[share]}</span>
             </Button>

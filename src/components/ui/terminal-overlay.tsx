@@ -214,13 +214,13 @@ export default function TerminalOverlay() {
             returnFocusRef.current?.focus({ preventScroll: true })
           }}
           onClick={() => inputRef.current?.focus()}
-          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col border border-ink bg-paper text-ink shadow-[3px_3px_0_hsl(var(--ink))] print:hidden"
+          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col border border-foreground bg-background text-foreground shadow-[3px_3px_0_hsl(var(--ink))] print:hidden"
         >
-          <div className="flex shrink-0 items-center justify-between border-b border-rule pl-4">
-            <DialogPrimitive.Title className="font-display text-caption text-ink-soft">Terminal</DialogPrimitive.Title>
+          <div className="flex shrink-0 items-center justify-between border-b border-border pl-4">
+            <DialogPrimitive.Title className="text-caption text-muted-foreground">Terminal</DialogPrimitive.Title>
             <DialogPrimitive.Close
               aria-label="Close terminal"
-              className="inline-flex h-11 w-11 items-center justify-center hover:bg-tint md:h-9 md:w-9"
+              className="inline-flex h-11 w-11 items-center justify-center hover:bg-muted md:h-9 md:w-9"
             >
               <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
             </DialogPrimitive.Close>
@@ -228,7 +228,7 @@ export default function TerminalOverlay() {
 
           <div ref={scrollRef} role="log" aria-live="polite" className="flex-1 overflow-y-auto p-4 text-[13.5px] leading-relaxed">
             {lines.map((l, i) => (
-              <samp key={i} className={cn("block whitespace-pre-wrap break-words", l.kind === "in" && "text-ink-soft")}>
+              <samp key={i} className={cn("block whitespace-pre-wrap break-words", l.kind === "in" && "text-muted-foreground")}>
                 {l.kind === "in" ? `$ ${l.text}` : l.text}
               </samp>
             ))}
@@ -244,7 +244,7 @@ export default function TerminalOverlay() {
                   spellCheck={false}
                   autoComplete="off"
                   autoCapitalize="off"
-                  className="flex-1 bg-transparent text-base text-ink md:text-[13.5px]"
+                  className="flex-1 bg-transparent text-base text-foreground md:text-[13.5px]"
                   aria-label="Terminal input"
                 />
               </kbd>

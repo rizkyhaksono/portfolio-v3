@@ -61,16 +61,16 @@ export default async function AdminDashboardPage() {
           { label: "New feedback", value: figure(feedback?.total) },
         ]}
       />
-      <p className="mt-3 font-display text-caption text-ink-soft">
+      <p className="mt-3 text-caption text-muted-foreground">
         Figures from Umami, refreshed every five minutes. A dash means the source did not answer.
       </p>
 
       <section className="mt-12">
-        <h2 className="font-display text-h3 text-ink">Drafts</h2>
+        <h2 className="text-h3 text-foreground">Drafts</h2>
         {posts === null ? (
-          <p className="mt-3 text-small text-ink-soft">The blog API did not answer, so drafts are unknown.</p>
+          <p className="mt-3 text-small text-muted-foreground">The blog API did not answer, so drafts are unknown.</p>
         ) : drafts.length === 0 ? (
-          <p className="mt-3 text-small text-ink-soft">No drafts. Every post is published.</p>
+          <p className="mt-3 text-small text-muted-foreground">No drafts. Every post is published.</p>
         ) : (
           <LedgerList className="mt-3">
             {drafts.map((post) => (
@@ -87,10 +87,10 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className="mt-12">
-        <h2 className="font-display text-h3 text-ink">Most read</h2>
-        <p className="mt-1 font-display text-caption text-ink-soft">Posts and projects, by readers in the last 30 days.</p>
+        <h2 className="text-h3 text-foreground">Most read</h2>
+        <p className="mt-1 text-caption text-muted-foreground">Posts and projects, by readers in the last 30 days.</p>
         {mostRead.length === 0 ? (
-          <p className="mt-3 text-small text-ink-soft">No readers recorded yet.</p>
+          <p className="mt-3 text-small text-muted-foreground">No readers recorded yet.</p>
         ) : (
           <LedgerList className="mt-3">
             {mostRead.map(([path, readers]) => (

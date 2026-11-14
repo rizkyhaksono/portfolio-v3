@@ -105,8 +105,8 @@ export function IeltsTab() {
             onClick={() => pickTopic(t)}
             className={cn(
               badgeVariants({ variant: "outline" }),
-              "min-h-8 transition-colors hover:border-ink [@media(pointer:coarse)]:min-h-11",
-              t === topic && "border-ink bg-ink text-paper",
+              "min-h-8 transition-colors hover:border-foreground [@media(pointer:coarse)]:min-h-11",
+              t === topic && "border-foreground bg-foreground text-background",
             )}
           >
             {t}
@@ -114,7 +114,7 @@ export function IeltsTab() {
         ))}
       </div>
 
-      <p className="font-display text-caption tabular-nums text-ink-soft">
+      <p className="text-caption tabular-nums text-muted-foreground">
         {filtered.length ? `Card ${index + 1} of ${filtered.length}.` : "No cards in this topic."} You know {known.size} and are still learning{" "}
         {learning.size}.
       </p>
@@ -125,13 +125,13 @@ export function IeltsTab() {
           onClick={() => setFlipped((f) => !f)}
           onKeyDown={onCardKey}
           aria-describedby="ielts-hint"
-          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-rule p-5 text-center transition-colors hover:border-ink sm:p-8"
+          className="flex min-h-[16rem] w-full flex-col items-center justify-center gap-4 border border-border p-5 text-center transition-colors hover:border-foreground sm:p-8"
         >
           {flipped ? (
             <span className="flex flex-col gap-3">
-              <span className="font-display text-h4 text-ink">{card.word}</span>
-              <span className="text-body text-ink">{card.definition}</span>
-              <span className="font-display text-body text-ink-soft">&ldquo;{card.example}&rdquo;</span>
+              <span className="text-h4 text-foreground">{card.word}</span>
+              <span className="text-body text-foreground">{card.definition}</span>
+              <span className="text-body text-muted-foreground">&ldquo;{card.example}&rdquo;</span>
               <span className="mt-1 flex flex-wrap justify-center gap-1.5">
                 {card.synonyms.map((s) => (
                   <Chip key={s}>{s}</Chip>
@@ -144,15 +144,15 @@ export function IeltsTab() {
                 <Chip>{card.pos}</Chip>
                 <Chip>{card.topic}</Chip>
               </span>
-              <span className="font-display text-h2 text-ink [overflow-wrap:anywhere] sm:text-h1">{card.word}</span>
-              <span className="text-caption text-ink-soft">Select to see the meaning</span>
+              <span className="text-h2 text-foreground [overflow-wrap:anywhere] sm:text-h1">{card.word}</span>
+              <span className="text-caption text-muted-foreground">Select to see the meaning</span>
             </>
           )}
         </button>
       ) : (
-        <p className="flex min-h-[16rem] items-center justify-center border border-rule font-display text-body text-ink-soft">No words in this topic.</p>
+        <p className="flex min-h-[16rem] items-center justify-center border border-border text-body text-muted-foreground">No words in this topic.</p>
       )}
-      <p id="ielts-hint" className="font-display text-caption text-ink-soft">
+      <p id="ielts-hint" className="text-caption text-muted-foreground">
         <span className="[@media(pointer:coarse)]:hidden">
           Select the card or press Space to turn it. While it has focus, the left and right arrows move between cards.
         </span>

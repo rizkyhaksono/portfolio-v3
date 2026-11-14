@@ -32,7 +32,7 @@ export default async function ReadersFigures({ stats, daily, reads }: Readonly<R
       contentClassName={cn("mt-6 grid gap-12", top.length > 0 && "lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]")}
     >
       <div className="lg:sticky lg:top-[calc(var(--head-h)+1rem)] lg:self-start">
-        <p className="text-small text-ink-soft">
+        <p className="text-small text-muted-foreground">
           Pages read each day over the last 30 days, with sessions dashed.{change(stats.comparison?.pageviews)}
         </p>
         <ReadingNow className="mt-1" />
@@ -47,7 +47,7 @@ export default async function ReadersFigures({ stats, daily, reads }: Readonly<R
 
       {top.length > 0 && (
         <div>
-          <h3 className="font-display text-h3 text-ink">Most read</h3>
+          <h3 className="text-h3 text-foreground">Most read</h3>
           <LedgerList className="mt-3">
             {top.map(({ path, readers, title }) => (
               <LedgerRow key={path} href={path} title={title} titleAs="h4" meta={`${readers.toLocaleString("en")} readers`} />

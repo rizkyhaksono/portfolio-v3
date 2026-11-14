@@ -79,7 +79,7 @@ function Images() {
           <img src={picture.url} alt={`A random ${picture.category} image`} className="mx-auto h-auto max-h-[32rem] w-auto max-w-full" />
         </PlateFigure>
       ) : (
-        !failed && <p className="text-body text-ink-soft">Pick a category, then press Generate image.</p>
+        !failed && <p className="text-body text-muted-foreground">Pick a category, then press Generate image.</p>
       )}
     </div>
   )
@@ -112,14 +112,14 @@ function Quotes() {
       {error && <ToolError>{error}</ToolError>}
 
       {quote ? (
-        <figure className="border-l-2 border-ink pl-5">
-          <blockquote className="max-w-[60ch] font-display text-lead text-ink">&ldquo;{quote.content}&rdquo;</blockquote>
-          <figcaption className="mt-3 text-small text-ink-soft">
+        <figure className="border-l-2 border-foreground pl-5">
+          <blockquote className="max-w-[60ch] text-lead text-foreground">&ldquo;{quote.content}&rdquo;</blockquote>
+          <figcaption className="mt-3 text-small text-muted-foreground">
             {quote.character.name}, {quote.anime.name}
           </figcaption>
         </figure>
       ) : (
-        !error && <p className="text-body text-ink-soft">Press Get a quote for a random line from an anime.</p>
+        !error && <p className="text-body text-muted-foreground">Press Get a quote for a random line from an anime.</p>
       )}
     </div>
   )

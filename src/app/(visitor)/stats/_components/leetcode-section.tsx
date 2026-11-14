@@ -80,8 +80,8 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
     >
       {submissions > 0 && (
         <div>
-          <h3 className="font-display text-h4 text-ink">Submissions, the last year</h3>
-          <p className="mt-1 text-small text-ink-soft">
+          <h3 className="text-h4 text-foreground">Submissions, the last year</h3>
+          <p className="mt-1 text-small text-muted-foreground">
             A streak of {n(stats.streak)} {stats.streak === 1 ? "day" : "days"} and {n(stats.totalActiveDays)} active days in all.
           </p>
           <InkHeatmap weeks={weeks} unit={["submission", "submissions"]} className="mt-4" />
@@ -90,7 +90,7 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
 
       {contest.length > 1 && (
         <div>
-          <h3 className="font-display text-h4 text-ink">Contest rating</h3>
+          <h3 className="text-h4 text-foreground">Contest rating</h3>
           <InkChart points={contest} name="Rating" label="LeetCode contest rating after each contest" />
         </div>
       )}
@@ -98,19 +98,19 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
       <div className="grid gap-12 md:grid-cols-2">
         {tags.length > 0 && (
           <div>
-            <h3 className="font-display text-h4 text-ink">Solved by topic</h3>
-            <ul role="list" className="mt-3 border-t border-ink pt-3">
+            <h3 className="text-h4 text-foreground">Solved by topic</h3>
+            <ul role="list" className="mt-3 border-t border-foreground pt-3">
               {tags.map((t) => (
                 <HatchBar key={t.tagName} name={t.tagName} percent={(t.problemsSolved / maxTag) * 100} value={n(t.problemsSolved)} />
               ))}
             </ul>
-            {languages.length > 0 && <p className="mt-4 text-small text-ink-soft">Written in {list.format(languages)}.</p>}
+            {languages.length > 0 && <p className="mt-4 text-small text-muted-foreground">Written in {list.format(languages)}.</p>}
           </div>
         )}
 
         {stats.recent.length > 0 && (
           <div>
-            <h3 className="font-display text-h4 text-ink">Recently solved</h3>
+            <h3 className="text-h4 text-foreground">Recently solved</h3>
             <LedgerList className="mt-3">
               {stats.recent.slice(0, 6).map((r, i) => (
                 <LedgerRow
@@ -127,7 +127,7 @@ export default function LeetCodeSection({ stats }: Readonly<{ stats: NonNullable
         )}
       </div>
 
-      {badges.length > 0 && <p className="text-small text-ink-soft">Badges earned: {list.format(badges)}.</p>}
+      {badges.length > 0 && <p className="text-small text-muted-foreground">Badges earned: {list.format(badges)}.</p>}
     </PageSection>
   )
 }

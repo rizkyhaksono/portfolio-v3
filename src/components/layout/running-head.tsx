@@ -13,12 +13,12 @@ export { SHELL_WIDTH }
 /** Sticky running head: wordmark, sections, theme, account; Contents below 1024px. */
 export function RunningHead() {
   return (
-    <header data-print-hide className="bg-paper-grain sticky top-0 z-40 border-b border-rule">
+    <header data-print-hide className="bg-paper-grain sticky top-0 z-40 border-b border-border">
       <div className={cn(SHELL_WIDTH, "flex h-[var(--head-h)] items-center gap-4 xl:gap-6")}>
         <Link
           href="/"
           aria-label="Rizky Haksono, home"
-          className="inline-flex min-h-11 min-w-11 shrink-0 items-center text-ink"
+          className="inline-flex min-h-11 min-w-11 shrink-0 items-center text-foreground"
           {...navTrack("/", "head")}
         >
           <Logo variant="mini" className="size-8" />

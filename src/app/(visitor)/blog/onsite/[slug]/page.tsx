@@ -74,9 +74,9 @@ export default async function OnsiteArticlePage({ params }: Props) {
           </>
         }
         footer={
-          <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-rule pt-6">
+          <div className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-border pt-6">
             <ClapButton targetType="blog" targetId={post.slug} />
-            <p className="text-small text-ink-soft">If this was useful, a clap tells me so.</p>
+            <p className="text-small text-muted-foreground">If this was useful, a clap tells me so.</p>
           </div>
         }
       >

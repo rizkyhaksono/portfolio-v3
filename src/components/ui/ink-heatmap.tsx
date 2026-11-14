@@ -34,7 +34,7 @@ export function heatLevels(counts: number[]): (count: number) => number {
 
 const Swatch = ({ level }: { level: number }) => (
   <span
-    className="inline-block h-[11px] w-[11px] border border-rule-strong"
+    className="inline-block h-[11px] w-[11px] border border-input"
     style={{ backgroundColor: `hsl(var(--ink) / ${LEVEL_OPACITY[level]})` }}
   />
 )
@@ -59,7 +59,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
       <div className="flex flex-row-reverse overflow-x-auto overscroll-x-contain pb-1" tabIndex={0} role="group" aria-label={summary}>
         {/* min-w-full keeps a narrow year left-aligned; a wide one overflows left and opens on the newest weeks. */}
         <div className="min-w-full shrink-0">
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className="block text-ink">
+          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden className="block text-foreground">
             {weeks.map((week, col) => {
               const first = week.contributionDays[0]?.date
               const prev = weeks[col - 1]?.contributionDays[0]?.date
@@ -69,7 +69,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
               return (
                 <g key={first ?? col}>
                   {showMonth && (
-                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption font-display text-muted-foreground">
+                    <text x={col * STEP} y={12} fill="currentColor" className="text-caption text-muted-foreground">
                       {formatDay(first, { month: "short" })}
                     </text>
                   )}
@@ -87,7 +87,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
                         stroke="hsl(var(--rule-strong))"
                         strokeWidth={1}
                         shapeRendering="crispEdges"
-                        className="hover:stroke-ink"
+                        className="hover:stroke-foreground"
                         data-tip={`${count.toLocaleString("en")} ${count === 1 ? unit[0] : unit[1]} on ${formatDay(day.date, { day: "numeric", month: "short", year: "numeric" })}`}
                       />
                     )

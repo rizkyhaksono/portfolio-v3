@@ -51,14 +51,14 @@ export default async function ProjectPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle font-display text-h1 text-balance text-ink">Projects</h1>
+        <h1 className="speckle text-h1 text-balance text-foreground">Projects</h1>
         {projects.length > 0 && (
-          <p className="mt-4 font-display text-caption tabular-nums text-ink-soft">
+          <p className="mt-4 text-caption tabular-nums text-muted-foreground">
             {projects.length.toLocaleString("en")} projects on record, the featured work first.
           </p>
         )}
       </header>
-      <div aria-hidden className="border-t border-ink" />
+      <div aria-hidden className="border-t border-foreground" />
 
       {projects.length === 0 && (
         <StatusLine kind="empty" className="mt-8">
@@ -68,21 +68,21 @@ export default async function ProjectPage() {
 
       {featured.length > 0 && (
         <section aria-labelledby="featured" className="mt-12">
-          <h2 id="featured" className="font-display text-h2 text-ink">
+          <h2 id="featured" className="text-h2 text-foreground">
             Featured
           </h2>
-          <div className="mt-6 border-t border-ink">
+          <div className="mt-6 border-t border-foreground">
             {featured.map((project) => {
               const plate = plateOf(project)
               return (
-                <article key={project.id} className="grid gap-6 border-b border-rule py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:gap-10">
+                <article key={project.id} className="grid gap-6 border-b border-border py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:gap-10">
                   <div className="min-w-0">
-                    <h3 className="font-display text-h3 text-balance text-ink">
+                    <h3 className="text-h3 text-balance text-foreground">
                       <InkLink href={`/project/${project.id}`} className="no-underline hover:underline">
                         {project.title}
                       </InkLink>
                     </h3>
-                    <p className="mt-3 line-clamp-4 max-w-[66ch] text-body text-ink-soft">{plainText(project.description)}</p>
+                    <p className="mt-3 line-clamp-4 max-w-[66ch] text-body text-muted-foreground">{plainText(project.description)}</p>
                     <ReaderCount path={`/project/${project.id}`} reads={reads} className="mt-3" />
                     <ProjectLinks project={project} className="mt-3" />
                   </div>
@@ -102,7 +102,7 @@ export default async function ProjectPage() {
 
       {rest.length > 0 && (
         <section aria-labelledby="more" className={SECTION_SPACING.section}>
-          <h2 id="more" className="font-display text-h2 text-ink">
+          <h2 id="more" className="text-h2 text-foreground">
             {featured.length > 0 ? "More projects" : "All projects"}
           </h2>
           <LedgerList className="mt-6">

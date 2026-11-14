@@ -55,7 +55,7 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
                   <Link
                     href={href}
                     aria-current={isCurrentPath(pathname, href) ? "page" : undefined}
-                    className="flex min-h-12 items-center font-display text-h2 leading-tight text-ink decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
+                    className="flex min-h-12 items-center text-h2 leading-tight text-foreground decoration-1 underline-offset-[0.2em] hover:underline aria-[current=page]:underline aria-[current=page]:decoration-2"
                     {...navTrack(href, "menu")}
                   >
                     {label}
@@ -70,7 +70,7 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
                 <SheetClose asChild>
                   <Link
                     href={href}
-                    className="inline-flex min-h-11 items-center text-small text-ink-soft decoration-1 underline-offset-[0.18em] hover:text-ink hover:underline"
+                    className="inline-flex min-h-11 items-center text-small text-muted-foreground decoration-1 underline-offset-[0.18em] hover:text-foreground hover:underline"
                     {...navTrack(href, "menu")}
                   >
                     {label}
@@ -81,17 +81,17 @@ export function ContentsSheet({ open, onOpenChange, returnFocus }: Readonly<Cont
           </ul>
         </nav>
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-rule px-5 py-4">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border px-5 py-4">
           <RadioGroup value={theme} onValueChange={chooseTheme} aria-label="Theme" className="flex gap-x-5 gap-y-0">
             {THEMES.map(({ value, label }) => (
-              <Label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 text-small font-normal text-ink">
+              <Label key={value} className="flex min-h-11 cursor-pointer items-center gap-2 text-small font-normal text-foreground">
                 <RadioGroupItem value={value} />
                 {label}
               </Label>
             ))}
           </RadioGroup>
           <SheetClose asChild>
-            <Link href="/profile" className="inline-flex min-h-11 items-center text-small font-semibold text-ink underline decoration-1 underline-offset-[0.18em] hover:decoration-2" {...navTrack("/profile", "menu")}>
+            <Link href="/profile" className="inline-flex min-h-11 items-center text-small font-semibold text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2" {...navTrack("/profile", "menu")}>
               Account
             </Link>
           </SheetClose>

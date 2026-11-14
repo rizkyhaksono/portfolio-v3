@@ -159,7 +159,7 @@ export function ContactForm() {
         <Button type="submit" disabled={busy}>
           {busy ? "Sending…" : "Send the message"}
         </Button>
-        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 font-display text-small text-ink">
+        <p id="contact-status" aria-live="polite" className="flex items-start gap-1.5 text-small text-foreground">
           {status.kind === "sent" && (
             <>
               <Check aria-hidden strokeWidth={1.5} className="mt-0.5 size-4 shrink-0" />
