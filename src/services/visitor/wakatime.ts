@@ -4,13 +4,11 @@ export const getReadStats = async (): Promise<{
   status: number;
   data: any;
 }> => {
-  const response = await fetch(`${STATS_ENDPOINT}/last_7_days`, {
+  // Public profile: no key. all_time is a large payload WakaTime may compute slowly, hence the longer wait.
+  const response = await fetch(STATS_ENDPOINT, {
     next: { revalidate: 3600 },
-    signal: AbortSignal.timeout(4000),
+    signal: AbortSignal.timeout(8000),
     method: "GET",
-    headers: {
-      Authorization: `Basic ${process.env.WAKATIME_API_KEY}`,
-    },
   });
 
   const status = response.status;

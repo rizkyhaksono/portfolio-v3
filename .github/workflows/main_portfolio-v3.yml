@@ -55,7 +55,6 @@ jobs:
           NEXT_PUBLIC_NPM_USERNAME: ${{ secrets.NEXT_PUBLIC_NPM_USERNAME }}
           GH_READ_USER_TOKEN_PERSONAL: ${{ secrets.GH_READ_USER_TOKEN_PERSONAL }}
           DEVTO_KEY: ${{ secrets.DEVTO_KEY }}
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
           # The runner cannot reach the internal Umami/API hosts, so prerender uses the public ones.
           UMAMI_API_URL: ${{ secrets.UMAMI_API_URL }}
           UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
@@ -65,7 +64,7 @@ jobs:
         run: |
           # The tracker has no fallback id any more; fail here instead of shipping without analytics.
           : "${NEXT_PUBLIC_UMAMI_SRC:?secret not set}" "${NEXT_PUBLIC_UMAMI_WEBSITE_ID:?secret not set}"
-          env | grep -E '^(DOMAIN|API_URL|NEXT_PUBLIC_|SUPABASE_|GH_READ_|DEVTO_|WAKATIME_|UMAMI_|MONKEYTYPE_)' \
+          env | grep -E '^(DOMAIN|API_URL|NEXT_PUBLIC_|SUPABASE_|GH_READ_|DEVTO_|UMAMI_|MONKEYTYPE_)' \
             | grep -v '=$' > "$RUNNER_TEMP/buildenv"
 
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
