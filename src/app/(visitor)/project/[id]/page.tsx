@@ -10,7 +10,7 @@ import ClapButton from "@/components/ui/clap-button"
 import { httpUrl } from "@/lib/utils"
 import ProjectImageViewer from "./_components/project-image-viewer"
 import { ProjectLinks, plateOf } from "../project-links"
-import { safeHtml } from "../safe-html"
+import { RichText } from "../rich-text"
 
 export const revalidate = 3600
 
@@ -58,7 +58,7 @@ export default async function ProjectDetailPage({ params }: Readonly<Props>) {
       prev={link(projects[index - 1])}
       next={link(projects[index + 1])}
     >
-      <div className="[&>*+*]:mt-[0.75em]" dangerouslySetInnerHTML={{ __html: safeHtml(project.description) }} />
+      <RichText className="[&>*+*]:mt-[0.75em]" html={project.description} />
     </ArticleShell>
   )
 }

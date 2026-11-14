@@ -6,6 +6,7 @@ import { FADE_IN } from "@/components/ui/page-loading"
 import ClapButton from "@/components/ui/clap-button"
 import { PlateFigure } from "@/components/ui/plate-figure"
 import { safeHtml } from "@/app/(visitor)/project/safe-html"
+import { RichText } from "@/app/(visitor)/project/rich-text"
 import { ArticleJsonLd } from "@/app/_components/blog/article-json-ld"
 import { articleProperties } from "@/app/_components/blog/article-properties"
 import { minutesToRead } from "@/app/_components/blog/format"
@@ -88,7 +89,7 @@ export default async function OnsiteArticlePage({ params }: Props) {
         }
       >
         {/* Nested `.prose` so the stored HTML gets the same block spacing as direct children. */}
-        <div className="prose" dangerouslySetInnerHTML={{ __html: content }} />
+        <RichText className="prose" html={post.content ?? ""} />
       </ArticleShell>
     </>
   )
