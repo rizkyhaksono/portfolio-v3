@@ -48,7 +48,7 @@ const COMMANDS: Command[] = [
   {
     name: "whoami",
     description: "About me",
-    run: () => ["Muhammad Rizky Haksono", `${JOB_TITLE} — RAG, LLMs, multi-cloud.`, "Type `socials` to connect, `open /project` to see my work."],
+    run: () => ["Muhammad Rizky Haksono", `${JOB_TITLE}: RAG, LLMs, multi-cloud.`, "Type `socials` to connect, `open /project` to see my work."],
   },
   {
     name: "ls",
@@ -108,7 +108,7 @@ const COMMANDS: Command[] = [
 ]
 
 const WELCOME: Line[] = [
-  { kind: "out", text: "rizky-os v3 — type `help` to begin, `exit` to close." },
+  { kind: "out", text: "rizky-os v3. Type `help` to begin, `exit` to close." },
 ]
 
 export default function TerminalOverlay() {
@@ -163,7 +163,7 @@ export default function TerminalOverlay() {
       }
 
       if (!command) {
-        setLines((prev) => [...prev, { kind: "out", text: `command not found: ${name} — try \`help\`` }])
+        setLines((prev) => [...prev, { kind: "out", text: `command not found: ${name}. Try \`help\`.` }])
         return
       }
       const out = command.run(args, ctx)
@@ -199,7 +199,7 @@ export default function TerminalOverlay() {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-[10001] bg-[hsl(var(--scrim,var(--ink)/.35))] print:hidden" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[10001] bg-[hsl(var(--scrim))] print:hidden" />
         <DialogPrimitive.Content
           aria-describedby={undefined}
           onOpenAutoFocus={(e) => {
@@ -214,19 +214,19 @@ export default function TerminalOverlay() {
             returnFocusRef.current?.focus({ preventScroll: true })
           }}
           onClick={() => inputRef.current?.focus()}
-          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col border border-foreground bg-background text-foreground shadow-[3px_3px_0_hsl(var(--ink))] print:hidden"
+          className="fixed inset-x-4 top-[12vh] z-[10001] mx-auto flex h-[60vh] max-h-[520px] max-w-2xl flex-col overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-float print:hidden"
         >
           <div className="flex shrink-0 items-center justify-between border-b border-border pl-4">
             <DialogPrimitive.Title className="text-caption text-muted-foreground">Terminal</DialogPrimitive.Title>
             <DialogPrimitive.Close
               aria-label="Close terminal"
-              className="inline-flex h-11 w-11 items-center justify-center hover:bg-muted md:h-9 md:w-9"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted md:h-9 md:w-9"
             >
               <X className="h-5 w-5" strokeWidth={1.5} aria-hidden />
             </DialogPrimitive.Close>
           </div>
 
-          <div ref={scrollRef} role="log" aria-live="polite" className="flex-1 overflow-y-auto p-4 text-[13.5px] leading-relaxed">
+          <div ref={scrollRef} role="log" aria-live="polite" className="flex-1 overflow-y-auto p-4 text-small">
             {lines.map((l, i) => (
               <samp key={i} className={cn("block whitespace-pre-wrap break-words", l.kind === "in" && "text-muted-foreground")}>
                 {l.kind === "in" ? `$ ${l.text}` : l.text}
@@ -244,7 +244,7 @@ export default function TerminalOverlay() {
                   spellCheck={false}
                   autoComplete="off"
                   autoCapitalize="off"
-                  className="flex-1 bg-transparent text-base text-foreground md:text-[13.5px]"
+                  className="flex-1 bg-transparent text-base text-foreground md:text-small"
                   aria-label="Terminal input"
                 />
               </kbd>

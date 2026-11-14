@@ -35,7 +35,7 @@ function Masthead() {
         <p className="masthead__job text-pretty text-lead text-muted-foreground">{JOB_TITLE} at Sarana AI, Malang, East Java.</p>
         <h1
           id="masthead-name"
-          className="speckle mt-[0.15em] translate-y-[0.2em] text-display text-foreground [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
+          className="mt-[0.15em] translate-y-[0.2em] text-display text-foreground [font-size:min(21vw,13svh)] sm:whitespace-nowrap sm:[font-size:min(12vw,22svh,11rem)]"
         >
           Rizky Haksono
         </h1>
@@ -57,7 +57,7 @@ function Lede() {
     <div className="ws">
       <InkedSentence
         className="max-w-[24ch] text-h1 text-foreground max-sm:text-[1.5rem]"
-        text="I build production AI systems — LLMs, RAG, agents and MCP — that ship, scale and stay up."
+        text="I build production AI systems: LLMs, RAG, agents and MCP, that ship, scale and stay up."
       />
       <ul className="mt-6 flex flex-wrap gap-x-6 text-body">
         <li>

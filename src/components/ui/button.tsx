@@ -5,27 +5,25 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-// One ink: solid, outline, or underline. Destructive is an outline with a cross and a verb, never red.
+// Destructive keeps its cross, so the danger never rests on colour alone.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none font-sans text-[15px] font-semibold not-italic leading-tight transition-[color,background-color,transform] [transition-duration:var(--dur-press)] [transition-timing-function:var(--ease-print)] active:translate-y-px disabled:pointer-events-none disabled:border-dashed disabled:border-input disabled:text-muted-foreground [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-body font-medium transition-[background-color,transform] duration-[var(--dur-press)] ease-out motion-safe:active:scale-[.98] disabled:pointer-events-none disabled:opacity-50 [@media(pointer:coarse)]:min-h-11 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        // Disabled is a dashed empty slot in tokens, not a faded fill (opacity greys the ink in Night print).
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 disabled:border disabled:bg-muted",
-        destructive:
-          "border border-destructive bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground",
-        outline: "border border-foreground bg-transparent text-foreground hover:bg-muted",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-border/60",
-        ghost: "text-foreground decoration-1 underline-offset-[0.18em] hover:underline",
-        link: "text-foreground underline decoration-1 underline-offset-[0.18em] hover:decoration-2",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-border bg-background text-foreground hover:bg-muted",
+        secondary: "bg-muted text-foreground hover:bg-muted/70",
+        ghost: "text-foreground hover:bg-muted",
+        link: "text-foreground underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-10 px-4 py-2",
+        default: "h-9 px-4",
         sm: "h-8 px-3 text-small",
-        lg: "h-11 px-6",
-        xl: "h-12 px-7 text-base",
-        icon: "h-10 w-10 [@media(pointer:coarse)]:min-w-11",
+        lg: "h-11 px-5",
+        xl: "h-12 px-6",
+        icon: "size-9 [@media(pointer:coarse)]:min-w-11",
       },
     },
     defaultVariants: {

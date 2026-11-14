@@ -27,7 +27,7 @@ export function AuthShell({ title, standfirst, footer, panel, children }: Readon
     >
       {panel && (
         // Reversed out of the ink like a cut in a newspaper: paper type on ink, which flips with the theme.
-        <aside className="ink-grain hidden bg-foreground p-8 text-background md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
+        <aside className="hidden bg-foreground p-8 text-background md:flex md:flex-col md:justify-between md:gap-16 lg:p-12">
           <Logo variant="mini" className="w-20" />
           {panel}
         </aside>
@@ -40,7 +40,7 @@ export function AuthShell({ title, standfirst, footer, panel, children }: Readon
         </Link>
 
         <header className="mt-10 pb-6">
-          <h1 className="speckle text-h2 text-balance text-foreground">{title}</h1>
+          <h1 className="text-h2 text-balance text-foreground">{title}</h1>
           {standfirst && <p className="mt-3 max-w-[46ch] text-pretty text-lead text-muted-foreground">{standfirst}</p>}
         </header>
         <div aria-hidden className="border-t border-foreground" />

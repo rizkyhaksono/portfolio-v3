@@ -13,7 +13,7 @@ export { SHELL_WIDTH }
 /** Sticky running head: wordmark, sections, theme, account; Contents below 1024px. */
 export function RunningHead() {
   return (
-    <header data-print-hide className="bg-paper-grain sticky top-0 z-40 border-b border-border">
+    <header data-print-hide className="bg-background sticky top-0 z-40 border-b border-border">
       <div className={cn(SHELL_WIDTH, "flex h-[var(--head-h)] items-center gap-4 xl:gap-6")}>
         <Link
           href="/"

@@ -13,7 +13,7 @@ interface StatusLineProps {
 export function StatusLine({ kind, children, action, className }: Readonly<StatusLineProps>) {
   if (kind === "failed") {
     return (
-      <div role="alert" className={cn("flex flex-col items-start gap-3 border border-foreground p-4 sm:flex-row sm:items-center sm:gap-6", className)}>
+      <div role="alert" className={cn("flex flex-col items-start gap-3 rounded-xl border border-border p-4 sm:flex-row sm:items-center sm:gap-6", className)}>
         <p className="flex gap-2 text-body text-foreground">
           <X aria-hidden strokeWidth={1.5} className="mt-1 size-4 shrink-0" />
           <span>{children}</span>

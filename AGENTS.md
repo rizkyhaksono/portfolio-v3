@@ -1,154 +1,219 @@
-# AGENTS.md — Portfolio v3
+# AGENTS.md: Portfolio v3
 
-Canonical instructions for **any** coding agent working in this repository (Cursor, Claude, Codex, Gemini, Copilot, and others). Platform files add tooling notes only. For UI, [`docs/ui/`](docs/ui/README.md) is the source of truth and wins over every summary, this one included.
+Canonical instructions for **any** coding agent in this repository (Claude, Cursor, Codex, Gemini, Copilot and others). Platform files point here and add tooling notes only. For UI, [`docs/ui/`](docs/ui/README.md) is the source of truth and wins over every summary, this one included.
 
-You are an expert full-stack TypeScript engineer. Produce production-ready code that follows modern Next.js App Router patterns and best practices.
+You are an expert full-stack TypeScript engineer. Produce production-ready code that follows modern Next.js App Router patterns.
 
-## Tech Stack
+## Tech stack
 
-- **Next.js 16** (App Router) + React 19
-- **TypeScript** (strict mode)
-- **Styling**: Tailwind CSS 3 (not v4) + shadcn/ui primitives restyled to the one-ink system
-- **Testing**: Jest + React Testing Library (unit), Playwright (e2e)
-- **Package Manager**: bun
+- **Next.js 16** (App Router) and React 19
+- **TypeScript**, strict mode
+- **Styling:** Tailwind CSS 3 (not v4) and shadcn/ui primitives restyled to the Langit Malang tokens
+- **Testing:** Jest and React Testing Library (unit), Playwright (e2e)
+- **Package manager:** bun
 
-## AI Instruction Map
+## AI instruction map
 
 | Platform | Entry file | Extra |
 |---|---|---|
-| **All agents** | `AGENTS.md` (this file) | — |
+| **All agents** | `AGENTS.md` (this file) | |
 | **Claude** | `CLAUDE.md` | `.claude/` |
 | **Cursor** | `.cursorrules` | `.cursor/rules/*.mdc` |
-| **Gemini** | `.geminirules` / `GEMINI.md` | — |
-| **Copilot** | `.github/copilot-instructions.md` | — |
-| **UI system (source of truth)** | `docs/ui/README.md` | `src/app/globals.css`, `tailwind.config.ts`, `src/lib/design-system.ts` |
+| **Gemini** | `.geminirules`, `GEMINI.md` | |
+| **Copilot** | `.github/copilot-instructions.md` | |
+| **UI system (source of truth)** | `docs/ui/README.md` | `src/app/globals.css`, `tailwind.config.ts`, `src/lib/design-system.ts`, `src/lib/theme-hex.ts` |
 
-Always read `prd/feature.md` and `prd/progress.md` before starting feature work; update `prd/progress.md` after completing tasks.
+Read `prd/feature.md` and `prd/progress.md` before feature work; update `prd/progress.md` when a task is done.
 
-## Architectural Guidelines
+## Architectural guidelines
 
-1. **React Server Components (RSC):** Default to Server Components. Add `'use client'` only at the top of files requiring state, hooks, interactivity, or browser APIs. Keep client islands small.
-2. **Component Organization:**
+1. **React Server Components:** default to Server Components. Add `'use client'` only to files that need state, hooks, interactivity or browser APIs. Keep client islands small.
+2. **Component organisation:**
    - Routes belong in `app/`.
-   - Reusable UI elements belong in `components/ui/`.
-   - Feature-specific code belongs in `components/[feature]/` or `app/_components/`.
-3. **TypeScript:** Use explicit `interface` or `type` for all props and state. Avoid `any`.
+   - Reusable UI belongs in `components/ui/`.
+   - Feature code belongs in `components/[feature]/` or `app/_components/`.
+3. **TypeScript:** explicit `interface` or `type` for all props and state. No `any`.
 4. **Styling:**
-   - Use Tailwind utility classes and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, `.plate`, `.engraving`, `.ws`, grain) lives in `src/app/globals.css`.
-   - Use `cn()` from `@/lib/utils` for conditional class merging.
-   - Mobile-first responsive design; no horizontal scroll at 375px.
-5. **Code Quality:** Keep functions small. Abstract complex or repetitive logic into hooks or `lib/`. No superfluous comments — names should be self-documenting.
-6. **Package manager:** Use **bun** (`bun install`, `bun run`, `bunx`). Never npm, pnpm or yarn.
+   - Tailwind utilities and the tokens in `docs/ui/design-system.md`. Shared CSS (`.prose`, the `.sky` block, view transitions) lives in `src/app/globals.css`.
+   - `cn()` from `@/lib/utils` for conditional classes.
+   - Mobile first; no horizontal scroll at 320 or 375px.
+5. **Code quality:** small functions; repeated logic goes into hooks or `lib/`. Comment only the why the code cannot show.
+6. **Package manager:** **bun** (`bun install`, `bun run`, `bunx`). Never npm, pnpm or yarn.
 
 ## UI rules (mandatory)
 
-Design brief: the whole site is one cobalt ink printed on cream paper, set in Plus Jakarta Sans, with riso grain, radius 0, hairline rules, duotone plates and a Hollar engraving band in the colophon. The home hero is a fixed print plate after the "Jakarta Sans" specimen: a dotted cobalt sky, the name in cream, and the Bromo plate (Greive after Salm, 1869) re-cut as contour hatching, its peaks rising in front of the letters. The site opens in Paper (light); dark mode ("Night print") is the same sheet reversed: cream ink on the hero's cobalt, and the menu sheet offers Paper, Night and System. The old monochrome / grayscale rules, the black-and-white orange-accent look of 1.6.0 (reverted in 1.7.0), Instrument Serif, Bricolage Grotesque, Inter, JetBrains Mono, `MacWindow` panels and every earlier logo are retired. Do not bring them back.
+Full detail: [`docs/ui/README.md`](docs/ui/README.md) (source of truth), [`design-system.md`](docs/ui/design-system.md), [`surfaces.md`](docs/ui/surfaces.md), [`page-shell.md`](docs/ui/page-shell.md), [`components.md`](docs/ui/components.md), [`platforms.md`](docs/ui/platforms.md).
 
-- Docs: [`docs/ui/README.md`](docs/ui/README.md) (source of truth)
-- Agent rule: `.cursor/rules/ui-layout-consistency.mdc`
+### Identity: Langit Malang
 
-### Ink and paper
+A calm, elegant, Apple-like look, equally good in light and dark: large tight semibold headlines, generous whitespace, soft large radii, quiet grey surfaces, one translucent sticky bar and slow eased motion. One font family, Onest. The one bold element is **the sky**: a blue band at the top of visitor pages whose colour follows the time of day in Malang (WIB), and the night sky in dark mode. Everything else is quiet.
 
-| Tailwind colour | Paper | Night | Role |
-|---|---|---|---|
-| `paper` | #F3ECDC | #1E3C9E | Page, card, text on solid ink |
-| `ink` | #1E3C9E | #F3ECDC | Text, icons, strong rules, solid button, focus, charts, engraving |
-| `ink-soft` | #445BAA | #E6D9BC | Secondary text (on paper or tint only) |
-| `rule` | #BFC6DE | #4E67BC | Decorative hairlines |
-| `rule-strong` | #6476B2 | #90A3DF | Control boundaries |
-| `tint` | #E2E4EB | #142C7B | Hover row, code ground, inset |
+- **Public site:** a centred layout. One 640px column; the name, page headers, section titles and footer are centred; prose, lists and rows are left-aligned inside the column. Media breaks out to 768px; `/tools` and `/chat` use the 960px wide column.
+- **Admin:** full width. A sidebar, a top bar, and content that fills the rest. No sky, no markers.
+- **Themes:** `defaultTheme="system"`; labels Light, Dark and System; every change goes through `switchTheme()`.
+- **Name and icon:** the name "Rizky Haksono" as text in Onest 600. The favicon is a plain "R" tile. There is no logo mark.
 
-shadcn names (`background`, `foreground`, `muted`, `border`, `input`, `primary`, ...) map onto these. No other hue, no hex, no `white` / `black`, no `dark:` classes (tokens flip on `<html class="dark">`). Status is shape plus word, never colour.
+### Tokens
+
+HSL triples in `src/app/globals.css` (`:root` light, `.dark` dark), exposed in `tailwind.config.ts` under the shadcn names. Hex copies live only in `src/lib/theme-hex.ts` (`THEME_HEX.light`, `THEME_HEX.dark`) for theme-color, the manifest, `global-error.tsx` and the OG and certificate cards.
+
+| Token | Class | Light | Dark | Role |
+|---|---|---|---|---|
+| `--background` | `bg-background` | #F8F8F6 | #1A1A19 | The page |
+| `--foreground` | `text-foreground` | #1F201D | #ECECE8 | Text, icons, primary button, focus ring |
+| `--muted-foreground` | `text-muted-foreground` | #62635E | #A3A49E | Secondary text, meta, nav |
+| `--border` | `border-border` | #E2E2DE | #30312D | Hairlines, decoration only |
+| `--muted` | `bg-muted` | #EFEFEB | #242522 | Tiles, hover rows, code, segmented tracks |
+| `--input` | `border-input` | #85867F | #71726C | Borders of controls (3:1) |
+| `--popover` | `bg-popover` | #FFFFFF | #232322 | Floating layers |
+| `--destructive` | `text-destructive` | #B42318 | #F97066 | Destructive actions and errors, admin only, always with a word |
+| `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent: the sky band |
+| `--sky-wash` | `bg-sky-wash` | #D9E6F4 | #203247 | Accent: the `Marker` fill |
+
+Derived: `--card` is background; `--primary` and `--ring` are foreground; `--secondary` and `--accent` are muted; `--radius` is `.75rem`. Motion variables: `--dur-press` 120ms, `--dur-ui` 200ms, `--dur-sheet` 280ms, `--ease-out` `cubic-bezier(.25,.1,.25,1)` (class `ease-out`). `--scrim` fills the backdrop behind modals.
+
+- **The accent has exactly two uses:** the sky band and the `Marker` highlight (`bg-sky-wash`, at most one phrase per page). Never links, buttons, focus, charts, icons or hover.
+- No hex, no `white` / `black`, no palette colours (`gray-500`, `blue-600`), no `dark:` classes: every token flips on `<html class="dark">`.
+- Text never takes an opacity modifier; use `text-muted-foreground`. Controls use `border-input`, not `border-border`.
+- State is an icon plus a word (`StatusLine`), never colour alone.
+- **Contrast guard:** `src/__tests__/unit/lib/contrast.test.ts` reads the triples and fails below the floors in both themes (foreground 7:1, muted-foreground 4.5:1, including over every sky stop; input 3:1; text on sky-wash 4.5:1) and checks `THEME_HEX` against the tokens. Change a token, change `theme-hex.ts` in the same commit.
 
 ### Type
 
-Plus Jakarta Sans only (`next/font/google`, one variable family, roman and italic, `--font-sans`; `font-display` is the same face). Weight and tracking carry the hierarchy, set on the size tokens: display 600 at -0.04em, h1 700 at -0.025em, h2 700 at -0.02em, h3 and h4 600, numerals 600, body and prose 400. Italic only for pull quotes and cited titles. System mono only for code, slugs, keys, raw JSON and kbd. The OG and certificate cards use a static Plus Jakarta Sans 600 WOFF from `src/assets/fonts/`.
+One family, **Onest** (variable, OFL), loaded once with `next/font/google` in `src/app/layout.tsx` as `--font-sans`. Site, admin and the OG and certificate cards all use it. System mono (`font-mono`) only for code. There is no second face and no `font-display`.
 
-The scale is compact and fluid (375 to 1280px), set as `fontSize` keys in `tailwind.config.ts`: `body` 15 to 16px, `prose` 16 to 17, `lead` 17 to 19, `h3` 18 to 20, `h2` 22 to 30, `h1` 30 to 44, `display` 44 to 104, `small` 13, `caption` and `xs` 12. Section rhythm is `SECTION_SPACING.section` (`mt-12 sm:mt-16`, 48px on phones, 64px from `sm`). Use the keys, never ad-hoc sizes. Full table: [`docs/ui/design-system.md`](docs/ui/design-system.md).
+| Key | Size / line height | Weight | Tracking |
+|---|---|---|---|
+| `caption` | 12 / 16 | 400 | |
+| `small` | 13 / 20 | 400 | |
+| `body` | 15 / 24 | 400 | |
+| `prose` | 17 / 28 | 400 | |
+| `lead` | 19 / 28 | 400, muted | |
+| `h4` | 15 / 24 | 500 | |
+| `h3` | 19 / 26 | 600 | -0.01em |
+| `h2` | 24 / 30 | 600 | -0.015em |
+| `h1` | 40 / 44, 32 on phones | 600 | -0.02em |
+| `display` | 56 / 60, 40 on phones (home name only) | 600 | -0.025em |
+| `numeral` | 32 / 36 | 600 | tabular |
 
-### Brand: the RH mark
+- Weights 400, 500 and 600 only. Onest has no italic and font synthesis is off, so never rely on italics.
+- Sizes only from the keys: never `text-[Npx]`. Tracking only from the keys: never `tracking-[…]`. No `uppercase`.
+- Inputs use 16px on phones. `tabular-nums` in rows, tables and figures.
 
-One RH monogram in the one ink (cobalt on cream, cream on night). Always place it through `<Logo variant="mini" | "mark" | "tile">` from `src/components/ui/logo.tsx`: `mini` is the glyph in `currentColor` (running head, admin spine), `mark` adds four registration ticks in ink at 60% opacity (colophon, 404, auth, locked Etan AI view), `tile` reverses the glyph out of an ink square. Never paste the SVG or recolour it. Art is generated by `node scripts/logo/make.mjs` (Node 22.18 or newer, no other input); never hand-edit `logo-art.ts`, `src/app/icon.svg`, `apple-icon.png`, `favicon.ico` or `public/brand/*`. `favicon.ico` must stay at `src/app/favicon.ico`: the container healthcheck fetches `/favicon.ico`. Details: [`docs/ui/README.md`](docs/ui/README.md).
+### Shape, shadow, blur
 
-### Three surfaces
+- **Radii grow with the surface:** fields and buttons `rounded-lg`, chips and badges `rounded-md`, floating layers `rounded-xl`, tiles and cards `rounded-2xl`, dots, switches, radios and avatars `rounded-full`. Never `rounded-[…]`.
+- **Surfaces** ([surfaces.md](docs/ui/surfaces.md)): page (no box), tile (`bg-muted`, no border, no shadow), frame (hairline `border-border`), float (`bg-popover`, `shadow-float`). One surface per level.
+- **`shadow-float`** only on floating layers (dialog, sheet, menu, popover, select content, hover tip, toasts, terminal overlay), applied inside the shared primitives. Nothing on the page casts a shadow.
+- **One blur:** the translucent sticky header in `running-head.tsx` (`backdrop-blur-md`). Scrims are a fixed fill, never blurred.
+- **Gradients** only in `globals.css` and the sky (`sky.tsx`).
 
-1. **Frame** — 1px `rule` hairline on paper, transparent ground: `Card`, `Surface variant="solid"`.
-2. **Inset** — `tint` ground for nested rows, code and hover rows: `Surface variant="inset"`.
-3. **Lift** — `bg-paper border border-ink shadow-[3px_3px_0_hsl(var(--ink))]`, floating layers only (dialog, sheet, popover, menu, tooltip, select, command, toast). Already applied inside the shared primitives.
+### The sky
 
-Radius 0 (the radio dot is the only circle). No gradients, glass, blur, glows or soft shadows. Page heads sit on a single 1px ink rule; never stack rules.
+`Sky` (`src/components/ui/sky.tsx`) is mounted by `BaseLayout`: the full band with clouds on home, a shorter static band on other visitor pages, nothing in the admin. It is `aria-hidden` and `pointer-events-none`. The phase (`skyPhase()` in `src/lib/malang-time.ts`: dawn, day, dusk, evening in WIB) sets `data-sky` on mount and crossfades over 600ms; the server renders the day stop. Dark mode is always the night sky with static stars. Clouds drift on a slow loop (about 90s), are pre-blurred shapes (never `filter: blur`), are hidden below `sm`, and stop for reduced motion, a hidden tab, or the pause button beside the theme toggle ("Pause the sky" / "Play the sky", `aria-pressed`, saved in localStorage). Stop colours live only in the `.sky` block of `globals.css`.
+
+### Motion
+
+All CSS or platform native. The complete list:
+
+1. **Route crossfade:** React `ViewTransition` around the `BaseLayout` content, opacity only (out 140ms, in 200ms). The header and footer stay still.
+2. **Project morph:** the `MediaCard` image and the project hero share `project-<id>` (320ms).
+3. **Theme crossfade:** `switchTheme()` wraps the change in a view transition.
+4. **Link underline:** dotted muted to solid foreground, 150ms.
+5. **Card hover:** the media image scales to 1.015 over 400ms, only under `(hover: hover)` and `motion-safe`.
+6. **The sky:** slow clouds with a pause control.
+
+Floating layers keep their Radix fade (150 to 280ms). Anything else that responds to input uses `--dur-*` and `ease-out`.
+
+**Reduced motion:** the global kill switch stays; every `::view-transition-*` gets `animation: none`; `switchTheme()` skips the view transition; the sky is static; card images do not scale. With `reducedMotion: 'reduce'`, `document.getAnimations().length` must be 0.
+
+**Banned:** scroll reveal and fade-up on sections, parallax, scroll-jacking or anything tied to scroll position, marquees, typing effects, custom cursors, pulsing and bouncing (`animate-ping`, `animate-bounce`, pulse skeletons), hover lifts, autoplaying media, framer-motion, `motion`, GSAP, Lenis or any other animation library.
+
+### Banned outright
+
+- `dark:` classes
+- Raw hex, `white` / `black` and Tailwind palette colours in components
+- Gradients outside `globals.css` and the sky; blur outside the header
+- `uppercase`, `tracking-[…]`, `text-[Npx]`, `rounded-[…]`
+- framer-motion, `motion`, GSAP, Lenis
+- Em dashes in UI copy, generic CTAs, buzzwords
+- Glass cards, soft shadows on the page, hover lifts, window chrome
+- Any class, variable or asset from the old design (see gate rules R1, R1b and R1c)
 
 ### Page patterns
 
 | Pattern | Component | Routes |
 |---|---|---|
-| Ledger | `ui/ledger.tsx` | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
-| Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
-| Cabinet | `tools/_components/tool-shell.tsx` + `ui/pager.tsx` | `/tools`, `/ai` |
-| Correspondence | Letters column, replies behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
-| Admin | Ruled spine, `--admin-rail` | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` |
-| Profile card | Double-rule sheet, definition list | `/profile`, `/profile/edit`, admin settings |
+| Ledger | `ui/ledger.tsx`: rows grouped by year, hover `bg-muted` | `/blog` rows, `/certificates`, `/changelog`, `/roadmap`, `/project` rows, home Writing and Work |
+| Article | `ui/article-shell.tsx`: centred header, contents in the margin from `xl`, `<details>` below | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
+| Media | `MediaCard`, `ui/plate-figure.tsx`: a picture on a `bg-muted` tile, `rounded-2xl`, in its own colours | Home Projects, `/project` featured, the `/blog` lead post, covers |
+| Cabinet | `tools/_components/tool-shell.tsx`, `ui/pager.tsx`, `width="wide"` | `/tools`, `/ai` |
+| Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home contact, admin Feedback |
+| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar`: solid fills, text alternatives | `/stats`, admin Home and Analytics |
+| Admin | `components/layout/admin/*`: full width, sidebar, peek sheet | `/admin/dashboard/*` |
+| Auth | `layout/auth-shell.tsx`: one centred column | `/auth/*`, `/admin/auth/login` |
+| Profile card | A definition list in a frame | `/profile`, `/profile/edit`, admin Settings |
 | Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states |
 
-Shell: `BaseLayout` (`bleed?`, `footer?: 'full' | 'compact' | 'none'`) with running head, menu sheet and colophon. No sidebars. Details: [`docs/ui/page-shell.md`](docs/ui/page-shell.md), [`docs/ui/platforms.md`](docs/ui/platforms.md).
-
-Home: the masthead (`bleed` slot) is a `.masthead` section filling the first screen in the theme's own ink and paper (cobalt on cream in Paper, cream on cobalt in Night): the job line and the speckled name (the LCP element, one line from `sm`, two below) centred, and the Bromo plate (`src/assets/plates/bromo-2400.webp`, served unoptimized; Paper swaps its two inks through `#plate-swap`) along the bottom 56%, layered over the name so the peaks cut the foot of the letters and cover it as the name sinks while the hero scrolls away. The positioning sentence (24px floor on phones) and the three links sit just below on paper, and the sentence inks on its own view timeline. The Hollar band appears in the colophon; 404 carries no plate, and `/auth` sets the form beside a reversed ink block (paper type on ink, `.ink-grain`) listing what an account is for. No site search. About carries the duotone portrait (a lazy `PlateFigure` in `src/app/_components/about/index.tsx`: an 18rem left column beside the prose from `md`, under the heading at up to 20rem on phones) and the prose with a bold drop cap.
+Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `bleed?`, `footer?: 'full' | 'compact' | 'none'`) with the translucent header, the sky, the menu sheet and the centred footer. No sidebars on visitor pages. One `PageHeader` per page. Details: [`page-shell.md`](docs/ui/page-shell.md), [`platforms.md`](docs/ui/platforms.md).
 
 Shared details agents trip on:
 
-- `PlateFigure` takes `tone?: "photo" | "color"`. `photo` (default) prints in duotone; `color` skips it and is for pictures that must keep their colour: anime and Pokémon pictures, the OCR upload, site-generated `/api/og` covers. The frame draws the focus outline when a control inside it is focused.
-- Generated cards: build URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=3`; bump it when a card's design changes so crawlers and CDNs refetch.
-- Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`, mounted once in the root layout). Not the native `title` attribute.
-- Contrast guard: `src/__tests__/unit/lib/contrast.test.ts` reads the token triples from `globals.css` and fails below the one-ink floors (ink on paper 7:1, ink-soft on paper and tint 4.5:1, rule-strong on paper 3:1, wordscroll ghost 3:1) in Paper and Night. Changing a token means updating `src/lib/print-hex.ts` too.
-- Themes: `ThemeProvider defaultTheme="light" enableSystem`. Labels are Paper, Night and System.
-
-### Motion
-
-- Tier 0 (no JS): native scroll, smooth anchor scroll, sticky layouts. `overflow-x: clip` on `html` and `main` only, never on `body`, never `overflow: hidden` / `auto` on a sticky ancestor.
-- Tier 1 (CSS scroll-driven, inside `@supports (animation-timeline: view())` and no-preference): the home lede wordscroll (on its own view timeline), the masthead cover (the name lags the page and sinks behind the plate, on the hero's own view timeline) and the reading hairline (articles and home). Nothing else.
-- Response motion only: underline, button press, tab underline, accordion, dialog and sheet fade, toasts.
-- **Banned:** parallax (beyond the masthead cover), marquees, typing effects, smooth cursor, page transitions, pulsing dots, fade-up or reveal on sections, hover lifts, Lenis, GSAP, `motion` / framer-motion.
+- Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`). Never the native `title` attribute.
+- Generated cards: build URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes.
+- `favicon.ico` must stay at `src/app/favicon.ico`: the container healthcheck fetches `/favicon.ico`.
+- Nav comes only from `src/commons/constants/navigation-menu.ts`.
 
 ### Copy
 
-Sentence case. No `uppercase`, no `tracking-[...]`, no all-caps eyebrows, no middle-dot meta strings, no mono small labels, no "→" on links, numbered markers only for real sequences (versions, stages, legal sections).
+- Sentence case everywhere. Plain verbs that say what happens ("Save changes", "Send message"); toasts echo the button ("Changes saved.").
+- No generic CTAs ("Learn more", "Click here", "Read more", "Get started", "Submit"). Name the destination ("All 27 projects").
+- No buzzwords ("seamless", "cutting-edge", "leverage", "unlock", "elevate", "supercharge").
+- No em dash in UI strings: use a comma, colon, full stop or "to". Comments may use one.
+- Honest states: empty says what is missing and what to do; loading is a static skeleton or a short line; errors say what happened and the next step, never "Oops". Home sections with no data hide; never show zeros, `NaN` or `-Infinity`.
+- No all-caps eyebrows, no middle-dot meta strings, no "→" after links. Numbers only for real sequences.
 
 ### Umami events
 
 - `data-umami-event` only on `<button>` and external `target="_blank"` links. On an internal `<a>` the tracker forces a full page reload.
 - Internal links use `data-track="nav-click"` plus `data-track-*` (for example `data-track-item="blog"`); a delegated listener forwards them. In code, call `track()` from `src/lib/analytics.ts`.
-- Kebab-case names, 50 characters or fewer, enum values only, one event per element. Never PII (emails, names, prompts, chat text, queries, ids, full URLs). Event table: [`docs/ui/components.md`](docs/ui/components.md).
+- Kebab-case names, 50 characters or fewer, enum values only, one event per element. Never PII (emails, names, prompts, chat text, queries, ids, full URLs). Event table: [`docs/ui/components.md`](docs/ui/components.md#umami-events).
 
-### Grep gate
+### The UI gate
 
-Both must print nothing for the paths you touched (`$PHASE_PATHS`); the final run uses `src content`. Token hex copies live only in `src/lib/print-hex.ts`, which the second command skips.
+The gate is the jest test `src/__tests__/unit/lib/ui-gate.test.ts`, run by `bun run test` in CI before every deploy. It scans `src/`, `content/` and `tailwind.config.ts`.
 
-```bash
-grep -rnIE "uppercase|tracking-[[]|(text|bg|border|from|to|via|ring|fill|stroke|divide|outline)-(green|red|yellow|orange|emerald|teal|violet|purple|blue|sky|indigo|amber|pink|rose|lime|cyan|neutral|zinc|slate|gray)-[0-9]{2,3}|shadow-(sm|md|lg|xl|2xl)|backdrop-blur|rounded-(sm|md|lg|xl|2xl|3xl|full)|dark:|BlurFade|from .motion|recharts" $PHASE_PATHS | grep -v "radio-group.tsx"
-grep -rnIE "\bfont-mono\b|bg-gradient|gradient-to|(text|bg|border|fill|stroke|ring|from|to|via)-(white|black)\b|[\"' ]rounded[\"' ]|rounded-\[|rounded-(t|b|l|r|tl|tr|bl|br)-|#[0-9a-fA-F]{6}\b|text-(foreground|primary|muted-foreground)/[0-9]" $PHASE_PATHS content | grep -vE "code-block|kbd|api/(og|certificate)|lib/print-hex"
-```
+| Rule | Bans | Allowed in |
+|---|---|---|
+| R1 | Old token classes (`text-ink`, `bg-paper`, `bg-tint`, `border-rule` and the rest) and `font-display` | nowhere |
+| R1b | Old variables and identifiers: `PRINT_HEX`, `--paper`, `#1E3C9E` and so on | nowhere |
+| R1c | Old identity classes: `speckle`, `engraving`, `masthead`, `plate`, `bg-hatch` and so on | nowhere |
+| R2 | `dark:` | nowhere |
+| R3 | Raw colour: hex and palette colours | `src/lib/theme-hex.ts`, `globals.css`, the OG and certificate routes |
+| R4 | Arbitrary values: `rounded-[…]`, `text-[Npx]`, `tracking-[…]`, plus `uppercase` | nowhere |
+| R5 | Motion libraries: `framer-motion`, `motion`, `gsap`, `lenis`, `animate-bounce`, `animate-ping` | nowhere |
+| R6 | Gradients and blur | `globals.css`, `sky.tsx`, `running-head.tsx` |
+| R7 | Copy: em dash in UI strings, generic CTAs, buzzwords | nowhere |
 
-Every route is migrated and both commands print nothing over `src content`. Never add a new hit.
+Some rules carry a shrinking allowlist of files that still break them while the redesign lands. Each PR removes the files it fixes; the cleanup PR empties the lists. Never add a file to an allowlist or loosen a pattern: fix the file.
 
-## Development Workflow
+## Development workflow
 
-1. Read `prd/feature.md` → `prd/progress.md` → `docs/ui/` → existing patterns in code.
-2. Prefer shared primitives over ad-hoc bordered `div`s.
-3. Validate input at boundaries; fail fast; map errors cleanly.
-4. Keep UI accessible (`aria-current`, labels, keyboard navigation, 44px targets on mobile, chart text alternatives).
+1. Read `prd/feature.md`, then `prd/progress.md`, then `docs/ui/`, then the existing patterns in code.
+2. Prefer shared primitives over ad-hoc bordered `div`s. When you touch an old-look file, move it to the new rules; never copy an old pattern into new code.
+3. Validate input at boundaries; fail fast; map errors to honest messages.
+4. Keep UI accessible: visible focus, `aria-current`, labels, keyboard navigation, Esc closes and focus returns, 44px targets below `md` on coarse pointers (`min-h-11`), chart text alternatives.
 5. Update `prd/progress.md` when a task is done.
-6. Before claiming completion: `bunx tsc --noEmit`, `bun run test`, the grep gate on your paths, and `bun run build --webpack` for anything that touches routes or config.
+6. Before claiming completion: `bunx tsc --noEmit`, `bun run test` (includes the UI gate and the contrast guard), and `bun run build --webpack` for anything that touches routes or config.
 
 ## Acceptance checklist (UI)
 
-- [ ] Route uses one page pattern from the table above
-- [ ] Colours from ink / paper tokens only; no hex, palette colours, `white` / `black` or `dark:`
-- [ ] Only frame, inset or lift; no glass, gradients, blur or soft shadows
-- [ ] Plus Jakarta Sans weights from the size tokens; mono only for machine text
-- [ ] No banned motion; reduced motion prints everything fully
+- [ ] The route uses one page pattern from the table above
+- [ ] Colours from the tokens only; the sky accent only in the sky and the `Marker`
+- [ ] Onest sizes from the `fontSize` keys; weights 400, 500, 600; mono only for code
+- [ ] Radii from the scale; `shadow-float` only on floating layers; no blur outside the header
+- [ ] Only the listed motion; reduced motion stops all of it
+- [ ] Copy in sentence case, plain verbs, no em dash, no generic CTAs or buzzwords
 - [ ] Umami attributes follow the button / external-link rule
-- [ ] Pictures use `PlateFigure` (`tone="color"` only for pictures that keep their colour); the logo goes through `<Logo>`
-- [ ] Grep gate prints nothing for the touched paths
+- [ ] Visible focus and 44px targets on phones; no horizontal scroll at 320 or 375px
+- [ ] `bun run test` passes, including the UI gate

@@ -37,7 +37,7 @@ export default async function BlogPage() {
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle text-h1 text-balance text-foreground">Writing</h1>
+        <h1 className="text-h1 text-balance text-foreground">Writing</h1>
         <p className="mt-4 text-caption tabular-nums text-muted-foreground">
           {lead && `${sourcesSentence(posts)} `}
           {/* Plain anchor: a feed is not a page, so no client navigation or prefetch. */}

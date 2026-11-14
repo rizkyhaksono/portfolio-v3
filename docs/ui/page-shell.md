@@ -3,99 +3,123 @@
 ## Shell
 
 ```
-1024px and up
-  Running head (sticky, 52px, paper + grain, 1px rule below):
-    [RH mark]   Projects Writing Etan AI Chat Roadmap Tools Stats   [theme] [Account]
-  Bleed slot (home masthead only)
-  main#main (overflow-x: clip), wrapper max-w 76rem, side padding clamp(20px, 4vw, 48px)
-  Ink rule (single, 1px)
-  Colophon: RH mark beside name, role, email / Read, Try, Site columns / credit line / Send feedback, Back to top
-  Engraving band, full bleed, 100:26 (about 26vw tall), at most 440px, at least min(200px, 18svh)
+ ┌ translucent bar ─ Rizky Haksono     Projects Writing Roadmap Tools Stats Chat     [pause][theme] ┐
+   ░░░░░░░░░░ Langit Malang band (time-of-day blue), clouds drifting near the top (home only) ░░░░░░░░░░
+                                          (o)              72px portrait, centred
+                                    Rizky Haksono          display, centred
+                    Senior AI engineer at Sarana AI, Malang, East Java.   lead, muted, centred
 
-768px to 1023px   wordmark, Projects Writing Etan AI, [Search] [menu icon]
-under 768px       wordmark, [menu icon]   (48px head, 44px targets)
+                I'm Rizky, a senior AI engineer at Sarana AI in Malang. I build LLM systems
+                for production ... [marked phrase] ...                     prose, left-aligned
+                                        Projects           h2, centred
+          ╭──────────── screenshot on a grey tile, 768px breakout, rounded-2xl ────────────╮
+          ╰────────────────────────────────────────────────────────────────────────────────╯
+                Project title                                                    2024
+                                         Writing
+                Post title ............................................... 12 Oct
+                     Rizky Haksono, email  /  links row  /  year, Malang      centred footer
 ```
 
-- If the head row overflows at 1024px, Chat moves into the menu for 1024px to 1279px only.
-- Certificates and Changelog live in the colophon and the menu.
-- **Menu** (below 1024px) is a two-rule icon button labelled "Menu" that opens a full-height Radix Sheet: every section at the `h2` size (22 to 30px), then a footer row with the theme radio (Paper, Night, System) and Account. No search field, no notes.
-- The colophon (full variant) is one field with the page: the theme's own paper and grain, no rules; mark, name, job line, email, Send feedback and Back to top on the left, the Read / Try / Site columns on the right, and the Hollar plate (`<Engraving crop="band" fade />`) fading up into the field at the bottom. The type and plate credits live in the Colophon section at the foot of `/changelog`.
-- `src/commons/constants/navigation-menu.ts` is the only nav source. The head, menu, colophon and terminal overlay all import it.
+### Header
+
+`src/components/layout/running-head.tsx`. An Apple-style translucent sticky bar, 48px tall (`--head-h`).
+
+- **Background:** a translucent `background` fill with `backdrop-blur-md`, and a hairline that appears after scrolling. It is the only blurred element on the site.
+- **Inner row,** centred at `WIDE_WIDTH`:
+  - Left: the name "Rizky Haksono" as text, 15px, weight 600. There is no logo mark.
+  - Centre, from `md`: the nav from `NAV_SECTIONS`, 13px muted text; the current page is foreground with `aria-current`.
+  - Right: the sky pause button and the theme toggle (`size-11`), plus a "Menu" text button below `lg`. Keep the name "Menu": e2e tests find it.
+- It carries `viewTransitionName: site-header`, so route crossfades leave it still.
+
+### Menu
+
+`src/components/layout/contents-sheet.tsx`, a Radix sheet on the float surface.
+
+- Every nav item shows its `note` as a second, muted line.
+- Theme radios read Light, Dark and System.
+- Account and legal links live here.
+
+### Footer
+
+`src/components/layout/footer.tsx`. Centred and quiet, not a four-column template.
+
+- The name and the email.
+- One row of links: GitHub, LinkedIn, RSS, Certificates, Changelog, Privacy, Terms, Send feedback.
+- The year and place in 12px muted text.
+- Keep `data-track-area="colophon"`: it is an analytics value.
+
+`src/commons/constants/navigation-menu.ts` is the only nav source. The header, menu, footer and terminal overlay all import it.
 
 ### BaseLayout
 
-File: `src/components/layout/base-layout.tsx`. It is a server component and reads no cookies, so pages under it can be static or ISR.
+`src/components/layout/base-layout.tsx`. A server component that reads no cookies, so pages under it can be static or ISR. It mounts `<Sky/>`.
 
 | Prop | Values | Use |
 |---|---|---|
-| `bleed?` | `ReactNode` | Full-width slot above `main` (home masthead only) |
+| `width?` | `'prose'` (default), `'wide'` | `wide` (960px) on `/tools` and `/chat` |
+| `fit?` | `boolean` | The page takes whatever height the header and footer leave |
+| `bleed?` | `ReactNode` | A full-width slot above the column |
 | `footer?` | `'full'` (default), `'compact'`, `'none'` | `compact` on `/ai` and `/chat` |
 
-- The old `sidebar` and `rightSidebar` props, the navbar, sidebars, right-sidebar windows and visitor panel are gone. Do not bring them back.
-- Client islands inside the shell: NavLinks (`aria-current`), ThemeToggle, ContentsTrigger (a two-rule menu icon labelled "Menu"). `DeferredClientUtilities` (terminal overlay, feedback dialog) mounts inside BaseLayout, so admin and auth skip it. There is no site search. The feedback dialog opens from `[data-open-feedback]` buttons (colophon); nothing floats over the page.
-- There is no scroll-to-top button; the colophon has a "Back to top" link.
-- Do not add horizontal padding inside BaseLayout. The wrapper already pads.
+- No sidebars, no right-hand panels, no scroll-to-top button.
+- Do not add horizontal padding inside `BaseLayout`; the column already has its gutters.
+- `DeferredClientUtilities` (terminal overlay, feedback dialog) mounts inside `BaseLayout`, so the admin and auth skip it. The feedback dialog opens from `[data-open-feedback]` buttons; nothing floats over the page.
 
-### Page width and PageSection
+## Width and alignment
 
-| Primitive | File | Role |
-|---|---|---|
-| `PageSection` | `src/components/ui/page-section.tsx` | Section rhythm (`SECTION_SPACING.section`) and an optional `SectionHeading` |
-| `SectionHeading` | `src/components/ui/section-heading.tsx` | Display title. `as="h1"` on page routes, `h2` on home sections. No `marker`, no all-caps eyebrow. `description` is for figures only (the LeetCode summary), never a standfirst. |
+The public site is centred:
 
-One width for every page. Every visitor and user route fills BaseLayout's wrapper (`SHELL_WIDTH` in `layout/running-head.tsx`), so the page head starts on the logo's left edge and the widest rule or row ends under "Account". Pages never narrow or centre their outer container: no `mx-auto max-w-*` wrapper, no width preset. Admin keeps its own shell, and Auth keeps `AuthShell`.
+- One 640px column (`PROSE_WIDTH`), centred, with 20px gutters on phones and 24px above.
+- **Centred:** the home name block, every page header (`PageHeader`: h1 plus lead), section titles and the footer. These are short display lines.
+- **Left-aligned inside the column:** prose, lists, rows, forms and tables. Long centred text is hard to read.
+- **Breakout:** media tiles grow symmetrically to 768px on large screens (`BREAKOUT`, `lg:-mx-16`).
+- **Wide:** `/tools` and `/chat` use `width="wide"` (960px).
 
-- **Page head.** The `h1`, then a single 1px ink rule (`border-t border-ink`), both full width. Never stack rules: a list, strip, tab row or board right under the head drops its own top rule, so only the head rule shows. No description, standfirst or italic lead under the title. Only short functional meta lines stay: counts, "Subscribe by RSS", "Times are Jakarta time.", datelines.
-- **Running text keeps a readable measure.** Prose, article bodies, chat messages, form text and excerpts cap at about 60 to 66ch (`.prose` is 66ch, otherwise `max-w-[66ch]`), left-aligned on the same edge. Never centre them.
-- **Ledgers.** Rows, rules and the marker (date) column span the full width.
-- **Articles.** `ArticleShell` starts on the shell's left edge: the 13rem rail, then a column that takes the rest; `.prose` inside it holds the 66ch measure. An article's own summary (a post or lesson description) may sit under its title as the one standfirst.
-- **Cards.** The Profile card and the Etan sign-in slip fill the width; their text keeps its measure.
-
-## Page patterns
-
-Every route uses one of these patterns. Pick the pattern first, then the primitives.
-
-| Pattern | Component | Routes |
-|---|---|---|
-| Ledger | `ui/ledger.tsx` (`LedgerList` with a sticky marker column, `LedgerRow` with a stretched link) | `/blog`, `/certificates`, `/changelog`, `/project` index, home Career and Certificates, admin lists |
-| Article | `ui/article-shell.tsx` (server; 13rem sticky rail beside a 66ch column; rail becomes `<details>` under `lg`) | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` |
-| Plates | `ui/plate-figure.tsx` (double-rule frame, `.plate` duotone unless `tone="color"`, caption) | Covers, project shots, About portrait, OCR specimen, anime and Pokémon pictures |
-| Cabinet | `tools/_components/tool-shell.tsx` and `ui/pager.tsx` | `/tools`, `/ai` |
-| Correspondence | A column of letters, replies set behind a left rule | `/chat`, `/ai` chat, home Contact, admin Feedback |
-| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, home Readers, admin dashboard and analytics |
-| Admin | Ruled spine, `--admin-rail`, inverted active row | `/admin/dashboard/*` |
-| Auth | `layout/auth-shell.tsx` (form beside a reversed ink `panel` on `/auth`; one narrow column without it) | `/auth/*`, `/admin/auth/login` |
-| Profile card | Double-rule sheet, definition list, dotted leaders | `/profile`, `/profile/edit`, admin settings |
-| Not found | `ui/not-found-view.tsx` (server) | 404s, `error.tsx`, empty states |
-
-Every route already uses one of these patterns. New routes pick one; never add legacy structure (window chrome, glass cards, sidebars).
-
-## Home
-
-The home page is a story, not a dashboard. Literal `h2`s: About, Skills, Career, Activity, Certificates, Readers, Recommendations, Contact.
-
-- Masthead in the `bleed` slot (`Masthead` in `src/app/page.tsx`): a `.masthead` section at least the first screen tall (`100svh` minus the running head, 30rem floor) in the theme's ink and paper. The job line (`text-lead`, ink-soft) and the speckled `h1` "Rizky Haksono" (never animated itself, the LCP element) are centred with their bottom on the plate's top edge. The name is the `display` token at `min(12vw, 22svh, 11rem)` on one line from `sm`, and `min(21vw, 13svh)` on two lines below.
-- The Bromo plate (`next/image`, `fill`, `object-cover`, focus `45% 0%`, `priority`, `unoptimized`, `alt=""`) fills the bottom 56%, layered above the name and nudged so the peaks cut the foot of the letters (the `h1` sits 0.2em low), as in the specimen.
-- The lede follows on paper inside the shell (`Lede`): the positioning sentence at `h1` size (24px floor below `sm`, where its unscrolled ghost passes as large text at 3.17:1), inking word by word on its own `.ws` view timeline, then three ink links.
-- About: the duotone portrait (`PlateFigure`, `next/image`, lazy) and three prose paragraphs under the `h2`, the first with a bold drop cap. From `md` the portrait is an 18rem left column, its top rule on the first line's cap height; on phones it sits under the heading, before the text, left-aligned at up to 20rem.
-- Skills is a stacking deck of sticky plates at 768px and up, a ruled list below.
-- Sections with no data hide. They never show zeros, `NaN` or `-Infinity`.
-- `content-visibility: auto` only on Activity, Certificates, Readers and Recommendations, never on or around sticky content.
-
-## Sticky rules
-
-- Sticky elements use `top: var(--head-h)` (plus an offset) so they clear the running head.
-- Opaque sticky surfaces take `.bg-paper-grain`.
-- No `overflow: hidden` or `auto` on any ancestor of a sticky element. Use `overflow-x: clip` where clipping is needed.
-- Verify sticky still works after the menu sheet opens and closes.
-
-## Width anti-patterns
+The admin is full width; see [platforms.md](./platforms.md#admin).
 
 | Avoid | Use |
 |---|---|
-| `mx-auto max-w-*` on a page wrapper, page head or section | Nothing: the page fills BaseLayout's wrapper |
-| A width preset or a narrower "ledger" or "article" column | The shell width; cap only running text with `max-w-[66ch]` |
-| A centred text column (`mx-auto max-w-[66ch]`) | Left-aligned `max-w-[66ch]` on the shell's left edge |
-| A description, standfirst or italic lead under a page `h1` | Nothing, or a short functional meta line (a count, a feed link, a dateline) |
-| A second `container` inside a page | Trust BaseLayout |
-| Horizontal scroll at 375px | Wrap, stack, or clip with `overflow-x: clip` |
+| Centred paragraphs, lists or rows | Left-aligned inside the centred column |
+| A second `container` or `mx-auto max-w-*` wrapper inside a page | `BaseLayout` and its `width` prop |
+| Hand-made h1 blocks | `PageHeader` |
+| Horizontal scroll at 320 or 375px | Wrap, stack, or clip with `overflow-x: clip` |
+
+## Page patterns
+
+Every route uses one of these. Pick the pattern first, then the primitives.
+
+| Pattern | Component | Routes | Look |
+|---|---|---|---|
+| Ledger | `ui/ledger.tsx` | `/blog` rows, `/certificates`, `/changelog`, `/roadmap`, `/project` rows, home Writing and Work | Rows grouped by year; title left, date right in muted text; hover `bg-muted` with `rounded-lg`; no sticky column |
+| Article | `ui/article-shell.tsx` | `/blog/[slug]`, `/blog/onsite/[slug]`, `/project/[id]`, `/roadmap/[slug]`, `/legal/*` | Centred header, prose at 17/28, contents in the margin from `xl`, a `<details>` above the text below `xl` |
+| Media | `MediaCard`, `ui/plate-figure.tsx` | Home Projects, `/project` featured, the `/blog` lead post, covers and screenshots | A picture in its own colours on a `bg-muted` tile, `rounded-2xl`, title and meta below; breaks out to 768px |
+| Cabinet | `tools/_components/tool-shell.tsx`, `ui/pager.tsx` | `/tools`, `/ai` | `width="wide"`, segmented tabs, state in `?tab=` |
+| Correspondence | The chat column, the contact form | `/chat`, `/ai` chat, home contact, admin Feedback | A column of messages; the home form sits in a `<details>` so its scripts load only when opened |
+| Figures | `StatStrip`, `ui/ink-chart.tsx`, `ui/ink-heatmap.tsx`, `HatchBar` | `/stats`, admin Home and Analytics | Numerals at the `numeral` size, solid fills, a text alternative for every chart |
+| Admin | `components/layout/admin/*` | `/admin/dashboard/*` | Full width: sidebar, top bar, tables with a peek sheet |
+| Auth | `layout/auth-shell.tsx` | `/auth/*`, `/admin/auth/login` | One centred column |
+| Profile card | The profile sheet | `/profile`, `/profile/edit`, admin Settings | A definition list in a frame |
+| Not found | `ui/not-found-view.tsx` | 404s, `error.tsx`, empty states | "There is no page at this address." and a way back |
+
+New routes pick one of these. Never add window chrome, glass cards or sidebars to a visitor page.
+
+## Home
+
+The home is a short, calm page written in the first person. Every data block is its own async server component in `<Suspense>`; the name and bio are static, so the LCP is text. Order:
+
+1. **Name block,** centred: the portrait in colour at 72px, the name in `display`, the job line in `lead`.
+2. **Bio:** three paragraphs with inline links (`InkLink` with an `icon` for GitHub and LinkedIn), left-aligned, at most one `Marker`.
+3. **Projects:** three `MediaCard`s and "All N projects".
+4. **Writing:** five rows.
+5. **Work:** the newest four career and education rows, with "Full history in my CV".
+6. **Recommendations:** at most two, only when the API returns any.
+7. **Contact:** one line with the email, and the form inside `<details>`, so Turnstile and EmailJS load only when it opens.
+
+Sections with no data hide. They never show zeros, `NaN` or `-Infinity`. Activity (heatmap, WakaTime, Duolingo) lives on `/stats`, and certificates on `/certificates`, linked from the footer.
+
+## Sticky and overflow rules
+
+- Sticky elements use `top: var(--head-h)` (plus an offset) to clear the header.
+- `overflow-x: clip` on `html` and `main` only. Never on `body`, never `overflow: hidden` or `auto` on a sticky ancestor, never `content-visibility` on or around sticky content.
+- Anchor targets use `[id] { scroll-margin-top: calc(var(--head-h) + 1rem) }`, not `scroll-padding-top` on `html`.
+- Check sticky still works after the menu sheet opens and closes.

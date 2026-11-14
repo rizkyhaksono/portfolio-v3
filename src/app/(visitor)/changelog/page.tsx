@@ -22,7 +22,7 @@ export default function ChangelogPage() {
     <BaseLayout>
       <div>
         <header className="pb-8">
-          <h1 className="speckle text-h1 text-balance text-foreground">Changelog</h1>
+          <h1 className="text-h1 text-balance text-foreground">Changelog</h1>
           <p className="mt-4 text-caption text-muted-foreground">
             Follow it in a feed reader with the{" "}
             <a

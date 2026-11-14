@@ -19,15 +19,16 @@ Canonical entry: **`AGENTS.md`** (repo root).
 
 Human-readable design system (required reading for UI work):
 
-- `docs/ui/README.md` — index
-- `docs/ui/design-system.md` — tokens
-- `docs/ui/surfaces.md` — frame / inset / lift
-- `docs/ui/page-shell.md` — BaseLayout recipes
-- `docs/ui/components.md` — primitive catalog
-- `docs/ui/platforms.md` — visitor / user / admin / auth
+- `docs/ui/README.md`: index, the rules in one screen, the UI gate
+- `docs/ui/design-system.md`: tokens, Onest and the type scale, radii, the sky, motion
+- `docs/ui/surfaces.md`: page, tile, frame, float
+- `docs/ui/page-shell.md`: BaseLayout, header, footer, page patterns
+- `docs/ui/components.md`: primitives, copy, Umami events
+- `docs/ui/platforms.md`: visitor, user, admin, auth
 
-Enforced rule: `.cursor/rules/ui-layout-consistency.mdc`  
-Tokens: `src/lib/design-system.ts`
+Full UI rules: the "UI rules (mandatory)" section of `AGENTS.md`  
+Enforced by: `src/__tests__/unit/lib/ui-gate.test.ts` (run by `bun run test`)  
+Tokens: `src/app/globals.css`, `tailwind.config.ts`, `src/lib/design-system.ts`, `src/lib/theme-hex.ts`
 
 ## Progress tracking
 

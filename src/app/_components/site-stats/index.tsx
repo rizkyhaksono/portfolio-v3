@@ -27,7 +27,7 @@ export default async function ReadersSection() {
     <PageSection id="readers" heading={{ title: "Readers" }} className={DEFERRED_SECTION} contentClassName="mt-6">
       <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] md:items-end md:gap-12">
         <div>
-          <p className="speckle text-numeral tabular-nums text-foreground">{views.toLocaleString("en")}</p>
+          <p className="text-numeral tabular-nums text-foreground">{views.toLocaleString("en")}</p>
           <p className="mt-2 text-small text-muted-foreground">
             Pages read in the last 30 days. {change(stats?.comparison?.pageviews)}
           </p>

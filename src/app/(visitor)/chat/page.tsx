@@ -11,7 +11,7 @@ export default async function ChatPage() {
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col">
       <header className="shrink-0 pb-8">
-        <h1 className="speckle text-h1 text-balance text-foreground">Chat</h1>
+        <h1 className="text-h1 text-balance text-foreground">Chat</h1>
         <p className="mt-4 text-caption text-muted-foreground">Times are Jakarta time.</p>
       </header>
       <div aria-hidden className="shrink-0 border-t border-foreground" />
@@ -28,7 +28,7 @@ export default async function ChatPage() {
             </Button>
           }
         >
-          The letters did not load. The chat server may be down for a moment.
+          The messages did not load. The chat server may be down for a moment.
         </StatusLine>
       )}
     </div>

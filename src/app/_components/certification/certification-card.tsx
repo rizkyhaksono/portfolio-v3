@@ -35,7 +35,7 @@ export function CertificationRow({ certification }: Readonly<{ certification: Li
             Verify
           </InkLink>
         ) : (
-          <span className="text-caption">Record on file</span>
+          <span className="text-caption">No public link</span>
         )}
       </span>
     </LedgerRow>

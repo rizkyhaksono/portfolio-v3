@@ -1,20 +1,20 @@
 /**
- * Shared design-system class tokens for Portfolio v3 (one ink on paper).
+ * Shared design-system class tokens for Portfolio v3 (Langit Malang).
  *
- * Surfaces are ruled frames on the paper itself, never filled cards:
- * - solid:  hairline frame, transparent ground (Card / FeatureCard)
+ * Page-level surfaces never cast a shadow:
+ * - solid:  hairline frame on the card ground (Card / FeatureCard)
  * - glass:  retired, same as solid (no blur, no translucency)
- * - inset:  tint ground for nested rows and code
+ * - inset:  muted ground, no border, for nested rows and tiles
  */
 
-const SOLID = "rounded-none border border-border bg-transparent"
+const SOLID = "rounded-2xl border border-border bg-card"
 
 export const SURFACE = {
   solid: SOLID,
   solidHover: "hover:border-foreground/20",
   glass: SOLID,
   glassNoBlur: SOLID,
-  inset: "bg-muted",
+  inset: "rounded-2xl bg-muted",
 } as const
 
 /** Default content padding for solid cards and feature boxes. */

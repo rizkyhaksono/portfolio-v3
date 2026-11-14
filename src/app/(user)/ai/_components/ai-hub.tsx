@@ -39,7 +39,7 @@ export default function AIHub({ initialTab }: Readonly<{ initialTab?: string }>)
   return (
     <div>
       <header className="pb-8">
-        <h1 className="speckle text-h1 text-balance text-foreground">Etan AI</h1>
+        <h1 className="text-h1 text-balance text-foreground">Etan AI</h1>
       </header>
       <div aria-hidden className="border-t border-foreground" />
 

@@ -35,7 +35,7 @@ export function heatLevels(counts: number[]): (count: number) => number {
 const Swatch = ({ level }: { level: number }) => (
   <span
     className="inline-block h-[11px] w-[11px] border border-input"
-    style={{ backgroundColor: `hsl(var(--ink) / ${LEVEL_OPACITY[level]})` }}
+    style={{ backgroundColor: `hsl(var(--foreground) / ${LEVEL_OPACITY[level]})` }}
   />
 )
 
@@ -84,7 +84,7 @@ export function InkHeatmap({ weeks, label, unit = ["contribution", "contribution
                         height={CELL - 1}
                         fill="currentColor"
                         fillOpacity={LEVEL_OPACITY[level(count)]}
-                        stroke="hsl(var(--rule-strong))"
+                        stroke="hsl(var(--input))"
                         strokeWidth={1}
                         shapeRendering="crispEdges"
                         className="hover:stroke-foreground"

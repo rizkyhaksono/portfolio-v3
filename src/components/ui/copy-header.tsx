@@ -17,8 +17,8 @@ export function CopyHeader({ level, id, children, ...props }: Readonly<CopyHeade
       {id && level <= 3 && (
         <>
           {" "}
-          {/* `!`: `.prose a` would otherwise underline and full-ink the pilcrow. */}
-          <a href={`#${id}`} aria-label="Permalink" className="relative not-italic !text-muted-foreground !no-underline after:absolute after:-inset-3 hover:!text-foreground">
+          {/* `!`: `.prose a` would otherwise underline the pilcrow and colour it as a link. */}
+          <a href={`#${id}`} aria-label="Permalink" className="relative !text-muted-foreground !no-underline after:absolute after:-inset-3 hover:!text-foreground">
             &para;
           </a>
         </>
