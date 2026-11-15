@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useEffect, useState, type ReactNode } from "react"
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react"
 import { useTheme } from "next-themes"
 import * as RadioGroup from "@radix-ui/react-radio-group"
 import { Mail, MessageSquareText, Monitor, Moon, PanelLeftClose, PanelLeftOpen, Rss, Sun } from "lucide-react"
@@ -34,6 +34,48 @@ function PageRow({ href, label, area, pathname }: Readonly<{ href: string; label
       </Link>
     </li>
   )
+}
+
+const SIGNED_IN_COOKIE = "NATEE_SIGNED_IN"
+const SIGN_IN_HREF = `/auth?redirect=${encodeURIComponent("/profile")}`
+
+type SidebarAccount = { name: string; avatarUrl: string | null }
+type AccountResult = { kind: "named"; account: SidebarAccount } | { kind: "signed-out" } | { kind: "unknown" }
+
+let accountLoad: Promise<AccountResult> | null = null
+
+function subscribeToSignedIn() {
+  return () => {}
+}
+
+function readSignedInMarker() {
+  return new RegExp(`(?:^|; )${SIGNED_IN_COOKIE}=`).test(document.cookie)
+}
+
+function finishAccount(request: Promise<AccountResult>, result: AccountResult): AccountResult {
+  if (accountLoad === request) accountLoad = null
+  return result
+}
+
+/** Shares one in-flight /me read between the sidebar and the phone menu, then drops it so the next page can read again. */
+function loadAccount(): Promise<AccountResult> {
+  if (accountLoad) return accountLoad
+  const request = fetch("/api/v3/me", { cache: "no-store" })
+    .then(async (response): Promise<AccountResult> => {
+      if (response.status === 401) return finishAccount(request, { kind: "signed-out" })
+      if (!response.ok) return finishAccount(request, { kind: "unknown" })
+      const json = (await response.json().catch(() => null)) as { data?: { name?: unknown; avatarUrl?: unknown } } | null
+      const name = typeof json?.data?.name === "string" ? json.data.name.trim() : ""
+      if (!name) return finishAccount(request, { kind: "unknown" })
+      const avatarUrl = json?.data?.avatarUrl
+      return finishAccount(request, {
+        kind: "named",
+        account: { name, avatarUrl: typeof avatarUrl === "string" && avatarUrl ? avatarUrl : null },
+      })
+    })
+    .catch((): AccountResult => finishAccount(request, { kind: "unknown" }))
+  accountLoad = request
+  return request
 }
 
 function OutRow({ href, icon, network, children }: Readonly<{ href: string; icon: ReactNode; network: string; children: string }>) {
@@ -86,7 +128,7 @@ function ThemeChoice() {
   )
 }
 
-/** Notion's « button: folds the desktop sidebar to its icons and back; the choice is kept for the next visit. */
+/** Folds the desktop sidebar to its icons and back. The button stays visible; the choice is kept for the next visit. */
 function CollapseToggle() {
   const [collapsed, setCollapsed] = useState(false)
   useEffect(() => setCollapsed(document.documentElement.dataset.sidebar === "collapsed"), [])
@@ -110,8 +152,7 @@ function CollapseToggle() {
       aria-label={label}
       aria-expanded={!collapsed}
       data-tip={label}
-      // Notion shows « only while the pointer is on the header; keyboard focus and touch screens always see it.
-      className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition duration-75 hover:bg-tint hover:text-foreground focus-visible:opacity-100 group-hover/head:opacity-100 group-focus-within/head:opacity-100 lg:size-7 [@media(hover:none)]:opacity-100"
+      className="inline-flex size-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition duration-75 hover:bg-tint hover:text-foreground lg:size-7"
     >
       {collapsed ? <PanelLeftOpen aria-hidden className="size-4" strokeWidth={1.5} /> : <PanelLeftClose aria-hidden className="size-4" strokeWidth={1.5} />}
     </button>
@@ -127,6 +168,54 @@ function GroupLabel({ children }: Readonly<{ children: ReactNode }>) {
   return <p className="sidebar-expanded-only mb-0.5 mt-3 px-2 text-caption font-medium text-muted-foreground">{children}</p>
 }
 
+/** Sign in, or the signed-in person. The marker cookie has no name, so /me fills that in after the first paint. */
+function AccountRow({ area, pathname }: Readonly<{ area: NavArea; pathname: string }>) {
+  const signedIn = useSyncExternalStore(subscribeToSignedIn, readSignedInMarker, () => false)
+  const [account, setAccount] = useState<AccountResult | null>(null)
+
+  useEffect(() => {
+    if (!signedIn) {
+      accountLoad = null
+      setAccount(null)
+      return
+    }
+    let current = true
+    loadAccount().then((result) => {
+      if (current) setAccount(result)
+    })
+    return () => {
+      current = false
+    }
+  }, [signedIn, pathname])
+
+  if (!signedIn || account?.kind === "signed-out") {
+    return (
+      <li>
+        <Link href={SIGN_IN_HREF} data-tip="Sign in" data-tip-rail className={ROW} {...navTrack("/auth", area)}>
+          <SectionIcon href="/profile" />
+          <span className="sidebar-label truncate">Sign in</span>
+        </Link>
+      </li>
+    )
+  }
+
+  const named = account?.kind === "named" ? account.account : null
+  const label = named?.name ?? "Signed in"
+  const current = isCurrentPath(pathname, "/profile")
+  return (
+    <li>
+      <Link href="/profile" aria-current={current ? "page" : undefined} data-tip={label} data-tip-rail className={ROW} {...navTrack("/profile", area)}>
+        {named?.avatarUrl ? (
+          <img src={named.avatarUrl} alt="" width={16} height={16} referrerPolicy="no-referrer" className="size-4 shrink-0 rounded-full object-cover" />
+        ) : (
+          <SectionIcon href="/profile" />
+        )}
+        <span className="sidebar-label truncate">{label}</span>
+      </Link>
+    </li>
+  )
+}
+
 /**
  * The Notion-style page tree: the owner's row, the main pages, the rest under "More", then the ways to reach
  * out and the legal pages beside the theme. Used by the desktop sidebar and the menu sheet on smaller screens.
@@ -137,7 +226,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
   return (
     <div className={cn("flex min-h-full flex-col px-2 pb-3 pt-2", className)}>
       {/* In the sheet the head leaves room for the sheet's close button. */}
-      <div className={cn("sidebar-head group/head flex items-center gap-1", !collapsible && "pr-11")}>
+      <div className={cn("sidebar-head flex items-center gap-1", !collapsible && "pr-11")}>
         <Link
           href="/"
           className="sidebar-expanded-only flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-md px-2 text-small font-medium text-foreground transition-colors duration-75 hover:bg-tint lg:min-h-8"
@@ -162,7 +251,7 @@ export function SidebarNav({ area = "sidebar", collapsible = false, className }:
           {NAV_SECTIONS.filter((section) => !section.head).map(({ href, label }) => (
             <PageRow key={href} href={href} label={label} area={area} pathname={pathname} />
           ))}
-          <PageRow href="/profile" label="Account" area={area} pathname={pathname} />
+          <AccountRow area={area} pathname={pathname} />
           <li>
             <a href="/feed.xml" data-track="rss-subscribe" data-track-feed="blog" data-track-area={area} data-tip="RSS feed" data-tip-rail className={ROW}>
               <Rss aria-hidden strokeWidth={1.5} />
