@@ -276,7 +276,7 @@ html[data-sidebar="collapsed"] .app-sidebar .sidebar-expanded-only {
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-head {
   justify-content: center;
 }
-/* Open, the « shows only on hover of the head (sidebar-nav.tsx); in the rail it is the only way back, so it stays. */
+/* The fold button stays visible open and folded. In the rail the header is only that button. */
 html[data-sidebar="collapsed"] .app-sidebar .sidebar-head button {
   opacity: 1;
 }

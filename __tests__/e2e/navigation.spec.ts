@@ -105,10 +105,8 @@ test.describe('Footer and sidebar', () => {
     await page.goto('/');
     const sidebar = page.getByRole('complementary', { name: 'Site' });
     const wide = (await sidebar.boundingBox())?.width ?? 0;
-    // Like Notion's «, the button shows on hover of the head and on keyboard focus.
     const collapse = page.getByRole('button', { name: 'Collapse the sidebar' });
-    await expect(collapse).toHaveCSS('opacity', '0');
-    await collapse.focus();
+    await expect(collapse).toBeVisible();
     await expect(collapse).toHaveCSS('opacity', '1');
     await collapse.click();
     await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeLessThan(wide / 2);
@@ -119,5 +117,37 @@ test.describe('Footer and sidebar', () => {
     await expect(page.getByRole('button', { name: 'Expand the sidebar' })).toHaveCSS('opacity', '1');
     await page.getByRole('button', { name: 'Expand the sidebar' }).click();
     await expect.poll(async () => (await sidebar.boundingBox())?.width ?? 0).toBeGreaterThan(200);
+  });
+
+  test('a signed-out visitor sees Sign in', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const signIn = page.getByRole('complementary', { name: 'Site' }).getByRole('link', { name: 'Sign in' });
+    await expect(signIn).toBeVisible();
+    await expect(signIn).toHaveAttribute('href', '/auth?redirect=%2Fprofile');
+  });
+
+  test('a signed-in visitor sees their name', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.route('**/api/v3/me', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ data: { name: 'Ada Lovelace', avatarUrl: null } }),
+      }),
+    );
+    await page.goto('/');
+    await page.context().addCookies([{ name: 'NATEE_SIGNED_IN', value: '1', url: page.url() }]);
+    await page.reload();
+    const account = page.getByRole('complementary', { name: 'Site' }).getByRole('link', { name: 'Ada Lovelace' });
+    await expect(account).toBeVisible();
+    await expect(account).toHaveAttribute('href', '/profile');
+  });
+
+  test('the phone menu uses the same Sign in row', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await expect(page.getByRole('dialog').getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 });
