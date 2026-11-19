@@ -100,7 +100,7 @@ export function RichTextEditor({ content, onChange, placeholder = "Write somethi
   }, [content, editor])
 
   return (
-    <div className={cn("border border-input transition-colors focus-within:border-foreground focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring", className)}>
+    <div className={cn("border border-transparent bg-tint transition-colors duration-75 hover:bg-tint-strong focus-within:border-border focus-within:bg-background focus-within:ring-2 focus-within:ring-foreground/15", className)}>
       {editor && <Toolbar editor={editor} />}
       <EditorContent editor={editor} />
     </div>

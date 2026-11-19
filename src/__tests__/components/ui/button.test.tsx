@@ -49,7 +49,7 @@ describe('Button Component', () => {
 describe('buttonVariants', () => {
   it('generates correct classes for default variant', () => {
     const classes = buttonVariants()
-    expect(classes).toContain('bg-foreground')
+    expect(classes).toContain('bg-primary')
   })
 
   it('generates correct classes for destructive variant', () => {

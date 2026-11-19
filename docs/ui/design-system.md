@@ -11,7 +11,7 @@ Tokens are HSL triples (no `hsl()` wrapper) in `src/app/globals.css`: `:root` is
 | `--muted-foreground` | `text-muted-foreground` | #6E6D69 | #9B9B9B | Secondary text: sidebar rows, descriptions, properties, meta |
 | `--border` | `border-border` | #E9E9E7 | #2F2F2F | Hairlines: table cells, card edges, floating layers, dividers |
 | `--muted` | `bg-muted` | #F7F7F5 | #202020 | The sidebar and the menu sheet, image grounds, code blocks, table head cells in prose |
-| `--input` | `border-input` | #8F8E8A | #6E6E6E | Borders of fields that must be seen (3:1, WCAG 1.4.11) |
+| `--input` | `border-input` | #8F8E8A | #6E6E6E | Radio borders (3:1, WCAG 1.4.11); text fields are filled instead |
 | `--popover` | `bg-popover` | #FFFFFF | #252525 | Floating layers |
 | `--destructive` | `text-destructive` | #C4321F | #F27166 | Destructive actions and errors, always with a word |
 | `--sky` | `text-sky` | #2D5B8C | #8DB6E6 | Accent kept in the tokens, `THEME_HEX` and the contrast test; no component uses it |
@@ -59,7 +59,7 @@ After a Notion page:
 
 - Colours only through the token classes and `tint`. No hex, no `white` or `black`, no Tailwind palette colours (`gray-500`, `blue-600`, `zinc-*`), no `dark:` classes.
 - Text never takes an opacity modifier (`text-foreground/70`). Use `text-muted-foreground`. Opacity on fills and decoration (`bg-foreground/85` for the ink button's hover, `decoration-foreground/40`) is fine.
-- `border-border` is a hairline for decoration and structure. Fields that must be seen (inputs, textareas, select triggers, radios) use `border-input`.
+- `border-border` is a hairline for decoration and structure. Radios use `border-input`; text fields (inputs, textareas, select triggers) are Notion-filled with `bg-tint` and no outline at rest, by the owner's request.
 - State is an icon plus a word (`StatusLine`, the `Badge` status square), never colour alone. `destructive` keeps its word and its cross.
 
 ### Contrast
