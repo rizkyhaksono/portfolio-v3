@@ -8,7 +8,7 @@
   --tip:0 0% 9%;--tip-foreground:0 0% 98%;--tip-border:0 0% 9%;
   --card:var(--background);--card-foreground:var(--foreground);--popover-foreground:var(--foreground);--primary:var(--foreground);--primary-foreground:var(--background);--secondary:var(--muted);--secondary-foreground:var(--foreground);--accent:var(--muted);--accent-foreground:var(--foreground);--destructive-foreground:var(--background);--ring:var(--foreground);--radius:.625rem;
   --head-h:2.75rem;--dur-press:120ms;--dur-ui:200ms;--dur-sheet:280ms;--ease-out:cubic-bezier(.25,.1,.25,1);--scrim:0 0% 6% / .5}
-  .dark{--background:0 0% 9.8%;--foreground:0 0% 83.1%;--muted:0 0% 12.5%;--muted-foreground:0 0% 60.8%;--border:0 0% 18.4%;--input:0 0% 43.1%;--popover:0 0% 14.5%;--destructive:4.7 84.3% 67.5%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%;--tip:0 0% 15.3%;--tip-foreground:0 0% 92%;--tip-border:0 0% 23%}
+  .dark{--background:0 0% 9.8%;--foreground:0 0% 83.1%;--muted:0 0% 12.5%;--muted-foreground:0 0% 60.8%;--border:0 0% 18.4%;--input:0 0% 43.1%;--popover:0 0% 14.5%;--destructive:4.7 84.3% 67.5%;--sky:212 64% 72.7%;--sky-wash:212 37.9% 20.2%;--primary:0 0% 22.7%;--primary-foreground:0 0% 96%;--tip:0 0% 15.3%;--tip-foreground:0 0% 92%;--tip-border:0 0% 23%}
 
   :root {
     color-scheme: light;
@@ -329,7 +329,7 @@ html[data-sidebar="collapsed"] .app-sidebar .sidebar-collapsed-only {
 }
 
 @media print {
-  .dark{--background:0 0% 100%;--foreground:45 7.8% 20%;--muted:60 11.1% 96.5%;--muted-foreground:48 2.3% 42.2%;--border:60 4.3% 91%;--input:48 2.2% 55.1%;--popover:0 0% 100%;--destructive:6.9 72.7% 44.5%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;color-scheme:light}
+  .dark{--background:0 0% 100%;--foreground:45 7.8% 20%;--muted:60 11.1% 96.5%;--muted-foreground:48 2.3% 42.2%;--border:60 4.3% 91%;--input:48 2.2% 55.1%;--popover:0 0% 100%;--destructive:6.9 72.7% 44.5%;--sky:211 51.4% 36.3%;--sky-wash:211 55.1% 90.4%;--primary:var(--foreground);--primary-foreground:var(--background);color-scheme:light}
   body { background: none; }
   nav, [role="dialog"], [data-print-hide] { display: none !important; }
   main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; overflow-wrap: anywhere; }

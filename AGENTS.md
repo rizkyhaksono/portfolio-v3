@@ -78,7 +78,7 @@ Derived: `--card` is background; `--primary` and `--ring` are foreground; `--sec
 
 - **Blue lives only in the `::selection` fill** (`sky-wash`). Never links, buttons, focus, charts, icons, tags or hover. The primary button is ink.
 - No hex, no `white` / `black`, no palette colours (`gray-500`, `blue-600`), no `dark:` classes: every token flips on `<html class="dark">`.
-- Text never takes an opacity modifier; use `text-muted-foreground`. Fields use `border-input`, not `border-border`.
+- Text never takes an opacity modifier; use `text-muted-foreground`. Text fields use the `bg-tint` fill; radios use `border-input`.
 - State is an icon plus a word (`StatusLine`, the `Badge` status square), never colour alone.
 - **Contrast guard:** `src/__tests__/unit/lib/contrast.test.ts` reads the triples and fails below the floors in both themes (foreground 7:1 and muted-foreground 4.5:1 on background, muted and popover; input 3:1; destructive and sky 4.5:1; foreground on sky-wash 7:1), checks `THEME_HEX` against the tokens and checks the print block. Change a token, change `theme-hex.ts` in the same commit.
 
@@ -176,7 +176,7 @@ Shell: `BaseLayout` (`width?: 'prose' | 'wide'`, `fit?`, `footer?: 'full' | 'com
 
 Shared details agents trip on:
 
-- Primary buttons are ink (`bg-foreground text-background`), 6px, 32px tall; fields are 36px, 6px, with a 3:1 `border-input` (firmer than Notion on purpose, WCAG 1.4.11).
+- Primary buttons are `bg-primary text-primary-foreground`: ink with white text in light, a soft grey (#3A3A3A) with white text in dark; 6px, 32px tall. Fields are 36px, 6px, Notion-filled: `bg-tint`, no outline at rest, page colour plus hairline plus `ring-foreground/15` on focus (owner's request; the field edge is below WCAG 1.4.11, the label and focus state identify it).
 - Nav and row icons come only from `SECTION_ICONS` (`src/components/layout/section-icons.tsx`); nav only from `src/commons/constants/navigation-menu.ts`.
 - Hover tips: `data-tip="..."` on any element (`ui/hover-tip.tsx`), Notion's dark tooltip (`bg-tip`, `text-tip-foreground`, a `border-tip-border` hairline in dark), fading in over 100ms. Never the native `title` attribute.
 - Generated cards: build URLs with `ogImageUrl(params, path?)` from `src/lib/site-url.ts`. It always sets `v=5`; raise it when a card's design changes.

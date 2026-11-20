@@ -74,6 +74,13 @@ describe.each([["light", light], ["dark", dark]] as const)("THEME_HEX.%s", (them
   })
 })
 
+// Light keeps the ink button (--primary is var(--foreground)); dark has its own soft grey with white text.
+describe("dark primary button", () => {
+  it("keeps its text at least 7:1 on the grey fill", () => {
+    expect(contrast(rgb(dark["primary-foreground"]), rgb(dark.primary))).toBeGreaterThanOrEqual(7)
+  })
+})
+
 describe("print block", () => {
   it("pins the light triples", () => {
     expect(printBlock).toBeDefined()

@@ -15,8 +15,8 @@ import { checkContactRateLimit, formatRemainingTime, recordContactSubmission } f
 // Cloudflare's script loads only once someone starts filling the form in.
 const Turnstile = dynamic(() => import("@marsidev/react-turnstile").then((mod) => mod.Turnstile), { ssr: false })
 
-// Notion form questions: the label in ink at 14px above its field.
-const LABEL = "text-small font-medium text-foreground"
+// Notion form questions: a muted 14px label above a filled field.
+const LABEL = "text-small font-medium text-muted-foreground"
 
 type Status = { kind: "idle" | "sending" | "sent" } | { kind: "error"; message: string }
 type Field = "email" | "name" | "message"
@@ -125,7 +125,7 @@ export function ContactForm() {
       noValidate
       data-private
       aria-describedby="contact-status"
-      className="space-y-4 rounded-lg border border-border p-4 sm:p-6"
+      className="space-y-4"
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">

@@ -325,7 +325,7 @@ export default function ChatClient({ initialMessages, currentUser }: Readonly<Ch
             )}
           </div>
           {/* Notion's comment box: the field and its send button share one bordered box, which takes the focus ring. */}
-          <div className="flex items-end gap-2 rounded-lg border border-input bg-background p-1.5 pl-3 transition-colors duration-ui ease-out focus-within:border-foreground focus-within:ring-1 focus-within:ring-foreground">
+          <div className="flex items-end gap-2 rounded-lg border border-transparent bg-tint p-1.5 pl-3 transition-colors duration-75 ease-out hover:bg-tint-strong focus-within:border-border focus-within:bg-background focus-within:ring-2 focus-within:ring-foreground/15">
             <Textarea
               id="chat-message"
               ref={textareaRef}

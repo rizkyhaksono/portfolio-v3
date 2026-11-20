@@ -232,7 +232,7 @@ function QuizRound({ questions, onAgain }: Readonly<{ questions: JLPTQuestion[];
                   onClick={() => setChoice(option)}
                   className={cn(
                     "flex min-h-11 w-full items-center gap-3 rounded-md border p-2.5 text-left text-body transition-colors duration-ui ease-out",
-                    picked && !answered ? "border-foreground bg-foreground text-background" : "border-border text-foreground",
+                    picked && !answered ? "border-primary bg-primary text-primary-foreground" : "border-border text-foreground",
                     !answered && !picked && "hover:bg-tint",
                     isAnswer && "border-foreground",
                   )}
